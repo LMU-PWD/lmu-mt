@@ -1,0 +1,86 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/paper-styles/color.html">
+<link rel="import" href="../shared/shared-styles.html">
+
+<dom-module id="index-card">
+    <template>
+        <style>
+            :host {
+                display: block;
+                height: 120px;
+                background-color: var(--paper-blue-grey-700);
+            }
+
+            .form-bg {
+                fill: var(--paper-blue-grey-100);
+                position: absolute;
+                z-index: 1;
+            }
+
+            h2 {
+                font-family: 'Roboto', 'Noto', sans-serif;
+                font-weight: 200;
+                font-size: 20px;
+                padding: 5px 10px;
+                color: var(--paper-blue-grey-50);
+                margin: 0;
+            }
+
+            p {
+                font-family: 'Roboto', 'Noto', sans-serif;
+                font-weight: 200;
+                font-size: 15px;
+                color: var(--paper-blue-grey-900);
+                margin: 0;
+                padding: 5px;
+            }
+            .back-container{
+                z-index:1;
+            }
+
+            .info {
+                height: 70px;
+                margin: 10px;
+                padding: 0;
+                z-index: 5;
+            }
+        </style>
+        <div>
+            <div class="front">
+
+                <div class="back-container">
+                    <svg class="form-bg" width="320px" height="120px" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M 0 30 V 120 H 320 V 0 H 220 Q 210 0 200 15 T 180 30"/>
+                    </svg>
+                </div>
+                <div class="icon">
+                </div>
+                <h2>[[type]]</h2>
+                <div class="info">
+                    <p>Lab: [[date]]</p>
+                    <p>Abgabe: [[delivery]]</p>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <script>
+        Polymer({
+
+            is: 'index-card',
+
+            properties: {
+                type: {
+                    type: String
+                },
+                delivery: {
+                    type: String
+                },
+                date: {
+                    type: String
+                }
+            }
+
+        });
+    </script>
+</dom-module>

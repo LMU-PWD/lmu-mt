@@ -8,7 +8,8 @@ Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
 
-<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/paper-styles/color.html">
 
 <!-- shared styles for all views -->
 <dom-module id="shared-styles">
@@ -24,7 +25,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
       }
 
-      .circle {
+      .my-circle {
         display: inline-block;
 
         width: 64px;
@@ -46,6 +47,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         color: #212121;
 
         font-size: 22px;
+      }
+      h2{
+        font: 'Roboto', 'Noto', sans-serif;
+        color: var(--paper-blue-grey-900);
       }
     </style>
   </template>

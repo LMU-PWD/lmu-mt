@@ -1,0 +1,29 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../components/index-card.html">
+
+<dom-module id="main-view">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <h2>Hello [[prop1]]</h2>
+    <index-card type="Fotopraktikum" delivery="in 6 Tagen" date="18.05.16, 14-16"></index-card>
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'main-view',
+
+      properties: {
+        prop1: {
+          type: String,
+          value: 'frontend-app',
+        },
+      },
+
+    });
+  </script>
+</dom-module>
