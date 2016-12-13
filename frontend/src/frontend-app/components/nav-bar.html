@@ -1,10 +1,62 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/paper-styles/color.html">
+<link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../../bower_components/iron-icons/social-icons.html">
+<!--<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">-->
+<link rel="import" href="../shared/shared-styles.html">
+
+<dom-module id="nav-bar">
+    <template>
+        <style>
+            :host {
+                display: block;
+                border-bottom: #BBB solid 3px;
+            }
+            .nav-container {
+                height: 55px;
+                background: var(--paper-blue-grey-100);
+            }
+            .nav-block {
+                height: 100%;
+                width: 17%;
+            }
+            .nav-block:first-child{
+                float: left;
+            }
+            .nav-block:last-child{
+                float:right;
+            }
+            iron-icon {
+                /*position:relative;*/
+                --iron-icon-width: 80%;
+                --iron-icon-height: 80%;
+                position: relative;
+                padding: 10%;
+                color: var(--paper-blue-grey-900);
+
+            }
+        </style>
+
+        <div class="nav-container" >
+            <div class="nav-block">
+                <iron-icon icon="icons:menu" class="iron-icon-1"></iron-icon>
+            </div>
+            <div class="nav-block">
+                <iron-icon icon="social:notifications"></iron-icon>
+            </div>
+        </div>
+    </template>
+
+
+    <script>
+        Polymer({
+
+            is: 'nav-bar',
+
+            properties: {
+
+            }
+
+        });
+    </script>
+</dom-module>

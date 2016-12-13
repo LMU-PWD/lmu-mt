@@ -1,4 +1,6 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../components/nav-bar.html">
+<link rel="import" href="../components/index-header.html">
 <link rel="import" href="../components/index-card.html">
 
 <dom-module id="main-view">
@@ -7,9 +9,22 @@
       :host {
         display: block;
       }
+      /*index-card {*/
+        /*margin-top: 5px;*/
+      /*}*/
+      /*div {*/
+        /*background-color: var(--paper-blue-grey-800);*/
+      /*}*/
     </style>
-    <h2>Hello [[prop1]]</h2>
-    <index-card type="Fotopraktikum" delivery="in 6 Tagen" date="18.05.16, 14-16"></index-card>
+
+    <nav-bar></nav-bar>
+    <index-header></index-header>
+
+    <div>
+      <index-card type="Fotopraktikum" delivery="in 6 Tagen" lab="18.05.16, 14-16"></index-card>
+      <index-card type="Videopraktikum" delivery="in 25 Tagen" lab="Jetzt anmelden!"></index-card>
+      <index-card type="Audiopraktikum" delivery="in 2 Monaten" lab="Anmeldung ab 03.07."></index-card>
+    </div>
   </template>
 
   <script>
@@ -18,11 +33,8 @@
       is: 'main-view',
 
       properties: {
-        prop1: {
-          type: String,
-          value: 'frontend-app',
-        },
-      },
+
+      }
 
     });
   </script>
