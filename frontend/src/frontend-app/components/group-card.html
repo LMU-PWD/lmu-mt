@@ -36,7 +36,7 @@
             <div class="icon">
                 <img src="../../../images/group.svg">
             </div>
-            <h1>Gruppe [[groupNumber]]</h1>
+            <h1>[[groupNumber]]</h1>
             
         </div>
     </template>
@@ -47,8 +47,9 @@
             is: 'group-card',
 
             properties: {
-                groupNumber: {
-                    type: Number
+                groupName: {
+                    type: String,
+                    value: "Gruppe 5"
                 },
                 expanded: {
                     type: Boolean,
