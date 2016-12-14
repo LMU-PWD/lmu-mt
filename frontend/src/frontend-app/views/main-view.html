@@ -1,5 +1,6 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../components/index-card.html">
+<link rel="import" href="../components/group-card.html">
 <link rel="import" href="../components/navigation-bar.html">
 <link rel="import" href="../shared/shared-styles.html">
 <link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
@@ -12,8 +13,6 @@
         display: block;
       }
       .group-placeholder{
-        height: 200px;
-        background-color: green;
         float: left;
       }
       .practicalsContainer {
@@ -69,10 +68,14 @@
       }
     </style>
     <h2>Hello [[prop1]]</h2>
-    <div class="notification-placeholder light-color-text">Notification Placeholder</div>
+    <div class="notification-placeholder light-color-text">
+      Notification Placeholder
+    </div>
 
     <div class="two_col_box">
-      <div class="group-placeholder light-color-text">Group PlaceHolder</div>
+      <div class="group-placeholder light-color-text">
+        <group-card expanded=false groupNumber="5"></group-card>
+      </div>
       <div class="practicalsContainer">
         <index-card type="Fotopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:" info2="18.05.16, 14-16"></index-card>
         <index-card type="Videopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:" info2="18.05.16, 14-16"></index-card>
@@ -92,6 +95,13 @@
           value: 'frontend-app',
         },
       },
+      //Resize listener not yet workings
+      /*ready: function(){
+        window.addEventListener("resize", function() { this.windowResize(); });
+      },
+      windowResize: function(){
+          this.expanded = ($(window).width()>767);
+      }*/
 
     });
   </script>

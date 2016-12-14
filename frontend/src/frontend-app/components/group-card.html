@@ -1,0 +1,62 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/paper-styles/color.html">
+<link rel="import" href="../shared/shared-styles.html">
+
+<dom-module id="group-card">
+    <template>
+        <style  include="shared-styles">
+            :host {
+                --custom-height: 120px;
+                height: var(--custom-height);
+                min-width: 320px;
+                margin:5px 0;
+                display: block;
+                background-color: var(--paper-blue-grey-100);
+            }
+
+            .icon{
+                height: 64px;
+                width: 64px;
+                position: relative;
+                float: left;
+                border-radius: 50%;
+                border: 2px solid var(--paper-blue-grey-900);
+            }
+            h1{
+                float: left;
+            }
+        </style>
+        <div>
+            <div class="icon">
+                <img src="../../../images/group.svg">
+            </div>
+            <h1>Gruppe [[groupNumber]]</h1>
+            
+        </div>
+    </template>
+
+    <script>
+        Polymer({
+
+            is: 'group-card',
+
+            properties: {
+                groupNumber: {
+                    type: String
+                },
+                expanded: {
+                    type: Boolean,
+                    value: false
+                }
+            },
+            ready: function(){
+                if(this.expanded){
+                    this.customStyle['--custom-height']= '380px';
+                    this.updateStyles();
+                    console.log("Updated Height");
+                }
+            }
+
+        });
+    </script>
+</dom-module>
