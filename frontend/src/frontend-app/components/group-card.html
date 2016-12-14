@@ -6,10 +6,10 @@
     <template>
         <style  include="shared-styles">
             :host {
-                --custom-height: 120px;
+                --custom-height: 100px;
                 height: var(--custom-height);
                 min-width: 320px;
-                margin:5px 0;
+                margin-top: 5px;
                 display: block;
                 background-color: var(--paper-blue-grey-100);
             }
@@ -18,12 +18,18 @@
                 height: 64px;
                 width: 64px;
                 position: relative;
+                margin: 18px calc(20% - 54px);
                 float: left;
                 border-radius: 50%;
                 border: 2px solid var(--paper-blue-grey-900);
             }
             h1{
-                float: left;
+                float: right;
+                position: relative;
+                top: 18px;
+                width:100px;
+                margin-right: calc(50% - 50px);
+                text-align: center;
             }
         </style>
         <div>
@@ -42,7 +48,7 @@
 
             properties: {
                 groupNumber: {
-                    type: String
+                    type: Number
                 },
                 expanded: {
                     type: Boolean,
@@ -51,7 +57,7 @@
             },
             ready: function(){
                 if(this.expanded){
-                    this.customStyle['--custom-height']= '380px';
+                    this.customStyle['--custom-height']= '370px';
                     this.updateStyles();
                     console.log("Updated Height");
                 }
