@@ -1,15 +1,84 @@
 <link rel="import" href="../../../bower_components/polymer/polymer.html">
 <link rel="import" href="../components/index-card.html">
+<link rel="import" href="../components/navigation-bar.html">
+<link rel="import" href="../shared/shared-styles.html">
+<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+
 
 <dom-module id="main-view">
   <template>
-    <style>
+    <style include="shared-styles">
       :host {
         display: block;
       }
+      .group-placeholder{
+        height: 200px;
+        background-color: green;
+        float: left;
+      }
+      .practicalsContainer {
+        float: left;
+      }
+      .notification-placeholder{
+        /*width:100%;
+        height:200px;
+        position: fixed;
+        background-color: blue;*/
+      }
+      /*Phone*/
+      @media screen and (max-width: 767px) {
+        .group-placeholder{
+          width: 100%;
+          min-width: 320px;
+        }
+
+        .practicalsContainer{
+          min-width: 320px;
+          width: 100%;
+
+        }
+      }
+      /*Tablet*/
+      @media screen and (min-width: 768px) and (max-width: 1023px) {
+        .group-placeholder{
+          margin: 10px;
+          width: calc(50% - 20px);
+        }
+        .practicalsContainer{
+          margin:10px;
+          width: calc(50% - 20px);
+        }
+      }
+      /*Desktop*/
+      @media screen and (min-width: 1024px) {
+        .group-placeholder{
+          margin:10px;
+          width: calc(35% - 20px);
+        }
+        .practicalsContainer{
+          margin:10px;
+          width: calc(35% - 20px);
+        }
+        .notification-placeholder{
+          margin:10px;
+          width: calc(30% - 20px);
+          height: 200px;
+          background-color: blue;
+          float: right;
+        }
+      }
     </style>
     <h2>Hello [[prop1]]</h2>
-    <index-card type="Fotopraktikum" delivery="in 6 Tagen" date="18.05.16, 14-16"></index-card>
+    <div class="notification-placeholder light-color-text">Notification Placeholder</div>
+
+    <div class="two_col_box">
+      <div class="group-placeholder light-color-text">Group PlaceHolder</div>
+      <div class="practicalsContainer">
+        <index-card type="Fotopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:" info2="18.05.16, 14-16"></index-card>
+        <index-card type="Videopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:" info2="18.05.16, 14-16"></index-card>
+        <index-card type="Audiopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:" info2="18.05.16, 14-16"></index-card>
+      </div>
+    </div>
   </template>
 
   <script>

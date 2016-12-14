@@ -1,0 +1,40 @@
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/paper-styles/color.html">
+<link rel="import" href="../shared/shared-styles.html">
+
+<dom-module id="navigation-bar">
+    <template>
+        <style>
+
+            :host {
+                position: fixed;
+                top:0;
+                left:0;
+                display: block;
+                height: 120px;
+                background-color: var(--paper-blue-grey-800);
+                margin:5px 0;
+                min-width: 320px;
+
+            }
+            div{
+                position: fixed;
+            }
+        </style>
+
+        <div></div>
+
+    </template>
+
+    <script>
+        Polymer({
+
+            is: 'navigation-bar',
+
+            properties: {
+
+            }
+
+        });
+    </script>
+</dom-module>
