@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 64 64" style="enable-background:new 0 0 64 64;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:#cfd8dc; stroke: #263238; stroke-width:2; }
+	.st1{fill:#263238;font-family: 'Roboto', 'Noto', sans-serif; font-size:32px;}
+</style>
+<g id="Ebene_2">
+	<circle class="st0" cx="32" cy="32" r="30" />
+</g>
+<g id="Ebene_1">
+		<text class="st1" x="10" y="44">MT</text>
+</g>
+</svg>
