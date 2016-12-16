@@ -3,69 +3,48 @@
 <link rel="import" href="../../../bower_components/iron-icons/iron-icons.html">
 <link rel="import" href="../../../bower_components/iron-icons/social-icons.html">
 <link rel="import" href="../../../bower_components/paper-toolbar/paper-toolbar.html">
-<link rel="import" href="../../../bower_components/app-layout/app-toolbar/app-toolbar.html">
-<link rel="import" href="../../../bower_components/app-layout/app-header/app-header.html">
-<link rel="import" href="../../../bower_components/app-layout/app-scroll-effects/app-scroll-effects.html">
-<!--<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">-->
+<link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../shared/shared-styles.html">
 
 <dom-module id="navigation-bar">
     <template>
+        <style include="shared-styles"></style>
         <style>
             :host {
                 display: block;
                 height: 60px;
             }
             .nav-container {
-                height: 55px;
+                height: 70px;
                 width: 100%;
                 position: fixed;
                 background: var(--paper-blue-grey-100);
                 z-index: 1;
                 border-bottom: #BBB solid 3px;
             }
-            .nav-block {
-                padding: 1%;
-                padding-top: 25px;
-                height: 100%;
-                width: 17%;
+            paper-icon-button {
+                padding: 0;
+                color: var(--paper-blue-grey-900);
             }
-            .configuration{
+            paper-toolbar paper-icon-button:first-child {
                 float: left;
             }
-            .notification{
-                float:right;
+            paper-toolbar paper-icon-button:last-child {
+                float: right;
             }
-            .icon{
-                display: block;
-                margin: auto;
-                padding-top: 10px;
-                width: 100px;
-                z-index: 1;
-            }
-            iron-icon {
-                /*position:relative;*/
-                --iron-icon-width: 35px;
-                --iron-icon-height: 35px;
-                position: relative;
-                /*padding: 10%;*/
-                color: var(--paper-blue-grey-900);
-
+            paper-toolbar img {
+                transform: translateY(20px);
+                height: 130%;
             }
         </style>
-        <app-header>
-            <app-toolbar class="nav-container">
-                <div class="configuration nav-block">
-                    <iron-icon icon="icons:menu" class="iron-icon-1"></iron-icon>
-                </div>
-                <div class="icon nav-block">
-                    <img src="../../../images/mt.svg">
-                </div>
-                <div class="notification  nav-block">
-                    <iron-icon icon="social:notifications"></iron-icon>
-                </div>
-            </app-toolbar>
-        </app-header>
+
+            <paper-toolbar class="nav-container" >
+                <paper-icon-button icon="icons:menu"></paper-icon-button>
+                <span style="flex: 1;"></span>          <!-- used to make the items float -->
+                <img src="../../../images/mt.svg">
+                <span style="flex: 1;"></span>          <!-- used to make the items float -->
+                <paper-icon-button class="mobile-and-tablet-only" icon="social:notifications" ></paper-icon-button>
+            </paper-toolbar>
     </template>
 
     <script>

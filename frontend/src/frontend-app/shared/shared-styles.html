@@ -52,6 +52,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       }
 
+      /* Tablet */
+      @media screen and (min-width: 768px) and (max-width: 1023px) {
+        .mobile-only {
+          visibility: hidden;
+        }
+      }
+      /* Desktop */
+      @media screen and (min-width: 1024px) {
+        .mobile-only {
+          visibility: hidden;
+        }
+        .mobile-and-tablet-only {
+          visibility: hidden;
+        }
+      }
+
+
 
     </style>
   </template>
