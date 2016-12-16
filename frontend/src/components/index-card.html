@@ -1,0 +1,158 @@
+<link rel="import" href="../shared/shared-styles.html">
+
+<dom-module id="index-card">
+    <template>
+        <style  include="shared-styles">
+            :host {
+                --color: #000000;
+                height: 120px;
+                min-width: 320px;
+                margin:5px 0;
+                display: block;
+                background-color: var(--color);
+            }
+            h2 {
+                display: inline;
+                float: left;
+                width: calc(60% - 20px);
+                margin: 0;
+            }
+
+            .form-container{
+                height: 30px;
+                display: inline;
+                float: right;
+                width: 40%;
+            }
+
+            .form-fill {
+                fill: var(--paper-blue-grey-100);
+            }
+            .back-fill{
+                width:calc(100% - 40px);
+                height:30px;
+                /*position: absolute;
+                right:0;*/
+                display: inline;
+                float: right;
+                background-color: var(--paper-blue-grey-100);
+
+
+            }
+
+            .content{
+                height: 90px;
+                width: 100%;
+                position: relative;
+                top: 30px;
+                background-color: var(--paper-blue-grey-100);
+            }
+
+
+            .info {
+                position: relative;
+                width: calc(60% + 20px);
+                height: 70px;
+                padding: 10px;
+            }
+
+            .plabel{
+                width: 40%;
+                float: left;
+                top: -30px;
+                position: relative;
+                line-height: 30px;
+            }
+            .pinfo{
+                width: 60%;
+                float: left;
+                top: -30px;
+                position: relative;
+                line-height: 30px;
+            }
+
+            .icon{
+                height: 64px;
+                width: 64px;
+                float: right;
+                margin-right: calc(20% - 54px);
+                position: relative;
+                top: -30px;
+                border-radius: 50%;
+                border: 2px solid var(--paper-blue-grey-900);
+            }
+        </style>
+        <div>
+
+            <div>
+                <h2 class="light light-color-text">[[type]]</h2>
+
+                <div class="form-container">
+
+                    <svg class="form-fill" width="40" height="30" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M 0 30  H 40 V 0 Q 30 0 20 15 T 0 30"/>
+                    </svg>
+                    <div class="back-fill"></div>
+                </div>
+            </div>
+
+            <div class="content">
+                <div class="icon">
+                    <img src=[[icon]] width="64px" height="64px" alt="camera-icon" fill="">
+                </div>
+                <div class="info">
+                    <p class="plabel">[[label1]]<br/>[[label2]]</p>
+                    <p class="pinfo">[[info1]]<br/>[[info2]]</p>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <script>
+        Polymer({
+
+            is: 'index-card',
+
+            properties: {
+                type: {
+                    type: String
+                },
+                label1: {
+                    type: String
+                },
+                label2: {
+                    type: String
+                },
+                info1: {
+                    type: String
+                },
+                info2: {
+                    type: String
+                },
+                icon: {
+                    type: String
+                }
+            },
+            ready: function () {
+                if(this.type.includes("Photo" || "photo")){
+                    this.icon = "../../../images/photo.svg";
+                    this.customStyle['--color'] = '#78909c';
+                    this.updateStyles();
+                } else if(this.type.includes("Foto" || "foto")){
+                    this.icon = "../../../images/photo.svg";
+                    this.customStyle['--color'] = '#78909c';
+                    this.updateStyles();
+                } else if(this.type.includes("Video" || "video")){
+                    this.icon = "../../../images/video.svg";
+                    this.customStyle['--color'] = '#546e7a';
+                    this.updateStyles();
+                } else if(this.type.includes("Audio" || "audio")){
+                    this.icon = "../../../images/audio.svg";
+                    this.customStyle['--color'] = '#455a64';
+                    this.updateStyles();
+                }
+            }
+
+        });
+    </script>
+</dom-module>

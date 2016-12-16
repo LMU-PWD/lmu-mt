@@ -1,0 +1,157 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/app-layout/app-drawer/app-drawer.html">
+<link rel="import" href="../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
+<link rel="import" href="../bower_components/app-layout/app-header/app-header.html">
+<link rel="import" href="../bower_components/app-layout/app-header-layout/app-header-layout.html">
+<link rel="import" href="../bower_components/app-layout/app-scroll-effects/app-scroll-effects.html">
+<link rel="import" href="../bower_components/app-layout/app-toolbar/app-toolbar.html">
+<link rel="import" href="../bower_components/app-route/app-location.html">
+<link rel="import" href="../bower_components/app-route/app-route.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/iron-icons/social-icons.html">
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../bower_components/iron-selector/iron-selector.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="components/index-card.html">
+<link rel="import" href="components/group-card.html">
+<link rel="import" href="components/navigation-bar.html">
+<link rel="import" href="views/main-view.html">
+<link rel="import" href="shared/shared-styles.html">
+
+
+
+<dom-module id="my-app">
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: block;
+      }
+      iron-pages{
+        margin-top: 0;
+      }
+      /*Phone*/
+      @media screen and (max-width: 767px) {
+        .group-placeholder{
+          width: 100%;
+          min-width: 320px;
+        }
+        .group-info{
+          display: none;
+        }
+
+        .practicalsContainer{
+          min-width: 320px;
+          width: 100%;
+
+        }
+      }
+      /*Tablet*/
+      @media screen and (min-width: 768px) and (max-width: 1023px) {
+        .group-placeholder{
+          margin: 10px;
+          width: calc(50% - 20px);
+        }
+        .practicalsContainer{
+          margin:10px;
+          width: calc(50% - 20px);
+        }
+      }
+      /*Desktop*/
+      @media screen and (min-width: 1024px) {
+        .group-placeholder{
+          margin:10px;
+          width: calc(35% - 20px);
+        }
+        .practicalsContainer{
+          margin:10px;
+          width: calc(35% - 20px);
+        }
+        .notification-placeholder{
+          margin:10px;
+          width: calc(30% - 20px);
+          height: 200px;
+          background-color: blue;
+          float: right;
+        }
+      }
+    </style>
+
+    <app-location route="{{route}}"></app-location>
+    <app-route
+        route="{{route}}"
+        pattern="/:page"
+        data="{{routeData}}"
+        tail="{{subroute}}"></app-route>
+
+    <app-drawer-layout>
+      <!-- Drawer content -->
+      <!--app-drawer>
+        <app-toolbar>Menu</app-toolbar>
+        <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
+          <a name="mainView" href="/views/main-view">Main-View</a>
+        </iron-selector>
+      </app-drawer-->
+
+      <!-- Main content -->
+      <app-header-layout>
+        <app-header fixed>
+          <navigation-bar></navigation-bar>
+        </app-header>
+        <div class="notification-placeholder light-color-text">
+          Notification Placeholder
+        </div>
+
+        <iron-pages
+            selected="[[page]]"
+            attr-for-selected="name"
+            role="main">
+          <main-view name="mainView"></main-view>
+        </iron-pages>
+      </app-header-layout>
+    </app-drawer-layout>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'my-app',
+
+      properties: {
+        page: {
+          type: String,
+          reflectToAttribute: true,
+          observer: '_pageChanged',
+          value:'mainView'
+        }
+      },
+
+      observers: [
+        '_routePageChanged(routeData.page)'
+      ],
+
+      _routePageChanged: function(page) {
+        this.page = page || 'mainView';
+      },
+
+      _pageChanged: function(page) {
+        // Load page import on demand.
+        var resolvedPageUrl = this.resolveUrl( page + '.html');
+        //this.importHref(resolvedPageUrl, null, this._showPage404, true);
+      },
+
+      _showPage404: function() {
+        //this.page = 'view404';
+      }
+    });
+  </script>
+</dom-module>

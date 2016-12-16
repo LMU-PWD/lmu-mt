@@ -1,0 +1,55 @@
+<link rel="import" href="../shared/shared-styles.html">
+
+<dom-module id="navigation-bar">
+    <template>
+        <style>
+            :host {
+                display: block;
+            }
+            .nav-container {
+                border-bottom: #BBB solid 3px;
+                background: var(--paper-blue-grey-100);
+                height: 70px;
+            }
+            .configuration{
+                float: left;
+            }
+            .notification{
+                float:right;
+            }
+            .icon{
+                display: block;
+                margin: auto;
+                /*padding-top: 10px;*/
+                width: 100px;
+                z-index: 1;
+            }
+            paper-icon-button {
+                /*position: relative;*/
+                margin: 5%;
+                color: var(--paper-blue-grey-900);
+            }
+        </style>
+
+        <app-toolbar class="nav-container">
+            <div class="configuration nav-block">
+                <paper-icon-button icon="icons:menu"></paper-icon-button>
+            </div>
+            <div class="icon nav-block">
+                <img src="../../../images/mt.svg">
+            </div>
+            <div class="notification  nav-block">
+                <paper-icon-button class="mobile-and-tablet-only" icon="social:notifications" ></paper-icon-button>
+            </div>
+        </app-toolbar>
+    </template>
+
+    <script>
+        Polymer({
+            is: 'navigation-bar',
+            properties: {
+
+            }
+        });
+    </script>
+</dom-module>

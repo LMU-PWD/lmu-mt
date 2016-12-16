@@ -1,0 +1,75 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../../bower_components/paper-styles/color.html">
+
+<!-- shared styles for all views -->
+<dom-module id="shared-styles">
+  <template>
+    <style>
+      /*Font styling*/
+      div,a,p,h1,h2{
+        font-family: 'Roboto', 'Noto', sans-serif;
+        font-weight: 400;
+        color: var(--paper-blue-grey-900);
+      }
+      .light{
+        font-weight: 100;
+      }
+      .bold{
+        font-weight: 400;
+      }
+      .light-color-text{
+        color: var(--paper-blue-grey-50);
+      }
+      h1{
+        /*Dark Colored Healdine */
+        font-size: 20px;
+        height:20px;
+        padding: 5px 10px;
+      }
+      h2{
+        /*Light Colored Headline*/
+        font-size: 20px;
+        height:20px;
+        padding: 5px 10px;
+      }
+      p{
+        font-size: 15px;
+      }
+
+
+      /*Icons*/
+      .icon-container{
+
+      }
+
+      /* Tablet */
+      @media screen and (min-width: 768px) and (max-width: 1023px) {
+        .mobile-only {
+          visibility: hidden;
+        }
+      }
+      /* Desktop */
+      @media screen and (min-width: 1024px) {
+        .mobile-only {
+          visibility: hidden;
+        }
+        .mobile-and-tablet-only {
+          visibility: hidden;
+        }
+      }
+
+
+
+    </style>
+  </template>
+</dom-module>
