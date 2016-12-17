@@ -26,10 +26,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="components/index-card.html">
 <link rel="import" href="components/group-card.html">
 <link rel="import" href="components/navigation-bar.html">
-<link rel="import" href="views/main-view.html">
 <link rel="import" href="shared/shared-styles.html">
-
-
 
 <dom-module id="my-app">
   <template>
@@ -87,7 +84,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
     </style>
 
-    <app-location route="{{route}}"></app-location>
+    <app-location route="{{route}}" use-hash-as-path></app-location>
+
     <app-route
         route="{{route}}"
         pattern="/:page"
@@ -95,31 +93,36 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         tail="{{subroute}}"></app-route>
 
     <app-drawer-layout>
-      <!-- Drawer content -->
-      <!--app-drawer>
-        <app-toolbar>Menu</app-toolbar>
-        <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
-          <a name="mainView" href="/views/main-view">Main-View</a>
-        </iron-selector>
-      </app-drawer-->
 
-      <!-- Main content -->
       <app-header-layout>
+
+        <!-- H E A D E R -->
         <app-header fixed>
           <navigation-bar></navigation-bar>
         </app-header>
-        <div class="notification-placeholder light-color-text">
-          Notification Placeholder
-        </div>
+        <template is="dom-if" if="[[ unfoldNotifications ]]">
+          <div class="notification-placeholder light-color-text">
+            Notification Placeholder
+          </div>
+        </template>
 
+        <!-- P A G E S -->
         <iron-pages
             selected="[[page]]"
             attr-for-selected="name"
+            fallback-selection="error"
             role="main">
-          <main-view name="mainView"></main-view>
+
+          <main-view name="main"></main-view>
+          <login-view name="login"></login-view>
+          <error-view name="error"></error-view>
+
         </iron-pages>
+
       </app-header-layout>
+
     </app-drawer-layout>
+
   </template>
 
   <script>
@@ -130,8 +133,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         page: {
           type: String,
           reflectToAttribute: true,
-          observer: '_pageChanged',
-          value:'mainView'
+          observer: '_pageChanged'
+        },
+        unfoldNotifications: {
+          type: Boolean,
+          value: true
         }
       },
 
@@ -140,17 +146,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       ],
 
       _routePageChanged: function(page) {
-        this.page = page || 'mainView';
+        this.page = page || 'main';
+        this.unfoldNotifications = (this.page === 'main') ? true : false;
       },
 
       _pageChanged: function(page) {
         // Load page import on demand.
-        var resolvedPageUrl = this.resolveUrl( page + '.html');
-        //this.importHref(resolvedPageUrl, null, this._showPage404, true);
+        var resolvedPageUrl = this.resolveUrl('./views/' + page + '-view.html');
+        this.importHref(resolvedPageUrl, null, this._showPage404, true);
       },
 
       _showPage404: function() {
-        //this.page = 'view404';
+        this.page = 'error';
       }
     });
   </script>

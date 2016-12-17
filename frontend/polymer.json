@@ -2,7 +2,9 @@
   "entrypoint": "index.html",
   "shell": "src/my-app.html",
   "fragments": [
-    "src/views/main-view.html"
+    "src/views/main-view.html",
+    "src/views/login-view.html",
+    "src/views/error-view.html"
   ],
   "sourceGlobs": [
    "src/**/*",
