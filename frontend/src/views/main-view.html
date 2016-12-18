@@ -1,6 +1,7 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../components/index-card.html">
 <link rel="import" href="../components/group-card.html">
+<link rel="import" href="../components/notifications-card.html">
 <link rel="import" href="../components/navigation-bar.html">
 <link rel="import" href="../shared/shared-styles.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
@@ -36,6 +37,7 @@
         .group-placeholder{
           width: 100%;
           min-width: 320px;
+          height: 104px; /*Hotfix for no bottom margin*/
         }
         .group-info{
           display: none;
@@ -72,13 +74,17 @@
           margin:10px;
           width: calc(30% - 20px);
           height: 200px;
-          background-color: blue;
+          /*background-color: blue;*/
           float: right;
         }
       }
     </style>
+    <navigation-bar></navigation-bar>
+    <div class="notification-placeholder light-color-text">
+      <notifications-card></notifications-card>
+    </div>
 
-    <div class="two_col_box">
+    <div >
       <div class="group-placeholder light-color-text">
         <group-card groupName="Gruppe 5"></group-card>
         <div class="group-info"></div>

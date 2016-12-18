@@ -1,0 +1,34 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="views/main-view.html">
+<link rel="import" href="views/login-view.html">
+<link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
+
+<dom-module id="frontend-app">
+  <template>
+    <style>
+      :host {
+        display: block;
+        margin: 0 auto;
+      }
+        body{
+        }
+    </style>
+    <!--h2>Hello [[prop1]]</h2-->
+    <main-view></main-view>
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'frontend-app',
+
+      properties: {
+        prop1: {
+          type: String,
+          value: 'frontend-app',
+        }
+      }
+
+    });
+  </script>
+</dom-module>
