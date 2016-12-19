@@ -1,0 +1,131 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../shared/shared-styles.html">
+
+<dom-module id="group-detail">
+    <template>
+        <style include="shared-styles">
+            :host{
+                height: auto;
+                min-width: 320px;
+                width: 100% ;
+                background-color: var(--paper-blue-grey-100);
+                display: block;
+
+            }
+            :host[joinedGroup] > .info{
+                display: block;
+            }
+            .info{
+                display: none;
+            }
+            .create-group{
+                margin: 20px;
+                background-color: var(--paper-blue-grey-50);
+                border-radius: 5px;
+                padding:20px;
+            }
+
+            paper-input[wronginput]{
+                color: red;
+            }
+        </style>
+        <div class="info">
+            <template is="dom-repeat" items="[[members]]">
+                <div>
+                    <h2>[[item.name]]</h2>
+                </div>
+            </template>
+        </div>
+        <div class="join">
+            <div>
+                <paper-button>Zufälliger Beitritt</paper-button>
+            </div>
+            <div class="create-group">
+                <paper-input label=" E-Mail Member 1" value="{{mail1}}">
+                    <iron-icon icon="mail" prefix></iron-icon>
+                    <div suffix>@campus.lmu.de</div>
+                </paper-input>
+                <paper-input label=" E-Mail Member 2" value="{{mail2}}">
+                    <iron-icon icon="mail" prefix></iron-icon>
+                    <div suffix>@campus.lmu.de</div>
+                </paper-input>
+                <paper-input label=" E-Mail Member 3" value="{{mail3}}">
+                    <iron-icon icon="mail" prefix></iron-icon>
+                    <div suffix>@campus.lmu.de</div>
+                </paper-input>
+                <paper-input label=" E-Mail Member 4" value="{{mail4}}">
+                    <iron-icon icon="mail" prefix></iron-icon>
+                    <div suffix>@campus.lmu.de</div>
+                </paper-input>
+                <paper-button on-tap="_createNewGroup">Neue Gruppe erstellen</paper-button>
+            </div>
+        </div>
+    </template>
+    <script>
+        Polymer({
+            is: 'group-detail',
+            properties: {
+                /*members: {
+                    type: Array,
+                    value: function(){
+                        return [];
+                    }
+                }*/
+                joinedGroup: {
+                    type: Boolean,
+                    value: true
+                },
+                mails: {
+                    type: Array,
+                    value: function () {
+                        return [];
+                    }
+                }
+            },
+            ready: function() {
+                /*this.members = [{    0:{name:"Max Mustermann", mail:""},
+                                    1:{name:"Frauke Fröhlich", mail:""},
+                                    2:{name:"Ida Irre", mail:""},
+                                    3:{name:"Nina Never", mail:""}];*/
+                this.members = [
+                        {name: 'Max Mustermann', mail:''},
+                        {name: 'Frauke Froehlich', mail:''},
+                        {name: 'Ida Irre', mail:''},
+                        {name: 'Nina Never', mail:''}
+                ];
+            },
+
+            _createNewGroup: function(){
+                var checked = false;
+                var inputs =  this.getEffectiveChildren('.creatate-group');
+                inputs = Polymer.dom(this.root).querySelector('.create-group').children;
+                console.log(inputs);
+
+                this.mails = [];
+                this.mails.push(this.mail1);
+                this.mails.push(this.mail2);
+                this.mails.push(this.mail3);
+                this.mails.push(this.mail4);
+                console.log(this.mails);
+
+                this.mails.forEach(function(element, index, array) {
+                    console.log(element);
+                    if(element){
+                        checked = true;
+                        inputs[index].setAttribute('wrongInput',false);
+                    }else{
+                        checked = false;
+                        inputs[index].setAttribute('wrongInput',true);
+                        console.log("Fehler bei"+index);
+                    }
+                });
+
+                if(checked){
+                    console.log("Korrekt ausgefüllt.")
+                }
+            }
+        });
+    </script>
+</dom-module>
