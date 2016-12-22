@@ -52,6 +52,17 @@
 
         </style>
 
+        <iron-ajax
+                auto
+                body="[[ ajax.body ]]"
+                content-type="[[ ajax.contentType ]]"
+                handle-as="json"
+                method="[[ ajax.method ]]"
+                on-error="handleTokenResponse"
+                on-response="handleTokenResponse"
+                url="[[ ajax.url ]]"
+                verbose></iron-ajax>
+
         <paper-card heading="Login">
             <div class="card-content">
                 <p>Willkommen bei <em>Medientechnik</em>. Bitte melde dich mit deiner Campus-Mailadresse an.</p>

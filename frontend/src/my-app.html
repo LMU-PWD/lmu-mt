@@ -113,8 +113,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             fallback-selection="error"
             role="main">
 
-          <main-view name="main"></main-view>
-          <login-view name="login"></login-view>
+          <template is="dom-if" if="[[ loggedIn ]]">
+            <main-view name="main"></main-view>
+          </template>
+          <template is="dom-if" if="[[ !loggedIn ]]">
+            <login-view name="login"></login-view>
+          </template>
           <error-view name="error"></error-view>
 
         </iron-pages>
@@ -130,20 +134,32 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       is: 'my-app',
 
       properties: {
+        loggedIn: {
+          type: Boolean,
+          value: false
+        },
         page: {
           type: String,
-          reflectToAttribute: true,
+          reflectToAttribute: false,
           observer: '_pageChanged'
         },
         unfoldNotifications: {
           type: Boolean,
-          value: true
+          value: false
         }
       },
 
       observers: [
         '_routePageChanged(routeData.page)'
       ],
+
+      attached: function () {
+
+        if (!this.loggedIn) {
+          this.set('route.path', '/login');
+        }
+
+      },
 
       _routePageChanged: function(page) {
         this.page = page || 'main';
