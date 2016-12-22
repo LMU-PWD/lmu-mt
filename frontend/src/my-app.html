@@ -110,15 +110,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <iron-pages
             selected="[[page]]"
             attr-for-selected="name"
-            fallback-selection="error"
-            role="main">
+            fallback-selection="error">
 
-          <template is="dom-if" if="[[ loggedIn ]]">
-            <main-view name="main"></main-view>
-          </template>
-          <template is="dom-if" if="[[ !loggedIn ]]">
-            <login-view name="login"></login-view>
-          </template>
+          <main-view name="main"></main-view>
+          <login-view
+            name="login"
+            access-token="{{ session.accessToken }}"
+            logged-in="{{ session.loggedIn }}"
+            user-id="{{ session.userID }}"></login-view>
           <error-view name="error"></error-view>
 
         </iron-pages>
@@ -134,14 +133,22 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       is: 'my-app',
 
       properties: {
-        loggedIn: {
-          type: Boolean,
-          value: false
+        session: {
+          type: Object,
+          value: {
+            accessToken: null,
+            loggedIn: false,
+            userID: null
+          }
         },
         page: {
           type: String,
           reflectToAttribute: false,
           observer: '_pageChanged'
+        },
+        route: {
+          type: Object,
+          notify: true
         },
         unfoldNotifications: {
           type: Boolean,
@@ -150,30 +157,66 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       },
 
       observers: [
-        '_routePageChanged(routeData.page)'
+        '_routePageChanged(routeData.page)',
+        '_loginStateChanged(session.loggedIn)'
       ],
 
-      attached: function () {
+      /**
+       * Callback fired when the applications route changes
+       * @param {String} page - new value of routeData.page
+       * @private
+       */
+      _routePageChanged: function(page) {
 
-        if (!this.loggedIn) {
+        console.log("routePageChanged");
+        console.log(this.route);
+
+        this.page = page || 'main';
+
+        console.log(this.page);
+      },
+
+      /**
+       * Callback fired when the applications page property changes
+       * @param {String} page - new value of page property
+       * @private
+         */
+      _pageChanged: function(page) {
+        console.log("pageChanged: " + page);
+
+        if (!this.session.loggedIn && page !== 'login') {
           this.set('route.path', '/login');
+          return;
         }
 
-      },
-
-      _routePageChanged: function(page) {
-        this.page = page || 'main';
-        this.unfoldNotifications = (this.page === 'main') ? true : false;
-      },
-
-      _pageChanged: function(page) {
         // Load page import on demand.
         var resolvedPageUrl = this.resolveUrl('./views/' + page + '-view.html');
         this.importHref(resolvedPageUrl, null, this._showPage404, true);
+
+        this.unfoldNotifications = (this.page === 'main') ? true : false;
+
       },
 
+      /**
+       * Set current page to 'error'
+       * @private
+         */
       _showPage404: function() {
         this.page = 'error';
+      },
+
+      /**
+       * Callback fired when the applications login state changes, e. g. when
+       * user successfully logs in or out
+       * @param {Boolean} loggedIn - new value of session.loggedIn property
+       * @private
+         */
+      _loginStateChanged: function(loggedIn) {
+        if (loggedIn) {
+          this.set('route.path', '/');
+        } else {
+          this.set('route.path', '/login');
+        }
       }
     });
   </script>

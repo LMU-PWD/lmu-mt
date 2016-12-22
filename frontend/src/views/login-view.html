@@ -15,7 +15,10 @@
         </style>
 
         <div class="horizontal center-justified layout">
-            <login-card></login-card>
+            <login-card
+                access-token="{{ accessToken }}"
+                logged-in="{{ loggedIn }}"
+                user-id="{{ userId }}"></login-card>
         </div>
 
     </template>
@@ -24,7 +27,26 @@
 
         Polymer({
 
-            is: 'login-view'
+            is: 'login-view',
+
+            properties: {
+
+                accessToken: {
+                    type: String,
+                    notify: true
+                },
+
+                loggedIn: {
+                    type: Boolean,
+                    notify: true
+                },
+
+                userId: {
+                    type: String,
+                    notify: true
+                }
+
+            }
 
         });
 
