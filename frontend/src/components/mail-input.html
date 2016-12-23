@@ -1,0 +1,58 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../shared/shared-styles.html">
+
+<dom-module id="mail-input">
+    <template>
+        <style include="shared-styles">
+            :host{
+            }
+        </style>
+        <div>
+            <paper-input label=[[label]]
+                         value="{{mail}}"
+                         auto-validate
+                         validator='validator1'>
+                <iron-icon icon="mail" prefix></iron-icon>
+                <div suffix>@campus.lmu.de</div>
+            </paper-input>
+        </div>
+
+        <!--<input is="iron-input" validator="my-validator" bind-value="{{value}}"
+          invalid="{{valueInvalid}}" on-input="revalidate">
+
+   <label hidden$="[[!valueInvalid]]">
+       Again with your invalid input?! Go to the corner and think about your life.
+   </label>-->
+    </template>
+
+    <script>
+        Polymer({
+            is: 'mail-input',
+            properties: {
+                mail: {
+                    type: String
+                },
+                label: {
+                    type: String
+                },
+                valid: {
+                    type: Boolean,
+                    value: false
+                }
+            },
+            behaviors: [Polymer.IronValidatableBehavior],
+            validate: function() {
+                //validation code
+                console.log("validate1");
+
+            },
+
+            ready: function() {
+                //this.$.validator.validate = this.validate.bind(this);
+            }
+        });
+    </script>
+</dom-module>

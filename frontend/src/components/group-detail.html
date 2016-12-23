@@ -1,7 +1,10 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
 <link rel="import" href="../shared/shared-styles.html">
+<link rel="import" href="mail-input.html">
 
 <dom-module id="group-detail">
     <template>
@@ -21,14 +24,56 @@
                 display: none;
             }
             .create-group{
-                margin: 20px;
                 background-color: var(--paper-blue-grey-50);
                 border-radius: 5px;
+                padding:10px 20px;
+            }
+            .random{
+                background-color: var(--paper-blue-grey-50);
+                border-radius: 5px;
+                padding:10px 20px;
+                margin-bottom: 5px;
+
+            }
+            .join{
                 padding:20px;
+                display: none;
+                border: solid 1px black;
+            }
+            .join[active]{
+                display: block;
+            }
+            .info{
+                display: none;
+            }
+            .info[active]{
+                display: block;
             }
 
+            .spinner-container{
+            }
+            paper-spinner::before{
+
+                position: absolute;
+                top: 0;
+                left: 0;
+                height: 100%;
+                width: 100%;
+                background-color: rgba(255,255,255,0.8);
+                background-size: 100px;
+
+            }
+            paper-spinner{
+                position: absolute;
+                height: 50px;
+                width: 50px;
+                top: calc(50% - 25px);
+                left: calc(50% - 25px);
+            }
             paper-input[wronginput]{
-                color: red;
+                color: var(--paper-red-500);
+            }
+            paper-spinner{
             }
         </style>
         <div class="info">
@@ -39,27 +84,33 @@
             </template>
         </div>
         <div class="join">
-            <div>
+            <div class="random">
                 <paper-button>Zufälliger Beitritt</paper-button>
             </div>
             <div class="create-group">
-                <paper-input label=" E-Mail Member 1" value="{{mail1}}">
-                    <iron-icon icon="mail" prefix></iron-icon>
-                    <div suffix>@campus.lmu.de</div>
-                </paper-input>
-                <paper-input label=" E-Mail Member 2" value="{{mail2}}">
-                    <iron-icon icon="mail" prefix></iron-icon>
-                    <div suffix>@campus.lmu.de</div>
-                </paper-input>
-                <paper-input label=" E-Mail Member 3" value="{{mail3}}">
-                    <iron-icon icon="mail" prefix></iron-icon>
-                    <div suffix>@campus.lmu.de</div>
-                </paper-input>
-                <paper-input label=" E-Mail Member 4" value="{{mail4}}">
-                    <iron-icon icon="mail" prefix></iron-icon>
-                    <div suffix>@campus.lmu.de</div>
-                </paper-input>
+                <paper-spinner active="[[isLoading]]"></paper-spinner>
+                <template is="dom-repeat" items="{{members}}" as="member">
+                    <paper-input label="Member [[index]]"
+                                 value="{{member.mail}}"
+                                 required
+                                 auto-validate
+                                 error-message="Uuups da hast du wohl was vergesen">
+                        <iron-icon icon="mail" prefix></iron-icon>
+                        <div suffix>@campus.lmu.de</div>
+                    </paper-input>
+                </template>
                 <paper-button on-tap="_createNewGroup">Neue Gruppe erstellen</paper-button>
+
+                <iron-ajax
+                        <!--withCredentials  for auth when user logged in-->
+                        id="joinRequest"
+                        url="https://www.some-api"
+                        params='[[joinParams]]'
+                        handle-as="json"
+                        on-response="_handleJoin"
+                        loading="{{isLoading}}">
+
+                </iron-ajax>
             </div>
         </div>
     </template>
@@ -75,55 +126,79 @@
                 }*/
                 joinedGroup: {
                     type: Boolean,
-                    value: true
+                    value: false
                 },
                 mails: {
                     type: Array,
                     value: function () {
                         return [];
                     }
+                },
+                groupSize: {
+                    //TODO make input dependent
+                    type: Number,
+                    value: 4
                 }
             },
             ready: function() {
-                /*this.members = [{    0:{name:"Max Mustermann", mail:""},
-                                    1:{name:"Frauke Fröhlich", mail:""},
-                                    2:{name:"Ida Irre", mail:""},
-                                    3:{name:"Nina Never", mail:""}];*/
-                this.members = [
-                        {name: 'Max Mustermann', mail:''},
-                        {name: 'Frauke Froehlich', mail:''},
-                        {name: 'Ida Irre', mail:''},
-                        {name: 'Nina Never', mail:''}
+                //Just for testing
+                var joinedMembersTest = [
+                    {name: 'Max Mustermann', mail:'max.mustermann@campus.lmu.de'},
+                    {name: 'Frauke Froehlich', mail:'frauke.froehlich@campus.lmu.de'},
+                    {name: 'Ida Irre', mail:'ida.irre@campus.lmu.de'},
+                    {name: 'Nina Never', mail:'nina.never@campus.lmu.de'}
                 ];
+                var notJoinedMembersTest = [
+                    {name: '', mail:''},
+                    {name: '', mail:''},
+                    {name: '', mail:''},
+                    {name: '', mail:''}
+                ];
+                this.members = notJoinedMembersTest;
+
+                //If not yet in group, show join group view, else show group info
+                if(!this.members[0].mail){
+                    this.toggleAttribute('active',true, this.$$('.join'));
+                } else {
+                    this.toggleAttribute('active',true, this.$$('.info'));
+
+                }
+
             },
 
             _createNewGroup: function(){
-                var checked = false;
+
+                var checked = true;
                 var inputs =  this.getEffectiveChildren('.creatate-group');
                 inputs = Polymer.dom(this.root).querySelector('.create-group').children;
                 console.log(inputs);
 
-                this.mails = [];
-                this.mails.push(this.mail1);
-                this.mails.push(this.mail2);
-                this.mails.push(this.mail3);
-                this.mails.push(this.mail4);
-                console.log(this.mails);
-
-                this.mails.forEach(function(element, index, array) {
-                    console.log(element);
-                    if(element){
-                        checked = true;
-                        inputs[index].setAttribute('wrongInput',false);
-                    }else{
+                //Check inputs
+                this.members.forEach(function(element) {
+                    if(!element.mail){
                         checked = false;
-                        inputs[index].setAttribute('wrongInput',true);
-                        console.log("Fehler bei"+index);
                     }
                 });
+                Polymer.updateStyles();
 
                 if(checked){
-                    console.log("Korrekt ausgefüllt.")
+                    console.log("Korrekt ausgefüllt.");
+                    this.joinParams = {
+                        'member1': this.mail1,
+                        'member2': this.mail2,
+                        'member3': this.mail3,
+                        'member4': this.mail4
+                    };
+                    this.$.joinRequest.generateRequest();
+                }
+                console.log(this.members);
+            },
+            _handleJoin: function(e){
+                var response = e.detail.response;
+                if(response.valid){
+                    this.members=response.members;
+                } else {
+
                 }
             }
         });
