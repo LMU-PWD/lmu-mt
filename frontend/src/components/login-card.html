@@ -53,15 +53,16 @@
         </style>
 
         <iron-ajax
-                auto
-                body="[[ ajax.body ]]"
-                content-type="[[ ajax.contentType ]]"
-                handle-as="json"
-                method="[[ ajax.method ]]"
-                on-error="_handleLoginError"
-                on-response="_handleLoginResponse"
-                url="[[ ajax.url ]]"
-                verbose></iron-ajax>
+            auto
+            body="[[ ajax.body ]]"
+            content-type="[[ ajax.contentType ]]"
+            handle-as="json"
+            method="[[ ajax.method ]]"
+            on-error="_handleLoginError"
+            on-response="_handleLoginResponse"
+            url="[[ ajax.url ]]"
+            verbose
+            with-credentials="true"></iron-ajax>
 
         <paper-card heading="Login">
             <div class="card-content">
@@ -135,6 +136,14 @@
             _handleLoginResponse: function (response) {
                 var jsonResponse = response.detail.response;
                 console.log(jsonResponse);
+
+                // Cookie stuff
+                var expires = new Date();
+                expires.setTime(expires.getTime() + (jsonResponse.ttl * 1000));
+                document.cookie = 'mt-api-accesstoken=' + jsonResponse.id + ';expires=' + expires.toUTCString() + ';';
+                document.cookie = "mt-api-userid=" + jsonResponse.userId + ';expires=' + expires.toUTCString() + ';';
+
+                // Global app properties
                 this.accessToken = jsonResponse.id;
                 this.userId = jsonResponse.userId;
                 this.loggedIn = true;

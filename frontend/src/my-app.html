@@ -138,7 +138,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           value: {
             accessToken: null,
             loggedIn: false,
-            userID: null
+            userId: null
           }
         },
         page: {
@@ -161,6 +161,44 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         '_loginStateChanged(session.loggedIn)'
       ],
 
+      ready: function () {
+
+        // Check for valid session cookies
+        var cookieAccessToken = this._getCookie('mt-api-accesstoken');
+        var cookieUserId = this._getCookie('mt-api-userid');
+
+        if (cookieAccessToken !== '' && cookieUserId !== '') {
+
+          // TODO: Verify validity of cookies with API request
+
+          console.log("Found cookies");
+          console.log("mt-api-accesstoken=" + cookieAccessToken);
+          console.log("mt-api-userid=" + cookieUserId);
+          this.session.accessToken = cookieAccessToken;
+          this.session.userId = cookieUserId;
+          this.set('session.loggedIn', true);
+        }
+
+      },
+
+      _getCookie: function (cookieName) {
+
+        var name = cookieName + '=';
+        var allCookies = document.cookie.split(';');
+        var idx;
+        for (idx in allCookies) {
+          var cookie = allCookies[idx];
+          while (cookie.charAt(0) == ' ') {
+            cookie = cookie.substring(1);
+          }
+          if (cookie.indexOf(name) == 0) {
+            return cookie.substring(name.length, cookie.length);
+          }
+        }
+        return '';
+
+      },
+
       /**
        * Callback fired when the applications route changes
        * @param {String} page - new value of routeData.page
@@ -168,12 +206,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
        */
       _routePageChanged: function(page) {
 
-        console.log("routePageChanged");
-        console.log(this.route);
-
         this.page = page || 'main';
 
-        console.log(this.page);
       },
 
       /**
@@ -182,7 +216,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
        * @private
          */
       _pageChanged: function(page) {
-        console.log("pageChanged: " + page);
 
         if (!this.session.loggedIn && page !== 'login') {
           this.set('route.path', '/login');
