@@ -31,9 +31,25 @@
             }
         </style>
 
+        <iron-ajax
+                auto
+                body="[[ ajax.body ]]"
+                content-type="[[ ajax.contentType ]]"
+                handle-as="json"
+                headers="[[ ajax.headers ]]"
+                method="[[ ajax.method ]]"
+                on-error="_handleLogoutError"
+                on-response="_handleLogoutResponse"
+                url="[[ ajax.url ]]"
+                verbose
+                with-credentials="true"></iron-ajax>
+
         <app-toolbar class="nav-container">
             <div class="configuration nav-block">
                 <paper-icon-button icon="icons:menu"></paper-icon-button>
+            </div>
+            <div class="configuration nav-block">
+                <paper-icon-button icon="icons:exit-to-app" on-tap="_fireLogoutRequest"></paper-icon-button>
             </div>
             <div class="icon nav-block">
                 <img src="../../../images/mt.svg">
@@ -42,12 +58,74 @@
                 <paper-icon-button class="mobile-and-tablet-only" icon="social:notifications" ></paper-icon-button>
             </div>
         </app-toolbar>
+
     </template>
 
     <script>
         Polymer({
+
             is: 'navigation-bar',
+
             properties: {
+
+                accessToken: {
+                    type: String,
+                    notify: true
+                },
+
+                loggedIn: {
+                    type: Boolean,
+                    notify: true
+                },
+
+                userId: {
+                    type: String,
+                    notify: true
+                }
+            },
+
+            /**
+             * Callback fired when logout button is pressed. Sets a property
+             * `ajax` containing information for logout API call
+             * @private
+             */
+            _fireLogoutRequest: function () {
+
+                if (this.loggedIn) {
+                    this.ajax = {
+                        body: {},
+                        contentType: 'application/json',
+                        headers: {
+                            'Authorization': this.accessToken
+                        },
+                        method: 'POST',
+                        url: 'http://localhost:3000/api/platformusers/logout'
+                    }
+                }
+            },
+
+            /**
+             * Callback fired when API responds with an error
+             * @param response
+             * @private
+             */
+            _handleLogoutError: function (response) {
+                console.log(response);
+            },
+
+            /**
+             * Callback fired when logout succeeds. Resets session cookies and
+             * global session properties.
+             * @private
+             */
+            _handleLogoutResponse: function () {
+
+                document.cookie = 'mt-api-accesstoken=; expires=Thu, 01 Jan 1970 00:00:00 UTC';
+                document.cookie = 'mt-api-userid=; expires=Thu, 01 Jan 1970 00:00:00 UTC';
+
+                this.set('accessToken', '');
+                this.set('userId', '');
+                this.set('loggedIn', false);
 
             }
         });

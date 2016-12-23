@@ -98,7 +98,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         <!-- H E A D E R -->
         <app-header fixed>
-          <navigation-bar></navigation-bar>
+          <navigation-bar
+            access-token="{{ session.accessToken }}"
+            logged-in="{{ session.loggedIn }}"
+            user-id="{{ session.userId }}"></navigation-bar>
         </app-header>
         <template is="dom-if" if="[[ unfoldNotifications ]]">
           <div class="notification-placeholder light-color-text">
@@ -117,7 +120,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             name="login"
             access-token="{{ session.accessToken }}"
             logged-in="{{ session.loggedIn }}"
-            user-id="{{ session.userID }}"></login-view>
+            user-id="{{ session.userId }}"></login-view>
           <error-view name="error"></error-view>
 
         </iron-pages>
@@ -170,17 +173,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         if (cookieAccessToken !== '' && cookieUserId !== '') {
 
           // TODO: Verify validity of cookies with API request
-
-          console.log("Found cookies");
-          console.log("mt-api-accesstoken=" + cookieAccessToken);
-          console.log("mt-api-userid=" + cookieUserId);
-          this.session.accessToken = cookieAccessToken;
-          this.session.userId = cookieUserId;
+          this.set('session.accessToken', cookieAccessToken);
+          this.set('session.userId', cookieUserId);
           this.set('session.loggedIn', true);
         }
 
       },
 
+      /**
+       * Helper function for parsing document.cookie
+       * @param {String} cookieName - key of the cookie whose value should be returned
+       * @returns {String} Cookie value
+       * @private
+       */
       _getCookie: function (cookieName) {
 
         var name = cookieName + '=';
@@ -251,6 +256,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           this.set('route.path', '/login');
         }
       }
+
     });
   </script>
 </dom-module>

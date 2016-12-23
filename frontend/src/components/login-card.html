@@ -97,7 +97,7 @@
                 },
 
                 userId: {
-                    type: Boolean,
+                    type: String,
                     notify: true
                 },
 
@@ -125,7 +125,12 @@
                     contentType: 'application/json',
                     method: 'POST',
                     url: 'http://localhost:3000/api/platformusers/login'
-                }
+                };
+
+                // Reset input fields (in case of immediate logout users
+                // should not have the impression we saved their credentials)
+                this.set('userInput.email', '');
+                this.set('userInput.password', '');
             },
 
             /**
@@ -134,16 +139,16 @@
              * @private
              */
             _handleLoginResponse: function (response) {
-                var jsonResponse = response.detail.response;
-                console.log(jsonResponse);
 
-                // Cookie stuff
+                var jsonResponse = response.detail.response;
+
+                // Save session info to cookies
                 var expires = new Date();
                 expires.setTime(expires.getTime() + (jsonResponse.ttl * 1000));
                 document.cookie = 'mt-api-accesstoken=' + jsonResponse.id + ';expires=' + expires.toUTCString() + ';';
                 document.cookie = "mt-api-userid=" + jsonResponse.userId + ';expires=' + expires.toUTCString() + ';';
 
-                // Global app properties
+                // Set global session properties
                 this.accessToken = jsonResponse.id;
                 this.userId = jsonResponse.userId;
                 this.loggedIn = true;
