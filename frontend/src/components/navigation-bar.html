@@ -2,7 +2,7 @@
 
 <dom-module id="navigation-bar">
     <template>
-        <style>
+        <style include="shared-styles">
             :host {
                 display: block;
             }
@@ -36,10 +36,10 @@
                 <paper-icon-button icon="icons:menu"></paper-icon-button>
             </div>
             <div class="icon nav-block">
-                <img src="../../../images/mt.svg">
+                <img src="../../images/mt.svg">
             </div>
             <div class="notification  nav-block">
-                <paper-icon-button class="mobile-and-tablet-only" icon="social:notifications" ></paper-icon-button>
+                <paper-icon-button class="mobile-and-tablet-only" icon="social:notifications" on-click="toggleNotificationList"></paper-icon-button>
             </div>
         </app-toolbar>
     </template>
@@ -48,8 +48,20 @@
         Polymer({
             is: 'navigation-bar',
             properties: {
-
-            }
+              show: {
+                type: Boolean,
+                value: true,
+                notify: true
+              }
+            },
+          toggleNotificationList: function() {
+            if (window.screen.availWidth < 1023)
+                this.show = !this.show;
+            console.log("clicked button, showlist: " + this.show);
+            console.log("screen width: " + window.screen.availWidth)
+          },
+          ready: function() {
+          }
         });
     </script>
 </dom-module>

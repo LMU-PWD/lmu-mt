@@ -26,6 +26,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="components/index-card.html">
 <link rel="import" href="components/group-card.html">
 <link rel="import" href="components/navigation-bar.html">
+<link rel="import" href="components/notifications-card.html">
 <link rel="import" href="shared/shared-styles.html">
 
 <dom-module id="my-app">
@@ -98,12 +99,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         <!-- H E A D E R -->
         <app-header fixed>
-          <navigation-bar></navigation-bar>
+          <navigation-bar show="{{ unfoldNotifications }}"></navigation-bar>
+
         </app-header>
+
         <template is="dom-if" if="[[ unfoldNotifications ]]">
-          <div class="notification-placeholder light-color-text">
-            Notification Placeholder
-          </div>
+          <notifications-card></notifications-card>
         </template>
 
         <!-- P A G E S -->
@@ -138,22 +139,35 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         unfoldNotifications: {
           type: Boolean,
           value: true
+        },
+        showNotificationsList: {
+          type: Boolean
         }
       },
 
       observers: [
-        '_routePageChanged(routeData.page)'
+        '_routePageChanged(routeData.page)',
+        '_showNotificationList(showNotificationsList)'
       ],
 
       _routePageChanged: function(page) {
         this.page = page || 'main';
+
         this.unfoldNotifications = (this.page === 'main') ? true : false;
+
+        // hide notifications on mobile first
+        if (window.screen.availWidth < 1023)
+          this.unfoldNotifications = false;
       },
 
       _pageChanged: function(page) {
         // Load page import on demand.
         var resolvedPageUrl = this.resolveUrl('./views/' + page + '-view.html');
         this.importHref(resolvedPageUrl, null, this._showPage404, true);
+      },
+
+      _showNotificationList: function(param) {
+        console.log("my-app toggle");
       },
 
       _showPage404: function() {
