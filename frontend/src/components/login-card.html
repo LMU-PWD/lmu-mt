@@ -52,14 +52,34 @@
 
         </style>
 
+        <iron-ajax
+            auto
+            body="[[ ajax.body ]]"
+            content-type="[[ ajax.contentType ]]"
+            handle-as="json"
+            method="[[ ajax.method ]]"
+            on-error="_handleLoginError"
+            on-response="_handleLoginResponse"
+            url="[[ ajax.url ]]"
+            verbose
+            with-credentials="true"></iron-ajax>
+
         <paper-card heading="Login">
             <div class="card-content">
                 <p>Willkommen bei <em>Medientechnik</em>. Bitte melde dich mit deiner Campus-Mailadresse an.</p>
-                <paper-input label="E-Mail" type="email"></paper-input>
-                <paper-input label="Password" type="password"></paper-input>
+                <paper-input
+                        label="E-Mail"
+                        type="email"
+                        value="{{ userInput.email }}"
+                        on-keydown="_onEnterFireLoginRequest"></paper-input>
+                <paper-input
+                        label="Password"
+                        type="password"
+                        value="{{ userInput.password }}"
+                        on-keydown="_onEnterFireLoginRequest"></paper-input>
             </div>
             <div class="card-actions">
-                <paper-button>Einloggen</paper-button>
+                <paper-button on-tap="_fireLoginRequest">Einloggen</paper-button>
                 <p>Neu hier? <a href="#">Registrieren</a></p>
             </div>
         </paper-card>
@@ -70,7 +90,94 @@
 
         Polymer({
 
-            is: 'login-card'
+            is: 'login-card',
+
+            properties: {
+
+                accessToken: {
+                    type: String,
+                    notify: true
+                },
+
+                loggedIn: {
+                    type: Boolean,
+                    notify: true
+                },
+
+                userId: {
+                    type: String,
+                    notify: true
+                },
+
+                userInput: {
+                    type: Object,
+                    value: {
+                        email: "",
+                        password: ""
+                    }
+                }
+
+            },
+
+            /**
+             * Callback fired when user clicks submit button. Sets a property
+             * `ajax` containing information for login API call
+             * @private
+             */
+            _fireLoginRequest: function () {
+                this.ajax = {
+                    body: {
+                        email: this.userInput.email,
+                        password: this.userInput.password
+                    },
+                    contentType: 'application/json',
+                    method: 'POST',
+                    url: 'http://localhost:3000/api/platformusers/login'
+                };
+
+                // Reset input fields (in case of immediate logout users
+                // should not have the impression we saved their credentials)
+                this.set('userInput.email', '');
+                this.set('userInput.password', '');
+            },
+
+            _onEnterFireLoginRequest: function (event) {
+
+                if (event.keyCode === 13) {
+                    this._fireLoginRequest();
+                }
+
+            },
+
+            /**
+             * Callback fired when API gives positive response
+             * @param {Object} response
+             * @private
+             */
+            _handleLoginResponse: function (response) {
+
+                var jsonResponse = response.detail.response;
+
+                // Save session info to cookies
+                var expires = new Date();
+                expires.setTime(expires.getTime() + (jsonResponse.ttl * 1000));
+                document.cookie = 'mt-api-accesstoken=' + jsonResponse.id + ';expires=' + expires.toUTCString() + ';';
+                document.cookie = "mt-api-userid=" + jsonResponse.userId + ';expires=' + expires.toUTCString() + ';';
+
+                // Set global session properties
+                this.accessToken = jsonResponse.id;
+                this.userId = jsonResponse.userId;
+                this.loggedIn = true;
+            },
+
+            /**
+             * Callback fired when API answers with an error
+             * @param response
+             * @private
+             */
+            _handleLoginError: function (response) {
+                console.log(response.detail.error);
+            }
 
         });
 
