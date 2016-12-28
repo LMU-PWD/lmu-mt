@@ -1,10 +1,5 @@
 <link rel="import" href="../shared/shared-styles.html">
 
-<link rel="import" href="../../bower_components/neon-animation/neon-animated-pages.html">
-<link rel="import" href="../../bower_components/neon-animation/neon-animations.html">
-<link rel="import" href="../../bower_components/neon-animation/demo/dropdown/animated-dropdown.html">
-<link rel="import" href="../../bower_components/neon-animation/animations/slide-from-top-animation.html">
-
 <dom-module id="notifications-card">
     <template>
         <style  include="shared-styles">
@@ -57,24 +52,23 @@
         </style>
 
 
-            <div class="notificationlist_container">
-                <div class="notification_item">
-                    <span class="text">
-                    Die Gruppenzuteilung ist jetzt freigeschalten! Trage dich jetzt in eine Gruppe ein, damit du
-                    zusammen mit deinen Freunden arbeiten kannst und nicht mit irgendwelchen random Leuten
-                    was machen musst! Das wäre doch blöd... </span>
-                    <span class="date">vor 10 Minuten</span>
-                </div>
-                <div class="notification_item">
-                    <span>Die Terminwahl ist jetzt freigeschalten!</span>
-
-                    <span class="date">gestern</span>
-                </div>
-                <div class="notification_item">
-                    hallo
-                    <span class="date">01.01.2001</span>
-                </div>
+        <div class="notificationlist_container">
+            <div class="notification_item">
+                <span class="text">
+                Die Gruppenzuteilung ist jetzt freigeschalten! Trage dich jetzt in eine Gruppe ein, damit du
+                zusammen mit deinen Freunden arbeiten kannst und nicht mit irgendwelchen random Leuten
+                was machen musst! Das wäre doch blöd... </span>
+                <span class="date">vor 10 Minuten</span>
             </div>
+            <div class="notification_item">
+                <span>Die Terminwahl ist jetzt freigeschalten!</span>
+                <span class="date">gestern</span>
+            </div>
+            <div class="notification_item">
+                hallo
+                <span class="date">01.01.2001</span>
+            </div>
+        </div>
     </template>
 
     <script>
@@ -89,18 +83,7 @@
         },
         observers: [
           '_toggleList(showlist)'
-        ],
-
-        _toggleList: function() {
-          console.log("_toggleList called")
-          var dropdown = this.$.notifications_dropdown;
-          if (dropdown){
-            dropdown.entryAnimation = 'slide-from-top-animation';
-            dropdown.exitAnimation = 'slide-down-animation';
-            dropdown.selected = 4;
-          }
-        }
-
+        ]
 
       });
     </script>

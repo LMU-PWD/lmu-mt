@@ -103,9 +103,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <navigation-bar show="{{ showMobileNotifications }}"></navigation-bar>
         </app-header>
 
-        <!--<button id="test" on-click="_onButtonClick">dropdown</button>-->
-        <!--<br>-->
-        <!--<animated-dropdown id="dropdown" on-click="_onDropdownClick">Hello world!</animated-dropdown>-->
 
         <template is="dom-if" if="{{ showMobileNotifications }}">
           <notifications-card showlist="{{ showMobileNotifications }}"></notifications-card>
@@ -139,23 +136,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           type: String,
           reflectToAttribute: true,
           observer: '_pageChanged'
-        },
-        showMobileNotifications: {
-          type: Boolean,
-          value: false
         }
       },
 
       observers: [
         '_routePageChanged(routeData.page)'
-        //'_showNotificationList(showNotificationsList)'
       ],
 
       _routePageChanged: function(page) {
         this.page = page || 'main';
 
-       // this.showMobileNotifications = (this.page === 'main') ? true : false;
-
+        // check if mobile or desktop notifications are needed
         if (window.screen.availWidth > 1023) {
           this.showDesktopNotifications = true;
           this.showMobileNotifications = false;
@@ -163,8 +154,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         else {
           this.showDesktopNotifications = false;
         }
-
-        console.log(" " + this.showDesktopNotifications + " " + this.showMobileNotifications);
       },
 
       _pageChanged: function(page) {
@@ -172,20 +161,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var resolvedPageUrl = this.resolveUrl('./views/' + page + '-view.html');
         this.importHref(resolvedPageUrl, null, this._showPage404, true);
       },
-
-      _showNotificationList: function(param) {
-        console.log("my-app toggle, showNtofiList = " + this.unfoldNotifications);
-        //this.showlist = this.unfoldNotifications;
-      },
-
-//      _onButtonClick : function(event) {
-//        console.log(event.target)
-//        var dropdown = this.$.dropdown;
-//        console.log(dropdown)
-//        if (dropdown) {
-//          dropdown.show();
-//        }
-//      },
 
       _showPage404: function() {
         this.page = 'error';
