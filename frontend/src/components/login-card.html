@@ -67,8 +67,16 @@
         <paper-card heading="Login">
             <div class="card-content">
                 <p>Willkommen bei <em>Medientechnik</em>. Bitte melde dich mit deiner Campus-Mailadresse an.</p>
-                <paper-input label="E-Mail" type="email" value="{{ userInput.email }}"></paper-input>
-                <paper-input label="Password" type="password" value="{{ userInput.password }}"></paper-input>
+                <paper-input
+                        label="E-Mail"
+                        type="email"
+                        value="{{ userInput.email }}"
+                        on-keydown="_onEnterFireLoginRequest"></paper-input>
+                <paper-input
+                        label="Password"
+                        type="password"
+                        value="{{ userInput.password }}"
+                        on-keydown="_onEnterFireLoginRequest"></paper-input>
             </div>
             <div class="card-actions">
                 <paper-button on-tap="_fireLoginRequest">Einloggen</paper-button>
@@ -131,6 +139,14 @@
                 // should not have the impression we saved their credentials)
                 this.set('userInput.email', '');
                 this.set('userInput.password', '');
+            },
+
+            _onEnterFireLoginRequest: function (event) {
+
+                if (event.keyCode === 13) {
+                    this._fireLoginRequest();
+                }
+
             },
 
             /**
