@@ -23,6 +23,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../bower_components/iron-selector/iron-selector.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+
 <link rel="import" href="components/index-card.html">
 <link rel="import" href="components/group-card.html">
 <link rel="import" href="components/navigation-bar.html">
@@ -99,12 +100,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         <!-- H E A D E R -->
         <app-header fixed>
-          <navigation-bar show="{{ unfoldNotifications }}"></navigation-bar>
-
+          <navigation-bar show="{{ showMobileNotifications }}"></navigation-bar>
         </app-header>
 
-        <template is="dom-if" if="[[ unfoldNotifications ]]">
-          <notifications-card></notifications-card>
+        <!--<button id="test" on-click="_onButtonClick">dropdown</button>-->
+        <!--<br>-->
+        <!--<animated-dropdown id="dropdown" on-click="_onDropdownClick">Hello world!</animated-dropdown>-->
+
+        <template is="dom-if" if="{{ showMobileNotifications }}">
+          <notifications-card showlist="{{ showMobileNotifications }}"></notifications-card>
         </template>
 
         <!-- P A G E S -->
@@ -114,7 +118,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             fallback-selection="error"
             role="main">
 
-          <main-view name="main"></main-view>
+          <main-view name="main" shownotifications="{{ showDesktopNotifications }}"></main-view>
           <login-view name="login"></login-view>
           <error-view name="error"></error-view>
 
@@ -136,28 +140,31 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           reflectToAttribute: true,
           observer: '_pageChanged'
         },
-        unfoldNotifications: {
+        showMobileNotifications: {
           type: Boolean,
-          value: true
-        },
-        showNotificationsList: {
-          type: Boolean
+          value: false
         }
       },
 
       observers: [
-        '_routePageChanged(routeData.page)',
-        '_showNotificationList(showNotificationsList)'
+        '_routePageChanged(routeData.page)'
+        //'_showNotificationList(showNotificationsList)'
       ],
 
       _routePageChanged: function(page) {
         this.page = page || 'main';
 
-        this.unfoldNotifications = (this.page === 'main') ? true : false;
+       // this.showMobileNotifications = (this.page === 'main') ? true : false;
 
-        // hide notifications on mobile first
-        if (window.screen.availWidth < 1023)
-          this.unfoldNotifications = false;
+        if (window.screen.availWidth > 1023) {
+          this.showDesktopNotifications = true;
+          this.showMobileNotifications = false;
+        }
+        else {
+          this.showDesktopNotifications = false;
+        }
+
+        console.log(" " + this.showDesktopNotifications + " " + this.showMobileNotifications);
       },
 
       _pageChanged: function(page) {
@@ -167,8 +174,18 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       },
 
       _showNotificationList: function(param) {
-        console.log("my-app toggle");
+        console.log("my-app toggle, showNtofiList = " + this.unfoldNotifications);
+        //this.showlist = this.unfoldNotifications;
       },
+
+//      _onButtonClick : function(event) {
+//        console.log(event.target)
+//        var dropdown = this.$.dropdown;
+//        console.log(dropdown)
+//        if (dropdown) {
+//          dropdown.show();
+//        }
+//      },
 
       _showPage404: function() {
         this.page = 'error';

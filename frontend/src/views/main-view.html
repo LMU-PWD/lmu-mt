@@ -77,6 +77,13 @@
           /*background-color: blue;*/
           float: right;
         }
+        .notificationsContainer {
+          /*margin:10px;*/
+          /*width: calc(30% - 20px);*/
+          /*height: 200px;*/
+          /*!*background-color: blue;*!*/
+          /*float: right;*/
+        }
       }
     </style>
     <div >
@@ -88,6 +95,11 @@
         <index-card type="Fotopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:" info2="18.05.16, 14-16"></index-card>
         <index-card type="Videopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:" info2="18.05.16, 14-16"></index-card>
         <index-card type="Audiopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:" info2="18.05.16, 14-16"></index-card>
+      </div>
+      <div class="notificationsContainer">
+        <template is="dom-if" if="{{ shownotifications }}">
+          <notifications-card showlist="{{ showlist }}"></notifications-card>
+        </template>
       </div>
     </div>
   </template>
@@ -101,6 +113,10 @@
         prop1: {
           type: String,
           value: 'frontend-app'
+        },
+        shownotifications: {
+          type: Boolean,
+          value: false
         }
       }
       //Resize listener not yet workings
