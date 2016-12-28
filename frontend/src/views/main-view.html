@@ -78,10 +78,12 @@
       }
     </style>
 
+
+
     <div class="two_col_box">
       <div class="group-placeholder light-color-text">
-        <group-card groupName="Gruppe 5"></group-card>
-        <group-detail class="group-info"></group-detail>
+        <group-card group-name=[[group.name]]></group-card>
+        <group-detail class="group-info" group-members="[[group]]"></group-detail>
       </div>
       <div class="practicalsContainer">
         <index-card type="Fotopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:" info2="18.05.16, 14-16"></index-card>
@@ -89,6 +91,7 @@
         <index-card type="Audiopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:" info2="18.05.16, 14-16"></index-card>
       </div>
     </div>
+    <h1>[[group.name]]</h1>
   </template>
 
   <script>
@@ -101,7 +104,30 @@
           type: String,
           value: 'frontend-app',
         },
+        group: {
+          type: Object,
+          value: function () {
+            return {};
+          }
+        }
       },
+      ready: function () {
+        this.group = {
+          "name": "Gruppe 5",
+          "id": "string",
+          "groupMemberIds": [
+            "string","string","string","string"
+          ],
+          "semesterId": "string",
+          "labIds": [
+            "string"
+          ],
+          "priorityIds": [
+            "string"
+          ]
+        };
+        console.log(this.group.groupMemberIds[0]);
+      }
       //Resize listener not yet workings
       /*ready: function(){
         window.addEventListener("resize", function() { this.windowResize(); });

@@ -85,12 +85,13 @@
         </div>
         <div class="join">
             <div class="random">
-                <paper-button>Zufälliger Beitritt</paper-button>
+                <paper-button disabled>Zufälliger Beitritt</paper-button>
             </div>
             <div class="create-group">
                 <paper-spinner active="[[isLoading]]"></paper-spinner>
                 <template is="dom-repeat" items="{{members}}" as="member">
-                    <paper-input label="Member [[index]]"
+                    <paper-input label="Member[[index]]"
+                                 on-input="validateInput"
                                  value="{{member.mail}}"
                                  required
                                  auto-validate
@@ -102,7 +103,6 @@
                 <paper-button on-tap="_createNewGroup">Neue Gruppe erstellen</paper-button>
 
                 <iron-ajax
-                        <!--withCredentials  for auth when user logged in-->
                         id="joinRequest"
                         url="https://www.some-api"
                         params='[[joinParams]]'
@@ -118,12 +118,12 @@
         Polymer({
             is: 'group-detail',
             properties: {
-                /*members: {
-                    type: Array,
+                groupMembers: {
+                    type: Object,
                     value: function(){
-                        return [];
+                        return {};
                     }
-                }*/
+                },
                 joinedGroup: {
                     type: Boolean,
                     value: false
@@ -141,6 +141,8 @@
                 }
             },
             ready: function() {
+                console.log(this.groupMembers);
+
                 //Just for testing
                 var joinedMembersTest = [
                     {name: 'Max Mustermann', mail:'max.mustermann@campus.lmu.de'},
@@ -169,6 +171,7 @@
             _createNewGroup: function(){
 
                 var checked = true;
+                var self = this;
                 var inputs =  this.getEffectiveChildren('.creatate-group');
                 inputs = Polymer.dom(this.root).querySelector('.create-group').children;
                 console.log(inputs);
@@ -179,6 +182,9 @@
                         checked = false;
                     }
                 });
+                self.$$('paper-input').each.validate();
+                console.log(self.$$('paper-input'));
+
                 Polymer.updateStyles();
 
                 if(checked){
