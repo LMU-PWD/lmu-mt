@@ -1,0 +1,79 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../shared/shared-styles.html">
+
+<dom-module is="login-card">
+
+    <template>
+
+        <style>
+
+            :host {
+                max-width: 400px;
+                padding: 10px;
+                width: 100%;
+            }
+
+            a {
+                color: var(--paper-blue-grey-800);
+            }
+
+            paper-card {
+                width: 100%;
+                --paper-card-background-color: var(--paper-blue-grey-100);
+                --paper-card-header-color: var(--paper-blue-grey-50);
+
+                --paper-card-header: {
+                    background: var(--paper-blue-grey-900);
+                };
+
+                --paper-card-actions: {
+                    border: 0;
+                };
+            }
+
+            paper-button {
+                background-color: var(--paper-blue-grey-900);
+                color: var(--paper-blue-grey-50);
+                margin: 0;
+                width: 100%;
+            }
+
+            paper-input {
+                --paper-input-container-color: var(--paper-blue-grey-500);
+                --paper-input-container-focus-color: var(--paper-blue-grey-900);
+            }
+
+            .card-content p {
+                margin-top: 0;
+            }
+
+        </style>
+
+        <paper-card heading="Login">
+            <div class="card-content">
+                <p>Willkommen bei <em>Medientechnik</em>. Bitte melde dich mit deiner Campus-Mailadresse an.</p>
+                <paper-input label="E-Mail" type="email"></paper-input>
+                <paper-input label="Password" type="password"></paper-input>
+            </div>
+            <div class="card-actions">
+                <paper-button>Einloggen</paper-button>
+                <p>Neu hier? <a href="#">Registrieren</a></p>
+            </div>
+        </paper-card>
+
+    </template>
+
+    <script>
+
+        Polymer({
+
+            is: 'login-card'
+
+        });
+
+    </script>
+
+</dom-module>
