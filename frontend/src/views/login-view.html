@@ -1,12 +1,24 @@
-<link rel="import" href="../../bower_components/polymer/polymer.html">
-<link rel="import" href="../shared/shared-styles.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../components/login-card.html">
 
 <dom-module id="login-view">
 
     <template>
 
-        <div>
-            <h1>Login Page</h1>
+        <style include="iron-flex iron-flex-alignment">
+
+            login-card {
+                margin-top: 50px;
+            }
+
+        </style>
+
+        <div class="horizontal center-justified layout">
+            <login-card
+                access-token="{{ accessToken }}"
+                logged-in="{{ loggedIn }}"
+                user-id="{{ userId }}"></login-card>
         </div>
 
     </template>
@@ -15,7 +27,26 @@
 
         Polymer({
 
-            is: 'login-view'
+            is: 'login-view',
+
+            properties: {
+
+                accessToken: {
+                    type: String,
+                    notify: true
+                },
+
+                loggedIn: {
+                    type: Boolean,
+                    notify: true
+                },
+
+                userId: {
+                    type: String,
+                    notify: true
+                }
+
+            }
 
         });
 

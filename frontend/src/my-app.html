@@ -23,9 +23,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../bower_components/iron-selector/iron-selector.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+
 <link rel="import" href="components/index-card.html">
 <link rel="import" href="components/group-card.html">
 <link rel="import" href="components/navigation-bar.html">
+<link rel="import" href="components/notifications-card.html">
 <link rel="import" href="shared/shared-styles.html">
 
 <dom-module id="my-app">
@@ -98,25 +100,31 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         <!-- H E A D E R -->
         <app-header fixed>
-          <navigation-bar></navigation-bar>
+          <navigation-bar
+            access-token="{{ session.accessToken }}"
+            logged-in="{{ session.loggedIn }}"
+            user-id="{{ session.userId }}"
+            show="{{ showMobileNotifications }}"></navigation-bar>
         </app-header>
-        <template is="dom-if" if="[[ unfoldNotifications ]]">
-          <div class="notification-placeholder light-color-text">
-            Notification Placeholder
-          </div>
+
+
+        <template is="dom-if" if="{{ showMobileNotifications }}">
+          <notifications-card showlist="{{ showMobileNotifications }}"></notifications-card>
         </template>
 
         <!-- P A G E S -->
         <iron-pages
             selected="[[page]]"
             attr-for-selected="name"
-            fallback-selection="error"
-            role="main">
+            fallback-selection="error">
 
-          <main-view name="main"></main-view>
-          <login-view name="login"></login-view>
-          <group-view name="group"></group-view>
-          <error-view name="error"></error-view>
+            <main-view name="main" shownotifications="{{ showDesktopNotifications }}"></main-view>
+            <login-view
+                name="login"
+                access-token="{{ session.accessToken }}"
+                logged-in="{{ session.loggedIn }}"
+                user-id="{{ session.userId }}"></login-view>
+            <error-view name="error"></error-view>
 
         </iron-pages>
 
@@ -131,35 +139,131 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       is: 'my-app',
 
       properties: {
+        session: {
+          type: Object,
+          value: {
+            accessToken: null,
+            loggedIn: false,
+            userId: null
+          }
+        },
         page: {
           type: String,
-          reflectToAttribute: true,
+          reflectToAttribute: false,
           observer: '_pageChanged'
         },
-        unfoldNotifications: {
-          type: Boolean,
-          value: true
+        route: {
+          type: Object,
+          notify: true
         }
       },
 
       observers: [
-        '_routePageChanged(routeData.page)'
+        '_routePageChanged(routeData.page)',
+        '_loginStateChanged(session.loggedIn)'
       ],
 
-      _routePageChanged: function(page) {
-        this.page = page || 'main';
-        this.unfoldNotifications = (this.page === 'main') ? true : false;
+      ready: function () {
+
+        // Check for valid session cookies
+        var cookieAccessToken = this._getCookie('mt-api-accesstoken');
+        var cookieUserId = this._getCookie('mt-api-userid');
+
+        if (cookieAccessToken !== '' && cookieUserId !== '') {
+
+          // TODO: Verify validity of cookies with API request
+          this.set('session.accessToken', cookieAccessToken);
+          this.set('session.userId', cookieUserId);
+          this.set('session.loggedIn', true);
+        }
+
       },
 
+      /**
+       * Helper function for parsing document.cookie
+       * @param {String} cookieName - key of the cookie whose value should be returned
+       * @returns {String} Cookie value
+       * @private
+       */
+      _getCookie: function (cookieName) {
+
+        var name = cookieName + '=';
+        var allCookies = document.cookie.split(';');
+        var idx;
+        for (idx in allCookies) {
+          var cookie = allCookies[idx];
+          while (cookie.charAt(0) == ' ') {
+            cookie = cookie.substring(1);
+          }
+          if (cookie.indexOf(name) == 0) {
+            return cookie.substring(name.length, cookie.length);
+          }
+        }
+        return '';
+
+      },
+
+      /**
+       * Callback fired when the applications route changes
+       * @param {String} page - new value of routeData.page
+       * @private
+       */
+      _routePageChanged: function(page) {
+
+        this.page = page || 'main';
+
+        // check if mobile or desktop notifications are needed
+        if (window.screen.availWidth > 1023) {
+          this.showDesktopNotifications = true;
+          this.showMobileNotifications = false;
+        }
+        else {
+          this.showDesktopNotifications = false;
+        }
+      },
+
+      /**
+       * Callback fired when the applications page property changes
+       * @param {String} page - new value of page property
+       * @private
+         */
       _pageChanged: function(page) {
+
+        if (!this.session.loggedIn && page !== 'login') {
+          this.set('route.path', '/login');
+          return;
+        }
+
         // Load page import on demand.
         var resolvedPageUrl = this.resolveUrl('./views/' + page + '-view.html');
         this.importHref(resolvedPageUrl, null, this._showPage404, true);
+
+        this.unfoldNotifications = (this.page === 'main') ? true : false;
+
       },
 
+      /**
+       * Set current page to 'error'
+       * @private
+         */
       _showPage404: function() {
         this.page = 'error';
+      },
+
+      /**
+       * Callback fired when the applications login state changes, e. g. when
+       * user successfully logs in or out
+       * @param {Boolean} loggedIn - new value of session.loggedIn property
+       * @private
+         */
+      _loginStateChanged: function(loggedIn) {
+        if (loggedIn) {
+          this.set('route.path', '/');
+        } else {
+          this.set('route.path', '/login');
+        }
       }
+
     });
   </script>
 </dom-module>
