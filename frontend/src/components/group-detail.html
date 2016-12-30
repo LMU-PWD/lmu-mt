@@ -50,30 +50,18 @@
                 display: block;
             }
 
-            .spinner-container{
-            }
-            paper-spinner::before{
-
-                position: absolute;
-                top: 0;
-                left: 0;
-                height: 100%;
-                width: 100%;
-                background-color: rgba(255,255,255,0.8);
-                background-size: 100px;
-
-            }
-            paper-spinner{
+            paper-spinner[active]{
                 position: absolute;
                 height: 50px;
                 width: 50px;
-                top: calc(50% - 25px);
-                left: calc(50% - 25px);
+                left: 0;
+                top: 0;
+                background-color: rgba(255,255,255,0.8);
+                padding:calc(50% - 10px) calc(50% - 25px);
+                z-index: 100;
             }
             paper-input[wronginput]{
                 color: var(--paper-red-500);
-            }
-            paper-spinner{
             }
         </style>
         <div class="info">
@@ -88,14 +76,17 @@
                 <paper-button disabled>Zufälliger Beitritt</paper-button>
             </div>
             <div class="create-group">
-                <paper-spinner active="[[isLoading]]"></paper-spinner>
+                <div>
+                    <content>
+                        <paper-spinner active="[[isLoading]]"></paper-spinner>
+                    </content>
+                </div>
                 <template is="dom-repeat" items="{{members}}" as="member">
-                    <paper-input label="Member[[index]]"
-                                 on-input="validateInput"
+                    <dom-if></dom-if>
+                    <paper-input label="Member [[calcNaturalIndex(index)]]"
                                  value="{{member.mail}}"
                                  required
-                                 auto-validate
-                                 error-message="Uuups da hast du wohl was vergesen">
+                                 <!--readonly-->>
                         <iron-icon icon="mail" prefix></iron-icon>
                         <div suffix>@campus.lmu.de</div>
                     </paper-input>
@@ -161,6 +152,7 @@
                 //If not yet in group, show join group view, else show group info
                 if(!this.members[0].mail){
                     this.toggleAttribute('active',true, this.$$('.join'));
+                    this.members[0].mail = 'your.mail';
                 } else {
                     this.toggleAttribute('active',true, this.$$('.info'));
 
@@ -182,7 +174,7 @@
                         checked = false;
                     }
                 });
-                self.$$('paper-input').each.validate();
+                //self.$$('paper-input').each.validate();
                 console.log(self.$$('paper-input'));
 
                 Polymer.updateStyles();
@@ -196,8 +188,12 @@
                         'member4': this.mail4
                     };
                     this.$.joinRequest.generateRequest();
+                    this.isLoading = true;
                 }
                 console.log(this.members);
+            },
+            calcNaturalIndex: function (index) {
+                return index+1;
             },
             _handleJoin: function(e){
                 var response = e.detail.response;
