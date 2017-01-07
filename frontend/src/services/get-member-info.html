@@ -1,0 +1,69 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="get-member-info">
+    <template>
+        <style>
+            :host{
+            }
+        </style>
+        <!--<iron-ajax
+                auto
+                body="[[ ajax.body ]]"+[[id]]
+                content-type="[[ ajax.contentType ]]"
+                handle-as="json"
+                method="[[ ajax.method ]]"
+                on-error="_handleLoginError"
+                on-response="_handleUserResponse"
+                url="[[ ajax.url ]]"
+                verbose
+                with-credentials="true"></iron-ajax>-->
+    </template>
+    <script>
+        Polymer({
+            is: 'get-member-info',
+            properties: {
+                id: {
+                    value: String,
+                    //For only downward Data Flow
+                    notify: false,
+                    readOnly: false
+                },
+                mail: {
+                    type: String,
+                    //For only Upward Data Flow
+                    notify: true,
+                    readOnly: true
+                },
+                name: {
+                    type: String,
+                    //For only Upward Data Flow
+                    notify: true,
+                    readOnly: true
+                }
+            },
+            ready: function() {
+                //For testing without API
+                var e = {
+                    "realm": "string",
+                    "username": "Test Name",
+                    "credentials": {},
+                    "challenges": {},
+                    "email": "mailtest@campus.lmu.de",
+                    "emailVerified": true,
+                    "status": "string",
+                    "created": "2017-01-06",
+                    "lastUpdated": "2017-01-06",
+                    "id": 0
+                };
+                this._handleUserResponse(e);
+            },
+
+            //Function for setting Mail & Name on Ajax response
+            _handleUserResponse: function(e) {
+                //this._set<Property> function for Updating readOnly Properties
+                this._setMail(e.email);
+                this._setName(e.username);
+            }
+        });
+    </script>
+</dom-module>
