@@ -86,15 +86,21 @@
         }
       }
     </style>
-    <div >
+    <div>
       <div class="group-placeholder light-color-text">
         <group-card groupName="Gruppe 5"></group-card>
         <div class="group-info"></div>
       </div>
       <div class="practicalsContainer">
-        <index-card type="Fotopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:" info2="18.05.16, 14-16"></index-card>
+        <div on-tap="_handleFotoTap">
+          <index-card type="Fotopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:" info2="18.05.16, 14-16"></index-card>
+        </div>
+        <div on-tap="_handleVideoTap">
         <index-card type="Videopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:" info2="18.05.16, 14-16"></index-card>
+        </div>
+        <div on-tap="_handleAudioTap">
         <index-card type="Audiopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:" info2="18.05.16, 14-16"></index-card>
+        </div>
       </div>
       <div class="notificationsContainer">
         <template is="dom-if" if="{{ shownotifications }}">
@@ -114,11 +120,11 @@
           type: String,
           value: 'frontend-app'
         },
-        shownotifications: {
+      shownotifications: {
           type: Boolean,
           value: false
         }
-      }
+      },
       //Resize listener not yet workings
       /*ready: function(){
         window.addEventListener("resize", function() { this.windowResize(); });
@@ -126,7 +132,15 @@
       windowResize: function(){
           this.expanded = ($(window).width()>767);
       }*/
-
+      _handleFotoTap: function(){
+            this.fire("foto-practicals-click");
+      },
+      _handleVideoTap: function(){
+            this.fire("video-practicals-click");
+      },
+      _handleAudioTap: function(){
+          this.fire("audio-practicals-click");
+      }
     });
   </script>
 </dom-module>

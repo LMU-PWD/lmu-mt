@@ -118,13 +118,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             attr-for-selected="name"
             fallback-selection="error">
 
-            <main-view name="main" shownotifications="{{ showDesktopNotifications }}"></main-view>
+            <main-view name="main" id="mainpage" shownotifications="{{ showDesktopNotifications }}"
+                       on-foto-practicals-click="_fotoPracticalClicked"
+                       on-video-practicals-click="_videoPracticalClicked"
+                       on-audio-practicals-click="_audioPracticalClicked"></main-view>
             <login-view
                 name="login"
                 access-token="{{ session.accessToken }}"
                 logged-in="{{ session.loggedIn }}"
                 user-id="{{ session.userId }}"></login-view>
             <error-view name="error"></error-view>
+            <practicals-view name="practicals" type={{course}} on-back-click="_backClicked"></practicals-view>
 
         </iron-pages>
 
@@ -152,6 +156,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           reflectToAttribute: false,
           observer: '_pageChanged'
         },
+        course: {
+            type: String
+        },
         route: {
           type: Object,
           notify: true
@@ -178,6 +185,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         }
 
       },
+
 
       /**
        * Helper function for parsing document.cookie
@@ -262,7 +270,38 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         } else {
           this.set('route.path', '/login');
         }
-      }
+      },
+
+        /**
+         * Process click on Foto-Card in the Main-View
+         */
+        _fotoPracticalClicked: function(){
+            this.course = "Foto"
+            this.page = "practicals";
+        },
+
+        /**
+         * Process click on Video-Card in the Main-View
+         */
+        _videoPracticalClicked: function(){
+            this.course = "Video"
+            this.page = "practicals";
+        },
+
+        /**
+         * Process click on Audio-Card in the Main-View
+         */
+        _audioPracticalClicked: function(){
+            this.course = "Audio"
+            this.page = "practicals";
+        },
+
+        /**
+         * Process click on Back-Button in the Practical-View
+         */
+        _backClicked: function(){
+            this.page = "main";
+        }
 
     });
   </script>
