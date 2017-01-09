@@ -1,0 +1,115 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../components/date-creator.html">
+<link rel="import" href="../shared/shared-styles.html">
+
+<dom-module id="date-selector">
+    <template>
+        <style include="shared-styles">
+            :host{
+                height: auto;
+                min-width: 320px;
+                width: 100% ;
+                background-color: var(--paper-blue-grey-100);
+                display: block;
+                position: relative;
+                top: 1px;
+                border-top: 1px solid var(--paper-blue-grey-900);
+                border-radius: 0 0 5px 5px;
+
+            }
+            paper-spinner[active]{
+                position: absolute;
+                height: 50px;
+                width: 50px;
+                left: 0;
+                top: 0;
+                background-color: rgba(255,255,255,0.8);
+                padding:calc(50% - 10px) calc(50% - 25px);
+                z-index: 100;
+            }
+            paper-input[wronginput]{
+                color: var(--paper-red-500);
+            }
+        </style>
+        <!-- Checking for Group ID if User Joined Group-->
+        <div class="dateselector">
+            <template is="dom-repeat" items="[[timeslots]]" as="slots">
+               <date-creator timeslots="[[slots]]"></date-creator>
+            </template>
+        </div>
+    </template>
+    <script>
+        Polymer({
+            is: 'date-selector',
+            properties: {
+                timeslots:{
+                    type: Array,
+                    value: []
+                },
+                timeSlotStrings:{
+                    type: Array,
+                    value: []
+                },
+                timeLimits:{
+                    type: Array,
+                    value: []
+                },
+                timeSlotSize:{
+                    type: Number,
+                    value: 0
+                },
+                timeSlotDates:{
+                    type: Array,
+                    value: []
+                }
+            },
+            ready: function() {
+                this.timeslots = this._calculateTimeslots([new Date(1,0,0,1,0),new Date(1,0,0,5,0),new Date(5,1,0,14,0),new Date(5,1,0,23,0)],30);
+            },
+
+            /**
+             * Calculate Timeslots from given timelimits and the desired timeslot size
+             * @param {Array} timeLimits - time limits to define the slots
+             * @param {Number} timeSlotSize - desired size of the time slots
+             */
+            _calculateTimeslots: function(timeLimits,timeSlotSize){
+                var timeslots =[];
+                if(timeLimits.length%2 == 0) {
+                    for (i = 0; i < timeLimits.length; i = i + 2) {
+                        if(timeLimits[i].getFullYear() == timeLimits[i+1].getFullYear() &&
+                            timeLimits[i].getMonth() == timeLimits[i+1].getMonth() &&
+                            timeLimits[i].getDate() == timeLimits[i+1].getDate()) {
+                            var slotsOnThisDays = [];
+                            var starttime = (timeLimits[i].getHours() * 60) + timeLimits[i].getMinutes();
+                            var endtime = (timeLimits[i + 1].getHours() * 60) + timeLimits[i + 1].getMinutes();
+                            var totalTimeDifference = endtime - starttime;
+
+                            for (j = 0; j < (totalTimeDifference); j = j + timeSlotSize) {
+
+                                var startdate = new Date(timeLimits[i].getFullYear(), timeLimits[i].getMonth(), timeLimits[i].getDate());
+                                startdate.setHours(Math.floor((starttime + j) / 60));
+                                startdate.setMinutes(Math.floor((starttime + j) % 60));
+
+                                var enddate = new Date(timeLimits[i].getFullYear(), timeLimits[i].getMonth(), timeLimits[i].getDate());
+                                enddate.setHours(Math.floor((starttime + j + timeSlotSize) / 60));
+                                enddate.setMinutes(Math.floor((starttime + j + timeSlotSize) % 60));
+                                slotsOnThisDays.push([startdate, enddate]);
+                            }
+                            timeslots.push(slotsOnThisDays);
+                        }
+                        else{console.log("Error: Array is malformed. Each start- and endlimit has to be on the same day.")}
+                    }
+                    return timeslots;
+                }
+                else{
+                    console.log("Error: Array is malformed. No pair number of timeslot limits.")
+                }
+            }
+
+        });
+    </script>
+</dom-module>

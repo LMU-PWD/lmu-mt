@@ -2,6 +2,7 @@
 <link rel="import" href="../shared/shared-styles.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../components/practical-date-detail.html">
 
 
 <dom-module id="practicals-view">
@@ -12,43 +13,45 @@
       }
       .page{
         #border-radius: 25px;
-        margin: 5%;
+        margin: 24px;
         background-color: var(--paper-blue-grey-100);
         color: var(--paper-blue-grey-900);
       }
       .tabheader{
         background-color: var(--paper-blue-grey-900);
         font-size: 120%;
-        #font-size: 4vw;
         #border-radius: 25px 25px 0px 0px;
         overflow: hidden;
-        height: 6vw;
+        height: 5vh;
       }
       .tabheaderbuttons{
         color: var(--paper-blue-grey-50);
         text-align: center;
       }
-      paper-icon-button{
-        width: 20%;
+      .backbutton{
+        width: 70px;
         --paper-icon-button-ink-color:var(--paper-blue-grey-300);
+        padding-right: 30px;
       }
-
+      .firsttab{
+        padding-left: 25px;
+      }
       paper-tab{
-        --paper-tab-ink:var(--paper-blue-grey-300);
+        --paper-tab-ink:var(--paper-blue-grey-100);
         font-weight: 300;
       }
       paper-tab.iron-selected {
         color: var(--paper-blue-grey-900);
-        background-color: var(--paper-blue-grey-300);
+        background-color: var(--paper-blue-grey-100);
       }
       .icon{
         position: absolute;
-        margin-left: 14%;
-        margin-top: -1%;
+        margin-left: 40px;
+        margin-top: -5px;
         width: 64px;
         height: 64px;
-        width: 8vw;
-        height: 8vw;
+        width: 6vh;
+        height: 6vh;
         border-radius: 50%;
         background-color: var(--paper-blue-grey-100);
         border:  3px solid var(--paper-blue-grey-900);
@@ -57,73 +60,24 @@
       .content{
         padding: 3%;
       }
-      /*Phone*/
-      @media screen and (max-width: 767px) {
-        .group-placeholder{
-          width: 100%;
-          min-width: 320px;
-        }
-        .group-info{
-          display: none;
-        }
-
-        .practicalsContainer{
-          min-width: 320px;
-          width: 100%;
-
-        }
-      }
-      /*Tablet*/
-      @media screen and (min-width: 768px) and (max-width: 1023px) {
-        .group-placeholder{
-          margin: 10px;
-          width: calc(50% - 20px);
-        }
-        .practicalsContainer{
-          margin:10px;
-          width: calc(50% - 20px);
-        }
-      }
-      /*Desktop*/
-      @media screen and (min-width: 1024px) {
-        .group-placeholder{
-          margin:10px;
-          width: calc(35% - 20px);
-        }
-        .practicalsContainer{
-          margin:10px;
-          width: calc(35% - 20px);
-        }
-        .notification-placeholder{
-          margin:10px;
-          width: calc(30% - 20px);
-          height: 200px;
-          /*background-color: blue;*/
-          float: right;
-        }
-
-      }
     </style>
     <div class="page">
       <img class="icon" src=[[icon]] z-index="1">
       <paper-tabs selected="{{selectedTab}}" class="tabheader" no-slide>
-        <paper-icon-button  class="tabheaderbuttons" icon="icons:arrow-back" on-tap="_backClicked"></paper-icon-button>
-        <paper-tab class="tabheaderbuttons">Allgemein</paper-tab>
+        <paper-icon-button  class="tabheaderbuttons backbutton" icon="icons:arrow-back" on-tap="_backClicked"></paper-icon-button>
+        <paper-tab class="tabheaderbuttons firsttab">Allgemein</paper-tab>
         <paper-tab class="tabheaderbuttons">Termine</paper-tab>
       </paper-tabs>
       <div class="content">
         <h2>[[type]] Praktikum</h2>
         <iron-pages selected="{{selectedTab}}">
           <div>Page 1 Text</div>
-          <div>Page 2 Text</div>
+          <div>
+            <practical-date-detail type=[[type]]></practical-date-detail>
+          </div>
         </iron-pages>
       </div>
     </div>
-
-
-    <!--div>
-      <practical-detail type=[[type]]></practical-detail>
-    </div-->
   </template>
 
   <script>
@@ -134,7 +88,7 @@
           type:{
               type: String,
               notify: true,
-              value: "Fotopraktikum"
+              value: ""
           },
           selectedTab:{
               type: String,
@@ -142,8 +96,11 @@
           },
           icon:{
               type: String,
-          }
+          },
       },
+        _backClicked: function() {
+            this.fire("back-click");
+        },
         ready: function () {
             if(this.type.includes("Photo" || "photo")){
                 this.icon = "../../../images/photo.svg";
@@ -156,9 +113,6 @@
             }
         },
 
-        _backClicked: function() {
-            this.fire("back-click");
-        }
     });
   </script>
 </dom-module>

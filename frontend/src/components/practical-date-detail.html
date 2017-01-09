@@ -1,0 +1,105 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../components/date-selector.html">
+<link rel="import" href="../shared/shared-styles.html">
+
+<dom-module id="practical-date-detail">
+    <template>
+        <style include="shared-styles">
+            :host{
+                height: auto;
+                min-width: 320px;
+                width: 100% ;
+                background-color: var(--paper-blue-grey-100);
+                display: block;
+                position: relative;
+                top: 1px;
+                border-top: 1px solid var(--paper-blue-grey-900);
+                border-radius: 0 0 5px 5px;
+            }
+        </style>
+        <!-- Checking for Group ID if User Joined Group-->
+        <template is="dom-if" if="{{!practicalDate}}">
+                <date-selector timesLimits="[[timeLimits]]" timeSlotSize="[[timeSlotSize]]"></date-selector>
+        </template>
+        <template is="dom-if" if="{{practicalDate}}">
+            <div class="dateshower">
+                Dein Praktikumstermin ist am {{practicalDateString}}
+            </div>
+        </template>
+    </template>
+    <script>
+        Polymer({
+            is: 'practical-date-detail',
+            properties: {
+                type:{
+                    type: String,
+                    notify: true,
+                    value: ""
+                },
+                practicalDate: {
+                    type: Date,
+                    notify: true,
+                    readOnly: false,
+                    value: null
+                },
+                practicalDateString: {
+                    type: String,
+                    value: ""
+                },
+                timeLimits:{
+                    type: Array,
+                    value: []
+                },
+                timeSlotSize:{
+                    type: Number,
+                    value: 0
+                }
+            },
+            ready: function() {
+                this.timeLimits=[new Date(1,0,0,1,0),new Date(1,0,0,5,0),new Date(5,1,0,14,0),new Date(5,1,0,23,0)];
+                this.timeSlotSize=30;
+                this.practicalDate = this._getDate();
+                if(this.practicalDate != null){
+                    this.practicalDateString = this._getDateString();
+                }
+            },
+            _getDate: function(){
+                //return new Date(1,0,0,0,0);
+                return null;
+            },
+            _getDateString: function(){
+                var datestring = "";
+                switch(this.practicalDate.getDay()){
+                    case 1:
+                        datestring = "Montag, den ";
+                        break;
+                    case 2:
+                        datestring = "Dienstag, den ";
+                        break;
+                    case 3:
+                        datestring = "Mittwoch, den ";
+                        break;
+                    case 4:
+                        datestring = "Donnerstag, den ";
+                        break;
+                    case 5:
+                        datestring = "Freitag, den ";
+                        break;
+                    case 6:
+                        datestring = "Samstag, den ";
+                        break;
+                    case 7:
+                        datestring = "Sonntag, den ";
+                        break;
+                }
+                datestring = datestring+this.practicalDate.getDate()+"."+this.practicalDate.getMonth()+"."+this.practicalDate.getFullYear()+
+                        " um "+this.practicalDate.getHours()+":"+this.practicalDate.getMinutes()+" Uhr"
+                return datestring;
+            }
+        });
+    </script>
+</dom-module>

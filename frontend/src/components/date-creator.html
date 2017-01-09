@@ -1,0 +1,131 @@
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+
+<dom-module id="date-creator">
+    <template>
+        <style include="shared-styles">
+            .date{
+                padding: 10px;
+                background-color: var(--paper-blue-grey-500);
+                color: var(--paper-blue-grey-100);
+                font-size: 18px;
+            }
+            .slot{
+                border-style: solid;
+                border-width: 1px;
+                border-color: var(--paper-blue-grey-100);
+            }
+            .date-creator{
+                margin-top: 20px;
+                background-color: var(--paper-blue-grey-50);
+            }
+        </style>
+        <div class="date-creator">
+            <div class="date">
+                [[date]]
+            </div>
+            <template is="dom-repeat" items="[[timeSlotStrings]]" as="slot" >
+                <paper-item class="slot" on-tap="_handleDateClick">
+                    [[slot]]
+                </paper-item>
+            </template>
+        </div>
+    </template>
+    <script>
+        Polymer({
+            is: 'date-creator',
+            properties: {
+                timeslots:{
+                    type: Array,
+                    value: []
+                },
+                timeSlotStrings:{
+                    type: Array,
+                    value: []
+                },
+                date:{
+                    type: String,
+                    value: ""
+                }
+            },
+            ready: function() {
+                this.date = this._getDateString(this.timeslots[0][0]);
+                this.timeSlotStrings = this._getTimeSlotString();
+            },
+
+            /**
+             * Creates string from the timeslot-timits to get a nicer visualisation
+             */
+            _getTimeSlotString: function(){
+                var timeslotstrings = [];
+                for (i=0; i<this.timeslots.length; i++) {
+                    var starthours = this.timeslots[i][0].getHours();
+                    var startminutes = this.timeslots[i][0].getMinutes();
+                    var endhours = this.timeslots[i][1].getHours();
+                    var endminutes = this.timeslots[i][1].getMinutes();
+
+                    /*
+                    * Add zeros, if necessary
+                    */
+
+                    if(starthours<10){
+                        starthours = "0"+starthours;
+                    }
+                    if(startminutes<10){
+                        startminutes = "0"+startminutes;
+                    }
+                    if(endhours<10){
+                        endhours = "0"+endhours;
+                    }
+                    if(endminutes<10){
+                        endminutes = "0"+endminutes;
+                    }
+
+                    timeslotstrings.push(starthours + ":" + startminutes + " - "
+                            + endhours + ":" + endminutes+ " Uhr");
+                }
+                return timeslotstrings;
+            },
+
+            /**
+             * Creates string from the given date
+             * @param {String} date - date that will be transformed to String
+             */
+            _getDateString: function(date){
+                var datestring = "";
+                switch(date.getDay()){
+                    case 1:
+                        datestring = "Montag, ";
+                        break;
+                    case 2:
+                        datestring = "Dienstag, ";
+                        break;
+                    case 3:
+                        datestring = "Mittwoch, ";
+                        break;
+                    case 4:
+                        datestring = "Donnerstag, ";
+                        break;
+                    case 5:
+                        datestring = "Freitag, ";
+                        break;
+                    case 6:
+                        datestring = "Samstag, ";
+                        break;
+                    case 7:
+                        datestring = "Sonntag, ";
+                        break;
+                }
+                datestring = datestring+date.getDate()+"."+date.getMonth()+"."+date.getFullYear();
+                return datestring;
+            },
+
+            /**
+             * Click-Event handler
+             * @param {String} e - handle data
+             */
+            _handleDateClick: function(e){
+
+            }
+        });
+    </script>
+</dom-module>
