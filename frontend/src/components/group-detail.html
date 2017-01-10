@@ -106,10 +106,10 @@
             <div class="info">
                 <template is="dom-repeat" items="[[group.groupMemberIds]]" as="member">
                     <div class="member">
-                        <get-user-info user-id='[[member]]' name='{{_setMemberInfo(groupMembers.*, 1, "name")}}' mail="{{mail}}"></get-user-info>
+                        <get-user-info user-id='[[member]]' name='{{memberName)}}' mail="{{mail}}"></get-user-info>
                         <!--TODO Bind Name & Mail to Property-->
                         <a href="mailto:[[mail]]" tabindex="-1"><paper-icon-button icon="icons:mail"></paper-icon-button></a>
-                        <h2>[[arrayItem(groupMembers.*, 1, "name")]]</h2>
+                        <h2>[[memberName]]</h2>
                     </div>
                 </template>
             </div>
