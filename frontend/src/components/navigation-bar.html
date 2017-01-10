@@ -90,7 +90,10 @@
             },
 
             toggleNotificationList: function() {
-                if (window.screen.availWidth < 1023)
+
+                var screenwidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+
+                if (screenwidth < 1023)
                     this.show = !this.show;
             },
 
@@ -110,6 +113,7 @@
                         },
                         method: 'POST',
                         url: 'http://localhost:3000/api/platformusers/logout'
+                        //url: 'http://lmu-mt-api.herokuapp.com/api/platformusers/logout'
                     }
                 }
             },

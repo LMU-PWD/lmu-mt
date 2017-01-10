@@ -98,19 +98,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       <app-header-layout>
 
-        <!-- H E A D E R -->
-        <app-header fixed>
-          <navigation-bar
-            access-token="{{ session.accessToken }}"
-            logged-in="{{ session.loggedIn }}"
-            user-id="{{ session.userId }}"
-            show="{{ showMobileNotifications }}"></navigation-bar>
-        </app-header>
 
-
-        <template is="dom-if" if="{{ showMobileNotifications }}">
-          <notifications-card showlist="{{ showMobileNotifications }}"></notifications-card>
-        </template>
 
         <!-- P A G E S -->
         <iron-pages
@@ -118,7 +106,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             attr-for-selected="name"
             fallback-selection="error">
 
-            <main-view name="main" shownotifications="{{ showDesktopNotifications }}"></main-view>
+            <main-view
+               name="main"
+               access-token="{{ session.accessToken }}"
+               logged-in="{{ session.loggedIn }}"
+               user-id="{{ session.userId }}"
+               shownotifications="{{ showDesktopNotifications }}"></main-view>
             <login-view
                 name="login"
                 access-token="{{ session.accessToken }}"
@@ -145,7 +138,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             accessToken: null,
             loggedIn: false,
             userId: null
-          }
+          },
+          notify: true
         },
         page: {
           type: String,
@@ -213,7 +207,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.page = page || 'main';
 
         // check if mobile or desktop notifications are needed
-        if (window.screen.availWidth > 1023) {
+        var screenwidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+        if (screenwidth > 1023) {
           this.showDesktopNotifications = true;
           this.showMobileNotifications = false;
         }

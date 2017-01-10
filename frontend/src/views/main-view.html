@@ -86,7 +86,26 @@
         }
       }
     </style>
+
+    <app-header fixed>
+      <navigation-bar
+        access-token="{{ accessToken }}"
+        logged-in="{{ loggedIn }}"
+        user-id="{{ userId }}"
+        show="{{ showMobileNotifications }}"></navigation-bar>
+    </app-header>
+
+    <!-- NOTIFICATIONS -->
+    <template is="dom-if" if="{{ showMobileNotifications }}">
+      <notifications-card showlist="{{ showMobileNotifications }}"></notifications-card>
+    </template>
+
     <div >
+      <div class="notificationsContainer">
+        <template is="dom-if" if="{{ shownotifications }}">
+          <notifications-card showlist="{{ showlist }}"></notifications-card>
+        </template>
+      </div>
       <div class="group-placeholder light-color-text">
         <group-card groupName="Gruppe 5"></group-card>
         <div class="group-info"></div>
@@ -96,11 +115,7 @@
         <index-card type="Videopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:" info2="18.05.16, 14-16"></index-card>
         <index-card type="Audiopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:" info2="18.05.16, 14-16"></index-card>
       </div>
-      <div class="notificationsContainer">
-        <template is="dom-if" if="{{ shownotifications }}">
-          <notifications-card showlist="{{ showlist }}"></notifications-card>
-        </template>
-      </div>
+
     </div>
   </template>
 
@@ -110,13 +125,22 @@
       is: 'main-view',
 
       properties: {
-        prop1: {
-          type: String,
-          value: 'frontend-app'
-        },
+
         shownotifications: {
           type: Boolean,
           value: false
+        },
+        accessToken: {
+          type: String,
+          notify: true
+        },
+        loggedIn: {
+          type: Boolean,
+          notify: true
+        },
+        userId: {
+          type: String,
+          notify: true
         }
       }
       //Resize listener not yet workings
