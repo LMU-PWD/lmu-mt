@@ -40,6 +40,7 @@
                 method="[[ ajax.method ]]"
                 on-error="_handleLogoutError"
                 on-response="_handleLogoutResponse"
+                access-control-allow-origin="http://lmu-mt-api.herokuapp.com"
                 url="[[ ajax.url ]]"
                 verbose
                 with-credentials="true"></iron-ajax>
@@ -112,8 +113,8 @@
                             'Authorization': this.accessToken
                         },
                         method: 'POST',
-                        url: 'http://localhost:3000/api/platformusers/logout'
-                        //url: 'http://lmu-mt-api.herokuapp.com/api/platformusers/logout'
+                        //url: 'http://localhost:3000/api/platformusers/logout'
+                        url: 'http://lmu-mt-api.herokuapp.com/api/platformusers/logout'
                     }
                 }
             },
