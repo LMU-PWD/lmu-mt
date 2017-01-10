@@ -1,6 +1,8 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../services/get-access-token.html">
 
-<dom-module id="get-member-info">
+<dom-module id="get-user-info">
     <template>
         <style>
             :host{
@@ -17,12 +19,20 @@
                 url="[[ ajax.url ]]"
                 verbose
                 with-credentials="true"></iron-ajax>-->
+        <get-access-token token="{{header}}"></get-access-token>
+        <iron-ajax
+                auto
+                headers='[[header]]'
+                handle-as="json"
+                on-response="_handleUserResponse"
+                lastResponse = "{{testResp}}"
+                url="http://localhost:3000/api/PlatformUsers/[[userId]]/"></iron-ajax>
     </template>
     <script>
         Polymer({
-            is: 'get-member-info',
+            is: 'get-user-info',
             properties: {
-                id: {
+                userId: {
                     value: String,
                     //For only downward Data Flow
                     notify: false,
@@ -42,6 +52,7 @@
                 }
             },
             ready: function() {
+                console.log(this.id);
                 //For testing without API
                 var e = {
                     "realm": "string",
@@ -55,14 +66,18 @@
                     "lastUpdated": "2017-01-06",
                     "id": 0
                 };
-                this._handleUserResponse(e);
+                //this._handleUserResponse(e);
+                //console.log(this.id);
             },
 
             //Function for setting Mail & Name on Ajax response
             _handleUserResponse: function(e) {
                 //this._set<Property> function for Updating readOnly Properties
-                this._setMail(e.email);
-                this._setName(e.username);
+                this._setMail(event.detail.response.email);
+                this._setName(event.detail.response.first_name + " " + e.detail.response.name);
+                console.log(event.detail.response);
+                console.log(event.detail.response.first_name + " " + e.detail.response.name);
+                console.log(this.testResp);
             }
         });
     </script>

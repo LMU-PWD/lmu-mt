@@ -6,6 +6,7 @@
 <link rel="import" href="../components/navigation-bar.html">
 <link rel="import" href="../shared/shared-styles.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
 
 
 <dom-module id="main-view">
@@ -83,10 +84,19 @@
         }
       }
     </style>
-    <div >
+    <!--Dieser Request soll die User Info über den eingeloggtend user holen-->
+    <iron-ajax
+            auto
+            headers='[[header]]'
+            handle-as="json"
+            on-response="_handleUserResponse"
+            url="http://localhost:3000/api/PlatformUsers/[[userId]]/"></iron-ajax>
+    <div>
+
+
       <div class="group-placeholder light-color-text">
-        <group-card group-name=[[group.name]]></group-card>
-        <group-detail class="group-info" group="{{group}}"></group-detail>
+        <group-card group-name=[[groupName]]></group-card>
+        <group-detail class="group-info" self-info="{{user}}" group-name="{{groupName}}"></group-detail>
       </div>
       <div class="practicalsContainer">
         <index-card type="Fotopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:" info2="18.05.16, 14-16"></index-card>
@@ -115,27 +125,47 @@
           type: Boolean,
           value: false
         },
-        group: {
+        userId: String,
+        accessKey: String,
+        user: {
           type: Object,
           notify: true,
           readOnly: false,
-          value: {
-            "name": "Gruppe 5",
+          /*value: {
+            "name": "string",
+            "first_name": "string",
+            "isTutor": false,
+            "free_tutor_dates": [
+              "2017-01-06"
+            ],
+            "realm": "string",
+            "username": "string",
+            "credentials": {},
+            "challenges": {},
+            "email": "string",
+            "emailVerified": true,
+            "status": "string",
+            "created": "2017-01-06",
+            "lastUpdated": "2017-01-06",
             "id": "string",
-            "groupMemberIds": [
-              "string","string","string","string"
-            ],
             "semesterId": "string",
-            "labIds": [
-              "string"
-            ],
-            "priorityIds": [
+            "groupId": "string",          // -> keine group id vorhanden wenn keine gruppe
+            "tutorLabIds": [
               "string"
             ]
-          }
+          }*/
         }
       },
       ready: function () {
+        console.log(this.userId);
+        console.log(this.accessKey);
+
+        this.header = {"Authorization": this.accessKey};
+
+
+        //On login -> id
+        // id -> request user info
+
         //Not yet working
         /*this.push('group',{
           "name": "Gruppe 5",
@@ -152,6 +182,10 @@
           ]
         });
         console.log(this.group);*/
+      },
+      _handleUserResponse: function (e) {
+        this.user = e.detail.response;
+        console.log(this.user);
       }
       //Resize listener not yet workings
       /*ready: function(){

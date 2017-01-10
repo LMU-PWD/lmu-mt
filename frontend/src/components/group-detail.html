@@ -4,7 +4,8 @@
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
 <link rel="import" href="../shared/shared-styles.html">
-<link rel="import" href="../services/get-member-info.html">
+<link rel="import" href="../services/get-user-info.html">
+<link rel="import" href="../services/get-access-token.html">
 <link rel="import" href="mail-input.html">
 
 <dom-module id="group-detail">
@@ -92,18 +93,28 @@
             }
         </style>
         <!-- Checking for Group ID if User Joined Group-->
-        <template is="dom-if" if="{{group.id}}">
+        <template is="dom-if" if="{{selfInfo.groupId}}">
+            <!-- Dieser Request soll anhand der ID die Gruppeninfo holen -->
             <div class="info">
-                <template is="dom-repeat" items="[[members]]" as="member">
+                <get-access-token token="{{header}}"></get-access-token>
+                <iron-ajax
+                    auto
+                    headers='[[header]]'
+                    handle-as="json"
+                    on-response="_handleGroupRequest"
+                    url="http://localhost:3000/api/Groups/[[selfInfo.groupId]]/"></iron-ajax>
+            <div class="info">
+                <template is="dom-repeat" items="[[group.groupMemberIds]]" as="member">
                     <div class="member">
-                        <get-member-info id=[[member.id]] name='{{memberName}}' mail="{{mail}}"></get-member-info>
+                        <get-user-info user-id='[[member]]' name='{{_setMemberInfo(groupMembers.*, 1, "name")}}' mail="{{mail}}"></get-user-info>
+                        <!--TODO Bind Name & Mail to Property-->
                         <a href="mailto:[[mail]]" tabindex="-1"><paper-icon-button icon="icons:mail"></paper-icon-button></a>
-                        <h2>[[memberName]]</h2>
+                        <h2>[[arrayItem(groupMembers.*, 1, "name")]]</h2>
                     </div>
                 </template>
             </div>
         </template>
-        <template is="dom-if" if="{{!group.id}}">
+        <template is="dom-if" if="{{!selfInfo.groupId}}">
             <div class="join">
                 <!-- Random Join Auskommentiert, da noch nicht unterstützt
                 <div class="random">
@@ -143,48 +154,48 @@
         Polymer({
             is: 'group-detail',
             properties: {
-                groupTest: {
-
+                selfInfo: {
                     type: Object,
                     notify: true,
                     readOnly: false,
-                    value: function () {
+                    /*value: function () {
                         return {};
-                    }
+                    }*/
                 },
                 group: {
                     type: Object,
                     notify: true,
-                    readOnly: false,
-                    value: function () {
-                        return {};
-                    }
+                    readOnly: false
                 },
                 groupMembers: {
-                    type: Object,
+                    type: Array,
+                    notify: true,
+                    value: [{"name":"","Mail":""},{"name":"Peter","Mail":""},{"name":"","Mail":""},{"name":"","Mail":""}]
                 },
                 joinedGroup: {
                     type: Boolean,
                     value: false
                 },
-                mails: {
-                    type: Array,
-                    value: function () {
-                        return [];
-                    }
-                },
                 groupSize: {
                     //TODO make input dependent
                     type: Number,
                     value: 4
+                },
+                groupName: {
+                    type: String,
+                    notify: true,
+                    readOnly: true
                 }
 
             },
             ready: function() {
-                console.log(this.group.id);
+                console.log(this.selfInfo);
+
+                //kevin id: 586fcef193fc4dc017aa3806
+                /*console.log(this.group.id);
                 console.log(this.groupMembers);
                 console.log(this.group);
-                console.log(this.groupTest);
+                console.log(this.groupTest);*/
                 //Just for testing
                 /*var joinedMembersTest = [
                     {name: 'Max Mustermann', mail:'max.mustermann@campus.lmu.de'},
@@ -202,12 +213,13 @@
                 //this.members = joinedMembersTest;
 
                 //Set Members to IDs retrieved from group info
-                this.members = [];
+                /*this.members = [];
                 var self = this;
                 for(var i = 0; i<this.group.groupMemberIds.length; i++){
                     //self.members.push({"id":this.group.groupMemberIds[i],"name":"","mail":""});
                     this.push('members',{"id":this.group.groupMemberIds[i]});
-                }
+                }*/
+
                 /*console.log(this.members);
                 this.members = [
                     {"id":"id1"},
@@ -222,7 +234,7 @@
                     {"id":this.group.groupMemberIds[3]}
                 ];
                 this.members = [];*/
-                console.log(this.members);
+                //console.log(this.members);
 
                 //If not yet in group, show join group view, else show group info
                 /*if(!this.members[0].id){
@@ -231,6 +243,24 @@
                 } else {
                     this.toggleAttribute('active',true, this.$$('.info'));
                 }*/
+
+                var groupE = {
+                    "name": "Gruppe 5",
+                    "id": "string",
+                    "groupMemberIds": [
+                        "string","string","string","string"
+                    ],
+                    "semesterId": "string",
+                    "labIds": [
+                        "string"
+                    ],
+                    "priorityIds": [
+                        "string"
+                    ]
+                };
+                //this._handleGroupRequest(groupE);
+                //console.log(this.group);
+                //console.log(this.group.groupMemberIds);
 
             },
             _getMembers: function () {
@@ -241,6 +271,16 @@
                 }
                 console.log(members);
                 return members;
+            },
+
+            _setMemberInfo: function (value, index, path) {
+                this.set(path,value);
+            },
+
+            arrayItem: function(change, index, path) {
+                // this.get(path, root) returns a value for a path
+                // relative to a root object.
+                return this.get(path, change.base[index]);
             },
 
             _createNewGroup: function(){
@@ -278,6 +318,12 @@
             calcNaturalIndex: function (index) {
                 return index+1;
             },
+            _handleGroupRequest: function (e) {
+                this.group = e.detail.response;
+                this.notifyPath('group.groupMemberIds');
+                console.log(this.group);
+                this._setGroupName(this.group.name);
+            },
             _handleJoin: function(e){
                 var response = e.detail.response;
                 if(response.valid){
@@ -286,6 +332,11 @@
 
                 }
                 this.group = e.detail.response;
+                this.selfInfo.groupId = "New ID";
+                console.log(this.selfInfo.groupId);
+            },
+            _handleUserResponse: function (e) {
+                console.log(e.detail.response);
             }
         });
     </script>

@@ -18,7 +18,7 @@
                 height: 64px;
                 width: 64px;
                 position: relative;
-                margin: 18px calc(20% - 54px);
+                margin: 18px 0 18px 18px; /*oben rechts unten links old:calc(20% - 54px)*/
                 float: left;
                 border-radius: 50%;
                 border: 2px solid var(--paper-blue-grey-900);
@@ -29,10 +29,13 @@
             h1{
                 float: right;
                 position: relative;
-                top: 18px;
-                width:100px;
-                margin-right: calc(50% - 50px);
-                text-align: center;
+                top: 20px;
+                display:flex;
+                align-items:center;
+                width:calc(100% - 128px);
+                margin: 0 18px;
+                height: 60px;
+                padding: 0;
             }
 
             @media screen and (max-width: 767px) {
@@ -57,7 +60,10 @@
 
             properties: {
                 groupName: {
-                    type: String
+                    type: String,
+                    value: "Tritt jetzt einer Gruppe bei!",
+                    notify: false,
+                    readOnly: false
                 },
                 expanded: {
                     type: Boolean,

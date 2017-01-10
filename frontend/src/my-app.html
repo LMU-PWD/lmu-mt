@@ -118,7 +118,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             attr-for-selected="name"
             fallback-selection="error">
 
-            <main-view name="main" shownotifications="{{ showDesktopNotifications }}"></main-view>
+            <main-view name="main" shownotifications="{{ showDesktopNotifications }}" user-id="{{session.userId}}" access-key="{{session.accessToken}}"></main-view>
             <login-view
                 name="login"
                 access-token="{{ session.accessToken }}"
@@ -169,7 +169,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var cookieAccessToken = this._getCookie('mt-api-accesstoken');
         var cookieUserId = this._getCookie('mt-api-userid');
 
-        if (cookieAccessToken !== '' && cookieUserId !== '') {
+          if (cookieAccessToken !== '' && cookieUserId !== '') {
 
           // TODO: Verify validity of cookies with API request
           this.set('session.accessToken', cookieAccessToken);
