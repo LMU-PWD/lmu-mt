@@ -56,6 +56,7 @@
             auto
             body="[[ ajax.body ]]"
             content-type="[[ ajax.contentType ]]"
+            access-control-allow-origin="http://lmu-mt-api.herokuapp.com"
             handle-as="json"
             method="[[ ajax.method ]]"
             on-error="_handleLoginError"
@@ -132,8 +133,8 @@
                     },
                     contentType: 'application/json',
                     method: 'POST',
-                    //url: 'http://lmu-mt-api.herokuapp.com/api/platformusers/login'
-                    url: 'http://localhost:3000/api/platformusers/login'
+                    url: 'http://lmu-mt-api.herokuapp.com/api/platformusers/login'
+                    //url: 'http://localhost:3000/api/platformusers/login'
                 };
 
                 // Reset input fields (in case of immediate logout users
