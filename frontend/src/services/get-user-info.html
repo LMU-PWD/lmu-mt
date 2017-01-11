@@ -52,7 +52,7 @@
                 }
             },
             ready: function() {
-                console.log(this.id);
+                //console.log(this.id);
                 //For testing without API
                 var e = {
                     "realm": "string",
@@ -75,9 +75,8 @@
                 //this._set<Property> function for Updating readOnly Properties
                 this._setMail(event.detail.response.email);
                 this._setName(event.detail.response.first_name + " " + e.detail.response.name);
-                console.log(event.detail.response);
-                console.log(event.detail.response.first_name + " " + e.detail.response.name);
-                console.log(this.testResp);
+                console.log(this.name);
+                console.log(this.mail);
             }
         });
     </script>

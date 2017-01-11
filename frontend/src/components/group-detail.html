@@ -103,13 +103,11 @@
                     handle-as="json"
                     on-response="_handleGroupRequest"
                     url="http://localhost:3000/api/Groups/[[selfInfo.groupId]]/"></iron-ajax>
-            <div class="info">
                 <template is="dom-repeat" items="[[group.groupMemberIds]]" as="member">
                     <div class="member">
-                        <get-user-info user-id='[[member]]' name='{{memberName)}}' mail="{{mail}}"></get-user-info>
-                        <!--TODO Bind Name & Mail to Property-->
-                        <a href="mailto:[[mail]]" tabindex="-1"><paper-icon-button icon="icons:mail"></paper-icon-button></a>
-                        <h2>[[memberName]]</h2>
+                        <get-user-info user-id='[[member.id]]' name='{{member.name}}' mail="{{member.mail}}"></get-user-info>
+                        <a href="mailto:[[member.mail]]" tabindex="-1"><paper-icon-button icon="icons:mail"></paper-icon-button></a>
+                        <h2>[[member.name]]</h2>
                     </div>
                 </template>
             </div>
@@ -166,15 +164,6 @@
                     type: Object,
                     notify: true,
                     readOnly: false
-                },
-                groupMembers: {
-                    type: Array,
-                    notify: true,
-                    value: [{"name":"","Mail":""},{"name":"Peter","Mail":""},{"name":"","Mail":""},{"name":"","Mail":""}]
-                },
-                joinedGroup: {
-                    type: Boolean,
-                    value: false
                 },
                 groupSize: {
                     //TODO make input dependent
@@ -321,8 +310,15 @@
             _handleGroupRequest: function (e) {
                 this.group = e.detail.response;
                 this.notifyPath('group.groupMemberIds');
-                console.log(this.group);
+                //console.log(this.group.groupMemberIds);
+                var self = this;
+                //Change groupMemberIds to Array Containing Objects with ID, Name and Mail
+                this.group.groupMemberIds.forEach(function () {
+                    self.push('group.groupMemberIds',{"id":self.shift('group.groupMemberIds'),"name":"","mail":""});
+                });
+                //Set the group name bound to group-card
                 this._setGroupName(this.group.name);
+                console.log(this.group);
             },
             _handleJoin: function(e){
                 var response = e.detail.response;
