@@ -9,7 +9,7 @@
   <template>
     <style include="shared-styles">
       :host {
-        display: block;
+        #display: block;
       }
       .page{
         #border-radius: 25px;
@@ -58,7 +58,7 @@
         z-index: 1;
       }
       .content{
-        padding: 3%;
+        padding: 10px;
       }
     </style>
     <div class="page">
@@ -96,7 +96,7 @@
           },
           icon:{
               type: String,
-          },
+          }
       },
         _backClicked: function() {
             this.fire("back-click");
@@ -111,7 +111,7 @@
             } else if(this.type.includes("Audio" || "audio")){
                 this.icon = "../../../images/audio.svg";
             }
-        },
+        }
 
     });
   </script>

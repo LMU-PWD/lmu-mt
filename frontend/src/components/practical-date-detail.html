@@ -3,27 +3,40 @@
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../../bower_components/paper-item/paper-item.html">
-<link rel="import" href="../components/date-selector.html">
+<link rel="import" href="../../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../../bower_components/iron-collapse/iron-collapse.html">
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="date-creator.html">
 <link rel="import" href="../shared/shared-styles.html">
 
 <dom-module id="practical-date-detail">
     <template>
         <style include="shared-styles">
             :host{
+
+            }
+            .dateselector{
+
+                text-align: center;
+                width: 100%;
+            }
+            .datecreator{
+                display:inline-block;
+                margin:0;
                 height: auto;
-                min-width: 320px;
-                width: 100% ;
-                background-color: var(--paper-blue-grey-100);
-                display: block;
-                position: relative;
-                top: 1px;
-                border-top: 1px solid var(--paper-blue-grey-900);
-                border-radius: 0 0 5px 5px;
+                width: 49%;
+                min-width: 400px;
+                vertical-align:top;
             }
         </style>
         <!-- Checking for Group ID if User Joined Group-->
         <template is="dom-if" if="{{!practicalDate}}">
-                <date-selector timesLimits="[[timeLimits]]" timeSlotSize="[[timeSlotSize]]"></date-selector>
+            <div class="dateselector">
+                <template is="dom-repeat" items="[[timeslots]]" as="slots">
+                    <date-creator timeslots="[[slots]]" priority="[[priority]]" class="datecreator"></date-creator>
+                </template>
+            </div>
         </template>
         <template is="dom-if" if="{{practicalDate}}">
             <div class="dateshower">
@@ -50,30 +63,54 @@
                     type: String,
                     value: ""
                 },
-                timeLimits:{
+                timeslots:{
                     type: Array,
                     value: []
                 },
-                timeSlotSize:{
+                time_limits:{
+                    type: Array,
+                    value: []
+                },
+                time_slot_size:{
+                    type: Number,
+                    value: 0
+                },
+                priority:{
                     type: Number,
                     value: 0
                 }
             },
+
             ready: function() {
-                this.timeLimits=[new Date(1,0,0,1,0),new Date(1,0,0,5,0),new Date(5,1,0,14,0),new Date(5,1,0,23,0)];
-                this.timeSlotSize=30;
+                this.priority = 5;
+                this.time_limits = [new Date(1,0,0,1,0),new Date(1,0,0,5,0),new Date(5,1,0,14,0),new Date(5,1,0,23,0)];
+                this.time_slot_size = 30;
                 this.practicalDate = this._getDate();
                 if(this.practicalDate != null){
-                    this.practicalDateString = this._getDateString();
+                    this.practicalDateString = this._getDateString(this.practicalDate);
+                }
+                else{
+                    this.timeslots = this._calculateTimeslots(this.time_limits,this.time_slot_size);
                 }
             },
+
+            /**
+             * Function that checks for the practial course date
+             * @param {String} date - date that will be transformed to String
+             */
             _getDate: function(){
+                //TODO: Check for Practicalsdates in Backend
                 //return new Date(1,0,0,0,0);
                 return null;
             },
-            _getDateString: function(){
+
+            /**
+             * Creates string from the given date
+             * @param {String} date - date that will be transformed to String
+             */
+            _getDateString: function(date){
                 var datestring = "";
-                switch(this.practicalDate.getDay()){
+                switch(date.getDay()){
                     case 1:
                         datestring = "Montag, den ";
                         break;
@@ -96,9 +133,48 @@
                         datestring = "Sonntag, den ";
                         break;
                 }
-                datestring = datestring+this.practicalDate.getDate()+"."+this.practicalDate.getMonth()+"."+this.practicalDate.getFullYear()+
-                        " um "+this.practicalDate.getHours()+":"+this.practicalDate.getMinutes()+" Uhr"
+                datestring = datestring+date.getDate()+"."+date.getMonth()+"."+date.getFullYear()+
+                        " um "+date.getHours()+":"+date.getMinutes()+" Uhr";
                 return datestring;
+            },
+
+            /**
+             * Calculate Timeslots from given timelimits and the desired timeslot size
+             * @param {Array} timeLimits - time limits to define the slots
+             * @param {Number} timeSlotSize - desired size of the time slots
+             */
+            _calculateTimeslots: function(timeLimits,timeSlotSize){
+                var timeslots =[];
+                if(timeLimits.length%2 == 0) {
+                    for (i = 0; i < timeLimits.length; i = i + 2) {
+                        if(timeLimits[i].getFullYear() == timeLimits[i+1].getFullYear() &&
+                            timeLimits[i].getMonth() == timeLimits[i+1].getMonth() &&
+                            timeLimits[i].getDate() == timeLimits[i+1].getDate()) {
+                            var slotsOnThisDays = [];
+                            var starttime = (timeLimits[i].getHours() * 60) + timeLimits[i].getMinutes();
+                            var endtime = (timeLimits[i + 1].getHours() * 60) + timeLimits[i + 1].getMinutes();
+                            var totalTimeDifference = endtime - starttime;
+
+                            for (j = 0; j < (totalTimeDifference); j = j + timeSlotSize) {
+
+                                var startdate = new Date(timeLimits[i].getFullYear(), timeLimits[i].getMonth(), timeLimits[i].getDate());
+                                startdate.setHours(Math.floor((starttime + j) / 60));
+                                startdate.setMinutes(Math.floor((starttime + j) % 60));
+
+                                var enddate = new Date(timeLimits[i].getFullYear(), timeLimits[i].getMonth(), timeLimits[i].getDate());
+                                enddate.setHours(Math.floor((starttime + j + timeSlotSize) / 60));
+                                enddate.setMinutes(Math.floor((starttime + j + timeSlotSize) % 60));
+                                slotsOnThisDays.push([startdate, enddate]);
+                            }
+                            timeslots.push(slotsOnThisDays);
+                        }
+                        else{console.log("Error: Array is malformed. Each start- and endlimit has to be on the same day.")}
+                    }
+                    return timeslots;
+                }
+                else{
+                    console.log("Error: Array is malformed. No pair number of timeslot limits.")
+                }
             }
         });
     </script>

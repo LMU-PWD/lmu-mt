@@ -1,8 +1,9 @@
-<link rel="import" href="../../bower_components/paper-item/paper-item.html">
-
 <dom-module id="date-creator">
     <template>
         <style include="shared-styles">
+            :host{
+
+            }
             .date{
                 padding: 10px;
                 background-color: var(--paper-blue-grey-500);
@@ -17,6 +18,11 @@
             .date-creator{
                 margin-top: 20px;
                 background-color: var(--paper-blue-grey-50);
+                text-align: center;
+            }
+            #priorityselection{
+                background-color: var(--paper-blue-grey-200);
+                padding-bottom: 20px;
             }
         </style>
         <div class="date-creator">
@@ -27,6 +33,22 @@
                 <paper-item class="slot" on-tap="_handleDateClick">
                     [[slot]]
                 </paper-item>
+                <iron-collapse id="priorityselection">
+                    <div>
+                        <!--div> Wähle die Priorität dieses Termins:</div-->
+                        <!--template is="dom-repeat" items="[[priorities]]" as="selector">
+                            <paper-checkbox>[[selector]]</paper-checkbox>
+                        </template-->
+                        <paper-dropdown-menu label="Priorität: ">
+                            <paper-listbox class="dropdown-content">
+                                <template is="dom-repeat" items="[[priorities]]" as="selector">
+                                    <paper-item on-tap="_handlePriorityClick">[[selector]]</paper-item>
+                                </template>
+                            </paper-listbox>
+                        </paper-dropdown-menu>
+                        <div>(1 - gering; [[priority]] - hoch)</div>
+                    </div>
+                </iron-collapse>
             </template>
         </div>
     </template>
@@ -45,15 +67,31 @@
                 date:{
                     type: String,
                     value: ""
+                },
+                priority:{
+                    type: Number,
+                    value: 0
+                },
+                priorities:{
+                    type: Array,
+                    value: []
+                },
+                recentdate:{
+                    type: Object
                 }
             },
             ready: function() {
                 this.date = this._getDateString(this.timeslots[0][0]);
                 this.timeSlotStrings = this._getTimeSlotString();
-            },
+
+                for (i = 0; i < this.priority; i++) {
+                        this.priorities[i]=i+1;
+                    }
+                },
 
             /**
-             * Creates string from the timeslot-timits to get a nicer visualisation
+             * Creates string from the timeslot-timits to get a nicer visualisation,
+             * Adds leading zeros, if necessary
              */
             _getTimeSlotString: function(){
                 var timeslotstrings = [];
@@ -121,10 +159,31 @@
 
             /**
              * Click-Event handler
+             * Handles the timeslot selection
              * @param {String} e - handle data
              */
             _handleDateClick: function(e){
+                if(this.recentdate){
+                    this.recentdate.hide();
+                }
+                var selectedTimeslot = this.timeslots[e.model.index];
+                //console.log(selectedTimeslot);
+                this.recentdate = Polymer.dom(this.root).querySelectorAll("#priorityselection")[e.model.index];
+                this.recentdate.toggle();
+            },
 
+            /**
+             * Click-Event handler
+             * Handles the priority selection
+             * @param {String} e - handle data
+             */
+            _handlePriorityClick: function(e){
+                var selectedPriority = e.model.selector;
+                console.log(selectedPriority);
+                this.recentdate.toggle();
+                //this.recentdate.customStyle['color'] = 'red';
+                //Polymer.updateStyles();
+                //this.updateStyles();
             }
         });
     </script>
