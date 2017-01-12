@@ -88,6 +88,10 @@
                     type: Number,
                     value: 0
                 },
+                chosenslot:{
+                    type: Number,
+                    value: 0
+                },
                 recentdate: {
                     type: Object
                 }
@@ -180,6 +184,9 @@
              */
             _handleDateClick: function(e){
                 this.fire("date-click");
+
+                this.chosenslot = this.timeslots[e.model.index];
+                //console.log(this.chosenslot);
 
                 //If there is a visible priorityselection, hide it
                 if(this.recentpriorityselection){

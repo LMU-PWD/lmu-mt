@@ -82,6 +82,10 @@
                 priorities:{
                     type: Array,
                     value: []
+                },
+                chosenslots:{
+                    type: Array,
+                    value: []
                 }
             },
 
@@ -203,6 +207,8 @@
              * @private
              */
             _handlePriorityClick: function(e){
+                this.chosenslots[e.target.chosenpriority-1]= e.target.chosenslot;
+                //console.log(this.chosenslots);
                 this.priorities[e.target.chosenpriority-1] = 0;
             }
         });
