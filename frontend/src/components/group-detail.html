@@ -133,7 +133,7 @@
                         </paper-input>
                     </template>
                     <paper-button on-tap="_createNewGroup">Neue Gruppe erstellen</paper-button>
-                    <paper-input-error invalid>Du musst zu viert sein um eine neue Gruppe zu erstellen</paper-input-error>
+                    <p class="red-color-text small">Du musst zu viert sein um eine neue Gruppe zu erstellen</p>
 
                     <iron-ajax
                             id="joinRequest"
@@ -155,10 +155,7 @@
                 selfInfo: {
                     type: Object,
                     notify: true,
-                    readOnly: false,
-                    /*value: function () {
-                        return {};
-                    }*/
+                    readOnly: false
                 },
                 group: {
                     type: Object,
