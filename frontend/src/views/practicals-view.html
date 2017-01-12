@@ -95,14 +95,15 @@
               value: "0"
           },
           icon:{
-              type: String,
+              type: String
           }
       },
         _backClicked: function() {
-            this.fire("back-click");
+          this.type = "";
+          this.fire("back-click");
         },
         ready: function () {
-            if(this.type.includes("Photo" || "photo")){
+            /*if(this.type.includes("Photo" || "photo")){
                 this.icon = "../../../images/photo.svg";
             } else if(this.type.includes("Foto" || "foto")){
                 this.icon = "../../../images/photo.svg";
@@ -111,6 +112,9 @@
             } else if(this.type.includes("Audio" || "audio")){
                 this.icon = "../../../images/audio.svg";
             }
+            console.log();
+            //Refreshing won't work this way
+            */
         }
 
     });

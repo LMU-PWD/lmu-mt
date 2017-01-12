@@ -17,7 +17,6 @@
 
             }
             .dateselector{
-
                 text-align: center;
                 width: 100%;
             }
@@ -34,7 +33,8 @@
         <template is="dom-if" if="{{!practicalDate}}">
             <div class="dateselector">
                 <template is="dom-repeat" items="[[timeslots]]" as="slots">
-                    <date-creator timeslots="[[slots]]" priority="[[priority]]" class="datecreator"></date-creator>
+                    <date-creator timeslots="[[slots]]" priority="[[priority]]" class="datecreator"
+                                  on-priority-click="_handlePriorityClick" on-date-click="_handleDateClick"></date-creator>
                 </template>
             </div>
         </template>
@@ -77,12 +77,15 @@
                 },
                 priority:{
                     type: Number,
-                    value: 0
+                    value: 5
+                },
+                priorities:{
+                    type: Array,
+                    value: []
                 }
             },
 
             ready: function() {
-                this.priority = 5;
                 this.time_limits = [new Date(1,0,0,1,0),new Date(1,0,0,5,0),new Date(5,1,0,14,0),new Date(5,1,0,23,0)];
                 this.time_slot_size = 30;
                 this.practicalDate = this._getDate();
@@ -91,6 +94,10 @@
                 }
                 else{
                     this.timeslots = this._calculateTimeslots(this.time_limits,this.time_slot_size);
+                }
+
+                for (i = 0; i < this.priority; i++) {
+                    this.priorities[i]=i+1;
                 }
             },
 
@@ -147,23 +154,26 @@
                 var timeslots =[];
                 if(timeLimits.length%2 == 0) {
                     for (i = 0; i < timeLimits.length; i = i + 2) {
+                        //Check if start- and endlimit are on the same day
                         if(timeLimits[i].getFullYear() == timeLimits[i+1].getFullYear() &&
                             timeLimits[i].getMonth() == timeLimits[i+1].getMonth() &&
                             timeLimits[i].getDate() == timeLimits[i+1].getDate()) {
                             var slotsOnThisDays = [];
-                            var starttime = (timeLimits[i].getHours() * 60) + timeLimits[i].getMinutes();
-                            var endtime = (timeLimits[i + 1].getHours() * 60) + timeLimits[i + 1].getMinutes();
-                            var totalTimeDifference = endtime - starttime;
+                            var starttime = (timeLimits[i].getHours() * 60) + timeLimits[i].getMinutes(); // Starttime in Minutes
+                            var endtime = (timeLimits[i + 1].getHours() * 60) + timeLimits[i + 1].getMinutes(); // Endtime in Minutes
+                            var totalTimeDifference = endtime - starttime; //Total timeslot length
 
                             for (j = 0; j < (totalTimeDifference); j = j + timeSlotSize) {
 
+                                //Calculate startdate of recent timeslot by adding the already calculated timeslot lenghts to the total starttime
                                 var startdate = new Date(timeLimits[i].getFullYear(), timeLimits[i].getMonth(), timeLimits[i].getDate());
                                 startdate.setHours(Math.floor((starttime + j) / 60));
-                                startdate.setMinutes(Math.floor((starttime + j) % 60));
+                                startdate.setMinutes((starttime + j) % 60);
 
+                                //Calculate enddate of recent timeslot by adding timeslot lenght to the startdate
                                 var enddate = new Date(timeLimits[i].getFullYear(), timeLimits[i].getMonth(), timeLimits[i].getDate());
                                 enddate.setHours(Math.floor((starttime + j + timeSlotSize) / 60));
-                                enddate.setMinutes(Math.floor((starttime + j + timeSlotSize) % 60));
+                                enddate.setMinutes((starttime + j + timeSlotSize) % 60);
                                 slotsOnThisDays.push([startdate, enddate]);
                             }
                             timeslots.push(slotsOnThisDays);
@@ -175,6 +185,25 @@
                 else{
                     console.log("Error: Array is malformed. No pair number of timeslot limits.")
                 }
+            },
+
+            /**
+             * Handle date click from Child (date-creator)
+             * Update child priorities-Array
+             * @param e - Event Variable
+             * @private
+             */
+            _handleDateClick: function(e){
+                e.target.priorities = this.priorities;
+            },
+
+            /**
+             * Handle priority click from Child (date-creator)
+             * @param e - Event Variable
+             * @private
+             */
+            _handlePriorityClick: function(e){
+                this.priorities[e.target.chosenpriority-1] = 0;
             }
         });
     </script>

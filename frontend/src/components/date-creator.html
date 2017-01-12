@@ -24,6 +24,14 @@
                 background-color: var(--paper-blue-grey-200);
                 padding-bottom: 20px;
             }
+            .priorityShower{
+                margin-left: 10%;
+                color: green;
+            }
+            .dropdown-content{
+                width: 70px;
+            }
+
         </style>
         <div class="date-creator">
             <div class="date">
@@ -35,14 +43,13 @@
                 </paper-item>
                 <iron-collapse id="priorityselection">
                     <div>
-                        <!--div> Wähle die Priorität dieses Termins:</div-->
-                        <!--template is="dom-repeat" items="[[priorities]]" as="selector">
-                            <paper-checkbox>[[selector]]</paper-checkbox>
-                        </template-->
                         <paper-dropdown-menu label="Priorität: ">
                             <paper-listbox class="dropdown-content">
                                 <template is="dom-repeat" items="[[priorities]]" as="selector">
-                                    <paper-item on-tap="_handlePriorityClick">[[selector]]</paper-item>
+                                    <!--template is="dom-if" if="[[_computeSelector(selector)]]"-->
+                                        <template is="dom-if" if="[[_computeSelector(selector)]]">
+                                          <paper-item on-tap="_handlePriorityClick">[[selector]]</paper-item>
+                                    </template>
                                 </template>
                             </paper-listbox>
                         </paper-dropdown-menu>
@@ -74,9 +81,18 @@
                 },
                 priorities:{
                     type: Array,
-                    value: []
+                    value: [],
+                    notify: true
                 },
-                recentdate:{
+                chosenpriority:{
+                    type: Number,
+                    value: 0
+                },
+                recentdate: {
+                    type: Object
+                }
+                ,
+                recentpriorityselection:{
                     type: Object
                 }
             },
@@ -86,8 +102,8 @@
 
                 for (i = 0; i < this.priority; i++) {
                         this.priorities[i]=i+1;
-                    }
-                },
+                }
+            },
 
             /**
              * Creates string from the timeslot-timits to get a nicer visualisation,
@@ -163,27 +179,51 @@
              * @param {String} e - handle data
              */
             _handleDateClick: function(e){
-                if(this.recentdate){
-                    this.recentdate.hide();
+                this.fire("date-click");
+
+                //If there is a visible priorityselection, hide it
+                if(this.recentpriorityselection){
+                    this.recentpriorityselection.hide();
                 }
-                var selectedTimeslot = this.timeslots[e.model.index];
-                //console.log(selectedTimeslot);
-                this.recentdate = Polymer.dom(this.root).querySelectorAll("#priorityselection")[e.model.index];
-                this.recentdate.toggle();
+
+                // Get clicked priorityselection
+                this.recentpriorityselection = Polymer.dom(this.root).querySelectorAll("#priorityselection")[e.model.index];
+                this.recentpriorityselection.toggle(); //Show Priorityselection
+                this.recentdate = e.target;
+
+                //Array-Mutation to force the priorityselection-Dom-Repeat to update
+                var array = this.priorities;
+                this.priorities = [];
+                this.priorities = array;
             },
 
             /**
              * Click-Event handler
-             * Handles the priority selection
+             * Handles the priority selection and fires the priority-click-Event
              * @param {String} e - handle data
              */
             _handlePriorityClick: function(e){
-                var selectedPriority = e.model.selector;
-                console.log(selectedPriority);
-                this.recentdate.toggle();
-                //this.recentdate.customStyle['color'] = 'red';
-                //Polymer.updateStyles();
-                //this.updateStyles();
+                this.chosenpriority = e.model.selector;
+                this.fire("priority-click"); //Notifies Parent (practical-date-detail.html)
+
+                this.recentpriorityselection.toggle(); //Hide Priorityselection
+                this.recentdate.style.color = 'green';
+                this.recentdate.style.backgroundColor = '#CEF6CE';
+                this.recentdate.innerHTML = this.recentdate.innerHTML + '<div class="priorityShower">    Priorität: ' + e.model.selector+ '</div>';
+            },
+
+            /**
+             * Checks if given Parameter is 0 and returns true of false
+             * @param selector - Given parameter
+             * @returns {boolean}
+             * @private
+             */
+            _computeSelector: function(selector){
+                var response = true;
+                if(selector == 0){
+                    response = false;
+                }
+                return response;
             }
         });
     </script>

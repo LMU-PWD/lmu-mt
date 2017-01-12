@@ -52,7 +52,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         .practicalsContainer{
           min-width: 320px;
           width: 100%;
-
         }
       }
       /*Tablet*/
@@ -128,7 +127,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 logged-in="{{ session.loggedIn }}"
                 user-id="{{ session.userId }}"></login-view>
             <error-view name="error"></error-view>
-            <practicals-view name="practicals" type={{course}} on-back-click="_backClicked"></practicals-view>
+            <practicals-view name="practicals" type=[[course]] icon="[[icon]]" on-back-click="_backClicked"></practicals-view>
 
         </iron-pages>
 
@@ -158,6 +157,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         },
         course: {
             type: String
+        },
+        icon:{
+          type: String
         },
         route: {
           type: Object,
@@ -276,30 +278,34 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
          * Process click on Foto-Card in the Main-View
          */
         _fotoPracticalClicked: function(){
-            this.course = "Foto"
+            this.course = "Foto";
             this.page = "practicals";
+            this.icon = "../../../images/photo.svg";
         },
 
         /**
          * Process click on Video-Card in the Main-View
          */
         _videoPracticalClicked: function(){
-            this.course = "Video"
+            this.course = "Video";
             this.page = "practicals";
+            this.icon = "../../../images/video.svg";
         },
 
         /**
          * Process click on Audio-Card in the Main-View
          */
         _audioPracticalClicked: function(){
-            this.course = "Audio"
+            this.course = "Audio";
             this.page = "practicals";
+            this.icon = "../../../images/audio.svg";
         },
 
         /**
          * Process click on Back-Button in the Practical-View
          */
         _backClicked: function(){
+            this.course = "";
             this.page = "main";
         }
 
