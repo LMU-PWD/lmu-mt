@@ -1,14 +1,18 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../components/index-card.html">
 <link rel="import" href="../components/group-card.html">
+<link rel="import" href="../components/group-detail.html">
 <link rel="import" href="../components/notifications-card.html">
 <link rel="import" href="../components/navigation-bar.html">
 <link rel="import" href="../shared/shared-styles.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
 
 
 <dom-module id="main-view">
+
   <template>
+
     <style include="shared-styles">
       :host {
         display: block;
@@ -18,10 +22,7 @@
       }
       .group-info{
         width: 100%;
-        height: 275px;
-        position: relative;
-        top: -5px;
-        background-color: green;
+        /*height: 275px;*/
       }
       .practicalsContainer {
         float: left;
@@ -37,7 +38,6 @@
         .group-placeholder{
           width: 100%;
           min-width: 320px;
-          height: 104px; /*Hotfix for no bottom margin*/
         }
         .group-info{
           display: none;
@@ -87,12 +87,23 @@
       }
     </style>
 
+    <!-- Fetches info about currently logged in user -->
+    <iron-ajax
+            auto
+            headers='[[ajax.headers]]'
+            content-type="[[ ajax.contentType ]]"
+            handle-as="json"
+            method="[[ ajax.method ]]"
+            on-error="_handleUserError"
+            on-response="_handleUserResponse"
+            url="[[ ajax.url ]]"></iron-ajax>
+
     <app-header fixed>
       <navigation-bar
-        access-token="{{ accessToken }}"
-        logged-in="{{ loggedIn }}"
-        user-id="{{ userId }}"
-        show="{{ showMobileNotifications }}"></navigation-bar>
+              access-token="{{ accessToken }}"
+              logged-in="{{ loggedIn }}"
+              user-id="{{ userId }}"
+              show="{{ showMobileNotifications }}"></navigation-bar>
     </app-header>
 
     <!-- NOTIFICATIONS -->
@@ -100,15 +111,15 @@
       <notifications-card showlist="{{ showMobileNotifications }}"></notifications-card>
     </template>
 
-    <div >
+    <div>
       <div class="notificationsContainer">
         <template is="dom-if" if="{{ shownotifications }}">
           <notifications-card showlist="{{ showlist }}"></notifications-card>
         </template>
       </div>
       <div class="group-placeholder light-color-text">
-        <group-card groupName="Gruppe 5"></group-card>
-        <div class="group-info"></div>
+        <group-card group-name=[[groupName]]></group-card>
+        <group-detail class="group-info" self-info="{{user}}" group-name="{{groupName}}"></group-detail>
       </div>
       <div class="practicalsContainer">
         <index-card type="Fotopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:" info2="18.05.16, 14-16"></index-card>
@@ -117,6 +128,7 @@
       </div>
 
     </div>
+
   </template>
 
   <script>
@@ -130,26 +142,64 @@
           type: Boolean,
           value: false
         },
-        accessToken: {
-          type: String,
-          notify: true
-        },
-        loggedIn: {
-          type: Boolean,
-          notify: true
-        },
-        userId: {
-          type: String,
-          notify: true
+        userId: String,
+        accessToken: String,
+        user: {
+          type: Object,
+          notify: true,
+          readOnly: false,
+          value: {}
         }
-      }
-      //Resize listener not yet workings
-      /*ready: function(){
-        window.addEventListener("resize", function() { this.windowResize(); });
       },
-      windowResize: function(){
-          this.expanded = ($(window).width()>767);
-      }*/
+      ready: function () {
+
+        this.ajax = {
+          contentType: 'application/json',
+          headers: {
+            Authorization: this.accessToken
+          },
+          method: 'GET',
+          url: 'http://localhost:3000/api/platformusers/' + this.userId
+        };
+
+
+        //On login -> id
+        // id -> request user info
+
+        //Not yet working
+        /*this.push('group',{
+          "name": "Gruppe 5",
+          "id": "string",
+          "groupMemberIds": [
+            "string","string","string","string"
+          ],
+          "semesterId": "string",
+          "labIds": [
+            "string"
+          ],
+          "priorityIds": [
+            "string"
+          ]
+        });
+        console.log(this.group);*/
+      },
+
+      /**
+       * Callback fired when API answers with an error
+       * @param response
+       * @private
+       */
+      _handleLoginError: function (response) {
+        console.log(response.detail.error);
+      },
+
+      _handleUserResponse: function (e) {
+        var userResponse = e.detail.response;
+        this.set('user.email', userResponse.email);
+        this.set('user.firstName', userResponse.firstName);
+        this.set('user.groupId', userResponse.groupId);
+        this.set('user.name', userResponse.name);
+      }
 
     });
   </script>

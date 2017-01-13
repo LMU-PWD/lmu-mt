@@ -1,0 +1,45 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="get-access-token">
+    <template>
+        <style>
+            :host{
+            }
+        </style>
+        <div></div>
+    </template>
+    <script>
+        Polymer({
+            is: 'get-access-token',
+            properties: {
+                token:{
+                    type: Object,
+                    notify: true,
+                    readOnly: true
+                }
+            
+            },
+            ready: function() {
+                var cookieAccessToken = this._getCookie('mt-api-accesstoken');
+                this._setToken({'Authorization':cookieAccessToken});
+            },
+
+            _getCookie: function (cookieName) {
+
+            var name = cookieName + '=';
+            var allCookies = document.cookie.split(';');
+            var idx;
+            for (idx in allCookies) {
+                var cookie = allCookies[idx];
+                while (cookie.charAt(0) == ' ') {
+                    cookie = cookie.substring(1);
+                }
+                if (cookie.indexOf(name) == 0) {
+                    return cookie.substring(name.length, cookie.length);
+                }
+            }
+            return '';
+            }
+        });
+    </script>
+</dom-module>

@@ -1,0 +1,83 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../services/get-access-token.html">
+
+<dom-module id="get-user-info">
+    <template>
+        <style>
+            :host{
+            }
+        </style>
+        <!--<iron-ajax
+                auto
+                body="[[ ajax.body ]]"+[[id]]
+                content-type="[[ ajax.contentType ]]"
+                handle-as="json"
+                method="[[ ajax.method ]]"
+                on-error="_handleLoginError"
+                on-response="_handleUserResponse"
+                url="[[ ajax.url ]]"
+                verbose
+                with-credentials="true"></iron-ajax>-->
+        <get-access-token token="{{header}}"></get-access-token>
+        <iron-ajax
+                auto
+                headers='[[header]]'
+                handle-as="json"
+                on-response="_handleUserResponse"
+                lastResponse = "{{testResp}}"
+                url="http://localhost:3000/api/PlatformUsers/[[userId]]/"></iron-ajax>
+    </template>
+    <script>
+        Polymer({
+            is: 'get-user-info',
+            properties: {
+                userId: {
+                    value: String,
+                    //For only downward Data Flow
+                    notify: false,
+                    readOnly: false
+                },
+                mail: {
+                    type: String,
+                    //For only Upward Data Flow
+                    notify: true,
+                    readOnly: true
+                },
+                name: {
+                    type: String,
+                    //For only Upward Data Flow
+                    notify: true,
+                    readOnly: true
+                }
+            },
+            ready: function() {
+                //console.log(this.id);
+                //For testing without API
+                var e = {
+                    "realm": "string",
+                    "username": "Test Name",
+                    "credentials": {},
+                    "challenges": {},
+                    "email": "mailtest@campus.lmu.de",
+                    "emailVerified": true,
+                    "status": "string",
+                    "created": "2017-01-06",
+                    "lastUpdated": "2017-01-06",
+                    "id": 0
+                };
+                //this._handleUserResponse(e);
+                //console.log(this.id);
+            },
+
+            //Function for setting Mail & Name on Ajax response
+            _handleUserResponse: function(e) {
+                //this._set<Property> function for Updating readOnly Properties
+                this._setMail(e.detail.response.email);
+                this._setName(e.detail.response.first_name + " " + e.detail.response.name);
+                console.log(this.name);
+                console.log(this.mail);
+            }
+        });
+    </script>
+</dom-module>

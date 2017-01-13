@@ -1,0 +1,341 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="../shared/shared-styles.html">
+<link rel="import" href="../services/get-user-info.html">
+<link rel="import" href="../services/get-access-token.html">
+<link rel="import" href="mail-input.html">
+
+<dom-module id="group-detail">
+
+    <template>
+
+        <style include="shared-styles">
+            :host{
+                height: auto;
+                min-width: 320px;
+                width: 100% ;
+                background-color: var(--paper-blue-grey-100);
+                display: block;
+                position: relative;
+                top: 1px;
+                border-top: 1px solid var(--paper-blue-grey-900);
+                border-radius: 0 0 5px 5px;
+            }
+
+            .info{
+                display: block;
+                padding: 5px;
+            }
+
+            .info > .member {
+                margin: 10px;
+                padding: 10px;
+                border: 1px solid var(--paper-blue-grey-700);
+                background-color: var(--paper-blue-grey-50);
+                border-radius: 5px;
+                height: 30px;
+                overflow: hidden;
+            }
+
+            .info > .member > h2 {
+
+                position: relative;
+                margin: 0 0 0 50px;
+                width: calc(100% - 50px);
+                top: -5px;
+                color: var(--paper-blue-grey-700);
+            }
+
+            .info > .member > a {
+                float: left;
+                width: 50px;
+                position: relative;
+                top: -5px;
+            }
+
+            .info > .member > a > paper-icon-button {
+                color: var(--paper-blue-grey-700);
+            }
+
+            .create-group{
+                background-color: var(--paper-blue-grey-50);
+                border-radius: 5px;
+                padding:10px 20px;
+            }
+
+            .random{
+                background-color: var(--paper-blue-grey-50);
+                border-radius: 5px;
+                padding:10px 20px;
+                margin-bottom: 5px;
+
+            }
+
+            .join{
+                display: block;
+                padding:20px;
+            }
+
+            paper-spinner[active]{
+                position: absolute;
+                height: 50px;
+                width: 50px;
+                left: 0;
+                top: 0;
+                background-color: rgba(255,255,255,0.8);
+                padding:calc(50% - 10px) calc(50% - 25px);
+                z-index: 100;
+            }
+
+            paper-input[wronginput]{
+                color: var(--paper-red-500);
+            }
+        </style>
+
+        <!-- Checking for Group ID if User Joined Group-->
+        <template is="dom-if" if="{{selfInfo.groupId}}">
+
+            <!-- Dieser Request soll anhand der ID die Gruppeninfo holen -->
+            <div class="info">
+                <get-access-token token="{{header}}"></get-access-token>
+                <iron-ajax
+                    auto
+                    headers="[[header]]"
+                    handle-as="json"
+                    on-response="_handleGroupRequest"
+                    url="http://localhost:3000/api/Groups/[[selfInfo.groupId]]/"></iron-ajax>
+                <template is="dom-repeat" items="[[group.groupMemberIds]]" as="member">
+                    <div class="member">
+                        <get-user-info user-id="[[member.id]]" name="{{member.name}}" mail="{{member.mail}}"></get-user-info>
+                        <a href="mailto:[[member.mail]]" tabindex="-1"><paper-icon-button icon="icons:mail"></paper-icon-button></a>
+                        <h2>[[member.name]]</h2>
+                    </div>
+                </template>
+            </div>
+
+        </template>
+        <template is="dom-if" if="{{!selfInfo.groupId}}">
+            <div class="join">
+                <!-- Random Join Auskommentiert, da noch nicht unterstützt
+                <div class="random">
+                    <paper-button disabled>Zufälliger Beitritt</paper-button>
+                </div>-->
+                <div class="create-group">
+                    <div>
+                        <content>
+                            <paper-spinner active="[[isLoading]]"></paper-spinner>
+                        </content>
+                    </div>
+                    <template is="dom-repeat" items="{{members}}" as="member">
+                        <paper-input label="Member [[calcNaturalIndex(index)]]"
+                                     value="{{member.mail}}"
+                                     required>
+                            <iron-icon icon="mail" prefix></iron-icon>
+                            <div suffix>@campus.lmu.de</div>
+                        </paper-input>
+                    </template>
+                    <paper-button on-tap="_createNewGroup">Neue Gruppe erstellen</paper-button>
+                    <p class="red-color-text small">Du musst zu viert sein um eine neue Gruppe zu erstellen</p>
+
+                    <iron-ajax
+                            id="joinRequest"
+                            url="https://www.some-api"
+                            params='[[joinParams]]'
+                            handle-as="json"
+                            on-response="_handleJoin"
+                            loading="{{isLoading}}">
+                    </iron-ajax>
+                </div>
+            </div>
+        </template>
+
+    </template>
+    <script>
+        Polymer({
+            is: 'group-detail',
+            properties: {
+                selfInfo: {
+                    type: Object,
+                    notify: true,
+                    readOnly: false
+                },
+                group: {
+                    type: Object,
+                    notify: true,
+                    readOnly: false
+                },
+                groupSize: {
+                    //TODO make input dependent
+                    type: Number,
+                    value: 4
+                },
+                groupName: {
+                    type: String,
+                    notify: true,
+                    readOnly: true
+                }
+
+            },
+            ready: function() {
+                console.log(this.selfInfo);
+
+                //kevin id: 586fcef193fc4dc017aa3806
+                /*console.log(this.group.id);
+                console.log(this.groupMembers);
+                console.log(this.group);
+                console.log(this.groupTest);*/
+                //Just for testing
+                /*var joinedMembersTest = [
+                    {name: 'Max Mustermann', mail:'max.mustermann@campus.lmu.de'},
+                    {name: 'Frauke Froehlich', mail:'frauke.froehlich@campus.lmu.de'},
+                    {name: 'Ida Irre', mail:'ida.irre@campus.lmu.de'},
+                    {name: 'Nina Never', mail:'nina.never@campus.lmu.de'}
+                ];
+                var notJoinedMembersTest = [
+                    {name: '', mail:''},
+                    {name: '', mail:''},
+                    {name: '', mail:''},
+                    {name: '', mail:''}
+                ];*/
+                //this.members = notJoinedMembersTest;
+                //this.members = joinedMembersTest;
+
+                //Set Members to IDs retrieved from group info
+                /*this.members = [];
+                var self = this;
+                for(var i = 0; i<this.group.groupMemberIds.length; i++){
+                    //self.members.push({"id":this.group.groupMemberIds[i],"name":"","mail":""});
+                    this.push('members',{"id":this.group.groupMemberIds[i]});
+                }*/
+
+                /*console.log(this.members);
+                this.members = [
+                    {"id":"id1"},
+                    {"id":"id2"},
+                    {"id":"id3"},
+                    {"id":"id4"}
+                ];
+                this.members = [
+                    {"id":this.group.groupMemberIds[0]},
+                    {"id":this.group.groupMemberIds[1]},
+                    {"id":this.group.groupMemberIds[2]},
+                    {"id":this.group.groupMemberIds[3]}
+                ];
+                this.members = [];*/
+                //console.log(this.members);
+
+                //If not yet in group, show join group view, else show group info
+                /*if(!this.members[0].id){
+                    this.toggleAttribute('active',true, this.$$('.join'));
+                    this.members[0].mail = 'your.mail';
+                } else {
+                    this.toggleAttribute('active',true, this.$$('.info'));
+                }
+
+                var groupE = {
+                    "name": "Gruppe 5",
+                    "id": "string",
+                    "groupMemberIds": [
+                        "string","string","string","string"
+                    ],
+                    "semesterId": "string",
+                    "labIds": [
+                        "string"
+                    ],
+                    "priorityIds": [
+                        "string"
+                    ]
+                };*/
+                //this._handleGroupRequest(groupE);
+                //console.log(this.group);
+                //console.log(this.group.groupMemberIds);
+
+            },
+            _getMembers: function () {
+                var members = [];
+                for(var i = 0; i<this.group.groupMemberIds.length; i++){
+                    //self.members.push({"id":this.group.groupMemberIds[i],"name":"","mail":""});
+                    members.push({"id":"id"+i});
+                }
+                console.log(members);
+                return members;
+            },
+
+            _setMemberInfo: function (value, index, path) {
+                this.set(path,value);
+            },
+
+            arrayItem: function(change, index, path) {
+                // this.get(path, root) returns a value for a path
+                // relative to a root object.
+                return this.get(path, change.base[index]);
+            },
+
+            _createNewGroup: function(){
+
+                var checked = true;
+                var self = this;
+                var inputs =  this.getEffectiveChildren('.creatate-group');
+                inputs = Polymer.dom(this.root).querySelector('.create-group').children;
+                console.log(inputs);
+
+                //Check inputs
+                this.members.forEach(function(element) {
+                    if(!element.mail){
+                        checked = false;
+                    }
+                });
+                //self.$$('paper-input').each.validate();
+                console.log(self.$$('paper-input'));
+
+                Polymer.updateStyles();
+
+                if(checked){
+                    console.log("Korrekt ausgefüllt.");
+                    this.joinParams = {
+                        'member1': this.mail1,
+                        'member2': this.mail2,
+                        'member3': this.mail3,
+                        'member4': this.mail4
+                    };
+                    this.$.joinRequest.generateRequest();
+                    this.isLoading = true;
+                }
+                console.log(this.members);
+            },
+            calcNaturalIndex: function (index) {
+                return index+1;
+            },
+            _handleGroupRequest: function (e) {
+                this.group = e.detail.response;
+                this.notifyPath('group.groupMemberIds');
+                //console.log(this.group.groupMemberIds);
+                var self = this;
+                //Change groupMemberIds to Array Containing Objects with ID, Name and Mail
+                this.group.groupMemberIds.forEach(function () {
+                    self.push('group.groupMemberIds',{"id":self.shift('group.groupMemberIds'),"name":"","mail":""});
+                });
+                //Set the group name bound to group-card
+                this._setGroupName(this.group.name);
+                console.log(this.group);
+            },
+            _handleJoin: function(e){
+                var response = e.detail.response;
+                if(response.valid){
+                    this.members=response.members;
+                } else {
+
+                }
+                this.group = e.detail.response;
+                this.selfInfo.groupId = "New ID";
+                console.log(this.selfInfo.groupId);
+            },
+            _handleUserResponse: function (e) {
+                console.log(e.detail.response);
+            }
+        });
+    </script>
+</dom-module>

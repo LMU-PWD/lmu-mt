@@ -111,7 +111,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                access-token="{{ session.accessToken }}"
                logged-in="{{ session.loggedIn }}"
                user-id="{{ session.userId }}"
-               shownotifications="{{ showDesktopNotifications }}"></main-view>
+               show-notifications="{{ showDesktopNotifications }}"></main-view>
             <login-view
                 name="login"
                 access-token="{{ session.accessToken }}"
@@ -132,15 +132,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       is: 'my-app',
 
       properties: {
-        session: {
-          type: Object,
-          value: {
-            accessToken: null,
-            loggedIn: false,
-            userId: null
-          },
-          notify: true
-        },
         page: {
           type: String,
           reflectToAttribute: false,
@@ -149,6 +140,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         route: {
           type: Object,
           notify: true
+        },
+        session: {
+          type: Object,
+          value: {
+            accessToken: null,
+            loggedIn: false,
+            userId: null
+          }
         }
       },
 
@@ -163,7 +162,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         var cookieAccessToken = this._getCookie('mt-api-accesstoken');
         var cookieUserId = this._getCookie('mt-api-userid');
 
-        if (cookieAccessToken !== '' && cookieUserId !== '') {
+          if (cookieAccessToken !== '' && cookieUserId !== '') {
 
           // TODO: Verify validity of cookies with API request
           this.set('session.accessToken', cookieAccessToken);
