@@ -106,7 +106,7 @@
                     headers="[[header]]"
                     handle-as="json"
                     on-response="_handleGroupRequest"
-                    url="http://localhost:3000/api/Groups/[[selfInfo.groupId]]/"></iron-ajax>
+                    url="http://lmu-mt-api.herokuapp.com/api/Groups/[[selfInfo.groupId]]/"></iron-ajax>
                 <template is="dom-repeat" items="[[group.groupMemberIds]]" as="member">
                     <div class="member">
                         <get-user-info user-id="[[member.id]]" name="{{member.name}}" mail="{{member.mail}}"></get-user-info>

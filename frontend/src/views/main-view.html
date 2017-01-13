@@ -113,7 +113,7 @@
 
     <div>
       <div class="notificationsContainer">
-        <template is="dom-if" if="{{ shownotifications }}">
+        <template is="dom-if" if="{{ showNotifications }}">
           <notifications-card showlist="{{ showlist }}"></notifications-card>
         </template>
       </div>
@@ -138,12 +138,16 @@
 
       properties: {
 
-        shownotifications: {
+        showNotifications: {
           type: Boolean,
           value: false
         },
         userId: String,
         accessToken: String,
+        loggedIn: {
+          type: Boolean,
+          notify: true
+        },
         user: {
           type: Object,
           notify: true,
@@ -159,7 +163,8 @@
             Authorization: this.accessToken
           },
           method: 'GET',
-          url: 'http://localhost:3000/api/platformusers/' + this.userId
+          url: 'http://lmu-mt-api.herokuapp.com/api/platformusers/' + this.userId
+          //url: 'http://localhost:3000/api/platformusers/' + this.userId
         };
 
 
