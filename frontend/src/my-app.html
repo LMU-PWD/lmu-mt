@@ -118,7 +118,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             attr-for-selected="name"
             fallback-selection="error">
 
-            <main-view name="main" shownotifications="{{ showDesktopNotifications }}" user-id="{{session.userId}}" access-key="{{session.accessToken}}"></main-view>
+            <main-view name="main"
+                show-notifications="{{ showDesktopNotifications }}"
+                user-id="{{session.userId}}"
+                access-token="{{session.accessToken}}"></main-view>
             <login-view
                 name="login"
                 access-token="{{ session.accessToken }}"
@@ -139,14 +142,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       is: 'my-app',
 
       properties: {
-        session: {
-          type: Object,
-          value: {
-            accessToken: null,
-            loggedIn: false,
-            userId: null
-          }
-        },
         page: {
           type: String,
           reflectToAttribute: false,
@@ -155,6 +150,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         route: {
           type: Object,
           notify: true
+        },
+        session: {
+          type: Object,
+          value: {
+            accessToken: null,
+            loggedIn: false,
+            userId: null
+          }
         }
       },
 

@@ -9,7 +9,9 @@
 <link rel="import" href="mail-input.html">
 
 <dom-module id="group-detail">
+
     <template>
+
         <style include="shared-styles">
             :host{
                 height: auto;
@@ -21,9 +23,7 @@
                 top: 1px;
                 border-top: 1px solid var(--paper-blue-grey-900);
                 border-radius: 0 0 5px 5px;
-
             }
-
 
             .info{
                 display: block;
@@ -60,12 +60,12 @@
                 color: var(--paper-blue-grey-700);
             }
 
-
             .create-group{
                 background-color: var(--paper-blue-grey-50);
                 border-radius: 5px;
                 padding:10px 20px;
             }
+
             .random{
                 background-color: var(--paper-blue-grey-50);
                 border-radius: 5px;
@@ -73,6 +73,7 @@
                 margin-bottom: 5px;
 
             }
+
             .join{
                 display: block;
                 padding:20px;
@@ -88,29 +89,33 @@
                 padding:calc(50% - 10px) calc(50% - 25px);
                 z-index: 100;
             }
+
             paper-input[wronginput]{
                 color: var(--paper-red-500);
             }
         </style>
+
         <!-- Checking for Group ID if User Joined Group-->
         <template is="dom-if" if="{{selfInfo.groupId}}">
+
             <!-- Dieser Request soll anhand der ID die Gruppeninfo holen -->
             <div class="info">
                 <get-access-token token="{{header}}"></get-access-token>
                 <iron-ajax
                     auto
-                    headers='[[header]]'
+                    headers="[[header]]"
                     handle-as="json"
                     on-response="_handleGroupRequest"
                     url="http://localhost:3000/api/Groups/[[selfInfo.groupId]]/"></iron-ajax>
                 <template is="dom-repeat" items="[[group.groupMemberIds]]" as="member">
                     <div class="member">
-                        <get-user-info user-id='[[member.id]]' name='{{member.name}}' mail="{{member.mail}}"></get-user-info>
+                        <get-user-info user-id="[[member.id]]" name="{{member.name}}" mail="{{member.mail}}"></get-user-info>
                         <a href="mailto:[[member.mail]]" tabindex="-1"><paper-icon-button icon="icons:mail"></paper-icon-button></a>
                         <h2>[[member.name]]</h2>
                     </div>
                 </template>
             </div>
+
         </template>
         <template is="dom-if" if="{{!selfInfo.groupId}}">
             <div class="join">
@@ -228,7 +233,7 @@
                     this.members[0].mail = 'your.mail';
                 } else {
                     this.toggleAttribute('active',true, this.$$('.info'));
-                }*/
+                }
 
                 var groupE = {
                     "name": "Gruppe 5",
@@ -243,7 +248,7 @@
                     "priorityIds": [
                         "string"
                     ]
-                };
+                };*/
                 //this._handleGroupRequest(groupE);
                 //console.log(this.group);
                 //console.log(this.group.groupMemberIds);

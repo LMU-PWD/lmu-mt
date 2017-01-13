@@ -10,7 +10,9 @@
 
 
 <dom-module id="main-view">
+
   <template>
+
     <style include="shared-styles">
       :host {
         display: block;
@@ -84,16 +86,19 @@
         }
       }
     </style>
-    <!--Dieser Request soll die User Info über den eingeloggtend user holen-->
+
+    <!-- Fetches info about currently logged in user -->
     <iron-ajax
             auto
-            headers='[[header]]'
+            headers='[[ajax.headers]]'
+            content-type="[[ ajax.contentType ]]"
             handle-as="json"
+            method="[[ ajax.method ]]"
+            on-error="_handleUserError"
             on-response="_handleUserResponse"
-            url="http://localhost:3000/api/PlatformUsers/[[userId]]/"></iron-ajax>
+            url="[[ ajax.url ]]"></iron-ajax>
+
     <div>
-
-
       <div class="group-placeholder light-color-text">
         <group-card group-name=[[groupName]]></group-card>
         <group-detail class="group-info" self-info="{{user}}" group-name="{{groupName}}"></group-detail>
@@ -104,11 +109,12 @@
         <index-card type="Audiopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:" info2="18.05.16, 14-16"></index-card>
       </div>
       <div class="notificationsContainer">
-        <template is="dom-if" if="{{ shownotifications }}">
+        <template is="dom-if" if="{{ showNotifications }}">
           <notifications-card showlist="{{ showlist }}"></notifications-card>
         </template>
       </div>
     </div>
+
   </template>
 
   <script>
@@ -117,50 +123,29 @@
       is: 'main-view',
 
       properties: {
-        prop1: {
-          type: String,
-          value: 'frontend-app'
-        },
-        shownotifications: {
+        showNotifications: {
           type: Boolean,
           value: false
         },
         userId: String,
-        accessKey: String,
+        accessToken: String,
         user: {
           type: Object,
           notify: true,
           readOnly: false,
-          /*value: {
-            "name": "string",
-            "first_name": "string",
-            "isTutor": false,
-            "free_tutor_dates": [
-              "2017-01-06"
-            ],
-            "realm": "string",
-            "username": "string",
-            "credentials": {},
-            "challenges": {},
-            "email": "string",
-            "emailVerified": true,
-            "status": "string",
-            "created": "2017-01-06",
-            "lastUpdated": "2017-01-06",
-            "id": "string",
-            "semesterId": "string",
-            "groupId": "string",          // -> keine group id vorhanden wenn keine gruppe
-            "tutorLabIds": [
-              "string"
-            ]
-          }*/
+          value: {}
         }
       },
       ready: function () {
-        console.log(this.userId);
-        console.log(this.accessKey);
 
-        this.header = {"Authorization": this.accessKey};
+        this.ajax = {
+          contentType: 'application/json',
+          headers: {
+            Authorization: this.accessToken
+          },
+          method: 'GET',
+          url: 'http://localhost:3000/api/platformusers/' + this.userId
+        };
 
 
         //On login -> id
@@ -183,17 +168,23 @@
         });
         console.log(this.group);*/
       },
-      _handleUserResponse: function (e) {
-        this.user = e.detail.response;
-        console.log(this.user);
-      }
-      //Resize listener not yet workings
-      /*ready: function(){
-        window.addEventListener("resize", function() { this.windowResize(); });
+
+      /**
+       * Callback fired when API answers with an error
+       * @param response
+       * @private
+       */
+      _handleLoginError: function (response) {
+        console.log(response.detail.error);
       },
-      windowResize: function(){
-          this.expanded = ($(window).width()>767);
-      }*/
+
+      _handleUserResponse: function (e) {
+        var userResponse = e.detail.response;
+        this.set('user.email', userResponse.email);
+        this.set('user.firstName', userResponse.firstName);
+        this.set('user.groupId', userResponse.groupId);
+        this.set('user.name', userResponse.name);
+      }
 
     });
   </script>
