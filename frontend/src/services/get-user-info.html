@@ -8,35 +8,29 @@
             :host{
             }
         </style>
-        <!--<iron-ajax
-                auto
-                body="[[ ajax.body ]]"+[[id]]
-                content-type="[[ ajax.contentType ]]"
-                handle-as="json"
-                method="[[ ajax.method ]]"
-                on-error="_handleLoginError"
-                on-response="_handleUserResponse"
-                url="[[ ajax.url ]]"
-                verbose
-                with-credentials="true"></iron-ajax>-->
-        <get-access-token token="{{header}}"></get-access-token>
+        <!--get-access-token token="{{header}}"></get-access-token-->
         <iron-ajax
                 auto
-                headers='[[header]]'
+                content-type="[[ ajax.contentType ]]"
+                headers="[[ ajax.headers ]]"
                 handle-as="json"
+                method="[[ ajax.method ]]"
                 on-response="_handleUserResponse"
-                lastResponse = "{{testResp}}"
-                url="http://lmu-mt-api.herokuapp.com/api/PlatformUsers/[[userId]]/"></iron-ajax>
+                url="[[ ajax.url ]]"></iron-ajax>
     </template>
     <script>
         Polymer({
             is: 'get-user-info',
             properties: {
+                accessToken: {
+                    type: String
+                },
                 userId: {
                     value: String,
                     //For only downward Data Flow
                     notify: false,
-                    readOnly: false
+                    readOnly: false,
+                    observer: '_userIdChanged'
                 },
                 mail: {
                     type: String,
@@ -68,10 +62,31 @@
                 };
                 //this._handleUserResponse(e);
                 //console.log(this.id);
+
+                this.ajax = {
+                    contentType: 'application/json',
+                    headers: {
+                        Authorization: this.accessToken
+                    },
+                    method: 'GET',
+                    //url: 'http://lmu-mt-api.herokuapp.com/api/PlatformUsers/' + this.userId
+                    url: 'http://localhost:3000/api/PlatformUsers/' + this.userId
+                }
+            },
+
+            _userIdChanged: function () {
+
+                console.log('get-user-info: userIdChanged() fired');
+
+                this.set('ajax.url', 'http://localhost:3000/api/PlatformUsers/' + this.userId);
+
             },
 
             //Function for setting Mail & Name on Ajax response
             _handleUserResponse: function(e) {
+
+                console.log('get-user-info: handleUserResponse() fired');
+
                 //this._set<Property> function for Updating readOnly Properties
                 this._setMail(e.detail.response.email);
                 this._setName(e.detail.response.first_name + " " + e.detail.response.name);

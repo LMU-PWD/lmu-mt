@@ -72,6 +72,12 @@
                     notify: true
                 },
 
+                group: {
+                    type: Object,
+                    notify: true,
+                    value: {}
+                },
+
                 loggedIn: {
                     type: Boolean,
                     notify: true
@@ -80,6 +86,12 @@
                 userId: {
                     type: String,
                     notify: true
+                },
+
+                user: {
+                    type: Object,
+                    notify: true,
+                    value: {}
                 },
 
                 show: {
@@ -112,8 +124,8 @@
                             'Authorization': this.accessToken
                         },
                         method: 'POST',
-                        //url: 'http://localhost:3000/api/platformusers/logout'
-                        url: 'http://lmu-mt-api.herokuapp.com/api/platformusers/logout'
+                        url: 'http://localhost:3000/api/platformusers/logout'
+                        //url: 'http://lmu-mt-api.herokuapp.com/api/platformusers/logout'
                     }
                 }
             },
@@ -140,6 +152,8 @@
                 this.set('accessToken', '');
                 this.set('userId', '');
                 this.set('loggedIn', false);
+                this.set('user', {});
+                this.set('group', {});
 
             }
         });

@@ -98,26 +98,36 @@
         <!-- Checking for Group ID if User Joined Group-->
         <template is="dom-if" if="{{selfInfo.groupId}}">
 
-            <!-- Dieser Request soll anhand der ID die Gruppeninfo holen -->
             <div class="info">
-                <get-access-token token="{{header}}"></get-access-token>
+
+                <!-- Dieser Request soll anhand der ID die Gruppeninfo holen -->
                 <iron-ajax
                     auto
-                    headers="[[header]]"
+                    content-type="[[ ajax.contentType ]]"
+                    headers="[[ ajax.headers ]]"
                     handle-as="json"
+                    method="[[ ajax.method ]]"
                     on-response="_handleGroupRequest"
-                    url="http://lmu-mt-api.herokuapp.com/api/Groups/[[selfInfo.groupId]]/"></iron-ajax>
+                    url="[[ ajax.url ]]"></iron-ajax>
+
                 <template is="dom-repeat" items="[[group.groupMemberIds]]" as="member">
                     <div class="member">
-                        <get-user-info user-id="[[member.id]]" name="{{member.name}}" mail="{{member.mail}}"></get-user-info>
+                        <get-user-info
+                                access-token="[[ accessToken ]]"
+                                user-id="[[member.id]]"
+                                name="{{member.name}}"
+                                mail="{{member.mail}}"></get-user-info>
                         <a href="mailto:[[member.mail]]" tabindex="-1"><paper-icon-button icon="icons:mail"></paper-icon-button></a>
                         <h2>[[member.name]]</h2>
                     </div>
                 </template>
+
             </div>
 
         </template>
+
         <template is="dom-if" if="{{!selfInfo.groupId}}">
+
             <div class="join">
                 <!-- Random Join Auskommentiert, da noch nicht unterstützt
                 <div class="random">
@@ -150,6 +160,7 @@
                     </iron-ajax>
                 </div>
             </div>
+
         </template>
 
     </template>
@@ -157,29 +168,36 @@
         Polymer({
             is: 'group-detail',
             properties: {
-                selfInfo: {
-                    type: Object,
-                    notify: true,
-                    readOnly: false
-                },
+                accessToken: String,
                 group: {
                     type: Object,
                     notify: true,
                     readOnly: false
+                },
+                groupName: {
+                    type: String,
+                    notify: true,
+                    readOnly: true
                 },
                 groupSize: {
                     //TODO make input dependent
                     type: Number,
                     value: 4
                 },
-                groupName: {
-                    type: String,
+                selfInfo: {
+                    type: Object,
                     notify: true,
-                    readOnly: true
+                    readOnly: false,
+                    value: {
+                        groupId: ''
+                    }
                 }
-
             },
+            observers: [
+                '_selfInfoGroupIdChanged(selfInfo.groupId)'
+            ],
             ready: function() {
+
                 console.log(this.selfInfo);
 
                 //kevin id: 586fcef193fc4dc017aa3806
@@ -254,6 +272,29 @@
                 //console.log(this.group.groupMemberIds);
 
             },
+            _selfInfoGroupIdChanged: function () {
+
+                console.log('selfInfoGroupIdChanged() fired');
+
+                console.log("selfInfo.groupId: " + this.selfInfo.groupId);
+
+                if (this.selfInfo.groupId) {
+
+                    console.log("We have a groupId");
+
+                    this.ajax = {
+                        contentType: 'application/json',
+                        headers: {
+                            Authorization: this.accessToken
+                        },
+                        method: 'GET',
+                        //url: 'http://lmu-mt-api.herokuapp.com/api/groups/' + this.selfInfo.groupId
+                        url: 'http://localhost:3000/api/groups/' + this.selfInfo.groupId
+                    }
+
+                }
+
+            },
             _getMembers: function () {
                 var members = [];
                 for(var i = 0; i<this.group.groupMemberIds.length; i++){
@@ -310,8 +351,18 @@
                 return index+1;
             },
             _handleGroupRequest: function (e) {
-                this.group = e.detail.response;
-                this.notifyPath('group.groupMemberIds');
+                console.log("_handleGroupRequest() fired");
+
+                var receivedGroup = e.detail.response;
+
+                this.group = {
+                    name: receivedGroup.name,
+                    semesterId: receivedGroup.semesterId,
+                    groupMemberIds: receivedGroup.groupMemberIds,
+                    labIds: receivedGroup.labIds,
+                    priorityIds: receivedGroup.priorityIds
+                };
+
                 //console.log(this.group.groupMemberIds);
                 var self = this;
                 //Change groupMemberIds to Array Containing Objects with ID, Name and Mail
