@@ -46,7 +46,10 @@
         .practicalsContainer{
           min-width: 320px;
           width: 100%;
+        }
 
+        .main-container {
+          padding: 10px;
         }
       }
       /*Tablet*/
@@ -111,7 +114,7 @@
       <notifications-card showlist="{{ showMobileNotifications }}"></notifications-card>
     </template>
 
-    <div>
+    <div class="main-container">
       <div class="notificationsContainer">
         <template is="dom-if" if="{{ showNotifications }}">
           <notifications-card showlist="{{ showlist }}"></notifications-card>
@@ -164,7 +167,7 @@
           },
           method: 'GET',
           url: 'http://lmu-mt-api.herokuapp.com/api/platformusers/' + this.userId
-          //url: 'http://localhost:3000/api/platformusers/' + this.userId
+//          url: 'http://localhost:3000/api/platformusers/' + this.userId
         };
 
 

@@ -78,9 +78,9 @@
                         value="{{ userInput.password }}"
                         on-keydown="_onEnterFireLoginRequest"></paper-input>
             </div>
-            <div class="card-actions">
+            <div class="card-actions" style="padding: 20px">
                 <paper-button on-tap="_fireLoginRequest">Einloggen</paper-button>
-                <p>Neu hier? <a href="#">Registrieren</a></p>
+                <!--<p>Neu hier? <a href="#">Registrieren</a></p>-->
             </div>
         </paper-card>
 
@@ -133,7 +133,7 @@
                     contentType: 'application/json',
                     method: 'POST',
                     url: 'http://lmu-mt-api.herokuapp.com/api/platformusers/login'
-                    //url: 'http://localhost:3000/api/platformusers/login'
+//                    url: 'http://localhost:3000/api/platformusers/login'
                 };
 
                 // Reset input fields (in case of immediate logout users

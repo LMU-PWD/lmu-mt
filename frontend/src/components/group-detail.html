@@ -20,9 +20,9 @@
                 background-color: var(--paper-blue-grey-100);
                 display: block;
                 position: relative;
-                top: 1px;
+                /*top: 1px;*/
                 border-top: 1px solid var(--paper-blue-grey-900);
-                border-radius: 0 0 5px 5px;
+                /*border-radius: 0 0 5px 5px;*/
             }
 
             .info{
@@ -107,6 +107,7 @@
                     handle-as="json"
                     on-response="_handleGroupRequest"
                     url="http://lmu-mt-api.herokuapp.com/api/Groups/[[selfInfo.groupId]]/"></iron-ajax>
+                    <!--url="http://localhost:3000/api/Groups/[[selfInfo.groupId]]/"></iron-ajax>-->
                 <template is="dom-repeat" items="[[group.groupMemberIds]]" as="member">
                     <div class="member">
                         <get-user-info user-id="[[member.id]]" name="{{member.name}}" mail="{{member.mail}}"></get-user-info>

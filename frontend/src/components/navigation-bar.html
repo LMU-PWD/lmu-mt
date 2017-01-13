@@ -45,9 +45,9 @@
                 with-credentials="true"></iron-ajax>
 
         <app-toolbar class="nav-container">
-            <div class="configuration nav-block">
-                <paper-icon-button icon="icons:menu"></paper-icon-button>
-            </div>
+            <!--<div class="configuration nav-block">-->
+                <!--<paper-icon-button icon="icons:menu"></paper-icon-button>-->
+            <!--</div>-->
             <div class="configuration nav-block">
                 <paper-icon-button icon="icons:exit-to-app" on-tap="_fireLogoutRequest"></paper-icon-button>
             </div>
@@ -112,7 +112,7 @@
                             'Authorization': this.accessToken
                         },
                         method: 'POST',
-                        //url: 'http://localhost:3000/api/platformusers/logout'
+//                        url: 'http://localhost:3000/api/platformusers/logout'
                         url: 'http://lmu-mt-api.herokuapp.com/api/platformusers/logout'
                     }
                 }
