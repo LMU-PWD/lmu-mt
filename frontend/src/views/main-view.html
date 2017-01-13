@@ -46,10 +46,7 @@
         .practicalsContainer{
           min-width: 320px;
           width: 100%;
-        }
 
-        .main-container {
-          padding: 10px;
         }
       }
       /*Tablet*/
@@ -104,8 +101,10 @@
     <app-header fixed>
       <navigation-bar
               access-token="{{ accessToken }}"
+              group="{{ group }}"
               logged-in="{{ loggedIn }}"
               user-id="{{ userId }}"
+              user="{{ user }}"
               show="{{ showMobileNotifications }}"></navigation-bar>
     </app-header>
 
@@ -122,7 +121,11 @@
       </div>
       <div class="group-placeholder light-color-text">
         <group-card group-name=[[groupName]]></group-card>
-        <group-detail class="group-info" self-info="{{user}}" group-name="{{groupName}}"></group-detail>
+        <group-detail class="group-info"
+                      access-token="[[ accessToken ]]"
+                      group="{{ group }}"
+                      self-info="{{user}}"
+                      group-name="{{groupName}}"></group-detail>
       </div>
       <div class="practicalsContainer">
         <index-card type="Fotopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:" info2="18.05.16, 14-16"></index-card>
@@ -141,15 +144,27 @@
 
       properties: {
 
+        accessToken: {
+          type: String,
+          observer: '_accessTokenChanged'
+        },
+        group: {
+          type: Object,
+          notify: true,
+          value: {}
+        },
+        loggedIn: {
+          type: Boolean,
+          notify: true
+        },
         showNotifications: {
           type: Boolean,
           value: false
         },
-        userId: String,
-        accessToken: String,
-        loggedIn: {
-          type: Boolean,
-          notify: true
+        userId: {
+          type: String,
+          notify: true,
+          observer: '_userIdChanged'
         },
         user: {
           type: Object,
@@ -160,15 +175,15 @@
       },
       ready: function () {
 
-        this.ajax = {
+        /*this.ajax = {
           contentType: 'application/json',
           headers: {
             Authorization: this.accessToken
           },
           method: 'GET',
           url: 'http://lmu-mt-api.herokuapp.com/api/platformusers/' + this.userId
-//          url: 'http://localhost:3000/api/platformusers/' + this.userId
-        };
+          //url: 'http://localhost:3000/api/platformusers/' + this.userId
+        };*/
 
 
         //On login -> id
@@ -190,6 +205,44 @@
           ]
         });
         console.log(this.group);*/
+      },
+
+      _userIdChanged: function () {
+
+        this.set('userId', this.userId);
+
+        if (this.userId && this.accessToken) {
+
+          this.ajax = {
+            contentType: 'application/json',
+            headers: {
+              Authorization: this.accessToken
+            },
+            method: 'GET',
+            url: 'http://lmu-mt-api.herokuapp.com/api/platformusers/' + this.userId
+            //url: 'http://localhost:3000/api/platformusers/' + this.userId
+          };
+
+        }
+
+      },
+
+      _accessTokenChanged: function () {
+
+        if (this.userId && this.accessToken) {
+
+          this.ajax = {
+            contentType: 'application/json',
+            headers: {
+              Authorization: this.accessToken
+            },
+            method: 'GET',
+            url: 'http://lmu-mt-api.herokuapp.com/api/platformusers/' + this.userId
+            //url: 'http://localhost:3000/api/platformusers/' + this.userId
+          };
+
+        }
+
       },
 
       /**
