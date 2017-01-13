@@ -274,13 +274,7 @@
             },
             _selfInfoGroupIdChanged: function () {
 
-                console.log('selfInfoGroupIdChanged() fired');
-
-                console.log("selfInfo.groupId: " + this.selfInfo.groupId);
-
                 if (this.selfInfo.groupId) {
-
-                    console.log("We have a groupId");
 
                     this.ajax = {
                         contentType: 'application/json',
@@ -351,7 +345,6 @@
                 return index+1;
             },
             _handleGroupRequest: function (e) {
-                console.log("_handleGroupRequest() fired");
 
                 var receivedGroup = e.detail.response;
 

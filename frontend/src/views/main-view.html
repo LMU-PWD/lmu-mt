@@ -157,7 +157,6 @@
         group: {
           type: Object,
           notify: true,
-          observer: '_groupChanged',
           value: {}
         },
         loggedIn: {
@@ -170,6 +169,7 @@
         },
         userId: {
           type: String,
+          notify: true,
           observer: '_userIdChanged'
         },
         user: {
@@ -215,6 +215,8 @@
 
       _userIdChanged: function () {
 
+        this.set('userId', this.userId);
+
         if (this.userId && this.accessToken) {
 
           this.ajax = {
@@ -246,12 +248,6 @@
           };
 
         }
-
-      },
-
-      _groupChanged: function () {
-
-        console.log('* * * Let me tell you: the group has changed');
 
       },
 

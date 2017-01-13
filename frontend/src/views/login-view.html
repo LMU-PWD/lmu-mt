@@ -43,9 +43,14 @@
 
                 userId: {
                     type: String,
-                    notify: true
+                    notify: true,
+                    observer: '_userIdChanged'
                 }
 
+            },
+
+            _userIdChanged: function () {
+                console.log('login-view.html: _userIdChanged() fired');
             }
 
         });
