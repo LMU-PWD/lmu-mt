@@ -1,4 +1,5 @@
 <link rel="import" href="../shared/shared-styles.html">
+<link rel="import" href="../../bower_components/paper-tooltip/paper-tooltip.html">
 
 <dom-module id="navigation-bar">
     <template>
@@ -50,6 +51,7 @@
             <!--</div>-->
             <div class="configuration nav-block">
                 <paper-icon-button icon="icons:exit-to-app" on-tap="_fireLogoutRequest"></paper-icon-button>
+                <paper-tooltip>Logout</paper-tooltip>
             </div>
             <div class="icon nav-block">
                 <img src="../../images/mt.svg">

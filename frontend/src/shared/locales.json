@@ -1,0 +1,23 @@
+{
+  "en": {
+    "logincard_welcome text-1": "Welcome to",
+    "logincard_welcome text-2": ". Please login with your Campus mail address.",
+    "logincard_login button": "Login",
+    "logincard_password placeholder": "Password",
+    "logincard_register text": "New here?",
+    "logincard_register button": "Register",
+
+    "groupdetail_create group": "Create new group",
+    "groupdetail_group comment": "You have to be 4 people to create a new group.",
+    "groupdetail_write mail": "Send an e-mail",
+
+    "notifications-card none": "No notifications.",
+
+    "mainview_praktikum typ": "Photo ",
+
+    "c_medientechnik": "Media Technology"
+  },
+
+  "de": {
+    }
+}

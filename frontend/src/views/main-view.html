@@ -171,8 +171,21 @@
           notify: true,
           readOnly: false,
           value: {}
+        },
+        language: {
+          type: String,
+          value: 'en'
         }
       },
+
+      behaviors: [
+        Polymer.AppLocalizeBehavior
+      ],
+
+      attached: function() {
+        this.loadResources(this.resolveUrl('../shared/locales.json'));
+      },
+
       ready: function () {
 
         /*this.ajax = {

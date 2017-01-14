@@ -58,7 +58,6 @@
 
         </style>
 
-
         <div class="notificationlist_container notification_noitems">
             <!--
             <div class="notification_item">
@@ -78,8 +77,7 @@
             </div>
             -->
             <div class="notification_item">
-                <span class="text">
-                Keine Benachrichtigungen</span>
+                <span class="text">{{localize('notifications-card none')}}</span>
             </div>
         </div>
     </template>
@@ -92,11 +90,24 @@
         properties: {
           showlist: {
             type: Boolean
+          },
+          language: {
+            value: 'en',
+            type: String
           }
         },
+
         observers: [
           '_toggleList(showlist)'
-        ]
+        ],
+
+        behaviors: [
+          Polymer.AppLocalizeBehavior
+        ],
+
+        attached: function() {
+          this.loadResources(this.resolveUrl('../shared/locales.json'));
+        },
 
       });
     </script>

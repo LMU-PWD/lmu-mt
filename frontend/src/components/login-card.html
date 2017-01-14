@@ -66,21 +66,21 @@
 
         <paper-card heading="Login">
             <div class="card-content">
-                <p>Willkommen bei <em>Medientechnik</em>. Bitte melde dich mit deiner Campus-Mailadresse an.</p>
+                <p>{{localize('logincardcard_welcome text-1')}} <em>{{localize('c_medientechnik')}}</em>{{localize('logincard_welcome text-2')}}</p>
                 <paper-input
                         label="E-Mail"
                         type="email"
                         value="{{ userInput.email }}"
                         on-keydown="_onEnterFireLoginRequest"></paper-input>
                 <paper-input
-                        label="Password"
+                        label="{{localize('logincard_password placeholder')}}"
                         type="password"
                         value="{{ userInput.password }}"
                         on-keydown="_onEnterFireLoginRequest"></paper-input>
             </div>
             <div class="card-actions" style="padding: 20px">
-                <paper-button on-tap="_fireLoginRequest">Einloggen</paper-button>
-                <!--<p>Neu hier? <a href="#">Registrieren</a></p>-->
+                <paper-button on-tap="_fireLoginRequest">{{localize('logincard_login button')}}</paper-button>
+                <!--<p>{{localize('logincardcard_register text')}} <a href="#">{{localize('logincardcard_register button')}}</a></p>-->
             </div>
         </paper-card>
 
@@ -93,6 +93,11 @@
             is: 'login-card',
 
             properties: {
+
+                  language: {
+                    value: 'en',
+                    type: String
+                  },
 
                 accessToken: {
                     type: String,
@@ -118,6 +123,14 @@
                 }
 
             },
+
+          behaviors: [
+            Polymer.AppLocalizeBehavior
+          ],
+
+          attached: function() {
+            this.loadResources(this.resolveUrl('../shared/locales.json'));
+          },
 
             /**
              * Callback fired when user clicks submit button. Sets a property

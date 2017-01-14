@@ -3,6 +3,7 @@
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="../../bower_components/paper-tooltip/paper-tooltip.html">
 <link rel="import" href="../shared/shared-styles.html">
 <link rel="import" href="../services/get-user-info.html">
 <link rel="import" href="../services/get-access-token.html">
@@ -117,7 +118,8 @@
                                 user-id="[[member.id]]"
                                 name="{{member.name}}"
                                 mail="{{member.mail}}"></get-user-info>
-                        <a href="mailto:[[member.mail]]" tabindex="-1"><paper-icon-button icon="icons:mail"></paper-icon-button></a>
+                        <a id="mail-[[member.id]]" href="mailto:[[member.mail]]" tabindex="-1"><paper-icon-button icon="icons:mail"></paper-icon-button></a>
+                        <paper-tooltip for="mail-[[member.id]]" offset="5">{{localize('groupdetail_write mail')}}</paper-tooltip>
                         <h2>[[member.name]]</h2>
                     </div>
                 </template>
@@ -147,8 +149,8 @@
                             <div suffix>@campus.lmu.de</div>
                         </paper-input>
                     </template>
-                    <paper-button on-tap="_createNewGroup">Neue Gruppe erstellen</paper-button>
-                    <p class="red-color-text small">Du musst zu viert sein um eine neue Gruppe zu erstellen</p>
+                    <paper-button on-tap="_createNewGroup">{{localize('groupdetail_create group')}}</paper-button>
+                    <p class="red-color-text small">{{localize('groupdetail_group comment')}}</p>
 
                     <iron-ajax
                             id="joinRequest"
@@ -191,11 +193,24 @@
                     value: {
                         groupId: ''
                     }
-                }
+                },
+              language: {
+                value: 'en',
+                type: String
+              }
             },
             observers: [
                 '_selfInfoGroupIdChanged(selfInfo.groupId)'
             ],
+
+            behaviors: [
+              Polymer.AppLocalizeBehavior
+            ],
+
+            attached: function() {
+              this.loadResources(this.resolveUrl('../shared/locales.json'));
+            },
+
             ready: function() {
 
                 console.log(this.selfInfo);
