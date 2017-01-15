@@ -70,10 +70,10 @@
       </paper-tabs>
       <div class="content">
         <h2>[[type]] Praktikum</h2>
-        <iron-pages selected="{{selectedTab}}">
+        <iron-pages selected="[[selectedTab]]">
           <div>Page 1 Text</div>
           <div>
-            <practical-date-detail type=[[type]]></practical-date-detail>
+            <practical-date-detail type="[[type]]" practical_date="[[practical_date]]" timeslots="[[timeslots]]" ></practical-date-detail>
           </div>
         </iron-pages>
       </div>
@@ -83,40 +83,113 @@
   <script>
     Polymer({
 
-      is: 'practicals-view',
-      properties: {
-          type:{
-              type: String,
-              notify: true,
-              value: ""
-          },
-          selectedTab:{
-              type: String,
-              value: "0"
-          },
-          icon:{
-              type: String
-          }
-      },
+        is: 'practicals-view',
+        properties: {
+            type:{
+                type: String,
+                notify: true,
+                value: ""
+            },
+            selectedTab:{
+                type: String,
+                value: "0"
+            },
+            icon:{
+                type: String
+            },
+            timeslots:{
+                type: Array,
+                value: []
+            },
+            practical_date:{
+                type: Date,
+                notify: true
+            }
+        },
+        ready: function () {
+            this.practical_date = this._getDate();
+            if(this.practical_date == null){
+                this.timeslots = this._getTimeslots();
+            }
+        },
+
+        /**
+         * Back-button click handler
+         */
         _backClicked: function() {
           this.type = "";
           this.fire("back-click");
         },
-        ready: function () {
-            /*if(this.type.includes("Photo" || "photo")){
-                this.icon = "../../../images/photo.svg";
-            } else if(this.type.includes("Foto" || "foto")){
-                this.icon = "../../../images/photo.svg";
-            } else if(this.type.includes("Video" || "video")){
-                this.icon = "../../../images/video.svg";
-            } else if(this.type.includes("Audio" || "audio")){
-                this.icon = "../../../images/audio.svg";
-            }
-            console.log();
-            //Refreshing won't work this way
-            */
-        }
 
+        /**
+         * Function that checks for the practial course date
+         * @param {String} date - date that will be transformed to String
+         */
+        _getDate: function(){
+            //TODO: Check for Practicalsdates in Backend
+            return null;
+            //return new Date(2017,2,25,14,0);
+
+        },
+
+        /**
+         * Function that checks for the practial course date
+         * @param {String} date - date that will be transformed to String
+         */
+        _getTimeslots: function(){
+            //TODO: Get Timeslots from Backend
+            var timeslots =[];
+            timeslots.starttimes = [new Date(2017,1,2,1,0),new Date(2017,1,2,2,0),new Date(2017,1,2,3,0),new Date(2017,1,2,4,0),new Date(2017,1,2,5,0),
+                new Date(2017,1,10,14,0),new Date(2017,1,10,15,0),new Date(2017,1,10,16,0),new Date(2017,1,10,17,0),new Date(2017,1,10,18,0),new Date(2017,1,10,19,0),new Date(2017,1,10,20,0),
+                new Date(2017,1,12,12,0),new Date(2017,1,12,13,0),new Date(2017,1,12,14,0),new Date(2017,1,12,15,0),new Date(2017,1,14,14,0),new Date(2017,1,14,15,0)];
+            timeslots.sizes =[60,60,60,60,60,60,60,60,60,60,60,60,60,60,60,60,60,60];
+
+            return this._transformTimeslots(timeslots);
+            //return null;
+        },
+
+        /**
+         * Transform the Format of the given Timeslots from the Api, so it will be easier to handle in the frontend
+         * @param slotsFromApi - Contains the given timeslots
+         * @returns {Array} - timeslots in new format
+         * @private
+         */
+        _transformTimeslots: function(slotsFromApi){
+            var transformedSlots = []; //Store return-Array here
+            var lastSlot = slotsFromApi.starttimes[0];
+            var countDates = 0; //Date counter
+            var countSlots = 0; //Slot counter
+            var dates = [];
+
+            for(i=0; i<slotsFromApi.starttimes.length; i++){
+                // Create a new array-entrie if date from recent slot is different from date of the last slot
+                if(slotsFromApi.starttimes[i].getFullYear() != lastSlot.getFullYear() ||
+                    slotsFromApi.starttimes[i].getMonth() != lastSlot.getMonth() ||
+                    slotsFromApi.starttimes[i].getDate() != lastSlot.getDate()) {
+                    dates = [];
+                    lastSlot = slotsFromApi.starttimes[i];
+                    transformedSlots.push([]);
+                    countDates++;
+                    countSlots = 0;
+                }
+                var endtime = new Date(slotsFromApi.starttimes[i].getFullYear(), slotsFromApi.starttimes[i].getMonth(), slotsFromApi.starttimes[i].getDate());
+                if((slotsFromApi.starttimes[i].getMinutes() + (slotsFromApi.sizes[i] % 60)) > 60){
+                    endtime.setHours(1+Math.floor(slotsFromApi.starttimes[i].getHours()+(slotsFromApi.sizes[i]) / 60));
+                    endtime.setMinutes(slotsFromApi.starttimes[i].getMinutes() + (slotsFromApi.sizes[i] % 60)-60);
+                }
+                else{
+                    endtime.setHours(Math.floor(slotsFromApi.starttimes[i].getHours()+(slotsFromApi.sizes[i]) / 60));
+                    endtime.setMinutes(slotsFromApi.starttimes[i].getMinutes() + (slotsFromApi.sizes[i] % 60));
+                }
+
+                var slot = [];
+                slot = [slotsFromApi.starttimes[i], endtime];
+                dates[countSlots] = slot;
+                transformedSlots[countDates] = dates;
+                countSlots++;
+            }
+            return transformedSlots;
+        }
     });
   </script>
 </dom-module>

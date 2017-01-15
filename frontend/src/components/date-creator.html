@@ -151,6 +151,10 @@
             _getDateString: function(date){
                 var datestring = "";
                 switch(date.getDay()){
+
+                    case 0:
+                        datestring = "Sonntag, ";
+                        break;
                     case 1:
                         datestring = "Montag, ";
                         break;
@@ -168,9 +172,6 @@
                         break;
                     case 6:
                         datestring = "Samstag, ";
-                        break;
-                    case 7:
-                        datestring = "Sonntag, ";
                         break;
                 }
                 datestring = datestring+date.getDate()+"."+date.getMonth()+"."+date.getFullYear();
