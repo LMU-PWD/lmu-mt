@@ -151,13 +151,14 @@
                     <p class="red-color-text small">Du musst zu viert sein um eine neue Gruppe zu erstellen</p>
 
                     <iron-ajax
-                            id="joinRequest"
-                            url="https://www.some-api"
-                            params='[[joinParams]]'
+                            auto
+                            content-type="[[ ajax.contentType ]]"
+                            headers="[[ ajax.headers ]]"
                             handle-as="json"
+                            method="[[ ajax.method ]]"
                             on-response="_handleJoin"
-                            loading="{{isLoading}}">
-                    </iron-ajax>
+                            url="[[ ajax.url ]]"
+                            loading="{{isLoading}}"></iron-ajax>
                 </div>
             </div>
 
@@ -199,6 +200,12 @@
             ready: function() {
 
                 console.log(this.selfInfo);
+                this.members = [];
+                for(var i=0; 0<this.groupSize; i++){
+                    this.members.push("");
+                }
+                this.set('member.0', "myMail");
+                console.log(this.members);
 
                 //kevin id: 586fcef193fc4dc017aa3806
                 /*console.log(this.group.id);
@@ -316,6 +323,19 @@
                 var inputs =  this.getEffectiveChildren('.creatate-group');
                 inputs = Polymer.dom(this.root).querySelector('.create-group').children;
                 console.log(inputs);
+
+                var joinMails = this.members;
+
+                this.ajax = {
+                            contentType: 'application/json',
+                            headers: {
+                                Authorization: this.accessToken
+                            },
+                            method: 'POST',
+                            body: joinMails,
+                            //url: 'http://lmu-mt-api.herokuapp.com/api/groups/' + this.selfInfo.groupId
+                            url: 'http://localhost:3000/api/group/createbymail'
+                        };
 
                 //Check inputs
                 this.members.forEach(function(element) {
