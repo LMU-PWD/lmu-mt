@@ -48,9 +48,9 @@
             <div class="icon">
                 <img src="../../../images/group.svg">
             </div>
-            <h1>[[groupName]]</h1>
-            
+            <h1 id="groupname">{{localize('groupcard_tritt bei')}}</h1>
         </div>
+        <iron-signals on-iron-signal-switchlocale="_switchLocale"></iron-signals>
     </template>
 
     <script>
@@ -61,23 +61,51 @@
             properties: {
                 groupName: {
                     type: String,
-                    value: "Tritt jetzt einer Gruppe bei!",
                     notify: false,
                     readOnly: false
                 },
                 expanded: {
                     type: Boolean,
                     value: false
+                },
+                language: {
+                  type: String,
+                  value: 'en'
                 }
             },
+
+            observers: [
+              "_onGroupNameSet(groupName)"
+            ],
+
             ready: function(){
                 if(this.expanded){
                     this.customStyle['--custom-height']= '370px';
                     this.updateStyles();
                     console.log("Updated Height");
                 }
+            },
 
-                console.log(this.groupName);
+            /**
+            * Localization setup
+            */
+            behaviors: [
+                Polymer.AppLocalizeBehavior
+            ],
+            attached: function() {
+                this.loadResources(this.resolveUrl('../shared/locales.json'));
+            },
+            _switchLocale: function() {
+                this.language = (this.language == 'en') ? 'de' : 'en';
+            },
+
+            /**
+            * Set the group name in the title, after it has been retrieved from AJAX
+            * @param groupName
+            * @private
+            */
+            _onGroupNameSet: function(groupName) {
+                this.$.groupname.textContent = groupName;
             }
 
         });

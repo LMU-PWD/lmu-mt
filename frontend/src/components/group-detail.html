@@ -162,7 +162,7 @@
                     </iron-ajax>
                 </div>
             </div>
-
+            <iron-signals on-iron-signal-switchlocale="_switchLocale"></iron-signals>
         </template>
 
     </template>
@@ -195,25 +195,31 @@
                     }
                 },
               language: {
-                value: 'en',
-                type: String
+                type: String,
+                value: 'en'
               }
             },
             observers: [
                 '_selfInfoGroupIdChanged(selfInfo.groupId)'
             ],
 
+            /**
+             * Localization setup
+             */
             behaviors: [
               Polymer.AppLocalizeBehavior
             ],
-
             attached: function() {
               this.loadResources(this.resolveUrl('../shared/locales.json'));
+            },
+            _switchLocale: function() {
+                this.language = (this.language == 'en') ? 'de' : 'en';
             },
 
             ready: function() {
 
                 console.log(this.selfInfo);
+
 
                 //kevin id: 586fcef193fc4dc017aa3806
                 /*console.log(this.group.id);
@@ -394,7 +400,9 @@
             },
             _handleUserResponse: function (e) {
                 console.log(e.detail.response);
-            }
+            },
+
+
         });
     </script>
 </dom-module>

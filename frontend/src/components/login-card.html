@@ -83,7 +83,7 @@
                 <!--<p>{{localize('logincardcard_register text')}} <a href="#">{{localize('logincardcard_register button')}}</a></p>-->
             </div>
         </paper-card>
-
+        <iron-signals on-iron-signal-switchlocale="_switchLocale"></iron-signals>
     </template>
 
     <script>
@@ -124,13 +124,18 @@
 
             },
 
-          behaviors: [
-            Polymer.AppLocalizeBehavior
-          ],
-
-          attached: function() {
-            this.loadResources(this.resolveUrl('../shared/locales.json'));
-          },
+            /**
+             * Localization setup
+             */
+            behaviors: [
+                Polymer.AppLocalizeBehavior
+            ],
+            attached: function() {
+                this.loadResources(this.resolveUrl('../shared/locales.json'));
+            },
+            _switchLocale: function() {
+                this.language = (this.language == 'en') ? 'de' : 'en';
+            },
 
             /**
              * Callback fired when user clicks submit button. Sets a property

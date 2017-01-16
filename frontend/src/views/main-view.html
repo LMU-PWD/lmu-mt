@@ -133,6 +133,7 @@
         <index-card type="Audiopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:" info2="18.05.16, 14-16"></index-card>
       </div>
 
+      <iron-signals on-iron-signal-switchlocale="_switchLocale"></iron-signals>
     </div>
 
   </template>
@@ -187,6 +188,13 @@
       },
 
       ready: function () {
+
+        /*
+        ** Eventhandler to receive language switches from nav bar
+        */
+//        addEventListener('switchlocale', function(e) {
+//
+//        });
 
         /*this.ajax = {
           contentType: 'application/json',
@@ -273,7 +281,11 @@
         this.set('user.firstName', userResponse.firstName);
         this.set('user.groupId', userResponse.groupId);
         this.set('user.name', userResponse.name);
-      }
+     },
+
+        _switchLocale: function() {
+          this.language = (this.language == 'en') ? 'de' : 'en';
+        }
 
     });
   </script>
