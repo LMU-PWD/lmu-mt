@@ -151,13 +151,14 @@
                     <p class="red-color-text small">Du musst zu viert sein um eine neue Gruppe zu erstellen</p>
 
                     <iron-ajax
-                            id="joinRequest"
-                            url="https://www.some-api"
-                            params='[[joinParams]]'
+                            auto
+                            content-type="[[ ajax.contentType ]]"
+                            headers="[[ ajax.headers ]]"
                             handle-as="json"
+                            method="[[ ajax.method ]]"
+                            url="[[ ajax.url ]]"
                             on-response="_handleJoin"
-                            loading="{{isLoading}}">
-                    </iron-ajax>
+                            loading="{{isLoading}}"></iron-ajax>
                 </div>
             </div>
 
