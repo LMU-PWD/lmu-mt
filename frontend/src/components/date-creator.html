@@ -24,7 +24,7 @@
                 background-color: var(--paper-blue-grey-200);
                 padding-bottom: 20px;
             }
-            .priorityShower{
+            #priorityShower{
                 margin-left: 10%;
                 color: green;
             }
@@ -38,7 +38,7 @@
                 [[date]]
             </div>
             <template is="dom-repeat" items="[[timeSlotStrings]]" as="slot" >
-                <paper-item class="slot" on-tap="_handleDateClick">
+                <paper-item id="slot" class="slot" on-tap="_handleDateClick">
                     [[slot]]
                 </paper-item>
                 <iron-collapse id="priorityselection">
@@ -89,13 +89,11 @@
                     value: 0
                 },
                 chosenslot:{
-                    type: Number,
-                    value: 0
+                    type: Number
                 },
-                recentdate: {
+                recentslot: {
                     type: Object
-                }
-                ,
+                },
                 recentpriorityselection:{
                     type: Object
                 }
@@ -197,7 +195,7 @@
                 // Get clicked priorityselection
                 this.recentpriorityselection = Polymer.dom(this.root).querySelectorAll("#priorityselection")[e.model.index];
                 this.recentpriorityselection.toggle(); //Show Priorityselection
-                this.recentdate = e.target;
+                this.recentslot = e.target;
 
                 //Array-Mutation to force the priorityselection-Dom-Repeat to update
                 var array = this.priorities;
@@ -215,9 +213,9 @@
                 this.fire("priority-click"); //Notifies Parent (practical-date-detail.html)
 
                 this.recentpriorityselection.toggle(); //Hide Priorityselection
-                this.recentdate.style.color = 'green';
-                this.recentdate.style.backgroundColor = '#CEF6CE';
-                this.recentdate.innerHTML = this.recentdate.innerHTML + '<div class="priorityShower">    Priorität: ' + e.model.selector+ '</div>';
+                this.recentslot.style.color = 'green';
+                this.recentslot.style.backgroundColor = '#CEF6CE';
+                this.recentslot.innerHTML = this.recentslot.innerHTML +'<div id="priorityShower">'+'Priorität: ' + e.model.selector+'</div>';
             },
 
             /**
@@ -232,6 +230,14 @@
                     response = false;
                 }
                 return response;
+            },
+            _resetSelection: function(){
+                var slots = Polymer.dom(this.root).querySelectorAll("#slot");
+                for(j=0; j < slots.length; j++){
+                    slots[j].innerHTML = this.timeSlotStrings[j];
+                    slots[j].style.color = '';
+                    slots[j].style.backgroundcolor = '';
+                }
             }
         });
     </script>
