@@ -139,9 +139,15 @@
                             <paper-spinner active="[[isLoading]]"></paper-spinner>
                         </content>
                     </div>
+                    <paper-input label="You"
+                                       value="{{convertMail(selfInfo.email)}}"
+                                       readonly>
+                        <iron-icon icon="mail" prefix></iron-icon>
+                        <div suffix>@campus.lmu.de</div>
+                    </paper-input>
                     <template is="dom-repeat" items="{{members}}" as="member">
                         <paper-input label="Member [[calcNaturalIndex(index)]]"
-                                     value="{{member.mail}}"
+                                     value="{{member}}"
                                      required>
                             <iron-icon icon="mail" prefix></iron-icon>
                             <div suffix>@campus.lmu.de</div>
@@ -201,77 +207,10 @@
 
                 console.log(this.selfInfo);
 
-                //kevin id: 586fcef193fc4dc017aa3806
-                /*console.log(this.group.id);
-                console.log(this.groupMembers);
-                console.log(this.group);
-                console.log(this.groupTest);*/
-                //Just for testing
-                /*var joinedMembersTest = [
-                    {name: 'Max Mustermann', mail:'max.mustermann@campus.lmu.de'},
-                    {name: 'Frauke Froehlich', mail:'frauke.froehlich@campus.lmu.de'},
-                    {name: 'Ida Irre', mail:'ida.irre@campus.lmu.de'},
-                    {name: 'Nina Never', mail:'nina.never@campus.lmu.de'}
-                ];
-                var notJoinedMembersTest = [
-                    {name: '', mail:''},
-                    {name: '', mail:''},
-                    {name: '', mail:''},
-                    {name: '', mail:''}
-                ];*/
-                //this.members = notJoinedMembersTest;
-                //this.members = joinedMembersTest;
-
-                //Set Members to IDs retrieved from group info
-                /*this.members = [];
-                var self = this;
-                for(var i = 0; i<this.group.groupMemberIds.length; i++){
-                    //self.members.push({"id":this.group.groupMemberIds[i],"name":"","mail":""});
-                    this.push('members',{"id":this.group.groupMemberIds[i]});
-                }*/
-
-                /*console.log(this.members);
-                this.members = [
-                    {"id":"id1"},
-                    {"id":"id2"},
-                    {"id":"id3"},
-                    {"id":"id4"}
-                ];
-                this.members = [
-                    {"id":this.group.groupMemberIds[0]},
-                    {"id":this.group.groupMemberIds[1]},
-                    {"id":this.group.groupMemberIds[2]},
-                    {"id":this.group.groupMemberIds[3]}
-                ];
-                this.members = [];*/
-                //console.log(this.members);
-
-                //If not yet in group, show join group view, else show group info
-                /*if(!this.members[0].id){
-                    this.toggleAttribute('active',true, this.$$('.join'));
-                    this.members[0].mail = 'your.mail';
-                } else {
-                    this.toggleAttribute('active',true, this.$$('.info'));
+                this.members= [];
+                for (var i=1;i<this.groupSize;i++){
+                    this.members.push("");
                 }
-
-                var groupE = {
-                    "name": "Gruppe 5",
-                    "id": "string",
-                    "groupMemberIds": [
-                        "string","string","string","string"
-                    ],
-                    "semesterId": "string",
-                    "labIds": [
-                        "string"
-                    ],
-                    "priorityIds": [
-                        "string"
-                    ]
-                };*/
-                //this._handleGroupRequest(groupE);
-                //console.log(this.group);
-                //console.log(this.group.groupMemberIds);
-
             },
             _selfInfoGroupIdChanged: function () {
 
@@ -290,58 +229,31 @@
                 }
 
             },
-            _getMembers: function () {
-                var members = [];
-                for(var i = 0; i<this.group.groupMemberIds.length; i++){
-                    //self.members.push({"id":this.group.groupMemberIds[i],"name":"","mail":""});
-                    members.push({"id":"id"+i});
-                }
-                console.log(members);
-                return members;
-            },
-
-            _setMemberInfo: function (value, index, path) {
-                this.set(path,value);
-            },
-
-            arrayItem: function(change, index, path) {
-                // this.get(path, root) returns a value for a path
-                // relative to a root object.
-                return this.get(path, change.base[index]);
-            },
 
             _createNewGroup: function(){
 
                 var checked = true;
-                var self = this;
-                var inputs =  this.getEffectiveChildren('.creatate-group');
-                inputs = Polymer.dom(this.root).querySelector('.create-group').children;
-                console.log(inputs);
-
+                var joinParams = [];
                 //Check inputs
                 this.members.forEach(function(element) {
-                    if(!element.mail){
+                    if(element==""){
                         checked = false;
                     }
                 });
-                //self.$$('paper-input').each.validate();
-                console.log(self.$$('paper-input'));
 
                 Polymer.updateStyles();
 
                 if(checked){
                     console.log("Korrekt ausgefüllt.");
-                    this.joinParams = {
-                        'member1': this.mail1,
-                        'member2': this.mail2,
-                        'member3': this.mail3,
-                        'member4': this.mail4
-                    };
-                    this.$.joinRequest.generateRequest();
-                    this.isLoading = true;
+                    this.members.forEach(function (element) {
+                        element = convertMail(element);
+                    })
+                }else {
+                    console.log("Da stimmt wohl was noch nicht");
                 }
                 console.log(this.members);
             },
+
             calcNaturalIndex: function (index) {
                 return index+1;
             },
@@ -380,6 +292,16 @@
             },
             _handleUserResponse: function (e) {
                 console.log(e.detail.response);
+            },
+            convertMail: function (mail) {
+                console.log(this.selfInfo.email);
+                if(mail==undefined) {
+                    return "";
+                } else if(mail.includes("@campus.lmu.de")){
+                    return mail.slice(0,-14);
+                }else{
+                    return mail+"@campus.lmu.de";
+                }
             }
         });
     </script>
