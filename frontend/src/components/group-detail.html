@@ -147,7 +147,7 @@
                     </paper-input>
                     <template is="dom-repeat" items="{{members}}" as="member">
                         <paper-input label="Member [[calcNaturalIndex(index)]]"
-                                     value="{{member}}"
+                                     value="{{member.name}}"
                                      required>
                             <iron-icon icon="mail" prefix></iron-icon>
                             <div suffix>@campus.lmu.de</div>
@@ -209,7 +209,7 @@
 
                 this.members= [];
                 for (var i=1;i<this.groupSize;i++){
-                    this.members.push("");
+                    this.members.push({"name":""});
                 }
             },
             _selfInfoGroupIdChanged: function () {
@@ -230,9 +230,24 @@
 
             },
 
+            convertMail: function (mail) {
+                console.log(this.selfInfo.email);
+                if(mail==undefined) {
+                    return "";
+                } else if(mail.includes("@campus.lmu.de")){
+                    return mail.slice(0,-14);
+                }else{
+                    console.log("no Contain");
+                    return mail+"@campus.lmu.de";
+                }
+
+            },
+
             _createNewGroup: function(){
 
+                console.log(this.members);
                 var checked = true;
+                self = this;
                 var joinParams = [];
                 //Check inputs
                 this.members.forEach(function(element) {
@@ -244,10 +259,23 @@
                 Polymer.updateStyles();
 
                 if(checked){
+                    var mails = [];
                     console.log("Korrekt ausgefüllt.");
                     this.members.forEach(function (element) {
-                        element = convertMail(element);
-                    })
+                        mails.push(element.name.concat("@campus.lmu.de"));
+                    });
+
+                    console.log(mails);
+                    this.ajax = {
+                        contentType: 'application/json',
+                        headers: {
+                            Authorization: this.accessToken
+                        },
+                        method: 'POST',
+                        //url: 'http://lmu-mt-api.herokuapp.com/api/createbymail/',
+                        body: mails,
+                        url: 'http://localhost:3000/api/Groups/createByMail/'
+                    }
                 }else {
                     console.log("Da stimmt wohl was noch nicht");
                 }
@@ -280,6 +308,7 @@
                 console.log(this.group);
             },
             _handleJoin: function(e){
+                console.log(e);
                 var response = e.detail.response;
                 if(response.valid){
                     this.members=response.members;
@@ -292,16 +321,6 @@
             },
             _handleUserResponse: function (e) {
                 console.log(e.detail.response);
-            },
-            convertMail: function (mail) {
-                console.log(this.selfInfo.email);
-                if(mail==undefined) {
-                    return "";
-                } else if(mail.includes("@campus.lmu.de")){
-                    return mail.slice(0,-14);
-                }else{
-                    return mail+"@campus.lmu.de";
-                }
             }
         });
     </script>
