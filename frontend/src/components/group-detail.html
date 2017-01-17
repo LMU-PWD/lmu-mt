@@ -79,7 +79,12 @@
                 padding:20px;
             }
 
+            paper-spinner{
+                display: none;
+            }
+
             paper-spinner[active]{
+                display: block;
                 position: absolute;
                 height: 50px;
                 width: 50px;
@@ -154,7 +159,7 @@
                         </paper-input>
                     </template>
                     <paper-button on-tap="_createNewGroup">Neue Gruppe erstellen</paper-button>
-                    <p class="red-color-text small">Du musst zu viert sein um eine neue Gruppe zu erstellen</p>
+                    <paper-input-error id="error" class="red-color-text small" invalid>Du musst zu viert sein um eine neue Gruppe zu erstellen</paper-input-error>
 
                     <iron-ajax
                             auto
@@ -236,11 +241,7 @@
                     return "";
                 } else if(mail.includes("@campus.lmu.de")){
                     return mail.slice(0,-14);
-                }else{
-                    console.log("no Contain");
-                    return mail+"@campus.lmu.de";
                 }
-
             },
 
             _createNewGroup: function(){
@@ -251,7 +252,7 @@
                 var joinParams = [];
                 //Check inputs
                 this.members.forEach(function(element) {
-                    if(element==""){
+                    if(element.name==""){
                         checked = false;
                     }
                 });
@@ -265,6 +266,9 @@
                         mails.push(element.name.concat("@campus.lmu.de"));
                     });
 
+                    var test = {"emails":mails};
+                    console.log(test);
+
                     console.log(mails);
                     this.ajax = {
                         contentType: 'application/json',
@@ -273,11 +277,13 @@
                         },
                         method: 'POST',
                         //url: 'http://lmu-mt-api.herokuapp.com/api/createbymail/',
-                        body: mails,
+                        body: test,
                         url: 'http://localhost:3000/api/Groups/createByMail/'
                     }
                 }else {
                     console.log("Da stimmt wohl was noch nicht");
+                    console.log(this.$.error);
+                    this.$.error.toggleAttribute("inactive",false);
                 }
                 console.log(this.members);
             },
