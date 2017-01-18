@@ -69,14 +69,14 @@
                         Authorization: this.accessToken
                     },
                     method: 'GET',
-                    url: 'http://lmu-mt-api.herokuapp.com/api/PlatformUsers/' + this.userId
-                    //url: 'http://localhost:3000/api/PlatformUsers/' + this.userId
+                    //url: 'http://lmu-mt-api.herokuapp.com/api/PlatformUsers/' + this.userId
+                    url: 'http://localhost:3000/api/PlatformUsers/' + this.userId
                 }
             },
 
             _userIdChanged: function () {
-                //this.set('ajax.url', 'http://localhost:3000/api/PlatformUsers/' + this.userId);
-                this.set('ajax.url', 'http://lmu-mt-api.herokuapp.com/api/PlatformUsers/' + this.userId);
+                this.set('ajax.url', 'http://localhost:3000/api/PlatformUsers/' + this.userId);
+                //this.set('ajax.url', 'http://lmu-mt-api.herokuapp.com/api/PlatformUsers/' + this.userId);
             },
 
             //Function for setting Mail & Name on Ajax response
