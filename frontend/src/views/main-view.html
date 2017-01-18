@@ -6,7 +6,6 @@
 <link rel="import" href="../components/navigation-bar.html">
 <link rel="import" href="../shared/shared-styles.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
-<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../../bower_components/iron-collapse/iron-collapse.html">
 
 
@@ -88,15 +87,11 @@
     </style>
 
     <!-- Fetches info about currently logged in user -->
-    <iron-ajax
-            auto
-            headers='[[ajax.headers]]'
-            content-type="[[ ajax.contentType ]]"
-            handle-as="json"
+    <api-request
+            headers="[[ ajax.headers ]]"
             method="[[ ajax.method ]]"
-            on-error="_handleUserError"
-            on-response="_handleUserResponse"
-            url="[[ ajax.url ]]"></iron-ajax>
+            endpoint="[[ ajax.endpoint ]]"
+            response="{{ apiResponse }}"></api-request>
 
     <app-header fixed>
       <navigation-bar
@@ -143,100 +138,89 @@
   <script>
     Polymer({
 
-      is: 'main-view',
+        is: 'main-view',
 
-      properties: {
+        properties: {
 
-        accessToken: {
-          type: String,
-          observer: '_accessTokenChanged'
-        },
-        group: {
-          type: Object,
-          notify: true,
-          value: {}
-        },
-        loggedIn: {
-          type: Boolean,
-          notify: true
-        },
-        showNotifications: {
-          type: Boolean,
-          value: false
-        },
-        userId: {
-          type: String,
-          notify: true,
-          observer: '_userIdChanged'
-        },
-        user: {
-          type: Object,
-          notify: true,
-          readOnly: false,
-          value: {}
-        }
-      },
-
-      _userIdChanged: function () {
-
-        this.set('userId', this.userId);
-
-        if (this.userId && this.accessToken) {
-
-          this.ajax = {
-            contentType: 'application/json',
-            headers: {
-              Authorization: this.accessToken
+            accessToken: {
+              type: String,
+              observer: '_accessTokenChanged'
             },
-            method: 'GET',
-            //url: 'http://lmu-mt-api.herokuapp.com/api/platformusers/' + this.userId
-            url: 'http://localhost:3000/api/platformusers/' + this.userId
-          };
-
-        }
-
-      },
-
-      _accessTokenChanged: function () {
-
-        if (this.userId && this.accessToken) {
-
-          this.ajax = {
-            contentType: 'application/json',
-            headers: {
-              Authorization: this.accessToken
+            apiResponse: {
+              type: Object,
+              reflectToAttribute: false,
+              observer: '_apiResponseChanged'
             },
-            method: 'GET',
-            //url: 'http://lmu-mt-api.herokuapp.com/api/platformusers/' + this.userId
-            url: 'http://localhost:3000/api/platformusers/' + this.userId
-          };
+            group: {
+              type: Object,
+              notify: true,
+              value: {}
+            },
+            loggedIn: {
+              type: Boolean,
+              notify: true
+            },
+            showNotifications: {
+              type: Boolean,
+              value: false
+            },
+            userId: {
+              type: String,
+              notify: true,
+              observer: '_userIdChanged'
+            },
+            user: {
+              type: Object,
+              notify: true,
+              readOnly: false,
+              value: {}
+            }
+        },
 
+        _userIdChanged: function () {
+
+            this.set('userId', this.userId);
+
+            if (this.userId && this.accessToken) {
+
+              this.ajax = {
+                headers: {
+                  Authorization: this.accessToken
+                },
+                method: 'GET',
+                endpoint: '/platformusers/' + this.userId
+              };
+
+            }
+
+        },
+
+        _accessTokenChanged: function () {
+
+            if (this.userId && this.accessToken) {
+
+              this.ajax = {
+                headers: {
+                  Authorization: this.accessToken
+                },
+                method: 'GET',
+                endpoint: '/platformusers/' + this.userId
+              };
+
+            }
+
+        },
+
+        _apiResponseChanged: function (response) {
+
+            if (response.type == 'response') {
+                var userResponse = response.data;
+                this.set('user.email', userResponse.email);
+                this.set('user.firstName', userResponse.firstName);
+                this.set('user.groupId', userResponse.groupId);
+                this.set('user.name', userResponse.name);
+            }
         }
-
-      },
-
-      /**
-       * Callback fired when API answers with an error
-       * @param response
-       * @private
-       */
-      _handleLoginError: function (response) {
-      },
-
-      _handleUserResponse: function (e) {
-        var userResponse = e.detail.response;
-        this.set('user.email', userResponse.email);
-        this.set('user.firstName', userResponse.firstName);
-        this.set('user.groupId', userResponse.groupId);
-        this.set('user.name', userResponse.name);
-      },
-
-      toggleGroup: function () {
-        var mq = window.matchMedia( "(max-width: 767px)" );
-        if(mq.matches){
-          this.$.collapse.toggle();
-        }
-      }
 
     });
   </script>

@@ -31,18 +31,11 @@
             }
         </style>
 
-        <iron-ajax
-                auto
-                body="[[ ajax.body ]]"
-                content-type="[[ ajax.contentType ]]"
-                handle-as="json"
+        <api-request
                 headers="[[ ajax.headers ]]"
                 method="[[ ajax.method ]]"
-                on-error="_handleLogoutError"
-                on-response="_handleLogoutResponse"
-                url="[[ ajax.url ]]"
-                verbose
-                with-credentials="true"></iron-ajax>
+                endpoint="[[ ajax.endpoint ]]"
+                response="{{ apiResponse }}"></api-request>
 
         <app-toolbar class="nav-container">
             <!--<div class="configuration nav-block">-->
@@ -67,6 +60,13 @@
             is: 'navigation-bar',
 
             properties: {
+
+                apiResponse: {
+                    type: String,
+                    reflectToAttribute: false,
+                    observer: '_apiResponseChanged'
+                },
+
                 accessToken: {
                     type: String,
                     notify: true
@@ -118,41 +118,29 @@
 
                 if (this.loggedIn) {
                     this.ajax = {
-                        body: {},
-                        contentType: 'application/json',
                         headers: {
                             'Authorization': this.accessToken
                         },
                         method: 'POST',
-                        url: 'http://localhost:3000/api/platformusers/logout'
-                        //url: 'http://lmu-mt-api.herokuapp.com/api/platformusers/logout'
+                        endpoint: '/platformusers/logout'
                     }
                 }
             },
 
-            /**
-             * Callback fired when API responds with an error
-             * @param response
-             * @private
-             */
-            _handleLogoutError: function (response) {
-            },
+            _apiResponseChanged: function (response) {
 
-            /**
-             * Callback fired when logout succeeds. Resets session cookies and
-             * global session properties.
-             * @private
-             */
-            _handleLogoutResponse: function () {
+                if (response.type == 'response') {
 
-                document.cookie = 'mt-api-accesstoken=; expires=Thu, 01 Jan 1970 00:00:00 UTC';
-                document.cookie = 'mt-api-userid=; expires=Thu, 01 Jan 1970 00:00:00 UTC';
+                    document.cookie = 'mt-api-accesstoken=; expires=Thu, 01 Jan 1970 00:00:00 UTC';
+                    document.cookie = 'mt-api-userid=; expires=Thu, 01 Jan 1970 00:00:00 UTC';
 
-                this.set('accessToken', '');
-                this.set('userId', '');
-                this.set('loggedIn', false);
-                this.set('user', {});
-                this.set('group', {});
+                    this.set('accessToken', '');
+                    this.set('userId', '');
+                    this.set('loggedIn', false);
+                    this.set('user', {});
+                    this.set('group', {});
+
+                }
 
             }
         });
