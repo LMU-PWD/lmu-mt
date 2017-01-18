@@ -66,6 +66,10 @@
                 padding:10px 20px;
             }
 
+            .create-group-input iron-icon {
+                margin-right: 5px;
+            }
+
             .error{
                 position: relative;
                 display: none;
@@ -115,6 +119,12 @@
             }
         </style>
 
+        <div>
+            <content>
+                <paper-spinner active="[[isLoading]]"></paper-spinner>
+            </content>
+        </div>
+
         <!-- Checking for Group ID if User Joined Group-->
         <template is="dom-if" if="{{selfInfo.groupId}}">
 
@@ -128,7 +138,8 @@
                     handle-as="json"
                     method="[[ ajax.method ]]"
                     on-response="_handleGroupRequest"
-                    url="[[ ajax.url ]]"></iron-ajax>
+                    url="[[ ajax.url ]]"
+                    loading="{{isLoading}}"></iron-ajax>
 
                 <template is="dom-repeat" items="[[group.groupMemberIds]]" as="member">
                     <div class="member">
@@ -154,19 +165,16 @@
                     <paper-button disabled>Zufälliger Beitritt</paper-button>
                 </div>-->
                 <div class="create-group">
-                    <div>
-                        <content>
-                            <paper-spinner active="[[isLoading]]"></paper-spinner>
-                        </content>
-                    </div>
-                    <paper-input label="You"
-                                       value="{{convertMail(selfInfo.email)}}"
-                                       readonly>
+                    <paper-input class="create-group-input"
+                                 label="You"
+                                 value="{{convertMail(selfInfo.email)}}"
+                                 readonly>
                         <iron-icon icon="mail" prefix></iron-icon>
                         <div suffix>@campus.lmu.de</div>
                     </paper-input>
                     <template is="dom-repeat" items="{{members}}" as="member">
-                        <paper-input label="Member [[calcNaturalIndex(index)]]"
+                        <paper-input class="create-group-input"
+                                     label="Member [[calcNaturalIndex(index)]]"
                                      value="{{member.name}}"
                                      required>
                             <iron-icon icon="mail" prefix></iron-icon>
@@ -182,6 +190,7 @@
                     </paper-input-error>
                     <iron-ajax
                             auto
+                            body="[[ ajax.body ]]"
                             content-type="[[ ajax.contentType ]]"
                             headers="[[ ajax.headers ]]"
                             body = "[[ ajax.body ]]"
@@ -217,6 +226,10 @@
                     type: Number,
                     value: 4
                 },
+                isLoading: {
+                    type: Boolean,
+                    value: false
+                },
                 selfInfo: {
                     type: Object,
                     notify: true,
@@ -231,16 +244,17 @@
             ],
             ready: function() {
 
-                console.log(this.selfInfo);
-
                 this.members= [];
                 for (var i=1;i<this.groupSize;i++){
                     this.members.push({"name":""});
                 }
             },
+
             _selfInfoGroupIdChanged: function () {
 
                 if (this.selfInfo.groupId) {
+
+
 
                     this.ajax = {
                         contentType: 'application/json',
@@ -257,12 +271,12 @@
             },
 
             convertMail: function (mail) {
-                console.log(this.selfInfo.email);
-                if(mail==undefined) {
+                if (!mail) {
                     return "";
-                } else if(mail.includes("@campus.lmu.de")){
+                } else if (mail.includes("@campus.lmu.de")) {
                     return mail.slice(0,-14);
                 }
+                return mail.split("@")[0];
             },
 
             _createNewGroup: function(){
