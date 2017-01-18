@@ -1,7 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
-<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
 <link rel="import" href="../shared/shared-styles.html">
 <link rel="import" href="../services/get-user-info.html">
@@ -131,15 +130,12 @@
             <div class="info">
 
                 <!-- Dieser Request soll anhand der ID die Gruppeninfo holen -->
-                <iron-ajax
-                    auto
-                    content-type="[[ ajax.contentType ]]"
-                    headers="[[ ajax.headers ]]"
-                    handle-as="json"
-                    method="[[ ajax.method ]]"
-                    on-response="_handleGroupRequest"
-                    url="[[ ajax.url ]]"
-                    loading="{{isLoading}}"></iron-ajax>
+                <api-request
+                        headers="[[ ajax.headers ]]"
+                        method="[[ ajax.method ]]"
+                        endpoint="[[ ajax.endpoint ]]"
+                        response="{{ apiGetGroupResponse }}"
+                        loading="{{ isLoading }}"></api-request>
 
                 <template is="dom-repeat" items="[[group.groupMemberIds]]" as="member">
                     <div class="member">
@@ -188,18 +184,14 @@
                     <paper-input-error id="requestError" class="error">
                         Uuups... hat haben wohl die E-Mails nicht gestimmt
                     </paper-input-error>
-                    <iron-ajax
-                            auto
+
+                    <api-request
                             body="[[ ajax.body ]]"
-                            content-type="[[ ajax.contentType ]]"
                             headers="[[ ajax.headers ]]"
-                            body = "[[ ajax.body ]]"
-                            handle-as="json"
                             method="[[ ajax.method ]]"
-                            url="[[ ajax.url ]]"
-                            on-response="_handleJoin"
-                            on-error="_handleErrorResponse"
-                            loading="{{isLoading}}"></iron-ajax>
+                            endpoint="[[ ajax.endpoint ]]"
+                            response="{{ apiCreateGroupResponse }}"
+                            loading="{{ isLoading }}"></api-request>
                 </div>
             </div>
 
@@ -211,6 +203,16 @@
             is: 'group-detail',
             properties: {
                 accessToken: String,
+                apiGetGroupResponse: {
+                    type: String,
+                    reflectToAttribute: false,
+                    observer: '_apiGetGroupResponseChanged'
+                },
+                apiCreateGroupResponse: {
+                    type: String,
+                    reflectToAttribute: false,
+                    observer: '_apiCreateGroupResponseChanged'
+                },
                 group: {
                     type: Object,
                     notify: true,
@@ -224,6 +226,11 @@
                 isLoading: {
                     type: Boolean,
                     value: false
+                },
+                members: {
+                    type: Array,
+                    reflectToAttribute: false,
+                    notify: true
                 },
                 selfInfo: {
                     type: Object,
@@ -255,8 +262,7 @@
                             Authorization: this.accessToken
                         },
                         method: 'GET',
-                        //url: 'http://lmu-mt-api.herokuapp.com/api/groups/' + this.selfInfo.groupId
-                        url: 'http://localhost:3000/api/groups/' + this.selfInfo.groupId
+                        endpoint: '/groups/' + this.selfInfo.groupId
                     }
 
                 }
@@ -282,6 +288,7 @@
                 //Check for empty inputs
                 this.members.forEach(function(element) {
                     if(element.name==""){
+                        console.log('element was empty');
                         checked = false;
                     }
                 });
@@ -294,15 +301,15 @@
                     });
 
                     this.ajax = {
-                        contentType: 'application/json',
                         headers: {
                             Authorization: this.accessToken
                         },
                         method: 'POST',
-                        //url: 'http://lmu-mt-api.herokuapp.com/api/createbymail/',
-                        body: {"emails":mails},
-                        url: 'http://localhost:3000/api/Groups/createByMail/'
-                    }
+                        body: {
+                            "emails": mails
+                        },
+                        endpoint: '/groups/createbymail/'
+                    };
                 }else {
                     this.$$('#inputError').toggleAttribute("invalid",true);
                 }
@@ -312,26 +319,40 @@
                 return index+1;
             },
 
-            _handleGroupRequest: function (e) {
-                var self = this;
-                var receivedGroup = e.detail.response;
-                this.set('group', receivedGroup);
+            /**
+             * Callback fired when api-request responds to GET on current group.
+             * @param response
+             * @private
+             */
+            _apiGetGroupResponseChanged: function (response) {
 
-                //Change groupMemberIds to Array Containing Objects with ID, Name and Mail
-                this.group.groupMemberIds.forEach(function () {
-                    self.push('group.groupMemberIds',{"id":self.shift('group.groupMemberIds'),"name":"","mail":""});
-                });
-            },
+                if (response.type == 'response'){
+                    var self = this;
+                    var receivedGroup = response.data;
+                    this.set('group', receivedGroup);
 
-            _handleJoin: function(e){
-                var response = e.detail.response.group;
-                if(response){
-                    this.set('selfInfo.groupId', response.id);
+                    //Change groupMemberIds to Array Containing Objects with ID, Name and Mail
+                    this.group.groupMemberIds.forEach(function () {
+                        self.push('group.groupMemberIds',{"id":self.shift('group.groupMemberIds'),"name":"","mail":""});
+                    });
                 }
             },
 
-            _handleErrorResponse: function (e) {
-                this.$$('#requestError').toggleAttribute("invalid",true);
+            /**
+             * Callback fired when api-request responds to createByMail request
+             * @param apiResponse
+             * @private
+             */
+            _apiCreateGroupResponseChanged: function(apiResponse){
+
+                if (apiResponse.type == 'response') {
+                    var result = apiResponse.data.group;
+                    if(result){
+                        this.set('selfInfo.groupId', result.id);
+                    }
+                } else if (apiResponse.type == 'error') {
+                    this.$$('#requestError').toggleAttribute("invalid",true);
+                }
             }
         });
     </script>

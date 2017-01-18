@@ -10,6 +10,7 @@
                    content-type="[[ contentType ]]"
                    handle-as="json"
                    headers="[[ headers ]]"
+                   loading="{{ loading }}"
                    method="[[ method ]]"
                    on-error="_handleError"
                    on-response="_handleResponse"
@@ -29,7 +30,8 @@
                 baseUrl: {
                     type: String,
                     reflectToAttribute: false,
-                    value: 'http://localhost:3000/api'
+                    //value: 'http://localhost:3000/api'
+                    value: 'https://lmu-mt-api.herokuapp.com/api'
                 },
 
                 body: {
@@ -50,6 +52,12 @@
                 headers: {
                     type: Object,
                     value: {}
+                },
+
+                loading: {
+                    type: Boolean,
+                    notify: true,
+                    value: false
                 },
 
                 method: {
