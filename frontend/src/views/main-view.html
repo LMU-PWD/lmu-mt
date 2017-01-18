@@ -120,7 +120,7 @@
         </template>
       </div>
       <div class="group-placeholder light-color-text">
-        <group-card group-name=[[groupName]] on-tap="toggleGroup"></group-card>
+        <group-card group-name=[[group.name]] on-tap="toggleGroup"></group-card>
         <iron-collapse id="collapse" opened=true>
           <group-detail class="group-info"
                         access-token="[[ accessToken ]]"

@@ -48,7 +48,7 @@
             <div class="icon">
                 <img src="../../../images/group.svg">
             </div>
-            <h1>[[groupName]]</h1>
+            <h1>[[headerText]]</h1>
             
         </div>
     </template>
@@ -61,20 +61,29 @@
             properties: {
                 groupName: {
                     type: String,
-                    value: "Tritt jetzt einer Gruppe bei!",
-                    notify: false,
-                    readOnly: false
+                    value: ''
                 },
                 expanded: {
                     type: Boolean,
                     value: false
+                },
+                headerText: {
+                    type: String,
+                    computed: '_computeGroupCardHeader(groupName)',
+                    value: 'Tritt jetzt einer Gruppe bei!'
                 }
             },
+
             ready: function(){
                 if(this.expanded){
                     this.customStyle['--custom-height']= '370px';
                     this.updateStyles();
                 }
+                console.log(this.groupName);
+            },
+
+            _computeGroupCardHeader: function (groupName) {
+                return (!groupName || groupName == '') ? 'Tritt jetzt einer Gruppe bei!' : this.groupName;
             }
 
         });

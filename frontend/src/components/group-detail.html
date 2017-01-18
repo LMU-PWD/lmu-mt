@@ -216,11 +216,6 @@
                     notify: true,
                     readOnly: false
                 },
-                groupName: {
-                    type: String,
-                    notify: true,
-                    readOnly: true
-                },
                 groupSize: {
                     //TODO make input dependent
                     type: Number,
@@ -326,9 +321,6 @@
                 this.group.groupMemberIds.forEach(function () {
                     self.push('group.groupMemberIds',{"id":self.shift('group.groupMemberIds'),"name":"","mail":""});
                 });
-
-                //Set the group name bound to group-card
-                this._setGroupName(this.group.name);
             },
 
             _handleJoin: function(e){
