@@ -69,13 +69,39 @@
                 display: none;
             }
 
+            .spinner-container {
+                background-color: rgba(255,255,255,0.8);
+                display: block;
+                height: 100vh;
+                left: 0;
+                position: absolute;
+                text-align: center;
+                top: 0;
+                width: 100vw;
+                z-index: 100;
+            }
+
+            paper-spinner[active]{
+                height: 50px;
+                margin: auto;
+                top: calc(50% - 25px);
+                width: 50px;
+            }
+
         </style>
 
         <api-request
                 body="[[ ajax.body ]]"
                 method="[[ ajax.method ]]"
                 endpoint="[[ ajax.endpoint ]]"
+                loading="{{ isLoading }}"
                 response="{{ apiResponse }}"></api-request>
+
+        <template is="dom-if" if="[[ isLoading ]]">
+            <div class="spinner-container">
+                <paper-spinner active="[[ isLoading ]]"></paper-spinner>
+            </div>
+        </template>
 
         <paper-card heading="Registrierung">
 
@@ -87,13 +113,6 @@
                     target="_blank">Medientechnik</a> angemeldet sind, können sich hier
                     für die Organisationsplattform registrieren.
                 </p>
-                <!--p>buttonDisabled: [[ buttonDisabled ]]</p>
-                <p>email: [[ userInput.email ]]</p>
-                <p>password: [[ userInput.password ]]</p>
-                <p>confirmPassword: [[ userInput.confirmPassword ]]</p>
-                <p>emailInvalid [[ invalid.email ]]</p>
-                <p>passwordInvalid [[ invalid.password ]]</p>
-                <p>confirmPasswordInvalid [[ invalid.confirmPassword ]]</p-->
 
                 <!-- Email input -->
                 <paper-input
@@ -145,6 +164,7 @@
             </div>
 
             <div class="card-actions" style="padding: 20px">
+
                 <paper-button
                         on-tap="_fireRegisterRequest"
                         disabled="{{ buttonDisabled }}">Account erstellen</paper-button>
@@ -169,11 +189,6 @@
                     observer: '_apiResponseChanged'
                 },
 
-                accessToken: {
-                    type: String,
-                    notify: true
-                },
-
                 buttonDisabled: {
                     type: Boolean,
                     notify: true,
@@ -190,8 +205,23 @@
                     }
                 },
 
-                loggedIn: {
+                isLoading: {
                     type: Boolean,
+                    value: false
+                },
+
+                page: {
+                    type: String,
+                    notify: true
+                },
+
+                presetEmail: {
+                    type: String,
+                    notify: true
+                },
+
+                presetName: {
+                    type: String,
                     notify: true
                 },
 
@@ -241,7 +271,7 @@
 
             /**
              * Callback fired when user clicks submit button. Sets a property
-             * `ajax` containing information for login API call
+             * `ajax` containing information for registration API call
              * @private
              */
             _fireRegisterRequest: function () {
@@ -284,16 +314,21 @@
 
                     var jsonResponse = response.data;
 
-                    // Save session info to cookies
-                    var expires = new Date();
-                    expires.setTime(expires.getTime() + (jsonResponse.ttl * 1000));
-                    document.cookie = 'mt-api-accesstoken=' + jsonResponse.id + ';expires=' + expires.toUTCString() + ';';
-                    document.cookie = "mt-api-userid=" + jsonResponse.userId + ';expires=' + expires.toUTCString() + ';';
+                    this.$.apiErrorMessage.setAttribute('class', 'error hide');
 
-                    // Set global session properties
-                    this.set('accessToken', jsonResponse.id);
-                    this.set('userId', jsonResponse.userId);
-                    this.set('loggedIn', true);
+                    this.presetEmail = jsonResponse.email;
+                    this.presetName = jsonResponse.first_name;
+                    /*this.set('userInput.email', '');
+                    this.set('userInput.password', '');
+                    this.set('userInput.confirmPassword', '');*/
+
+                    this.set('userInput', {
+                        email: '',
+                        password: '',
+                        confirmPassword: ''
+                    });
+
+                    this.set('page', '/');
 
                 }
             }
