@@ -115,7 +115,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 name="login"
                 access-token="{{ session.accessToken }}"
                 logged-in="{{ session.loggedIn }}"
-                user-id="{{ session.userId }}"></login-view>
+                user-id="{{ session.userId }}"
+                route="{{ subroute }}"></login-view>
             <error-view name="error"></error-view>
 
         </iron-pages>
@@ -137,6 +138,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           observer: '_pageChanged'
         },
         route: {
+          type: Object,
+          notify: true
+        },
+        subroute: {
           type: Object,
           notify: true
         },
