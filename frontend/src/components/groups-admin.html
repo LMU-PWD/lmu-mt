@@ -1,7 +1,11 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../shared/shared-styles.html">
 <link rel="import" href="../services/get-user-info.html">
 <link rel="import" href="../services/get-access-token.html">
@@ -15,18 +19,70 @@
             :host{
 
             }
+
+            .container{
+                padding: 20px;
+                background-color: var(--paper-blue-grey-100);
+            }
+
+            .group{
+                height: 50px;
+                background-color: var(--paper-blue-grey-50);
+                border-bottom: 1px solid var(--paper-blue-grey-700);
+
+                border-radius: 5px;
+            }
+
+
+            .group>h1{
+                width: calc(100% - 100px);
+                float: left;
+                margin: 10px;
+
+                font-size: 20px;
+                height:30px;
+                padding: 0 10px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            .group>paper-icon-button{
+                float: right;
+                margin: 5px;
+            }
         </style>
 
-        <!-- Fetches info about currently logged in user -->
+        <paper-dialog id="deleteDialog" on-iron-overlay-closed="_reactToDialog">
+            <div>
+                <h1>Soll diese Gruppe wirklich gelöscht werden?</h1>
+                <p>(Diese aktion ist nicht wiederrufbar)</p>
+            </div>
+            <div class="buttons">
+                <paper-button dialog-dismiss autofocus>Cancel</paper-button>
+                <paper-button dialog-confirm>OK</paper-button>
+            </div>
+        </paper-dialog>
+
+        <!-- Fetches all current Groups -->
         <api-request
                 headers="[[ ajax.headers ]]"
                 method="[[ ajax.method ]]"
                 endpoint="[[ ajax.endpoint ]]"
                 response="{{ apiGetGroupsResponse }}"></api-request>
+
+        <!-- Deletes Specific group -->
+        <api-request
+                headers="[[ deleteAjax.headers ]]"
+                method="[[ deleteAjax.method ]]"
+                endpoint="[[ deleteAjax.endpoint ]]"
+                response="{{ apiDeleteGroupResponse }}"></api-request>
         <!--Lists all Groups-->
+        <div class="container">
         <template is="dom-repeat" items="[[groups]]" as="group">
+            <div class="group">
             <h1>[[group.name]]</h1>
-            <paper-icon-button icon="icons:mail" on-tap="_deleteGroup([[group.id]])"></paper-icon-button>
+            <paper-icon-button icon="icons:delete" on-tap="_deleteGroup"></paper-icon-button>
+            </div>
 
             <!--TODO Lists Group Memebers -->
             <!--<template is="dom-repeat" items="[[group.groupMemberIds]]" as="member">
@@ -43,7 +99,7 @@
             </template>-->
 
         </template>
-
+        </div>
     </template>
     <script>
         Polymer({
@@ -63,15 +119,21 @@
                     reflectToAttribute: false,
                     observer: '_apiGetGroupsResponseChanged'
                 },
+                apiDeleteGroupResponse: {
+                    type: String,
+                    reflectToAttribute: false,
+                    observer: '_apiDeleteGroupResponseChanged'
+                },
                 groups: {
                     type: Array
                 }
             },
-            observers: [
-                '_selfInfoGroupIdChanged(selfInfo.groupId)'
-            ],
 
             ready: function () {
+                this._groupsChanged();
+            },
+
+            _groupsChanged: function () {
                 this.ajax = {
                     contentType: 'application/json',
                     headers: {
@@ -108,9 +170,38 @@
                 console.log(this.groups);
             },
 
+            _apiDeleteGroupResponseChanged: function (response) {
+                console.log(response);
+
+                this._groupsChanged();
+            },
+
             _deleteGroup: function(event, groupId){
                 console.log(event);
-                console.log(groupId);
+                console.log(event.model.__data__.group.id);
+
+                var groupID = event.model.__data__.group.id;
+                //Pass Group ID Through deleteDialog
+                this.$.deleteDialog.dataset.groupID = groupID;
+                this.$.deleteDialog.open();
+            },
+
+            _reactToDialog: function (event) {
+                if(event.detail.confirmed){
+                    //Get bakc groupID
+                    var groupID = event.path[0].dataset.groupID;
+                    this.deleteAjax = {
+                     contentType: 'application/json',
+                     headers: {
+                     Authorization: this.accessToken
+                     },
+                     method: 'DELETE',
+                     endpoint: '/groups/' + groupID
+                     };
+
+                }
+                //Reset groupID Attribute
+                this.$.deleteDialog.dataset.groupID = '';
             }
         });
     </script>

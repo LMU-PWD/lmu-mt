@@ -116,14 +116,18 @@
         </template>
       </div>
       <template is="dom-if" if="[[user.isAdmin]]">
-        <div class="group-placeholder light-color-text">
+        <div class="group-placeholder">
           <group-card group-name="Gruppen" on-tap="toggleGroup"></group-card>
+          <iron-collapse id="collapse" opened=true>
           <groups-admin class="group-info"
                         access-token="[[ accessToken ]]"
                         self-info="{{user}}" ></groups-admin>
+            </iron-collapse>
 
         </div>
       </template>
+
+      <template is="dom-if" if="[[user.isStudent]]">
       <div class="group-placeholder light-color-text">
         <group-card group-name=[[group.name]] on-tap="toggleGroup"></group-card>
         <iron-collapse id="collapse" opened=true>
@@ -133,8 +137,9 @@
                         self-info="{{user}}"
                         group-name="{{groupName}}"></group-detail>
         </iron-collapse>
-
       </div>
+        </template>
+
       <div class="practicalsContainer">
         <index-card type="Fotopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:" info2="18.05.16, 14-16"></index-card>
         <index-card type="Videopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:" info2="18.05.16, 14-16"></index-card>
@@ -235,13 +240,24 @@
                 this.set('user.groupId', userResponse.groupId);
                 this.set('user.name', userResponse.name);
                 this.set('user.isAdmin', userResponse.isAdmin);
+                this.set('user.isTutor', userResponse.isTutor);
+            if(!this.user.isAdmin && !this.user.isTutor){
+              this.set('user.isStudent', true);
+              console.log("true");
+            }
             }
         },
 
       toggleGroup: function () {
         var mq = window.matchMedia( "(max-width: 767px)" );
         if(mq.matches){
-          this.$.collapse.toggle();
+          this.$$('#collapse').toggle();
+        }
+      },
+
+      isStudent: function () {
+        if(!this.user.isAdmin && !this.user.isTutor){
+          return true;
         }
       }
 
