@@ -1,0 +1,117 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="../shared/shared-styles.html">
+<link rel="import" href="../services/get-user-info.html">
+<link rel="import" href="../services/get-access-token.html">
+<link rel="import" href="mail-input.html">
+
+<dom-module id="groups-admin">
+
+    <template>
+
+        <style include="shared-styles">
+            :host{
+
+            }
+        </style>
+
+        <!-- Fetches info about currently logged in user -->
+        <api-request
+                headers="[[ ajax.headers ]]"
+                method="[[ ajax.method ]]"
+                endpoint="[[ ajax.endpoint ]]"
+                response="{{ apiGetGroupsResponse }}"></api-request>
+        <!--Lists all Groups-->
+        <template is="dom-repeat" items="[[groups]]" as="group">
+            <h1>[[group.name]]</h1>
+            <paper-icon-button icon="icons:mail" on-tap="_deleteGroup([[group.id]])"></paper-icon-button>
+
+            <!--TODO Lists Group Memebers -->
+            <!--<template is="dom-repeat" items="[[group.groupMemberIds]]" as="member">
+                <div class="member">
+                    <h1>[[member]]</h1>
+                    <get-user-info
+                            access-token="[[ accessToken ]]"
+                            user-id="[[member.id]]"
+                            name="{{member.name}}"
+                            mail="{{member.mail}}"></get-user-info>
+                    <a href="mailto:[[member.mail]]" tabindex="-1"><paper-icon-button icon="icons:mail"></paper-icon-button></a>
+                    <h2>[[member.name]]</h2>
+                </div>
+            </template>-->
+
+        </template>
+
+    </template>
+    <script>
+        Polymer({
+            is: 'groups-admin',
+            properties: {
+                accessToken: String,
+                selfInfo: {
+                    type: Object,
+                    notify: true,
+                    readOnly: false,
+                    value: {
+                        groupId: ''
+                    }
+                },
+                apiGetGroupsResponse: {
+                    type: String,
+                    reflectToAttribute: false,
+                    observer: '_apiGetGroupsResponseChanged'
+                },
+                groups: {
+                    type: Array
+                }
+            },
+            observers: [
+                '_selfInfoGroupIdChanged(selfInfo.groupId)'
+            ],
+
+            ready: function () {
+                this.ajax = {
+                    contentType: 'application/json',
+                    headers: {
+                        Authorization: this.accessToken
+                    },
+                    method: 'GET',
+                    endpoint: '/groups/'
+                }
+            },
+
+
+
+            /**
+             * Callback fired when api-request responds to GET on current group.
+             * @param response
+             * @private
+             */
+            _apiGetGroupsResponseChanged: function (response) {
+
+                if (response.type == 'response'){
+                    var self = this;
+                    var receivedGroup = response.data;
+                    this.set('groups', receivedGroup);
+
+                    //Change groupMemberIds to Array Containing Objects with ID, Name and Mail
+                    //TODO Add members
+                    /*this.groups.forEach(function (element) {
+                        element.groupMemberIds.forEach(function (element) {
+                            console.log(element);
+                        });
+                        self.push('groups.groupMemberIds',{"id":self.shift('group.groupMemberIds'),"name":"","mail":""});
+                    });*/
+                }
+                console.log(this.groups);
+            },
+
+            _deleteGroup: function(event, groupId){
+                console.log(event);
+                console.log(groupId);
+            }
+        });
+    </script>
+</dom-module>

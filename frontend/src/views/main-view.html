@@ -2,6 +2,7 @@
 <link rel="import" href="../components/index-card.html">
 <link rel="import" href="../components/group-card.html">
 <link rel="import" href="../components/group-detail.html">
+<link rel="import" href="../components/groups-admin.html">
 <link rel="import" href="../components/notifications-card.html">
 <link rel="import" href="../components/navigation-bar.html">
 <link rel="import" href="../shared/shared-styles.html">
@@ -114,6 +115,15 @@
           <notifications-card showlist="{{ showlist }}"></notifications-card>
         </template>
       </div>
+      <template is="dom-if" if="[[user.isAdmin]]">
+        <div class="group-placeholder light-color-text">
+          <group-card group-name="Gruppen" on-tap="toggleGroup"></group-card>
+          <groups-admin class="group-info"
+                        access-token="[[ accessToken ]]"
+                        self-info="{{user}}" ></groups-admin>
+
+        </div>
+      </template>
       <div class="group-placeholder light-color-text">
         <group-card group-name=[[group.name]] on-tap="toggleGroup"></group-card>
         <iron-collapse id="collapse" opened=true>
@@ -177,6 +187,10 @@
             }
         },
 
+      ready: function () {
+        console.log(this.user.isAdmin);
+      },
+
         _userIdChanged: function () {
 
             this.set('userId', this.userId);
@@ -212,13 +226,15 @@
         },
 
         _apiResponseChanged: function (response) {
+          console.log(response);
 
-            if (response.type == 'response') {
+          if (response.type == 'response') {
                 var userResponse = response.data;
                 this.set('user.email', userResponse.email);
                 this.set('user.firstName', userResponse.firstName);
                 this.set('user.groupId', userResponse.groupId);
                 this.set('user.name', userResponse.name);
+                this.set('user.isAdmin', userResponse.isAdmin);
             }
         },
 
