@@ -220,7 +220,14 @@
                 this.set('user.groupId', userResponse.groupId);
                 this.set('user.name', userResponse.name);
             }
+        },
+
+      toggleGroup: function () {
+        var mq = window.matchMedia( "(max-width: 767px)" );
+        if(mq.matches){
+          this.$.collapse.toggle();
         }
+      }
 
     });
   </script>
