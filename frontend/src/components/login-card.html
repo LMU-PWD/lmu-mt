@@ -90,7 +90,7 @@
                     <p><b>Hi, [[ presetName ]]!</b> Deine Registrierung war erfolgreich. Du kannst dich nun einloggen.</p>
                 </template>
                 <template is="dom-if" if="[[ !customWelcomeText ]]">
-                    <p>Willkommen bei <em>Medientechnik</em>. Bitte melde dich mit deiner Campus-Mailadresse an.</p>
+                    <p>{{localize('logincardcard_welcome text-1')}} <em>{{localize('c_medientechnik')}}</em>{{localize('logincard_welcome text-2')}}</p>
                 </template>
                 <paper-input
                         label="E-Mail"
@@ -98,17 +98,17 @@
                         value="{{ userInput.email }}"
                         on-keydown="_onEnterFireLoginRequest"></paper-input>
                 <paper-input
-                        label="Password"
+                        label="{{localize('logincard_password placeholder')}}"
                         type="password"
                         value="{{ userInput.password }}"
                         on-keydown="_onEnterFireLoginRequest"></paper-input>
             </div>
             <div class="card-actions" style="padding: 20px">
-                <paper-button on-tap="_fireLoginRequest">Einloggen</paper-button>
-                <p>Neu hier? <a href="#/login/register">Registrieren</a></p>
+                <paper-button on-tap="_fireLoginRequest">{{localize('logincard_login button')}}</paper-button>
+                <p>Neu hier? <a href="#/login/register">{{localize('logincardcard_register button')}}</a></p>
             </div>
         </paper-card>
-
+        <iron-signals on-iron-signal-switchlocale="_switchLocale"></iron-signals>
     </template>
 
     <script>
@@ -118,6 +118,11 @@
             is: 'login-card',
 
             properties: {
+
+                  language: {
+                    value: 'en',
+                    type: String
+                  },
 
                 apiResponse: {
                     type: String,
@@ -172,6 +177,18 @@
 
             },
 
+            /**
+             * Localization setup
+             */
+            behaviors: [
+                Polymer.AppLocalizeBehavior
+            ],
+            attached: function() {
+                this.loadResources(this.resolveUrl('../shared/locales.json'));
+            },
+            _switchLocale: function() {
+                this.language = (this.language == 'en') ? 'de' : 'en';
+            },
             _apiResponseChanged: function (response) {
 
                 if (response.type == 'response') {
