@@ -87,10 +87,10 @@
         <paper-card heading="Login">
             <div class="card-content">
                 <template is="dom-if" if="[[ customWelcomeText ]]">
-                    <p><b>Hi, [[ presetName ]]!</b> Deine Registrierung war erfolgreich. Du kannst dich nun einloggen.</p>
+                    <p><b>Hi, [[ presetName ]]!</b> {{localize('logincard_register success')}}</p>
                 </template>
                 <template is="dom-if" if="[[ !customWelcomeText ]]">
-                    <p>{{localize('logincardcard_welcome text-1')}} <em>{{localize('c_medientechnik')}}</em>{{localize('logincard_welcome text-2')}}</p>
+                    <p>{{localize('logincard_welcome text-1')}} <em>{{localize('c_medientechnik')}}</em>{{localize('logincard_welcome text-2')}}</p>
                 </template>
                 <paper-input
                         label="E-Mail"
@@ -105,7 +105,7 @@
             </div>
             <div class="card-actions" style="padding: 20px">
                 <paper-button on-tap="_fireLoginRequest">{{localize('logincard_login button')}}</paper-button>
-                <p>Neu hier? <a href="#/login/register">{{localize('logincardcard_register button')}}</a></p>
+                <p>{{localize('logincard_register text')}} <a href="#/login/register">{{localize('logincard_register button')}}</a></p>
             </div>
         </paper-card>
         <iron-signals on-iron-signal-switchlocale="_switchLocale"></iron-signals>
