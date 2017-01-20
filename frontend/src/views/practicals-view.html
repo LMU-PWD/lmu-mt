@@ -61,6 +61,7 @@
         padding: 10px;
       }
     </style>
+
     <div class="page">
       <img class="icon" src=[[icon]] z-index="1">
       <paper-tabs selected="{{selectedTab}}" class="tabheader" no-slide>
@@ -85,6 +86,10 @@
 
         is: 'practicals-view',
         properties: {
+            accessToken: {
+                type: String,
+                notify: true
+            },
             type:{
                 type: String,
                 notify: true,
@@ -104,6 +109,10 @@
             practical_date:{
                 type: Date,
                 notify: true
+            },
+            route: {
+                type: Object,
+                notify: true
             }
         },
         ready: function () {
@@ -111,6 +120,8 @@
             if(this.practical_date == null){
                 this.timeslots = this._getTimeslots();
             }
+            console.log(this.accessToken);
+            console.log(this.route);
         },
 
         /**

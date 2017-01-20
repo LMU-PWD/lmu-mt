@@ -1,0 +1,102 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+
+<dom-module is="api-request">
+
+    <template>
+
+        <iron-ajax auto
+                   body="[[ body ]]"
+                   content-type="[[ contentType ]]"
+                   handle-as="json"
+                   headers="[[ headers ]]"
+                   loading="{{ loading }}"
+                   method="[[ method ]]"
+                   on-error="_handleError"
+                   on-response="_handleResponse"
+                   url="[[ url ]]"
+                   verbose></iron-ajax>
+
+    </template>
+
+    <script>
+
+        Polymer({
+
+            is: 'api-request',
+
+            properties: {
+
+                baseUrl: {
+                    type: String,
+                    reflectToAttribute: false,
+                    value: 'http://localhost:3000/api'
+                    //value: 'https://lmu-mt-api.herokuapp.com/api'
+                },
+
+                body: {
+                    type: Object,
+                    value: {}
+                },
+
+                contentType: {
+                    type: String,
+                    value: 'application/json'
+                },
+
+                endpoint: {
+                    type: String,
+                    observer: '_computeUrl'
+                },
+
+                headers: {
+                    type: Object,
+                    value: {}
+                },
+
+                loading: {
+                    type: Boolean,
+                    notify: true,
+                    value: false
+                },
+
+                method: {
+                    type: String,
+                    value: 'GET'
+                },
+
+                response: {
+                    type: Object,
+                    notify: true,
+                    value: ''
+                },
+
+                url: {
+                    type: String,
+                    reflectToAttribute: false
+                }
+            },
+
+            _handleResponse: function (response) {
+                this.response = {
+                    data: response.detail.response,
+                    type: 'response'
+                };
+            },
+
+            _handleError: function (response) {
+                this.response = {
+                    data: response.detail.error,
+                    type: 'error'
+                };
+            },
+
+            _computeUrl: function () {
+                this.url = this.baseUrl + this.endpoint;
+            }
+
+        });
+
+    </script>
+
+</dom-module>

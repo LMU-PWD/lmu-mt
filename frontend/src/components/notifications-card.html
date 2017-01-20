@@ -13,7 +13,6 @@
                 margin-left: 5px;
                 border-left: 5px solid var(--paper-orange-400);
 
-
                 /*margin:10px;*/
                 /*height: 200px;*/
                 /*!*background-color: blue;*!*/
@@ -29,6 +28,14 @@
             .notification_item:last-child {
                 border-bottom: none;
             }
+            .notification_noitems {
+                border-left-color: var(--paper-blue-grey-400);
+
+            }
+            .notification_noitems .notification_item {
+                color: var(--paper-blue-grey-300);
+            }
+
             .date{
                 font-size: 12px;
                 color: var(--paper-grey-500);
@@ -52,7 +59,8 @@
         </style>
 
 
-        <div class="notificationlist_container">
+        <div class="notificationlist_container notification_noitems">
+            <!--
             <div class="notification_item">
                 <span class="text">
                 Die Gruppenzuteilung ist jetzt freigeschalten! Trage dich jetzt in eine Gruppe ein, damit du
@@ -67,6 +75,11 @@
             <div class="notification_item">
                 hallo
                 <span class="date">01.01.2001</span>
+            </div>
+            -->
+            <div class="notification_item">
+                <span class="text">
+                Keine Benachrichtigungen</span>
             </div>
         </div>
     </template>

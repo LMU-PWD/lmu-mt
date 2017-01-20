@@ -1,4 +1,5 @@
 <link rel="import" href="../shared/shared-styles.html">
+<link rel="import" href="group-detail.html">
 
 <dom-module id="group-card">
     <template>
@@ -10,31 +11,44 @@
                 margin-top: 5px;
                 display: block;
                 background-color: var(--paper-blue-grey-100);
+                /*border-radius: 5px 5px 0 0;*/
             }
 
             .icon{
                 height: 64px;
                 width: 64px;
                 position: relative;
-                margin: 18px calc(20% - 54px);
+                margin: 18px 0 18px 18px; /*oben rechts unten links old:calc(20% - 54px)*/
                 float: left;
                 border-radius: 50%;
                 border: 2px solid var(--paper-blue-grey-900);
             }
+            .icon > img {
+                color: var(--paper-blue-grey-900);
+            }
             h1{
                 float: right;
                 position: relative;
-                top: 18px;
-                width:100px;
-                margin-right: calc(50% - 50px);
-                text-align: center;
+                top: 20px;
+                display:flex;
+                align-items:center;
+                width:calc(100% - 128px);
+                margin: 0 18px;
+                height: 60px;
+                padding: 0;
+            }
+
+            @media screen and (max-width: 767px) {
+                :host{
+                    border-radius: 0;
+                }
             }
         </style>
         <div>
             <div class="icon">
                 <img src="../../../images/group.svg">
             </div>
-            <h1>[[groupName]]</h1>
+            <h1>[[headerText]]</h1>
             
         </div>
     </template>
@@ -47,19 +61,28 @@
             properties: {
                 groupName: {
                     type: String,
-                    value: "Gruppe 5"
+                    value: ''
                 },
                 expanded: {
                     type: Boolean,
                     value: false
+                },
+                headerText: {
+                    type: String,
+                    computed: '_computeGroupCardHeader(groupName)',
+                    value: 'Tritt jetzt einer Gruppe bei!'
                 }
             },
+
             ready: function(){
                 if(this.expanded){
                     this.customStyle['--custom-height']= '370px';
                     this.updateStyles();
-                    console.log("Updated Height");
                 }
+            },
+
+            _computeGroupCardHeader: function (groupName) {
+                return (!groupName || groupName == '') ? 'Tritt jetzt einer Gruppe bei!' : this.groupName;
             }
 
         });

@@ -52,17 +52,11 @@
 
         </style>
 
-        <iron-ajax
-            auto
-            body="[[ ajax.body ]]"
-            content-type="[[ ajax.contentType ]]"
-            handle-as="json"
-            method="[[ ajax.method ]]"
-            on-error="_handleLoginError"
-            on-response="_handleLoginResponse"
-            url="[[ ajax.url ]]"
-            verbose
-            with-credentials="true"></iron-ajax>
+        <api-request
+                body="[[ ajax.body ]]"
+                method="[[ ajax.method ]]"
+                endpoint="[[ ajax.endpoint ]]"
+                response="{{ apiResponse }}"></api-request>
 
         <paper-card heading="Login">
             <div class="card-content">
@@ -78,9 +72,9 @@
                         value="{{ userInput.password }}"
                         on-keydown="_onEnterFireLoginRequest"></paper-input>
             </div>
-            <div class="card-actions">
+            <div class="card-actions" style="padding: 20px">
                 <paper-button on-tap="_fireLoginRequest">Einloggen</paper-button>
-                <p>Neu hier? <a href="#">Registrieren</a></p>
+                <!--<p>Neu hier? <a href="#">Registrieren</a></p>-->
             </div>
         </paper-card>
 
@@ -93,6 +87,12 @@
             is: 'login-card',
 
             properties: {
+
+                apiResponse: {
+                    type: String,
+                    reflectToAttribute: false,
+                    observer: '_apiResponseChanged'
+                },
 
                 accessToken: {
                     type: String,
@@ -130,9 +130,8 @@
                         email: this.userInput.email,
                         password: this.userInput.password
                     },
-                    contentType: 'application/json',
                     method: 'POST',
-                    url: 'http://localhost:3000/api/platformusers/login'
+                    endpoint: '/platformusers/login'
                 };
 
                 // Reset input fields (in case of immediate logout users
@@ -149,34 +148,25 @@
 
             },
 
-            /**
-             * Callback fired when API gives positive response
-             * @param {Object} response
-             * @private
-             */
-            _handleLoginResponse: function (response) {
+            _apiResponseChanged: function (response) {
+                if (response.type == 'error') {
 
-                var jsonResponse = response.detail.response;
+                } else if (response.type == 'response') {
 
-                // Save session info to cookies
-                var expires = new Date();
-                expires.setTime(expires.getTime() + (jsonResponse.ttl * 1000));
-                document.cookie = 'mt-api-accesstoken=' + jsonResponse.id + ';expires=' + expires.toUTCString() + ';';
-                document.cookie = "mt-api-userid=" + jsonResponse.userId + ';expires=' + expires.toUTCString() + ';';
+                    var jsonResponse = response.data;
 
-                // Set global session properties
-                this.accessToken = jsonResponse.id;
-                this.userId = jsonResponse.userId;
-                this.loggedIn = true;
-            },
+                    // Save session info to cookies
+                    var expires = new Date();
+                    expires.setTime(expires.getTime() + (jsonResponse.ttl * 1000));
+                    document.cookie = 'mt-api-accesstoken=' + jsonResponse.id + ';expires=' + expires.toUTCString() + ';';
+                    document.cookie = "mt-api-userid=" + jsonResponse.userId + ';expires=' + expires.toUTCString() + ';';
 
-            /**
-             * Callback fired when API answers with an error
-             * @param response
-             * @private
-             */
-            _handleLoginError: function (response) {
-                console.log(response.detail.error);
+                    // Set global session properties
+                    this.set('accessToken', jsonResponse.id);
+                    this.set('userId', jsonResponse.userId);
+                    this.set('loggedIn', true);
+
+                }
             }
 
         });
