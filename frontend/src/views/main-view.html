@@ -149,8 +149,26 @@
         </div>
 
         <practicals-view
-              name="practicals"
-              type=[[course]]
+              name="foto-practicals"
+              type= "Foto"
+              icon="[[icon]]"
+              route="{{subroute}}"
+              on-back-click="_handleBackTap"
+              access-token="{{ session.accessToken }}"
+              logged-in="{{ session.loggedIn }}"
+              user-id="{{ session.userId }}"></practicals-view>
+      <practicals-view
+              name="video-practicals"
+              type= "Video"
+              icon="[[icon]]"
+              route="{{subroute}}"
+              on-back-click="_handleBackTap"
+              access-token="{{ session.accessToken }}"
+              logged-in="{{ session.loggedIn }}"
+              user-id="{{ session.userId }}"></practicals-view>
+      <practicals-view
+              name="audio-practicals"
+              type="Audio"
               icon="[[icon]]"
               route="{{subroute}}"
               on-back-click="_handleBackTap"
@@ -175,6 +193,9 @@
                 route: {
                     type: Object,
                     notify: true
+                },
+                routeData:{
+                    type: Object
                 },
                 accessToken: {
                     type: String,
@@ -227,11 +248,10 @@
             }
           },
 
-            observers: [
-                '_routePageChanged(routeData.page)'
-            ],
+          observers: [
+              '_routePageChanged(routeData.page)'
+          ],
           _accessTokenChanged: function () {
-
               if (this.userId && this.accessToken) {
 
                   this.ajax = {
@@ -241,9 +261,7 @@
                       method: 'GET',
                       endpoint: '/platformusers/' + this.userId
                   };
-
               }
-
           },
           _apiResponseChanged: function (response) {
 
@@ -255,26 +273,19 @@
                   this.set('user.name', userResponse.name);
               }
           },
-            _handleBackTap: function(){
+          _handleBackTap: function(){
               this.page = 'dashboard';
-              },
+          },
           _handleFotoTap: function(){
-                //this.fire("foto-practicals-click");
-              console.log("practicals");
-              this.course = "Foto";
-              this.page = "practicals";
+              this.page  = "foto-practicals";
               this.icon = "../../../images/photo.svg";
           },
           _handleVideoTap: function(){
-                //this.fire("video-practicals-click");
-              this.course = "Video";
-              this.page = "practicals";
+              this.page  = "video-practicals";
               this.icon = "../../../images/video.svg";
           },
           _handleAudioTap: function(){
-              //this.fire("audio-practicals-click");
-              this.course = "Audio";
-              this.page = "practicals";
+              this.page  = "audio-practicals";
               this.icon = "../../../images/audio.svg";
           },
             /**
@@ -282,16 +293,21 @@
              * @param {String} page - new value of routeData.page
              * @private
              */
-            _routePageChanged: function(page) {
-                this.page = page || 'dashboard';
-            },
-            _pageChanged: function(page) {
-                // Load page import on demand. Show 404 page if fails
-                if(page != 'dashboard'){
-                    var resolvedPageUrl = this.resolveUrl(page + '-view.html');
-                    this.importHref(resolvedPageUrl, null, this._showPage404, true);
-                }
-            }
+          _routePageChanged: function(page) {
+              this.page  = page || 'dashboard';
+          },
+          /**
+           * Callback fired when the applications page property changes
+           * @param {String} page - new value of page property
+           * @private
+           */
+          _pageChanged: function(page) {
+              // Load page import on demand.
+              if(page.search('practicals')>=0) {
+                  var resolvedPageUrl = this.resolveUrl('./practicals-view.html');
+                  this.importHref(resolvedPageUrl, null, this._showPage404, true);
+              }
+          },
       });
   </script>
 </dom-module>

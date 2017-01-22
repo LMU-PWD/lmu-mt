@@ -25,6 +25,7 @@
                 padding-bottom: 20px;
             }
             #priorityShower{
+                visibility: hidden;
                 margin-left: 10%;
                 color: green;
             }
@@ -37,16 +38,16 @@
             <div class="date">
                 [[date]]
             </div>
-            <template is="dom-repeat" items="[[timeSlotStrings]]" as="slot" >
+            <template is="dom-repeat" items="[[timeslots]]" as="slot" >
                 <paper-item id="slot" class="slot" on-tap="_handleDateClick">
-                    [[slot]]
+                    [[_getTimeSlotString(slot)]]
+                    <div id="priorityShower"></div>
                 </paper-item>
                 <iron-collapse id="priorityselection">
                     <div>
                         <paper-dropdown-menu label="Priorität: ">
                             <paper-listbox class="dropdown-content">
                                 <template is="dom-repeat" items="[[priorities]]" as="selector">
-                                    <!--template is="dom-if" if="[[_computeSelector(selector)]]"-->
                                         <template is="dom-if" if="[[_computeSelector(selector)]]">
                                           <paper-item on-tap="_handlePriorityClick">[[selector]]</paper-item>
                                     </template>
@@ -67,10 +68,6 @@
                     type: Array,
                     value: []
                 },
-                timeSlotStrings:{
-                    type: Array,
-                    value: []
-                },
                 date:{
                     type: String,
                     value: ""
@@ -88,7 +85,7 @@
                     type: Number,
                     value: 0
                 },
-                chosenslot:{
+                chosenslotindex:{
                     type: Number
                 },
                 recentslot: {
@@ -100,7 +97,6 @@
             },
             ready: function() {
                 this.date = this._getDateString(this.timeslots[0][0]);
-                this.timeSlotStrings = this._getTimeSlotString();
 
                 for (i = 0; i < this.priority; i++) {
                         this.priorities[i]=i+1;
@@ -111,35 +107,33 @@
              * Creates string from the timeslot-timits to get a nicer visualisation,
              * Adds leading zeros, if necessary
              */
-            _getTimeSlotString: function(){
-                var timeslotstrings = [];
-                for (i=0; i<this.timeslots.length; i++) {
-                    var starthours = this.timeslots[i][0].getHours();
-                    var startminutes = this.timeslots[i][0].getMinutes();
-                    var endhours = this.timeslots[i][1].getHours();
-                    var endminutes = this.timeslots[i][1].getMinutes();
-
-                    /*
+            _getTimeSlotString: function(slot){
+                if(slot) {
+                        var starthour = slot[0].getHours();
+                        var startminute = slot[0].getMinutes();
+                        var endhour = slot[1].getHours();
+                        var endminute = slot[1].getMinutes();
+                        /*
                     * Add zeros, if necessary
                     */
 
-                    if(starthours<10){
-                        starthours = "0"+starthours;
+                    if(starthour<10){
+
+                        starthour = "0"+ starthour;
                     }
-                    if(startminutes<10){
-                        startminutes = "0"+startminutes;
+                    if(startminute<10){
+                        startminute = "0"+startminute;
                     }
-                    if(endhours<10){
-                        endhours = "0"+endhours;
+                    if(endhour<10
+                    ){
+                        endhour = "0"+endhour;
                     }
-                    if(endminutes<10){
-                        endminutes = "0"+endminutes;
+                    if(endminute< 10){
+                        endminute = "0" +endminute;
                     }
 
-                    timeslotstrings.push(starthours + ":" + startminutes + " - "
-                            + endhours + ":" + endminutes+ " Uhr");
+                    return starthour + ":" + startminute + " - " + endhour + ":" + endminute+ " Uhr";
                 }
-                return timeslotstrings;
             },
 
             /**
@@ -184,8 +178,8 @@
             _handleDateClick: function(e){
                 this.fire("date-click");
 
-                this.chosenslot = this.timeslots[e.model.index];
-                //console.log(this.chosenslot);
+                this.chosenslotindex = e.model.index;
+
 
                 //If there is a visible priorityselection, hide it
                 if(this.recentpriorityselection){
@@ -209,13 +203,19 @@
              * @param {String} e - handle data
              */
             _handlePriorityClick: function(e){
-                this.chosenpriority = e.model.selector;
-                this.fire("priority-click"); //Notifies Parent (practical-date-detail.html)
-
-                this.recentpriorityselection.toggle(); //Hide Priorityselection
-                this.recentslot.style.color = 'green';
-                this.recentslot.style.backgroundColor = '#CEF6CE';
-                this.recentslot.innerHTML = this.recentslot.innerHTML +'<div id="priorityShower">'+'Priorität: ' + e.model.selector+'</div>';
+                if(e.model.selector){
+                    this.chosenpriority = e.model.selector;
+                    if(this.recentslot.lastChild.textContent.search('Priorität:')>=0){
+                        this.fire("replace-priority");
+                        //TODO: replace slot on practical-date-detail chosenslots-Array and priorities-Array
+                    }
+                    this.fire("priority-click"); //Notifies Parent (practical-date-detail.html)
+                    this.recentpriorityselection.toggle(); //Hide Priorityselection
+                    this.recentslot.style.color = 'green';
+                    this.recentslot.style.backgroundColor = '#CEF6CE';
+                    this.recentslot.lastChild.textContent = 'Priorität: ' + e.model.selector;
+                    //this.recentslot.innerHTML = this.recentslot.innerHTML +'<div id="priorityShower">'+'Priorität: ' + e.model.selector+'</div>';
+                }
             },
 
             /**
@@ -231,10 +231,14 @@
                 }
                 return response;
             },
+            /**
+             * Reset slotselection on Button click
+             * @private
+             */
             _resetSelection: function(){
                 var slots = Polymer.dom(this.root).querySelectorAll("#slot");
                 for(j=0; j < slots.length; j++){
-                    slots[j].innerHTML = this.timeSlotStrings[j];
+                    slots[j].lastChild.textContent = '';
                     slots[j].style.color = '';
                     slots[j].style.backgroundColor = '';
                 }

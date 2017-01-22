@@ -64,7 +64,9 @@
             <div class="dateselector">
                 <template is="dom-repeat" items="[[timeslots]]" as="slots">
                     <date-creator id="dateselectors" class="datecreator" timeslots="[[slots]]" priority="[[priority]]"
-                                  on-priority-click="_handlePriorityClick" on-date-click="_handleDateClick"></date-creator>
+                                  on-priority-click="_handlePriorityClick"
+                                  on-date-click="_handleDateClick"
+                                  on-replace-priority="_handleReplacePriority"></date-creator>
                 </template>
             </div>
         </template>
@@ -201,8 +203,21 @@
              * @private
              */
             _handlePriorityClick: function(e){
-                this.chosenslots[e.target.chosenpriority-1]= e.target.chosenslot;
+                this.chosenslots[e.target.chosenpriority-1]= e.target.timeslots[e.target.chosenslotindex];
                 this.priorities[e.target.chosenpriority-1] = 0;
+            },
+            /**
+             * Replace a already chosen priority with e newly selected one
+             * @param e - Event Variable
+             * @private
+             */
+            _handleReplacePriority: function(e){
+                for(i=0; i<this.priorities.length; i++){
+                    if(this.chosenslots[i] == e.target.timeslots[e.target.chosenslotindex]){
+                        this.chosenslots[i]= '';
+                        this.priorities[i] = i+1;
+                    }
+                }
             }
         });
     </script>
