@@ -86,6 +86,13 @@
       }
     </style>
 
+    <!--app-location route="{{route}}" use-hash-as-path></app-location--><!--zugriff auf url; get ulr mäßig; use-hash-as-path: # vor path-->
+    <app-route
+            route="{{route}}"
+            pattern="/:page"
+            data="{{routeData}}"
+            tail="{{subroute}}"></app-route>
+
     <!-- Fetches info about currently logged in user -->
     <api-request
             headers="[[ ajax.headers ]]"
@@ -103,36 +110,76 @@
               show="{{ showMobileNotifications }}"></navigation-bar>
     </app-header>
 
-    <!-- NOTIFICATIONS -->
+
     <template is="dom-if" if="{{ showMobileNotifications }}">
       <notifications-card showlist="{{ showMobileNotifications }}"></notifications-card>
     </template>
 
-    <div class="main-container">
-      <div class="notificationsContainer">
-        <template is="dom-if" if="{{ showNotifications }}">
-          <notifications-card showlist="{{ showlist }}"></notifications-card>
-        </template>
-      </div>
-      <div class="group-placeholder light-color-text">
-        <group-card group-name=[[group.name]] on-tap="toggleGroup"></group-card>
-        <iron-collapse id="collapse" opened=true>
-          <group-detail class="group-info"
-                        access-token="[[ accessToken ]]"
-                        group="{{ group }}"
-                        self-info="{{user}}"
-                        group-name="{{groupName}}"></group-detail>
-        </iron-collapse>
+    <!-- P A G E S -->
+    <iron-pages
+            selected="[[page]]"
+            attr-for-selected="name"
+            fallback-selection="error">
+        <div class="main-page" name="dashboard">
+          <!-- NOTIFICATIONS -->
+          <div class="notificationsContainer">
+            <template is="dom-if" if="{{ showNotifications }}">
+              <notifications-card showlist="{{ showlist }}"></notifications-card>
+            </template>
+          </div>
+          <div class="group-placeholder light-color-text">
+            <group-card group-name=[[group.name]] on-tap="toggleGroup"></group-card>
+            <iron-collapse id="collapse" opened=true>
+              <group-detail class="group-info"
+                            access-token="[[ accessToken ]]"
+                            group="{{ group }}"
+                            self-info="{{user}}"
+                            group-name="{{groupName}}"></group-detail>
+            </iron-collapse>
+          </div>
 
-      </div>
-      <div class="practicalsContainer">
-        <index-card type="Fotopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:" info2="18.05.16, 14-16"></index-card>
-        <index-card type="Videopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:" info2="18.05.16, 14-16"></index-card>
-        <index-card type="Audiopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:" info2="18.05.16, 14-16"></index-card>
-      </div>
+          <div class="practicalsContainer">
+            <div on-tap="_handleFotoTap">
+                <index-card type="Fotopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:" info2="18.05.16, 14-16"></index-card>
+            </div>
+            <div on-tap="_handleVideoTap">
+                <index-card type="Videopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:" info2="18.05.16, 14-16"></index-card>
+            </div>
+            <div on-tap="_handleAudioTap">
+                <index-card type="Audiopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:" info2="18.05.16, 14-16"></index-card>
+            </div>
+          </div>
+        </div>
 
-      <iron-signals on-iron-signal-switchlocale="_switchLocale"></iron-signals>
-    </div>
+        <practicals-view
+              name="foto-practicals"
+              type= "Foto"
+              icon="[[icon]]"
+              route="{{subroute}}"
+              on-back-click="_handleBackTap"
+              access-token="{{ session.accessToken }}"
+              logged-in="{{ session.loggedIn }}"
+              user-id="{{ session.userId }}"></practicals-view>
+        <practicals-view
+              name="video-practicals"
+              type= "Video"
+              icon="[[icon]]"
+              route="{{subroute}}"
+              on-back-click="_handleBackTap"
+              access-token="{{ session.accessToken }}"
+              logged-in="{{ session.loggedIn }}"
+              user-id="{{ session.userId }}"></practicals-view>
+        <practicals-view
+              name="audio-practicals"
+              type="Audio"
+              icon="[[icon]]"
+              route="{{subroute}}"
+              on-back-click="_handleBackTap"
+              access-token="{{ session.accessToken }}"
+              logged-in="{{ session.loggedIn }}"
+              user-id="{{ session.userId }}"></practicals-view>
+
+    </iron-pages>
 
   </template>
 
@@ -176,75 +223,120 @@
               readOnly: false,
               value: {}
             },
-          language: {
-              type: String,
-              value: 'en'
-          }
+            language: {
+                type: String,
+                value: 'en'
+            },
+            page: {
+                type: String,
+                reflectToAttribute: false,
+                observer: '_pageChanged'
+            },
+            route: {
+                type: Object,
+                notify: true
+            },
+            routeData:{
+                type: Object
+            }
         },
-
-        behaviors: [
-            Polymer.AppLocalizeBehavior
+        observers: [
+            '_routePageChanged(routeData.page)'
         ],
-
-        attached: function() {
-            this.loadResources(this.resolveUrl('../shared/locales.json'));
-        },
-
         _userIdChanged: function () {
 
             this.set('userId', this.userId);
 
             if (this.userId && this.accessToken) {
 
-              this.ajax = {
-                headers: {
-                  Authorization: this.accessToken
-                },
-                method: 'GET',
-                endpoint: '/platformusers/' + this.userId
-              };
-
+                  this.ajax = {
+                      headers: {
+                          Authorization: this.accessToken
+                      },
+                      method: 'GET',
+                      endpoint: '/platformusers/' + this.userId
+                  };
             }
-
         },
 
+        toggleGroup: function () {
+            var mq = window.matchMedia( "(max-width: 767px)" );
+            if(mq.matches){
+              this.$.collapse.toggle();
+            }
+        },
+        _switchLocale: function() {
+            this.language = (this.language == 'en') ? 'de' : 'en';
+        },
         _accessTokenChanged: function () {
-
             if (this.userId && this.accessToken) {
 
-              this.ajax = {
-                headers: {
-                  Authorization: this.accessToken
-                },
-                method: 'GET',
-                endpoint: '/platformusers/' + this.userId
-              };
-
+                  this.ajax = {
+                      headers: {
+                          Authorization: this.accessToken
+                      },
+                      method: 'GET',
+                      endpoint: '/platformusers/' + this.userId
+                  };
             }
-
         },
-
         _apiResponseChanged: function (response) {
 
             if (response.type == 'response') {
-                var userResponse = response.data;
-                this.set('user.email', userResponse.email);
-                this.set('user.firstName', userResponse.firstName);
-                this.set('user.groupId', userResponse.groupId);
-                this.set('user.name', userResponse.name);
+                  var userResponse = response.data;
+                  this.set('user.email', userResponse.email);
+                  this.set('user.firstName', userResponse.firstName);
+                  this.set('user.groupId', userResponse.groupId);
+                  this.set('user.name', userResponse.name);
             }
         },
-
-      toggleGroup: function () {
-        var mq = window.matchMedia( "(max-width: 767px)" );
-        if(mq.matches){
-          this.$.collapse.toggle();
-        }
-      },
-        _switchLocale: function() {
-            this.language = (this.language == 'en') ? 'de' : 'en';
-        }
-
-    });
+        /**
+         * Handle tap on Back-Button
+         */
+        _handleBackTap: function(){
+            this.page = 'dashboard';
+        },
+        /**
+         * Handle tap on Foto-Button
+         */
+        _handleFotoTap: function(){
+            this.page  = "foto-practicals";
+            this.icon = "../../../images/photo.svg";
+        },
+        /**
+         * Handle tap on Video-Button
+         */
+        _handleVideoTap: function(){
+            this.page  = "video-practicals";
+            this.icon = "../../../images/video.svg";
+        },
+        /**
+         * Handle tap on Audio-Button
+         */
+        _handleAudioTap: function(){
+            this.page  = "audio-practicals";
+            this.icon = "../../../images/audio.svg";
+        },
+        /**
+        * Callback fired when the applications route changes
+        * @param {String} page - new value of routeData.page
+        * @private
+        */
+        _routePageChanged: function(page) {
+            this.page  = page || 'dashboard';
+        },
+        /**
+         * Callback fired when the applications page property changes
+         * @param {String} page - new value of page property
+         * @private
+         */
+         _pageChanged: function(page) {
+              // Load page import on demand.
+             if(page.search('practicals')>=0) {
+                  var resolvedPageUrl = this.resolveUrl('./practicals-view.html');
+                  this.importHref(resolvedPageUrl, null, this._showPage404, true);
+            }
+         }
+      });
   </script>
 </dom-module>

@@ -1,0 +1,356 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input-container.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input-error.html">
+<link rel="import" href="../../bower_components/iron-icons/communication-icons.html">
+<link rel="import" href="../shared/shared-styles.html">
+
+<dom-module is="registration-card">
+
+    <template>
+
+        <style>
+
+            :host {
+                max-width: 400px;
+                padding: 10px;
+                width: 100%;
+            }
+
+            a {
+                color: var(--paper-blue-grey-800);
+            }
+
+            paper-card {
+                width: 100%;
+                --paper-card-background-color: var(--paper-blue-grey-100);
+                --paper-card-header-color: var(--paper-blue-grey-50);
+
+                --paper-card-header: {
+                    background: var(--paper-blue-grey-900);
+                };
+
+                --paper-card-actions: {
+                    border: 0;
+                };
+            }
+
+            paper-button {
+                background-color: var(--paper-blue-grey-900);
+                color: var(--paper-blue-grey-50);
+                margin: 0;
+                width: 100%;
+            }
+
+            paper-input-container, paper-input {
+                --paper-input-container-color: var(--paper-blue-grey-500);
+                --paper-input-container-focus-color: var(--paper-blue-grey-900);
+            }
+
+            iron-icon[prefix] {
+                margin-right: 5px;
+            }
+
+            .card-content p {
+                margin-top: 0;
+            }
+
+            .card-content p.error {
+                color: #db4437;
+                font-size: 12px;
+                margin-bottom: 0;
+                margin-top: 16px;
+                transition: height 1s;
+            }
+
+            .card-content p.hide {
+                display: none;
+            }
+
+            .spinner-container {
+                background-color: rgba(255,255,255,0.8);
+                display: block;
+                height: 100vh;
+                left: 0;
+                position: absolute;
+                text-align: center;
+                top: 0;
+                width: 100vw;
+                z-index: 100;
+            }
+
+            paper-spinner[active]{
+                height: 50px;
+                margin: auto;
+                top: calc(50% - 25px);
+                width: 50px;
+            }
+
+        </style>
+
+        <api-request
+                body="[[ ajax.body ]]"
+                method="[[ ajax.method ]]"
+                endpoint="[[ ajax.endpoint ]]"
+                loading="{{ isLoading }}"
+                response="{{ apiResponse }}"></api-request>
+
+        <template is="dom-if" if="[[ isLoading ]]">
+            <div class="spinner-container">
+                <paper-spinner active="[[ isLoading ]]"></paper-spinner>
+            </div>
+        </template>
+
+        <paper-card heading="{{localize('registrationcard_header')}}">
+
+            <div class="card-content">
+
+                <!-- Description text -->
+                <p>{{localize('registrationcard_descr text-1')}}
+                    <a href="https://uniworx.ifi.lmu.de/?action=uniworxCourseWelcome&id=654"
+                    target="_blank">{{localize('c_medientechnik')}}</a> {{localize('registrationcard_descr text-2')}}
+                </p>
+
+                <!-- Email input -->
+                <paper-input
+                        id="emailInput"
+                        label="{{localize('registrationcard_campus email')}}"
+                        value="{{ userInput.email }}"
+                        on-keydown="_onEnterFireRegisterRequest"
+                        error-message="{{localize('registrationcard_mandatory')}}"
+                        auto-validate
+                        required
+                        invalid="{{ invalid.email }}">
+                    <iron-icon icon="mail" prefix></iron-icon>
+                </paper-input>
+
+                <!-- Password input -->
+                <paper-input
+                        id="passwordInput"
+                        label="{{localize('registrationcard_password')}}"
+                        type="password"
+                        value="{{ userInput.password }}"
+                        on-keydown="_onEnterFireRegisterRequest"
+                        on-input="_validateConfirmPasswordInput"
+                        error-message="{{localize('registrationcard_mandatory')}}"
+                        auto-validate
+                        required
+                        invalid="{{ invalid.password }}">
+                    <iron-icon icon="communication:vpn-key" prefix></iron-icon>
+                </paper-input>
+
+                <!-- Confirm password input -->
+                <paper-input
+                        id="confirmPasswordInput"
+                        label="{{localize('registrationcard_confirm')}}"
+                        type="password"
+                        value="{{ userInput.confirmPassword }}"
+                        on-keydown="_onEnterFireRegisterRequest"
+                        error-message="{{localize('registrationcard_mismatch')}}"
+                        invalid="{{ invalid.confirmPassword }}"
+                        on-input="_validateConfirmPasswordInput"
+                        required>
+                    <iron-icon icon="communication:vpn-key" prefix></iron-icon>
+                </paper-input>
+
+                <!-- API error message -->
+                <p class="error hide" id="apiErrorMessage">
+                    {{localize('registrationcard_error')}}
+                </p>
+
+            </div>
+
+            <div class="card-actions" style="padding: 20px">
+
+                <paper-button
+                        on-tap="_fireRegisterRequest"
+                        disabled="{{ buttonDisabled }}">{{localize('registrationcard_new account')}}</paper-button>
+                <p><a href="#/login/">{{localize('registrationcard_back')}}</a></p>
+            </div>
+
+        </paper-card>
+        <iron-signals on-iron-signal-switchlocale="_switchLocale"></iron-signals>
+    </template>
+
+    <script>
+
+        Polymer({
+
+            is: 'registration-card',
+
+            properties: {
+
+                apiResponse: {
+                    type: String,
+                    reflectToAttribute: false,
+                    observer: '_apiResponseChanged'
+                },
+
+                buttonDisabled: {
+                    type: Boolean,
+                    notify: true,
+                    value: true
+                },
+
+                invalid: {
+                    type: Object,
+                    notify: true,
+                    value: {
+                        email: false,
+                        password: false,
+                        confirmPassword: false
+                    }
+                },
+
+                isLoading: {
+                    type: Boolean,
+                    value: false
+                },
+
+                page: {
+                    type: String,
+                    notify: true
+                },
+
+                presetEmail: {
+                    type: String,
+                    notify: true
+                },
+
+                presetName: {
+                    type: String,
+                    notify: true
+                },
+
+                userId: {
+                    type: String,
+                    notify: true
+                },
+
+                userInput: {
+                    type: Object,
+                    value: {
+                        email: "",
+                        password: "",
+                        confirmPassword: ""
+                    }
+                },
+                language: {
+                    type: String,
+                    value: 'en'
+                }
+            },
+
+            observers: [
+                '_invalidChanged(invalid.email)',
+                '_invalidChanged(invalid.password)',
+                '_invalidChanged(invalid.confirmPassword)'
+            ],
+
+            /**
+             * Localization setup
+             */
+            behaviors: [
+                Polymer.AppLocalizeBehavior
+            ],
+            attached: function() {
+                this.loadResources(this.resolveUrl('../shared/locales.json'));
+            },
+            _switchLocale: function() {
+                this.language = (this.language == 'en') ? 'de' : 'en';
+            },
+
+
+            _validateConfirmPasswordInput: function () {
+                if (this.userInput.password === this.userInput.confirmPassword) {
+                    this.set('invalid.confirmPassword', false);
+                } else {
+                    this.set('invalid.confirmPassword', true);
+                }
+            },
+
+            _invalidChanged: function () {
+                if (this.invalid.email ||
+                    this.invalid.password ||
+                    this.invalid.confirmPassword) {
+
+                    this.set('buttonDisabled', true);
+
+                } else {
+
+                    this.set('buttonDisabled', false);
+
+                }
+            },
+
+            /**
+             * Callback fired when user clicks submit button. Sets a property
+             * `ajax` containing information for registration API call
+             * @private
+             */
+            _fireRegisterRequest: function () {
+
+                this.$.emailInput.validate();
+                this.$.passwordInput.validate();
+                this._validateConfirmPasswordInput();
+
+                if (!this.invalid.email &&
+                    !this.invalid.password &&
+                    !this.invalid.confirmPassword) {
+
+                    this.ajax = {
+                        body: {
+                            email: this.userInput.email,
+                            password: this.userInput.password,
+                            first_name: "first_name",
+                            name: "name"
+                        },
+                        method: 'POST',
+                        endpoint: '/platformusers/'
+                    };
+                }
+            },
+
+            _onEnterFireRegisterRequest: function (event) {
+
+                if (event.keyCode === 13) {
+                    this._fireRegisterRequest();
+                }
+
+            },
+
+            _apiResponseChanged: function (response) {
+                if (response.type == 'error') {
+
+                    this.$.apiErrorMessage.setAttribute('class', 'error');
+
+                } else if (response.type == 'response') {
+
+                    var jsonResponse = response.data;
+
+                    this.$.apiErrorMessage.setAttribute('class', 'error hide');
+
+                    this.presetEmail = jsonResponse.email;
+                    this.presetName = jsonResponse.first_name;
+                    /*this.set('userInput.email', '');
+                    this.set('userInput.password', '');
+                    this.set('userInput.confirmPassword', '');*/
+
+                    this.set('userInput', {
+                        email: '',
+                        password: '',
+                        confirmPassword: ''
+                    });
+
+                    this.set('page', '/');
+
+                }
+            }
+
+        });
+
+    </script>
+
+</dom-module>
