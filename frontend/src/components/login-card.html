@@ -18,6 +18,14 @@
 
             a {
                 color: var(--paper-blue-grey-800);
+
+            }
+            a:hover {
+                color: var(--paper-blue-grey-500);
+                -o-transition:.1s;
+                -moz-transition:.1s;
+                -webkit-transition:.1s;
+                transition:.1s;
             }
 
             paper-card {
@@ -34,11 +42,18 @@
                 };
             }
 
-            paper-button {
+            .card-actions paper-button {
                 background-color: var(--paper-blue-grey-900);
                 color: var(--paper-blue-grey-50);
                 margin: 0;
                 width: 100%;
+            }
+            .card-actions paper-button:hover {
+                background-color: var(--paper-blue-grey-700);
+                -o-transition:.1s;
+                -moz-transition:.1s;
+                -webkit-transition:.1s;
+                transition:.1s;
             }
 
             paper-input {
@@ -50,23 +65,81 @@
                 margin-top: 0;
             }
 
+            .spinner-container {
+                background-color: rgba(255,255,255,0.8);
+                display: block;
+                height: 100vh;
+                left: 0;
+                position: absolute;
+                text-align: center;
+                top: 0;
+                width: 100vw;
+                z-index: 100;
+            }
+
+            paper-spinner[active]{
+                height: 50px;
+                margin: auto;
+                top: calc(50% - 25px);
+                width: 50px;
+            }
+            .card-header {
+              @apply(--paper-font-headline);
+              background-color:  var(--paper-blue-grey-900);
+              padding: 16px;
+              font-size: 24px;
+              font-weight: 400;
+              color: #eceff1;
+            }
+            .localepicker {
+              float:right;
+            }
+            .localepicker paper-button {
+              padding: 0;
+              /*width: 50px;*/
+              color: var(--paper-blue-grey-300);
+              min-width: 0px;
+              font-size: 20px;
+              font-weight: 300;
+            }
+            .localepicker paper-button:hover {
+                color: #FFF;
+                -o-transition:.1s;
+                -moz-transition:.1s;
+                -webkit-transition:.1s;
+                transition:.1s;
+            }
         </style>
 
-        <iron-ajax
-            auto
-            body="[[ ajax.body ]]"
-            content-type="[[ ajax.contentType ]]"
-            handle-as="json"
-            method="[[ ajax.method ]]"
-            on-error="_handleLoginError"
-            on-response="_handleLoginResponse"
-            url="[[ ajax.url ]]"
-            verbose
-            with-credentials="true"></iron-ajax>
+        <api-request
+                body="[[ ajax.body ]]"
+                method="[[ ajax.method ]]"
+                endpoint="[[ ajax.endpoint ]]"
+                loading="{{ isLoading }}"
+                response="{{ apiResponse }}"></api-request>
 
-        <paper-card heading="Login">
+        <template is="dom-if" if="[[ isLoading ]]">
+            <div class="spinner-container">
+                <paper-spinner active="[[ isLoading ]]"></paper-spinner>
+            </div>
+        </template>
+
+        <paper-card>
+          <div class="card-header">
+            <span>Login</span>
+            <span class="localepicker">
+              <paper-button style="float:right" on-tap="_switchLocale">{{ language }}
+              </paper-button>
+              <paper-tooltip  offset="5">{{localize('logincard_locale button tooltip')}}</paper-tooltip>
+            </span>
+          </div>
             <div class="card-content">
-                <p>{{localize('logincardcard_welcome text-1')}} <em>{{localize('c_medientechnik')}}</em>{{localize('logincard_welcome text-2')}}</p>
+                <template is="dom-if" if="[[ customWelcomeText ]]">
+                    <p><b>Hi, [[ presetName ]]!</b> {{localize('logincard_register success')}}</p>
+                </template>
+                <template is="dom-if" if="[[ !customWelcomeText ]]">
+                    <p>{{localize('logincard_welcome text-1')}} <em>{{localize('c_medientechnik')}}</em>{{localize('logincard_welcome text-2')}}</p>
+                </template>
                 <paper-input
                         label="E-Mail"
                         type="email"
@@ -80,7 +153,7 @@
             </div>
             <div class="card-actions" style="padding: 20px">
                 <paper-button on-tap="_fireLoginRequest">{{localize('logincard_login button')}}</paper-button>
-                <!--<p>{{localize('logincardcard_register text')}} <a href="#">{{localize('logincardcard_register button')}}</a></p>-->
+                <p>{{localize('logincard_register text')}} <a href="#/login/register">{{localize('logincard_register button')}}</a></p>
             </div>
         </paper-card>
         <iron-signals on-iron-signal-switchlocale="_switchLocale"></iron-signals>
@@ -95,18 +168,46 @@
             properties: {
 
                   language: {
-                    value: 'en',
+                    value: 'de',
                     type: String
                   },
+
+                apiResponse: {
+                    type: String,
+                    reflectToAttribute: false,
+                    observer: '_apiResponseChanged'
+                },
 
                 accessToken: {
                     type: String,
                     notify: true
                 },
 
+                customWelcomeText: {
+                    type: Boolean,
+                    value: false
+                },
+
+                isLoading: {
+                    type: Boolean,
+                    value: false
+                },
+
                 loggedIn: {
                     type: Boolean,
                     notify: true
+                },
+
+                presetEmail: {
+                    type: String,
+                    notify: true,
+                    observer: '_presetChanged'
+                },
+
+                presetName: {
+                    type: String,
+                    notify: true,
+                    observer: '_presetChanged'
                 },
 
                 userId: {
@@ -136,6 +237,28 @@
             _switchLocale: function() {
                 this.language = (this.language == 'en') ? 'de' : 'en';
             },
+            _apiResponseChanged: function (response) {
+
+                if (response.type == 'response') {
+
+                    var jsonResponse = response.data;
+
+                    // Save session info to cookies
+                    var expires = new Date();
+                    expires.setTime(expires.getTime() + (jsonResponse.ttl * 1000));
+                    document.cookie = 'mt-api-accesstoken=' + jsonResponse.id + ';expires=' + expires.toUTCString() + ';';
+                    document.cookie = "mt-api-userid=" + jsonResponse.userId + ';expires=' + expires.toUTCString() + ';';
+
+                    // Set global session properties
+                    this.set('accessToken', jsonResponse.id);
+                    this.set('userId', jsonResponse.userId);
+                    this.set('loggedIn', true);
+                    this.set('presetEmail', '');
+                    this.set('presetName', '');
+                    this.customWelcomeText = false;
+
+                }
+            },
 
             /**
              * Callback fired when user clicks submit button. Sets a property
@@ -148,10 +271,8 @@
                         email: this.userInput.email,
                         password: this.userInput.password
                     },
-                    contentType: 'application/json',
                     method: 'POST',
-                    url: 'http://lmu-mt-api.herokuapp.com/api/platformusers/login'
-//                    url: 'http://localhost:3000/api/platformusers/login'
+                    endpoint: '/platformusers/login'
                 };
 
                 // Reset input fields (in case of immediate logout users
@@ -168,34 +289,14 @@
 
             },
 
-            /**
-             * Callback fired when API gives positive response
-             * @param {Object} response
-             * @private
-             */
-            _handleLoginResponse: function (response) {
+            _presetChanged: function () {
 
-                var jsonResponse = response.detail.response;
+                if (this.presetEmail != '' && this.presetName != '') {
 
-                // Save session info to cookies
-                var expires = new Date();
-                expires.setTime(expires.getTime() + (jsonResponse.ttl * 1000));
-                document.cookie = 'mt-api-accesstoken=' + jsonResponse.id + ';expires=' + expires.toUTCString() + ';';
-                document.cookie = "mt-api-userid=" + jsonResponse.userId + ';expires=' + expires.toUTCString() + ';';
+                    this.set('userInput.email', this.presetEmail);
+                    this.customWelcomeText = true;
 
-                // Set global session properties
-                this.set('accessToken', jsonResponse.id);
-                this.set('userId', jsonResponse.userId);
-                this.set('loggedIn', true);
-            },
-
-            /**
-             * Callback fired when API answers with an error
-             * @param response
-             * @private
-             */
-            _handleLoginError: function (response) {
-                console.log(response.detail.error);
+                }
             }
 
         });

@@ -1,5 +1,4 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../services/get-access-token.html">
 
 <dom-module id="get-user-info">
@@ -8,15 +7,12 @@
             :host{
             }
         </style>
-        <!--get-access-token token="{{header}}"></get-access-token-->
-        <iron-ajax
-                auto
-                content-type="[[ ajax.contentType ]]"
+
+        <api-request
                 headers="[[ ajax.headers ]]"
-                handle-as="json"
                 method="[[ ajax.method ]]"
-                on-response="_handleUserResponse"
-                url="[[ ajax.url ]]"></iron-ajax>
+                endpoint="[[ ajax.endpoint ]]"
+                response="{{ apiResponse }}"></api-request>
     </template>
     <script>
         Polymer({
@@ -24,6 +20,11 @@
             properties: {
                 accessToken: {
                     type: String
+                },
+                apiResponse: {
+                    type: Object,
+                    reflectToAttribute: false,
+                    observer: '_apiResponseChanged'
                 },
                 userId: {
                     value: String,
@@ -46,46 +47,27 @@
                 }
             },
             ready: function() {
-                //console.log(this.id);
-                //For testing without API
-                var e = {
-                    "realm": "string",
-                    "username": "Test Name",
-                    "credentials": {},
-                    "challenges": {},
-                    "email": "mailtest@campus.lmu.de",
-                    "emailVerified": true,
-                    "status": "string",
-                    "created": "2017-01-06",
-                    "lastUpdated": "2017-01-06",
-                    "id": 0
-                };
-                //this._handleUserResponse(e);
-                //console.log(this.id);
 
                 this.ajax = {
-                    contentType: 'application/json',
                     headers: {
                         Authorization: this.accessToken
                     },
                     method: 'GET',
-                    url: 'http://lmu-mt-api.herokuapp.com/api/PlatformUsers/' + this.userId
-                    //url: 'http://localhost:3000/api/PlatformUsers/' + this.userId
+                    endpoint: '/platformusers/' + this.userId
                 }
             },
 
             _userIdChanged: function () {
-                //this.set('ajax.url', 'http://localhost:3000/api/PlatformUsers/' + this.userId);
-                this.set('ajax.url', 'http://lmu-mt-api.herokuapp.com/api/PlatformUsers/' + this.userId);
+                this.set('ajax.endpoint', '/platformusers/' + this.userId);
             },
 
             //Function for setting Mail & Name on Ajax response
-            _handleUserResponse: function(e) {
-                //this._set<Property> function for Updating readOnly Properties
-                this._setMail(e.detail.response.email);
-                this._setName(e.detail.response.first_name + " " + e.detail.response.name);
-                console.log(this.name);
-                console.log(this.mail);
+            _apiResponseChanged: function(response) {
+
+                if (response.type == 'response') {
+                    this._setMail(response.data.email);
+                    this._setName(response.data['first_name'] + " " + response.data.name);
+                }
             }
         });
     </script>
