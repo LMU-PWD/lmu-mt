@@ -1,0 +1,51 @@
+ <link rel="import" href="../../bower_components/polymer-redux/polymer-redux.html">
+
+<script>
+    const initialState = {
+        friends: ["Peter","Hans","Monica"]
+    };
+
+    /*const reducer = (state,action) => {
+        if(!state) return initialState;
+    };*/
+
+    function reducer(state, action) {
+        if(!state){
+            return initialState;
+        }
+        switch (action.type){
+            case 'ADD_FRIEND':
+                const friends = state.friends.slice(0);
+                friends.push(action.friend);
+                return Object.assign({}, state, {friends: friends});
+            default: return state;
+        }
+    }
+
+    const store = Redux.createStore(reducer);
+    const ReduxBehavior = PolymerRedux(store);
+
+</script>
+<!--<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="redux-store">
+    <template>
+        <style>
+            :host{
+            }
+        </style>
+        <div></div>
+    </template>
+    <script>
+        Polymer({
+            is: 'redux-store',
+            properties: {
+            
+            },
+            ready: function() {
+            
+            }
+        });
+    </script>
+</dom-module>-->

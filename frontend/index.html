@@ -46,6 +46,22 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <meta name="msapplication-TileColor" content="#3f51b5">
     <meta name="msapplication-tap-highlight" content="no">
 
+    <script src="node_modules/redux/dist/redux.js"></script>
+
+    <!-- Firebase hosting -->
+    <script src="https://www.gstatic.com/firebasejs/3.6.4/firebase.js"></script>
+    <script>
+      // Initialize Firebase
+      var config = {
+        apiKey: "AIzaSyDTkuED6_mXQTU2x_XzF2LEykA1ZRQ5TnI",
+        authDomain: "lmu-media-technology.firebaseapp.com",
+        databaseURL: "https://lmu-media-technology.firebaseio.com",
+        storageBucket: "lmu-media-technology.appspot.com",
+        messagingSenderId: "200883486256"
+      };
+      firebase.initializeApp(config);
+    </script>
+
     <script>
       // Setup Polymer options
       window.Polymer = {

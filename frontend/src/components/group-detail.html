@@ -5,8 +5,11 @@
 <link rel="import" href="../../bower_components/paper-tooltip/paper-tooltip.html">
 <link rel="import" href="../shared/shared-styles.html">
 <link rel="import" href="../services/get-user-info.html">
+<link rel="import" href="../services/redux-store.html">
 <link rel="import" href="../services/get-access-token.html">
 <link rel="import" href="mail-input.html">
+
+
 
 <dom-module id="group-detail">
 
@@ -151,6 +154,10 @@
                     </div>
                 </template>
 
+                <template is="dom-repeat" items="[[reduxTestFriends]]" as="friend">
+                    <h1>[[friend]]</h1>
+                </template>
+
             </div>
 
         </template>
@@ -204,6 +211,10 @@
         Polymer({
             is: 'group-detail',
             properties: {
+                reduxTestFriends: {
+                    type: Array,
+                    statePath: 'friends'
+                },
                 accessToken: String,
                 apiGetGroupResponse: {
                     type: String,
@@ -255,7 +266,7 @@
              * Localization setup
              */
             behaviors: [
-              Polymer.AppLocalizeBehavior
+              Polymer.AppLocalizeBehavior, ReduxBehavior
             ],
             attached: function() {
               this.loadResources(this.resolveUrl('../shared/locales.json'));
