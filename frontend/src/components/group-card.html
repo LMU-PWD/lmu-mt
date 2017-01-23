@@ -1,5 +1,8 @@
 <link rel="import" href="../shared/shared-styles.html">
 <link rel="import" href="group-detail.html">
+<link rel="import" href="../services/redux-store.html">
+
+
 
 <dom-module id="group-card">
     <template>
@@ -61,12 +64,13 @@
             properties: {
                 groupName: {
                     type: String,
-                    notify: false,
-                    readOnly: false
+                    statePath: 'group.name'
+                    /*notify: false,
+                    readOnly: false*/
                 },
-                expanded: {
-                    type: Boolean,
-                    value: false
+                group: {
+                    type: Object,
+                    statePath: 'group'
                 },
                 language: {
                   type: String,
@@ -78,19 +82,11 @@
               "_onGroupNameSet(groupName)"
             ],
 
-            ready: function() {
-                if (this.expanded) {
-                    this.customStyle['--custom-height'] = '370px';
-                    this.updateStyles();
-                    console.log("Updated Height");
-                }
-            },
-
             /**
             * Localization setup
             */
             behaviors: [
-                Polymer.AppLocalizeBehavior
+                Polymer.AppLocalizeBehavior, ReduxBehavior
             ],
             attached: function() {
                 this.loadResources(this.resolveUrl('../shared/locales.json'));
@@ -98,15 +94,21 @@
             _switchLocale: function() {
                 this.language = (this.language == 'en') ? 'de' : 'en';
             },
+            ready: function () {
+                if(!this.group.name==""){
+                    console.log("NO GROUP");
+                    this.$.groupname.textContent = groupName;
+                }
+            },
 
             /**
             * Set the group name in the title, after it has been retrieved from AJAX
             * @param groupName
             * @private
             */
-            _onGroupNameSet: function(groupName) {
+            /*_onGroupNameSet: function(groupName) {
                 this.$.groupname.textContent = groupName;
-            }
+            }*/
 
         });
     </script>

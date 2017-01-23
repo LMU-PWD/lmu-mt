@@ -154,10 +154,6 @@
                     </div>
                 </template>
 
-                <template is="dom-repeat" items="[[reduxTestFriends]]" as="friend">
-                    <h1>[[friend]]</h1>
-                </template>
-
             </div>
 
         </template>
@@ -228,8 +224,7 @@
                 },
                 group: {
                     type: Object,
-                    notify: true,
-                    readOnly: false
+                    statePath: 'group'
                 },
                 groupSize: {
                     //TODO make input dependent
@@ -247,11 +242,12 @@
                 },
                 selfInfo: {
                     type: Object,
-                    notify: true,
+                    statePath: 'user'
+                    /*notify: true,
                     readOnly: false,
                     value: {
                         groupId: ''
-                    }
+                    }*/
                 },
               language: {
                 type: String,
@@ -261,13 +257,22 @@
             observers: [
                 '_selfInfoGroupIdChanged(selfInfo.groupId)'
             ],
-
             /**
              * Localization setup
              */
             behaviors: [
-              Polymer.AppLocalizeBehavior, ReduxBehavior
+                Polymer.AppLocalizeBehavior, ReduxBehavior
             ],
+
+            actions: {
+                group: function (group) {
+                    return{
+                        type: 'UPDATE_GROUP',
+                        detail: group
+                    }
+                }
+            },
+
             attached: function() {
               this.loadResources(this.resolveUrl('../shared/locales.json'));
             },
@@ -355,16 +360,8 @@
              * @private
              */
             _apiGetGroupResponseChanged: function (response) {
-
                 if (response.type == 'response'){
-                    var self = this;
-                    var receivedGroup = response.data;
-                    this.set('group', receivedGroup);
-
-                    //Change groupMemberIds to Array Containing Objects with ID, Name and Mail
-                    this.group.groupMemberIds.forEach(function () {
-                        self.push('group.groupMemberIds',{"id":self.shift('group.groupMemberIds'),"name":"","mail":""});
-                    });
+                    this.dispatch('group', response.data);
                 }
             },
 

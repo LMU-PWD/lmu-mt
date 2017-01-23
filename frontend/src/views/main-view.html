@@ -7,6 +7,7 @@
 <link rel="import" href="../shared/shared-styles.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../../bower_components/iron-collapse/iron-collapse.html">
+<link rel="import" href="../services/redux-store.html">
 
 
 <dom-module id="main-view">
@@ -109,20 +110,16 @@
     </template>
 
     <div class="main-container">
-      <redux-test></redux-test>
       <div class="notificationsContainer">
         <template is="dom-if" if="{{ showNotifications }}">
           <notifications-card showlist="{{ showlist }}"></notifications-card>
         </template>
       </div>
       <div class="group-placeholder light-color-text">
-        <group-card group-name=[[group.name]] on-tap="toggleGroup"></group-card>
+        <group-card on-tap="toggleGroup"></group-card>
         <iron-collapse id="collapse" opened=true>
           <group-detail class="group-info"
-                        access-token="[[ accessToken ]]"
-                        group="{{ group }}"
-                        self-info="{{user}}"
-                        group-name="{{groupName}}"></group-detail>
+                        access-token="[[ accessToken ]]"></group-detail>
         </iron-collapse>
 
       </div>
@@ -155,8 +152,9 @@
             },
             group: {
               type: Object,
-              notify: true,
-              value: {}
+              statePath: 'group'
+              /*notify: true,
+              value: {}*/
             },
             loggedIn: {
               type: Boolean,
@@ -173,9 +171,10 @@
             },
             user: {
               type: Object,
-              notify: true,
+              statePath: 'user'
+              /*notify: true,
               readOnly: false,
-              value: {}
+              value: {}*/
             },
           language: {
               type: String,
@@ -184,8 +183,17 @@
         },
 
         behaviors: [
-            Polymer.AppLocalizeBehavior
+            Polymer.AppLocalizeBehavior, ReduxBehavior
         ],
+
+        actions: {
+            user: function(user){
+                return {
+                    type: 'UPDATE_USER',
+                    detail: user
+                }
+            }
+        },
 
         attached: function() {
             this.loadResources(this.resolveUrl('../shared/locales.json'));
@@ -228,11 +236,13 @@
         _apiResponseChanged: function (response) {
 
             if (response.type == 'response') {
-                var userResponse = response.data;
+                this.dispatch('user',response.data);
+
+                /*var userResponse = response.data;
                 this.set('user.email', userResponse.email);
                 this.set('user.firstName', userResponse.firstName);
                 this.set('user.groupId', userResponse.groupId);
-                this.set('user.name', userResponse.name);
+                this.set('user.name', userResponse.name);*/
             }
         },
 

@@ -1,5 +1,6 @@
 <link rel="import" href="../shared/shared-styles.html">
 <link rel="import" href="../../bower_components/paper-tooltip/paper-tooltip.html">
+<link rel="import" href="../services/redux-store.html">
 
 <dom-module id="navigation-bar">
     <template>
@@ -122,8 +123,16 @@
              * Localization setup
              */
             behaviors: [
-                Polymer.AppLocalizeBehavior
+                Polymer.AppLocalizeBehavior, ReduxBehavior
             ],
+            actions: {
+                reset: function () {
+                    return{
+                        type: 'RESET'
+                    }
+
+                }
+            },
             attached: function() {
                 this.loadResources(this.resolveUrl('../shared/locales.json'));
             },
@@ -163,6 +172,10 @@
                         endpoint: '/platformusers/logout'
                     }
                 }
+
+                //Reset Redux Store to initail State
+                this.dispatch('reset');
+
             },
 
             _apiResponseChanged: function (response) {

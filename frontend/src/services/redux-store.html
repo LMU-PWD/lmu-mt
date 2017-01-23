@@ -2,7 +2,29 @@
 
 <script>
     const initialState = {
-        friends: ["Peter","Hans","Monica"]
+        friends: ["Peter","Hans","Monica"],
+        userId: "",
+        accessToken: "",
+        user: {
+            userID: "",
+            groupID: "",
+        },
+        group: {
+            name: "",
+            members: [
+                    {id:"",name:"", mail: ""}
+            ],
+            semesterId: "",
+            labsIds: [],
+            priorityIds: []
+        },
+        apiStuff: {},
+        semester: {},
+        session: {
+            accessToken: null,
+            loggedIn: false,
+            userId: null
+        }
     };
 
     /*const reducer = (state,action) => {
@@ -10,14 +32,23 @@
     };*/
 
     function reducer(state, action) {
+        console.log(state);
         if(!state){
             return initialState;
         }
         switch (action.type){
-            case 'ADD_FRIEND':
-                const friends = state.friends.slice(0);
-                friends.push(action.friend);
-                return Object.assign({}, state, {friends: friends});
+            case 'UPDATE_USER':
+                const user = action.detail;
+                return Object.assign({}, state, {user: user});
+            case 'UPDATE_GROUP':
+                const group = action.detail;
+                //Change groupMemberIds to Array Containing Objects with ID, Name and Mail
+                group.groupMemberIds.forEach(function (element) {
+                    group.groupMemberIds.push({"id":group.groupMemberIds.shift(),"name":"","mail":""});
+                });
+                return Object.assign({}, state, {group: group});
+            case 'RESET':
+                return initialState;
             default: return state;
         }
     }
