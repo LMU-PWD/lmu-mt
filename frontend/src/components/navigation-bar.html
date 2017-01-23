@@ -21,18 +21,31 @@
             .icon{
                 display: block;
                 margin: auto;
-                /*padding-top: 10px;*/
                 width: 100px;
                 z-index: 1;
             }
             paper-icon-button {
-                /*position: relative;*/
                 margin: 5%;
                 color: var(--paper-blue-grey-900);
             }
             .notification a {
                 text-decoration: none;
             }
+            .notification paper-button {
+                background: none;
+                min-width: 0;
+                margin: 0;
+                padding: 0;
+                color: var(--paper-blue-grey-900);
+            }
+            .notification paper-button:hover, paper-icon-button:hover {
+                color: var(--paper-blue-grey-500);
+                -o-transition: .1s;
+                -moz-transition: .1s;
+                -webkit-transition: .1s;
+                transition: .1s;
+            }
+
             .active-language {
                 text-decoration: underline !important;
             }
@@ -45,9 +58,6 @@
                 response="{{ apiResponse }}"></api-request>
 
         <app-toolbar class="nav-container">
-            <!--<div class="configuration nav-block">-->
-                <!--<paper-icon-button icon="icons:menu"></paper-icon-button>-->
-            <!--</div>-->
             <div class="configuration nav-block">
                 <paper-icon-button icon="icons:exit-to-app" on-tap="_fireLogoutRequest"></paper-icon-button>
                 <paper-tooltip>Logout</paper-tooltip>
@@ -56,14 +66,15 @@
                 <img src="../../images/mt.svg">
             </div>
             <div class="notification  nav-block">
-                    <a id="de_locale" href="#" on-tap="initSwitchLocale">DE</a>
-                    <a id="en_locale" href="#" on-tap="initSwitchLocale">EN</a>
+                <paper-button style="float:right" on-click="initSwitchLocale">{{ language }}</paper-button>
+                <paper-tooltip offset="5">{{localize('logincard_locale button tooltip')}}</paper-tooltip>
+
             </div>
             <div class="notification  nav-block">
                 <paper-icon-button class="mobile-and-tablet-only" icon="social:notifications" on-tap="toggleNotificationList"></paper-icon-button>
             </div>
         </app-toolbar>
-
+        <iron-signals on-iron-signal-switchlocale="_switchLocale"></iron-signals>
     </template>
 
     <script>
@@ -114,7 +125,7 @@
 
                 language: {
                     type: String,
-                    value: 'en'
+                    value: 'de'
                 }
             },
 
@@ -129,13 +140,6 @@
             },
             _switchLocale: function() {
                 this.language = (this.language == 'en') ? 'de' : 'en';
-            },
-
-            ready: function() {
-                if (this.language == 'en')
-                    this.$.en_locale.classList.add('active-language');
-                else
-                    this.$.de_locale.classList.add('active-language');
             },
 
             /**
@@ -182,24 +186,7 @@
 
             },
             initSwitchLocale: function(e) {
-
-                if (this.language.toUpperCase() == e.currentTarget.textContent)
-                {
-                    return;
-                }
                 this.fire("iron-signal", {name: "switchlocale"});
-
-                if (this.language == 'en')
-                {
-                    this.$.en_locale.classList.remove('active-language');
-                    this.$.de_locale.classList.add('active-language');
-                }
-                else
-                {
-                    this.$.de_locale.classList.remove('active-language');
-                    this.$.en_locale.classList.add('active-language');
-                }
-                this.language = (this.language == 'en') ? 'de' : 'en';
             }
         });
     </script>
