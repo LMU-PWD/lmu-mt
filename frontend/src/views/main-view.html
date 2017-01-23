@@ -10,7 +10,9 @@
 
 
 <dom-module id="main-view">
+
   <template>
+
     <style include="shared-styles">
       .group-placeholder{
         float: left;
@@ -106,35 +108,7 @@
       <notifications-card showlist="{{ showMobileNotifications }}"></notifications-card>
     </template>
 
-          <div class="notificationsContainer">
-            <template is="dom-if" if="{{ showNotifications }}">
-              <notifications-card showlist="{{ showlist }}"></notifications-card>
-            </template>
-          </div>
-          <div class="group-placeholder light-color-text">
-            <group-card group-name=[[group.name]] on-tap="toggleGroup"></group-card>
-            <iron-collapse id="collapse" opened=true>
-              <group-detail class="group-info"
-                            access-token="[[ accessToken ]]"
-                            group="{{ group }}"
-                            self-info="{{user}}"
-                            group-name="{{groupName}}"></group-detail>
-            </iron-collapse>
-          </div>
-
-          <div class="practicalsContainer">
-            <div on-tap="_handleFotoTap">
-                <index-card type="Fotopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:" info2="18.05.16, 14-16"></index-card>
-            </div>
-            <div on-tap="_handleVideoTap">
-                <index-card type="Videopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:" info2="18.05.16, 14-16"></index-card>
-            </div>
-            <div on-tap="_handleAudioTap">
-                <index-card type="Audiopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:" info2="18.05.16, 14-16"></index-card>
-            </div>
-          </div>
-        </div>
-
+    <div class="main-container">
       <div class="notificationsContainer">
         <template is="dom-if" if="{{ showNotifications }}">
           <notifications-card showlist="{{ showlist }}"></notifications-card>
@@ -163,41 +137,12 @@
   </template>
 
   <script>
-                accessToken: {
-                    type: String,
-                    observer: '_accessTokenChanged'
-                },
-                apiResponse: {
-                    type: Object,
-                    reflectToAttribute: false,
-                    observer: '_apiResponseChanged'
-                },
-                group: {
-                    type: Object,
-                    notify: true,
-                    value: {}
-                },
-                loggedIn: {
-                    type: Boolean,
-                    notify: true
-                },
-                showNotifications: {
-                    type: Boolean,
-                    value: false
-                },
-                userId: {
-                    type: String,
-                    notify: true,
-                    observer: '_userIdChanged'
-                },
-                user: {
-                    type: Object,
-                    notify: true,
-                    readOnly: false,
-                    value: {}
-                }
-          },
-          _userIdChanged: function () {
+    Polymer({
+
+        is: 'main-view',
+
+        properties: {
+
             accessToken: {
               type: String,
               observer: '_accessTokenChanged'
@@ -260,7 +205,9 @@
               };
 
             }
-      });
+
+        },
+
         _accessTokenChanged: function () {
 
             if (this.userId && this.accessToken) {
