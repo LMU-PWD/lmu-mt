@@ -1,5 +1,6 @@
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../components/login-card.html">
+<link rel="import" href="../components/registration-card.html">
 
 <dom-module id="login-view">
 
@@ -7,18 +8,39 @@
 
         <style include="iron-flex iron-flex-alignment">
 
-            login-card {
+            login-card, registration-card {
                 margin-top: 50px;
             }
 
         </style>
 
-        <div class="horizontal center-justified layout">
-            <login-card
-                access-token="{{ accessToken }}"
-                logged-in="{{ loggedIn }}"
-                user-id="{{ userId }}"></login-card>
-        </div>
+        <app-route
+            route="{{route}}"
+            pattern="/:page"
+            data="{{routeData}}"
+            tail="{{subroute}}"></app-route>
+
+        <iron-pages
+                selected="[[page]]"
+                attr-for-selected="name"
+                fallback-selection="login">
+
+            <div name="auth" class="horizontal center-justified layout">
+                <login-card
+                        access-token="{{ accessToken }}"
+                        logged-in="{{ loggedIn }}"
+                        preset-email="{{ presetEmail }}"
+                        preset-name="{{ presetName }}"
+                        user-id="{{ userId }}"></login-card>
+            </div>
+            <div name="register" class="horizontal center-justified layout">
+                <registration-card
+                        page="{{ route.path }}"
+                        preset-email="{{ presetEmail }}"
+                        preset-name="{{ presetName }}"></registration-card>
+            </div>
+
+        </iron-pages>
 
     </template>
 
@@ -43,8 +65,29 @@
                 userId: {
                     type: String,
                     notify: true
-                }
+                },
 
+                page: {
+                    type: String,
+                    reflectToAttribute: false
+                },
+
+                presetEmail: String,
+
+                presetName: String,
+
+                route: {
+                    type: Object,
+                    notify: true
+                }
+            },
+
+            observers: [
+                '_routePageChanged(routeData.page)'
+            ],
+
+            _routePageChanged: function (page) {
+                this.page = page || 'auth';
             }
 
         });
