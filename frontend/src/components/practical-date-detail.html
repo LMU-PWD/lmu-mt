@@ -29,6 +29,13 @@
             }
             .resetButton{
                 margin-bottom: 10px;
+                width: 49%;
+                float: left;
+            }
+            .saveButton{
+                margin-bottom: 10px;
+                width: 49%;
+                float: right;
             }
             /*Phone*/
             @media screen and (max-width: 767px) {
@@ -58,7 +65,11 @@
             <div>
                 <paper-button raised class="resetButton" on-tap="_handleResetClick">
                     <iron-icon icon="reply"></iron-icon>
-                        Auswahl zurücksetzen
+                        Zurücksetzen
+                </paper-button>
+                <paper-button raised class="saveButton" on-tap="_handleSaveClick">
+                    <iron-icon icon="save"></iron-icon>
+                    Speichern
                 </paper-button>
             </div>
             <div class="dateselector">
@@ -179,12 +190,13 @@
             /**
              * Handles Reset-Button Click; Resets the priorities-Array and calls childs resetSelection functions
              */
-            _handleResetClick: function(){
+            _handleResetClick: function(e){
                 this._fillPrioritiesArray();
                 var dateselectors = Polymer.dom(this.root).querySelectorAll("#dateselectors");
                 for(i = 0; i < dateselectors.length; i++){
                     dateselectors[i]._resetSelection();
                 }
+                this.fire("reset-click");
             },
 
             /**
@@ -206,6 +218,16 @@
                 this.chosenslots[e.target.chosenpriority-1]= e.target.timeslots[e.target.chosenslotindex];
                 this.priorities[e.target.chosenpriority-1] = 0;
             },
+
+            /**
+             * Handle save click
+             * @param e - Event Variable
+             * @private
+             */
+            _handleSaveClick: function(e){
+                this.fire("save-click");
+            },
+
             /**
              * Replace a already chosen priority with e newly selected one
              * @param e - Event Variable

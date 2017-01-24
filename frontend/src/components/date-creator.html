@@ -48,7 +48,7 @@
                         <paper-dropdown-menu label="Priorität: ">
                             <paper-listbox class="dropdown-content">
                                 <template is="dom-repeat" items="[[priorities]]" as="selector">
-                                        <template is="dom-if" if="[[_computeSelector(selector)]]">
+                                    <template is="dom-if" if="[[_computeSelector(selector)]]">
                                           <paper-item on-tap="_handlePriorityClick">[[selector]]</paper-item>
                                     </template>
                                 </template>

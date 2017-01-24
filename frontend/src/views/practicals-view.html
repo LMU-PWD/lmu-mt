@@ -74,7 +74,10 @@
         <iron-pages selected="[[selectedTab]]">
           <div>Page 1 Text</div>
           <div>
-            <practical-date-detail type="[[type]]" practical_date="[[practical_date]]" timeslots="[[timeslots]]" ></practical-date-detail>
+            <practical-date-detail id="practicalDateDetail" type="[[type]]" practical_date="[[practical_date]]"
+                                   timeslots="[[timeslots]]"
+                                   on-save-click="_handleSaveClick"
+                                   on-reset-click="_handleResetClick"></practical-date-detail>
           </div>
         </iron-pages>
       </div>
@@ -90,21 +93,12 @@
                 type: String,
                 notify: true
             },
-            type:{
-                type: String,
-                notify: true,
-                value: ""
-            },
-            selectedTab:{
-                type: String,
-                value: "0"
+            chosenslots:{
+                type: Array,
+                value: []
             },
             icon:{
                 type: String
-            },
-            timeslots:{
-                type: Array,
-                value: []
             },
             practical_date:{
                 type: Date,
@@ -113,6 +107,19 @@
             route: {
                 type: Object,
                 notify: true
+            },
+            selectedTab:{
+                type: String,
+                value: "0"
+            },
+            timeslots:{
+                type: Array,
+                value: []
+            },
+            type:{
+                type: String,
+                notify: true,
+                value: ""
             }
         },
         ready: function () {
@@ -130,6 +137,21 @@
         _backClicked: function() {
           this.type = "";
           this.fire("back-click");
+          this.$.practicalDateDetail._handleResetClick();
+        },
+
+        /**
+         * Handle save click
+         * @param e - Event Variable
+         * @private
+         */
+        _handleSaveClick: function(e){
+            this.chosenslots = this.$.practicalDateDetail.chosenslots;
+            console.log(this.chosenslots);
+        },
+
+        _handleResetClick: function(e){
+            this.chosenslots = [];
         },
 
         /**
