@@ -9,6 +9,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 
 <link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/app-localize-behavior/app-localize-behavior.html">
+
 <link rel="import" href="../bower_components/app-layout/app-drawer/app-drawer.html">
 <link rel="import" href="../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
 <link rel="import" href="../bower_components/app-layout/app-header/app-header.html">
@@ -23,6 +25,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../bower_components/iron-selector/iron-selector.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/iron-signals/iron-signals.html">
 
 <link rel="import" href="components/index-card.html">
 <link rel="import" href="components/group-card.html">
@@ -115,7 +118,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 name="login"
                 access-token="{{ session.accessToken }}"
                 logged-in="{{ session.loggedIn }}"
-                user-id="{{ session.userId }}"></login-view>
+                user-id="{{ session.userId }}"
+                route="{{ subroute }}"></login-view>
             <error-view name="error"></error-view>
 
         </iron-pages>
@@ -140,6 +144,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           type: Object,
           notify: true
         },
+        subroute: {
+          type: Object,
+          notify: true
+        },
         session: {
           type: Object,
           value: {
@@ -154,6 +162,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         '_routePageChanged(routeData.page)',
         '_loginStateChanged(session.loggedIn)'
       ],
+
+
 
       ready: function () {
 
@@ -255,7 +265,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         } else {
           this.set('route.path', '/login');
         }
-      }
+      },
 
     });
   </script>

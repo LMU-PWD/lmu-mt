@@ -146,6 +146,7 @@
         <index-card type="Audiopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:" info2="18.05.16, 14-16"></index-card>
       </div>
 
+      <iron-signals on-iron-signal-switchlocale="_switchLocale"></iron-signals>
     </div>
 
   </template>
@@ -189,7 +190,19 @@
               notify: true,
               readOnly: false,
               value: {}
-            }
+            },
+          language: {
+              type: String,
+              value: 'en'
+          }
+        },
+
+        behaviors: [
+            Polymer.AppLocalizeBehavior
+        ],
+
+        attached: function() {
+            this.loadResources(this.resolveUrl('../shared/locales.json'));
         },
 
       ready: function () {
@@ -259,7 +272,10 @@
         if(!this.user.isAdmin && !this.user.isTutor){
           return true;
         }
-      }
+      },
+        _switchLocale: function() {
+            this.language = (this.language == 'en') ? 'de' : 'en';
+        }
 
     });
   </script>

@@ -1,0 +1,71 @@
+{
+  "en": {
+    "logincard_welcome text-1": "Welcome to",
+    "logincard_welcome text-2": ". Please login with your campus mail address.",
+    "logincard_register success": " your registration succeeded. You can login now.",
+    "logincard_login button": "Login",
+    "logincard_password placeholder": "Password",
+    "logincard_register text": "New here?",
+    "logincard_register button": "Register",
+
+    "groupdetail_create group": "Create new group",
+    "groupdetail_group comment": "You have to be 4 people to create a new group.",
+    "groupdetail_write mail": "Send an e-mail",
+
+    "groupcard_tritt bei": "Join a group now!",
+
+    "notifications-card none": "No notifications.",
+
+    "mainview_praktikum typ": "Photo ",
+
+    "registrationcard_header": "Register",
+    "registrationcard_descr text-1": "Students and tutors, who are signed in the course ",
+    "registrationcard_descr text-2": " can register here for the organization platform.",
+    "registrationcard_error": "Your entries contain errors. Please check your e-mail-address.",
+    "registrationcard_new account": "Create account",
+    "registrationcard_back": "Back to login",
+    "registrationcard_campus email": "Campus e-mail address",
+    "registrationcard_password": "Password",
+    "registrationcard_mandatory": "Mandatory field.",
+    "registrationcard_confirm": "Confirm password",
+    "registrationcard_mismatch": "Passwords mismatch",
+
+    "c_medientechnik": "Media Technology"
+  },
+
+  "de": {
+    "logincard_welcome text-1": "Willkommen bei ",
+    "logincard_welcome text-2": ". Bitte logge dich mit deiner Campus Mail-Adresse ein.",
+    "logincard_register success": "Deine Registrierung war erfolgreich. Du kannst dich nun einloggen.",
+    "logincard_login button": "Einloggen",
+    "logincard_password placeholder": "Passwort",
+    "logincard_register text": "Neu hier?",
+    "logincard_register button": "Registrieren",
+
+    "groupdetail_create group": "Neue Gruppe Erstellen",
+    "groupdetail_group comment": "Ihr müsst zu viert sein, um eine neue Gruppe zu erstellen.",
+    "groupdetail_write mail": "E-Mail senden",
+
+    "groupcard_tritt bei": "Tritt jetzt einer Gruppe bei!",
+
+    "notifications-card none": "Keine Benachrichtigungen.",
+
+    "mainview_praktikum typ": "Photo ",
+
+
+    "registrationcard_header": "Registrierung",
+    "registrationcard_descr text-1": "Studenten und Tutoren, die in UniworX für den Kurs",
+    "registrationcard_descr text-2": " angemeldet sind, können sich hier für die Organisationsplattform registrieren.",
+    "registrationcard_error": "Deine Eingaben enthalten Fehler. Bitte überprüfe deine E-Mail-Adresse.",
+    "registrationcard_new account": "Account erstellen",
+    "registrationcard_back": "Zurück zum Login",
+    "registrationcard_campus email": "Campus-E-Mail-Adresse",
+    "registrationcard_password": "Passwort",
+    "registrationcard_mandatory": "Pflichtfeld",
+    "registrationcard_confirm": "Passwort bestätigen",
+    "registrationcard_mismatch": "Passwörter stimmen nicht überein",
+
+
+    "c_medientechnik": "Medientechnik"
+    }
+}

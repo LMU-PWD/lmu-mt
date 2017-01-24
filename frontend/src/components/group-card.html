@@ -48,9 +48,9 @@
             <div class="icon">
                 <img src="../../../images/group.svg">
             </div>
-            <h1>[[headerText]]</h1>
-            
+            <h1 id="groupname">{{localize('groupcard_tritt bei')}}</h1>
         </div>
+        <iron-signals on-iron-signal-switchlocale="_switchLocale"></iron-signals>
     </template>
 
     <script>
@@ -61,28 +61,51 @@
             properties: {
                 groupName: {
                     type: String,
-                    value: ''
+                    notify: false,
+                    readOnly: false
                 },
                 expanded: {
                     type: Boolean,
                     value: false
                 },
-                headerText: {
-                    type: String,
-                    computed: '_computeGroupCardHeader(groupName)',
-                    value: 'Tritt jetzt einer Gruppe bei!'
+                language: {
+                  type: String,
+                  value: 'en'
                 }
             },
 
-            ready: function(){
-                if(this.expanded){
-                    this.customStyle['--custom-height']= '370px';
+            observers: [
+              "_onGroupNameSet(groupName)"
+            ],
+
+            ready: function() {
+                if (this.expanded) {
+                    this.customStyle['--custom-height'] = '370px';
                     this.updateStyles();
+                    console.log("Updated Height");
                 }
             },
 
-            _computeGroupCardHeader: function (groupName) {
-                return (!groupName || groupName == '') ? 'Tritt jetzt einer Gruppe bei!' : this.groupName;
+            /**
+            * Localization setup
+            */
+            behaviors: [
+                Polymer.AppLocalizeBehavior
+            ],
+            attached: function() {
+                this.loadResources(this.resolveUrl('../shared/locales.json'));
+            },
+            _switchLocale: function() {
+                this.language = (this.language == 'en') ? 'de' : 'en';
+            },
+
+            /**
+            * Set the group name in the title, after it has been retrieved from AJAX
+            * @param groupName
+            * @private
+            */
+            _onGroupNameSet: function(groupName) {
+                this.$.groupname.textContent = groupName;
             }
 
         });
