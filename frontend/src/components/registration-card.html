@@ -58,7 +58,7 @@
             }
 
             .card-content p.error {
-                color: red;
+                color: #db4437;
                 font-size: 12px;
                 margin-bottom: 0;
                 margin-top: 16px;
@@ -103,24 +103,23 @@
             </div>
         </template>
 
-        <paper-card heading="Registrierung">
+        <paper-card heading="{{localize('registrationcard_header')}}">
 
             <div class="card-content">
 
                 <!-- Description text -->
-                <p>Studenten und Tutoren, die in UniworX für den Kurs
+                <p>{{localize('registrationcard_descr text-1')}}
                     <a href="https://uniworx.ifi.lmu.de/?action=uniworxCourseWelcome&id=654"
-                    target="_blank">Medientechnik</a> angemeldet sind, können sich hier
-                    für die Organisationsplattform registrieren.
+                    target="_blank">{{localize('c_medientechnik')}}</a> {{localize('registrationcard_descr text-2')}}
                 </p>
 
                 <!-- Email input -->
                 <paper-input
                         id="emailInput"
-                        label="Campus-E-Mail-Adresse"
+                        label="{{localize('registrationcard_campus email')}}"
                         value="{{ userInput.email }}"
                         on-keydown="_onEnterFireRegisterRequest"
-                        error-message="Pflichtfeld"
+                        error-message="{{localize('registrationcard_mandatory')}}"
                         auto-validate
                         required
                         invalid="{{ invalid.email }}">
@@ -130,12 +129,12 @@
                 <!-- Password input -->
                 <paper-input
                         id="passwordInput"
-                        label="Passwort"
+                        label="{{localize('registrationcard_password')}}"
                         type="password"
                         value="{{ userInput.password }}"
                         on-keydown="_onEnterFireRegisterRequest"
                         on-input="_validateConfirmPasswordInput"
-                        error-message="Pflichtfeld"
+                        error-message="{{localize('registrationcard_mandatory')}}"
                         auto-validate
                         required
                         invalid="{{ invalid.password }}">
@@ -145,11 +144,11 @@
                 <!-- Confirm password input -->
                 <paper-input
                         id="confirmPasswordInput"
-                        label="Passwort bestätigen"
+                        label="{{localize('registrationcard_confirm')}}"
                         type="password"
                         value="{{ userInput.confirmPassword }}"
                         on-keydown="_onEnterFireRegisterRequest"
-                        error-message="Passwörter stimmen nicht überein"
+                        error-message="{{localize('registrationcard_mismatch')}}"
                         invalid="{{ invalid.confirmPassword }}"
                         on-input="_validateConfirmPasswordInput"
                         required>
@@ -158,7 +157,7 @@
 
                 <!-- API error message -->
                 <p class="error hide" id="apiErrorMessage">
-                    Deine Eingaben enthalten Fehler. Bitte überprüfe deine E-Mail-Adresse.
+                    {{localize('registrationcard_error')}}
                 </p>
 
             </div>
@@ -167,12 +166,12 @@
 
                 <paper-button
                         on-tap="_fireRegisterRequest"
-                        disabled="{{ buttonDisabled }}">Account erstellen</paper-button>
-                <p><a href="#/login/">Zurück zum Login</a></p>
+                        disabled="{{ buttonDisabled }}">{{localize('registrationcard_new account')}}</paper-button>
+                <p><a href="#/login/">{{localize('registrationcard_back')}}</a></p>
             </div>
 
         </paper-card>
-
+        <iron-signals on-iron-signal-switchlocale="_switchLocale"></iron-signals>
     </template>
 
     <script>
@@ -237,8 +236,11 @@
                         password: "",
                         confirmPassword: ""
                     }
+                },
+                language: {
+                    type: String,
+                    value: 'en'
                 }
-
             },
 
             observers: [
@@ -246,6 +248,20 @@
                 '_invalidChanged(invalid.password)',
                 '_invalidChanged(invalid.confirmPassword)'
             ],
+
+            /**
+             * Localization setup
+             */
+            behaviors: [
+                Polymer.AppLocalizeBehavior
+            ],
+            attached: function() {
+                this.loadResources(this.resolveUrl('../shared/locales.json'));
+            },
+            _switchLocale: function() {
+                this.language = (this.language == 'en') ? 'de' : 'en';
+            },
+
 
             _validateConfirmPasswordInput: function () {
                 if (this.userInput.password === this.userInput.confirmPassword) {

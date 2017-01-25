@@ -1,4 +1,5 @@
 <link rel="import" href="../shared/shared-styles.html">
+<link rel="import" href="../../bower_components/paper-tooltip/paper-tooltip.html">
 
 <dom-module id="navigation-bar">
     <template>
@@ -29,6 +30,12 @@
                 margin: 5%;
                 color: var(--paper-blue-grey-900);
             }
+            .notification a {
+                text-decoration: none;
+            }
+            .active-language {
+                text-decoration: underline !important;
+            }
         </style>
 
         <api-request
@@ -43,12 +50,17 @@
             <!--</div>-->
             <div class="configuration nav-block">
                 <paper-icon-button icon="icons:exit-to-app" on-tap="_fireLogoutRequest"></paper-icon-button>
+                <paper-tooltip>Logout</paper-tooltip>
             </div>
             <div class="icon nav-block">
                 <img src="../../images/mt.svg">
             </div>
             <div class="notification  nav-block">
-                <paper-icon-button class="mobile-and-tablet-only" icon="social:notifications" on-click="toggleNotificationList"></paper-icon-button>
+                    <a id="de_locale" href="#" on-tap="initSwitchLocale">DE</a>
+                    <a id="en_locale" href="#" on-tap="initSwitchLocale">EN</a>
+            </div>
+            <div class="notification  nav-block">
+                <paper-icon-button class="mobile-and-tablet-only" icon="social:notifications" on-tap="toggleNotificationList"></paper-icon-button>
             </div>
         </app-toolbar>
 
@@ -98,13 +110,39 @@
                     type: Boolean,
                     value: false,
                     notify: true
+                },
+
+                language: {
+                    type: String,
+                    value: 'en'
                 }
             },
 
+            /**
+             * Localization setup
+             */
+            behaviors: [
+                Polymer.AppLocalizeBehavior
+            ],
+            attached: function() {
+                this.loadResources(this.resolveUrl('../shared/locales.json'));
+            },
+            _switchLocale: function() {
+                this.language = (this.language == 'en') ? 'de' : 'en';
+            },
+
+            ready: function() {
+                if (this.language == 'en')
+                    this.$.en_locale.classList.add('active-language');
+                else
+                    this.$.de_locale.classList.add('active-language');
+            },
+
+            /**
+             * Toggle notifications display on button tap
+             */
             toggleNotificationList: function() {
-
                 var screenwidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-
                 if (screenwidth < 1023)
                     this.show = !this.show;
             },
@@ -142,6 +180,26 @@
 
                 }
 
+            },
+            initSwitchLocale: function(e) {
+
+                if (this.language.toUpperCase() == e.currentTarget.textContent)
+                {
+                    return;
+                }
+                this.fire("iron-signal", {name: "switchlocale"});
+
+                if (this.language == 'en')
+                {
+                    this.$.en_locale.classList.remove('active-language');
+                    this.$.de_locale.classList.add('active-language');
+                }
+                else
+                {
+                    this.$.de_locale.classList.remove('active-language');
+                    this.$.en_locale.classList.add('active-language');
+                }
+                this.language = (this.language == 'en') ? 'de' : 'en';
             }
         });
     </script>
