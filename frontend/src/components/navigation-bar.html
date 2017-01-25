@@ -56,10 +56,6 @@
                 <img src="../../images/mt.svg">
             </div>
             <div class="notification  nav-block">
-                    <a id="de_locale" href="#" on-tap="initSwitchLocale">DE</a>
-                    <a id="en_locale" href="#" on-tap="initSwitchLocale">EN</a>
-            </div>
-            <div class="notification  nav-block">
                 <paper-icon-button class="mobile-and-tablet-only" icon="social:notifications" on-tap="toggleNotificationList"></paper-icon-button>
             </div>
         </app-toolbar>
@@ -116,26 +112,6 @@
                     type: String,
                     value: 'en'
                 }
-            },
-
-            /**
-             * Localization setup
-             */
-            behaviors: [
-                Polymer.AppLocalizeBehavior
-            ],
-            attached: function() {
-                this.loadResources(this.resolveUrl('../shared/locales.json'));
-            },
-            _switchLocale: function() {
-                this.language = (this.language == 'en') ? 'de' : 'en';
-            },
-
-            ready: function() {
-                if (this.language == 'en')
-                    this.$.en_locale.classList.add('active-language');
-                else
-                    this.$.de_locale.classList.add('active-language');
             },
 
             /**

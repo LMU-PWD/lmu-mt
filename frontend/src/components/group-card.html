@@ -48,7 +48,7 @@
             <div class="icon">
                 <img src="../../../images/group.svg">
             </div>
-            <h1 id="groupname">{{localize('groupcard_tritt bei')}}</h1>
+            <h1 id="groupname">Tritt jetzt einer Gruppe bei!</h1>
         </div>
         <iron-signals on-iron-signal-switchlocale="_switchLocale"></iron-signals>
     </template>
@@ -84,16 +84,6 @@
                     this.updateStyles();
                     console.log("Updated Height");
                 }
-            },
-
-            /**
-            * Localization setup
-            */
-            behaviors: [
-                Polymer.AppLocalizeBehavior
-            ],
-            attached: function() {
-                this.loadResources(this.resolveUrl('../shared/locales.json'));
             },
             _switchLocale: function() {
                 this.language = (this.language == 'en') ? 'de' : 'en';
