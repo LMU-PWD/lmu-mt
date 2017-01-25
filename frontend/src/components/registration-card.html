@@ -103,23 +103,23 @@
             </div>
         </template>
 
-        <paper-card heading="{{localize('registrationcard_header')}}">
+        <paper-card heading="Registrierung">
 
             <div class="card-content">
 
                 <!-- Description text -->
-                <p>{{localize('registrationcard_descr text-1')}}
+                <p>Studenten und Tutoren, die in UniworX für den Kurs
                     <a href="https://uniworx.ifi.lmu.de/?action=uniworxCourseWelcome&id=654"
-                    target="_blank">{{localize('c_medientechnik')}}</a> {{localize('registrationcard_descr text-2')}}
+                    target="_blank">Medientechnik</a> angemeldet sind, können sich hier für die Organisationsplattform registrieren.
                 </p>
 
                 <!-- Email input -->
                 <paper-input
                         id="emailInput"
-                        label="{{localize('registrationcard_campus email')}}"
+                        label="Campus-E-Mail-Adresse"
                         value="{{ userInput.email }}"
                         on-keydown="_onEnterFireRegisterRequest"
-                        error-message="{{localize('registrationcard_mandatory')}}"
+                        error-message="Pflichtfeld"
                         auto-validate
                         required
                         invalid="{{ invalid.email }}">
@@ -129,12 +129,12 @@
                 <!-- Password input -->
                 <paper-input
                         id="passwordInput"
-                        label="{{localize('registrationcard_password')}}"
+                        label="Passwort"
                         type="password"
                         value="{{ userInput.password }}"
                         on-keydown="_onEnterFireRegisterRequest"
                         on-input="_validateConfirmPasswordInput"
-                        error-message="{{localize('registrationcard_mandatory')}}"
+                        error-message="Pflichtfeld"
                         auto-validate
                         required
                         invalid="{{ invalid.password }}">
@@ -144,11 +144,11 @@
                 <!-- Confirm password input -->
                 <paper-input
                         id="confirmPasswordInput"
-                        label="{{localize('registrationcard_confirm')}}"
+                        label="Passwort bestätigen"
                         type="password"
                         value="{{ userInput.confirmPassword }}"
                         on-keydown="_onEnterFireRegisterRequest"
-                        error-message="{{localize('registrationcard_mismatch')}}"
+                        error-message="Passwörter stimmen nicht überein"
                         invalid="{{ invalid.confirmPassword }}"
                         on-input="_validateConfirmPasswordInput"
                         required>
@@ -157,7 +157,7 @@
 
                 <!-- API error message -->
                 <p class="error hide" id="apiErrorMessage">
-                    {{localize('registrationcard_error')}}
+                    Deine Eingaben enthalten Fehler. Bitte überprüfe deine E-Mail-Adresse.
                 </p>
 
             </div>
@@ -166,8 +166,8 @@
 
                 <paper-button
                         on-tap="_fireRegisterRequest"
-                        disabled="{{ buttonDisabled }}">{{localize('registrationcard_new account')}}</paper-button>
-                <p><a href="#/login/">{{localize('registrationcard_back')}}</a></p>
+                        disabled="{{ buttonDisabled }}">Account erstellen</paper-button>
+                <p><a href="#/login/">Zurück zum Login</a></p>
             </div>
 
         </paper-card>
@@ -249,15 +249,6 @@
                 '_invalidChanged(invalid.confirmPassword)'
             ],
 
-            /**
-             * Localization setup
-             */
-            behaviors: [
-                Polymer.AppLocalizeBehavior
-            ],
-            attached: function() {
-                this.loadResources(this.resolveUrl('../shared/locales.json'));
-            },
             _switchLocale: function() {
                 this.language = (this.language == 'en') ? 'de' : 'en';
             },
