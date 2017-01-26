@@ -11,7 +11,7 @@
 <link rel="import" href="calculate-timeslots.html">
 <link rel="import" href="../shared/shared-styles.html">
 
-<dom-module id="practical-date-detail">
+<dom-module id="practicals-date-selector">
     <template>
         <style include="shared-styles">
             :host{
@@ -59,9 +59,6 @@
                 }
             }
         </style>
-        <calculate-timeslots></calculate-timeslots>
-        <!-- Checking for PracticalDate to know, if the date is already chosen-->
-        <template is="dom-if" if="[[!practical_date]]">
             <div>
                 <paper-button raised class="resetButton" on-tap="_handleResetClick">
                     <iron-icon icon="reply"></iron-icon>
@@ -80,16 +77,10 @@
                                   on-replace-priority="_handleReplacePriority"></date-creator>
                 </template>
             </div>
-        </template>
-        <template is="dom-if" if="[[practical_date]]">
-            <div class="dateshower">
-                Dein Praktikumstermin ist am [[practical_date_string]]
-            </div>
-        </template>
     </template>
     <script>
         Polymer({
-            is: 'practical-date-detail',
+            is: 'practicals-date-selector',
             properties: {
                 type:{
                     type: String,
@@ -105,7 +96,6 @@
                     type: String,
                     value: "",
                     notify: true
-
                 },
                 timeslots:{
                     type: Array,

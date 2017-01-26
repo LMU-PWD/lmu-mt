@@ -1,0 +1,142 @@
+<dom-module id="practicals-show-saved-dates">
+    <template>
+        <style include="shared-styles">
+            .saved-dates-shower{
+                padding-left: 20px;
+            }
+        </style>
+        <div class="saved-dates-shower">Deine Gruppe hat diese Termine ausgewählt:
+            <ol type="1">
+                <!--[[chosenslots]]-->
+                <template is="dom-repeat" items="[[chosenslots]]" as="chosen">
+                    <li>[[_getTimeSlotString(chosen)]]</li>
+                    <!--li>[[chosen]]</li-->
+                </template>
+            </ol>
+            <paper-button raised class="changeButton" on-tap="_handleChangeClick">
+                <iron-icon icon="reply"></iron-icon>
+                Auswahl ändern
+            </paper-button>
+        </div>
+    </template>
+    <script>
+        Polymer({
+            is: 'practicals-show-saved-dates',
+            properties: {
+                chosenslots:{
+                    type: Array,
+                    value: [],
+                    observer: "_slotsChanged"
+                }
+            },
+            ready: function(){
+
+            },
+            _handleChangeClick: function(e){
+                this.fire("change-slots-click");
+            },
+            _slotsChanged: function(){
+                console.log(this.chosenslots);
+            },
+            /**
+             * Creates string from the given date
+             * @param {String} date - date that will be transformed to String
+             */
+            _getDateString: function(date){
+                var datestring = "";
+                switch(date.getDay()){
+                    case 0:
+                        datestring = "Sonntag, den ";
+                        break;
+                    case 1:
+                        datestring = "Montag, den ";
+                        break;
+                    case 2:
+                        datestring = "Dienstag, den ";
+                        break;
+                    case 3:
+                        datestring = "Mittwoch, den ";
+                        break;
+                    case 4:
+                        datestring = "Donnerstag, den ";
+                        break;
+                    case 5:
+                        datestring = "Freitag, den ";
+                        break;
+                    case 6:
+                        datestring = "Samstag, den ";
+                        break;
+                }
+                var hours = date.getHours();
+                var minutes = date.getMinutes();
+                if(hours<10){
+                    hours = "0"+hours;
+                }
+                if(minutes<10){
+                    minutes = "0"+minutes;
+                }
+                datestring = datestring+date.getDate()+"."+date.getMonth()+"."+date.getFullYear()+
+                    " um "+hours+":"+minutes+" Uhr";
+                return datestring;
+            },
+            /**
+             * Creates string from the timeslot-timits to get a nicer visualisation,
+             * Adds leading zeros, if necessary
+             */
+            _getTimeSlotString: function(slot){
+                if(slot) {
+                    var datestring = "";
+                    var starthours = slot[0].getHours();
+                    var startminutes = slot[0].getMinutes();
+                    var endhours = slot[1].getHours();
+                    var endminutes = slot[1].getMinutes();
+
+                    /*
+                     * Add zeros, if necessary
+                     */
+                    switch(slot[0].getDay()){
+                        case 0:
+                            datestring = "Sonntag, ";
+                            break;
+                        case 1:
+                            datestring = "Montag, ";
+                            break;
+                        case 2:
+                            datestring = "Dienstag, ";
+                            break;
+                        case 3:
+                            datestring = "Mittwoch, ";
+                            break;
+                        case 4:
+                            datestring = "Donnerstag, ";
+                            break;
+                        case 5:
+                            datestring = "Freitag, ";
+                            break;
+                        case 6:
+                            datestring = "Samstag, ";
+                            break;
+                    }
+
+                    if(starthours<10){
+                        starthours = "0"+starthours;
+                    }
+                    if(startminutes<10){
+                        startminutes = "0"+startminutes;
+                    }
+                    if(endhours<10){
+                        endhours = "0"+endhours;
+                    }
+                    if(endminutes<10){
+                        endminutes = "0"+endminutes;
+                    }
+
+                    return datestring+slot[0].getDate()+"."+slot[0].getMonth()+"."+slot[0].getFullYear()+
+                        ", "+starthours +":"+startminutes+" - "+endhours+":"+endminutes+" Uhr";
+                }
+            }
+
+        });
+
+    </script>
+</dom-module>
