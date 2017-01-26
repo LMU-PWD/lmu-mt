@@ -5,6 +5,7 @@
 <link rel="import" href="../components/groups-admin.html">
 <link rel="import" href="../components/notifications-card.html">
 <link rel="import" href="../components/navigation-bar.html">
+<link rel="import" href="../components/admin-toolbar.html">
 <link rel="import" href="../shared/shared-styles.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../../bower_components/iron-collapse/iron-collapse.html">
@@ -36,6 +37,11 @@
         width: 100%;
       }
 
+      admin-toolbar {
+          margin: 0 10px;
+          width: auto;
+      }
+
       /*Phone*/
       @media screen and (max-width: 767px) {
         .group-placeholder{
@@ -46,7 +52,10 @@
         .practicalsContainer{
           min-width: 320px;
           width: 100%;
+        }
 
+        admin-toolbar {
+            margin: 0;
         }
       }
       /*Tablet*/
@@ -114,6 +123,12 @@
 
     <template is="dom-if" if="{{ showMobileNotifications }}">
       <notifications-card showlist="{{ showMobileNotifications }}"></notifications-card>
+    </template>
+
+
+    <!-- A D M I N   T O O L B A R -->
+    <template is="dom-if" if="[[ user.isAdmin ]]">
+        <admin-toolbar></admin-toolbar>
     </template>
 
     <!-- P A G E S -->

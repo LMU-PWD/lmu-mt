@@ -1,0 +1,100 @@
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+
+<dom-module id="admin-toolbar">
+
+    <template>
+
+        <style>
+
+            :host {
+                display: block;
+                text-align: right;
+            }
+
+            paper-dropdown-menu {
+                margin: 0 10px;
+            }
+
+            @media screen and (max-width: 767px) {
+                :host {
+                    text-align: left;
+                }
+            }
+
+        </style>
+
+        <api-request
+            headers="[[ ajax.headers ]]"
+            method="[[ ajax.method ]]"
+            endpoint="[[ ajax.endpoint ]]"
+            response="{{ semestersResponse }}"></api-request>
+
+        <paper-dropdown-menu label="Semester">
+            <paper-listbox class="dropdown-content">
+                <template is="dom-repeat" items="[[ semesters ]]" as="semester">
+                    <paper-item>[[ semester.term ]]</paper-item>
+                </template>
+            </paper-listbox>
+        </paper-dropdown-menu>
+
+        <paper-icon-button icon="icons:add-circle-outline"></paper-icon-button>
+
+    </template>
+
+    <script>
+
+        Polymer({
+
+            is: 'admin-toolbar',
+
+            properties: {
+
+                accessToken: {
+                    type: String,
+                    value: ""
+                },
+
+                userId: {
+                    type: String,
+                    value: ""
+                },
+
+                semesters: {
+                    type: Array,
+                    value: []
+                },
+
+                semestersResponse: {
+                    type: Object,
+                    value: {},
+                    observer: '_semestersResponseChanged'
+                }
+
+            },
+
+            attached: function () {
+
+                this.ajax = {
+                    headers: {
+                        Authorization: this.accessToken
+                    },
+                    method: 'GET',
+                    endpoint: '/semesters'
+                }
+            },
+
+            _semestersResponseChanged: function (response) {
+
+                if (response.type != 'error') {
+                    this.semesters = response.data;
+                }
+
+            }
+
+        });
+
+    </script>
+
+</dom-module>
