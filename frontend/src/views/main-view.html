@@ -121,23 +121,39 @@
             selected="[[page]]"
             attr-for-selected="name"
             fallback-selection="error">
+
         <div class="main-page" name="dashboard">
-          <!-- NOTIFICATIONS -->
-          <div class="notificationsContainer">
+
+            <!-- NOTIFICATIONS -->
+            <div class="notificationsContainer">
             <template is="dom-if" if="{{ showNotifications }}">
               <notifications-card showlist="{{ showlist }}"></notifications-card>
             </template>
-          </div>
-          <div class="group-placeholder light-color-text">
-            <group-card group-name=[[group.name]] on-tap="toggleGroup"></group-card>
-            <iron-collapse id="collapse" opened=true>
-              <group-detail class="group-info"
-                            access-token="[[ accessToken ]]"
-                            group="{{ group }}"
-                            self-info="{{user}}"
-                            group-name="{{groupName}}"></group-detail>
-            </iron-collapse>
-          </div>
+            </div>
+
+            <template is="dom-if" if="[[user.isAdmin]]">
+                <div class="group-placeholder">
+                    <group-card group-name="Gruppen" on-tap="toggleGroup"></group-card>
+                    <iron-collapse id="collapse" opened=true>
+                        <groups-admin class="group-info"
+                                      access-token="[[ accessToken ]]"
+                                      self-info="{{user}}" ></groups-admin>
+                    </iron-collapse>
+                </div>
+            </template>
+
+            <template is="dom-if" if="[[user.isStudent]]">
+                <div class="group-placeholder light-color-text">
+                    <group-card group-name=[[group.name]] on-tap="toggleGroup"></group-card>
+                    <iron-collapse id="collapse" opened=true>
+                        <group-detail class="group-info"
+                                      access-token="[[ accessToken ]]"
+                                      group="{{ group }}"
+                                      self-info="{{user}}"
+                                      group-name="{{groupName}}"></group-detail>
+                    </iron-collapse>
+                </div>
+            </template>
 
           <div class="practicalsContainer">
             <div on-tap="_handleFotoTap">
