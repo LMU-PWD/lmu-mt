@@ -37,11 +37,18 @@
                 };
             }
 
-            paper-button {
+            .card-actions paper-button {
                 background-color: var(--paper-blue-grey-900);
                 color: var(--paper-blue-grey-50);
                 margin: 0;
                 width: 100%;
+            }
+            .card-actions paper-button:hover {
+                background-color: var(--paper-blue-grey-700);
+                -o-transition: .1s;
+                -moz-transition: .1s;
+                -webkit-transition: .1s;
+                transition: .1s;
             }
 
             paper-input-container, paper-input {
@@ -88,6 +95,36 @@
                 width: 50px;
             }
 
+            .card-header {
+                @apply(--paper-font-headline);
+                background-color: var(--paper-blue-grey-900);
+                padding: 16px;
+                font-size: 24px;
+                font-weight: 400;
+                color: #eceff1;
+            }
+
+            .localepicker {
+                float: right;
+            }
+
+            .localepicker paper-button {
+                padding: 0;
+                /*width: 50px;*/
+                color: var(--paper-blue-grey-300);
+                min-width: 0px;
+                font-size: 20px;
+                font-weight: 300;
+            }
+
+            .localepicker paper-button:hover {
+                color: #FFF;
+                -o-transition: .1s;
+                -moz-transition: .1s;
+                -webkit-transition: .1s;
+                transition: .1s;
+            }
+
         </style>
 
         <api-request
@@ -103,7 +140,15 @@
             </div>
         </template>
 
-        <paper-card heading="{{localize('registrationcard_header')}}">
+        <paper-card>
+
+            <div class="card-header">
+                <span>{{localize('registrationcard_header')}}</span>
+                <span class="localepicker">
+                    <paper-button style="float:right" on-tap="initSwitchLocale">{{ language }}</paper-button>
+                    <paper-tooltip offset="5">{{localize('logincard_locale button tooltip')}}</paper-tooltip>
+                </span>
+            </div>
 
             <div class="card-content">
 
@@ -239,7 +284,7 @@
                 },
                 language: {
                     type: String,
-                    value: 'en'
+                    value: 'de'
                 }
             },
 
@@ -347,6 +392,10 @@
                     this.set('page', '/');
 
                 }
+            },
+
+            initSwitchLocale: function(e) {
+                this.fire("iron-signal", {name: "switchlocale"});
             }
 
         });

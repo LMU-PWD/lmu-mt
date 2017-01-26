@@ -20,6 +20,14 @@
                 color: var(--paper-blue-grey-800);
             }
 
+            a:hover {
+                color: var(--paper-blue-grey-500);
+                -o-transition: .1s;
+                -moz-transition: .1s;
+                -webkit-transition: .1s;
+                transition: .1s;
+            }
+
             paper-card {
                 width: 100%;
                 --paper-card-background-color: var(--paper-blue-grey-100);
@@ -34,11 +42,19 @@
                 };
             }
 
-            paper-button {
+            .card-actions paper-button {
                 background-color: var(--paper-blue-grey-900);
                 color: var(--paper-blue-grey-50);
                 margin: 0;
                 width: 100%;
+            }
+
+            .card-actions paper-button:hover {
+                background-color: var(--paper-blue-grey-700);
+                -o-transition: .1s;
+                -moz-transition: .1s;
+                -webkit-transition: .1s;
+                transition: .1s;
             }
 
             paper-input {
@@ -48,6 +64,18 @@
 
             .card-content p {
                 margin-top: 0;
+            }
+
+            .card-content p.error {
+                color: #db4437;
+                font-size: 12px;
+                margin-bottom: 0;
+                margin-top: 16px;
+                transition: height 1s;
+            }
+
+            .card-content p.hide {
+                display: none;
             }
 
             .spinner-container {
@@ -69,6 +97,36 @@
                 width: 50px;
             }
 
+            .card-header {
+                @apply(--paper-font-headline);
+                background-color: var(--paper-blue-grey-900);
+                padding: 16px;
+                font-size: 24px;
+                font-weight: 400;
+                color: #eceff1;
+            }
+
+            .localepicker {
+                float: right;
+            }
+
+            .localepicker paper-button {
+                padding: 0;
+                /*width: 50px;*/
+                color: var(--paper-blue-grey-300);
+                min-width: 0px;
+                font-size: 20px;
+                font-weight: 300;
+            }
+
+            .localepicker paper-button:hover {
+                color: #FFF;
+                -o-transition: .1s;
+                -moz-transition: .1s;
+                -webkit-transition: .1s;
+                transition: .1s;
+            }
+
         </style>
 
         <api-request
@@ -84,7 +142,14 @@
             </div>
         </template>
 
-        <paper-card heading="Login">
+        <paper-card>
+            <div class="card-header">
+                <span>Login</span>
+                <span class="localepicker">
+                    <paper-button style="float:right" on-tap="initSwitchLocale">{{ language }}</paper-button>
+                    <paper-tooltip offset="5">{{localize('logincard_locale button tooltip')}}</paper-tooltip>
+                </span>
+            </div>
             <div class="card-content">
                 <template is="dom-if" if="[[ customWelcomeText ]]">
                     <p><b>Hi, [[ presetName ]]!</b> {{localize('logincard_register success')}}</p>
@@ -120,7 +185,7 @@
             properties: {
 
                   language: {
-                    value: 'en',
+                    value: 'de',
                     type: String
                   },
 
@@ -249,6 +314,10 @@
                     this.customWelcomeText = true;
 
                 }
+            },
+
+            initSwitchLocale: function(e) {
+                this.fire("iron-signal", {name: "switchlocale"});
             }
 
         });

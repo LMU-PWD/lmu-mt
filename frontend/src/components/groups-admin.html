@@ -104,11 +104,11 @@
 
         <paper-dialog id="deleteDialog" on-iron-overlay-closed="_reactToDialog">
             <div>
-                <h1>Soll die Gruppe <span></span> wirklich gelöscht werden?</h1>
-                <p>(Diese aktion ist nicht wiederrufbar)</p>
+                <h1>{{localize('groupsadmin_dialog text-1')}}<span></span> {{localize('groupsadmin_dialog text-2')}} </h1>
+                <p>{{localize('groupsadmin_dialog text-3')}}</p>
             </div>
             <div class="buttons">
-                <paper-button dialog-dismiss autofocus>Cancel</paper-button>
+                <paper-button dialog-dismiss autofocus>{{localize('c_button_cancel')}}</paper-button>
                 <paper-button dialog-confirm>OK</paper-button>
             </div>
         </paper-dialog>
@@ -152,6 +152,7 @@
 
         </template>
         </div>
+        <iron-signals on-iron-signal-switchlocale="_switchLocale"></iron-signals>
     </template>
     <script>
         Polymer({
@@ -178,11 +179,28 @@
                 },
                 groups: {
                     type: Array
+                },
+                language: {
+                    type: String,
+                    value: 'de'
                 }
             },
 
             ready: function () {
                 this._groupsChanged();
+            },
+
+            /**
+             * Localization setup
+             */
+            behaviors: [
+                Polymer.AppLocalizeBehavior
+            ],
+            attached: function() {
+                this.loadResources(this.resolveUrl('../shared/locales.json'));
+            },
+            _switchLocale: function() {
+                this.language = (this.language == 'en') ? 'de' : 'en';
             },
 
             _groupsChanged: function () {
@@ -195,8 +213,6 @@
                     endpoint: '/groups/'
                 }
             },
-
-
 
             /**
              * Callback fired when api-request responds to GET on current group.

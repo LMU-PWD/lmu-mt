@@ -3,6 +3,7 @@
     "logincard_welcome text-1": "Welcome to",
     "logincard_welcome text-2": ". Please login with your campus mail address.",
     "logincard_register success": " your registration succeeded. You can login now.",
+    "logincard_locale button tooltip": "Change to German",
     "logincard_login button": "Login",
     "logincard_password placeholder": "Password",
     "logincard_register text": "New here?",
@@ -30,6 +31,11 @@
     "registrationcard_confirm": "Confirm password",
     "registrationcard_mismatch": "Passwords mismatch",
 
+    "groupsadmin_dialog text-1": "Would you really like to delete group ",
+    "groupsadmin_dialog text-2": "?",
+    "groupsadmin_dialog text-3": "(This action can't be undone!)",
+
+    "c_button_cancel": "Cancel",
     "c_medientechnik": "Media Technology"
   },
 
@@ -37,6 +43,7 @@
     "logincard_welcome text-1": "Willkommen bei ",
     "logincard_welcome text-2": ". Bitte logge dich mit deiner Campus Mail-Adresse ein.",
     "logincard_register success": "Deine Registrierung war erfolgreich. Du kannst dich nun einloggen.",
+    "logincard_locale button tooltip": "In Englisch anzeigen",
     "logincard_login button": "Einloggen",
     "logincard_password placeholder": "Passwort",
     "logincard_register text": "Neu hier?",
@@ -65,7 +72,11 @@
     "registrationcard_confirm": "Passwort bestätigen",
     "registrationcard_mismatch": "Passwörter stimmen nicht überein",
 
+    "groupsadmin_dialog text-1": "Soll die Gruppe ",
+    "groupsadmin_dialog text-2": " wirklich gelöscht werden?",
+    "groupsadmin_dialog text-3": "(Diese Aktion kann nicht rückgängig gemacht werden!)",
 
+    "c_button_cancel": "Abbrechen",
     "c_medientechnik": "Medientechnik"
-    }
+  }
 }
