@@ -37,11 +37,18 @@
                 };
             }
 
-            paper-button {
+            .card-actions paper-button {
                 background-color: var(--paper-blue-grey-900);
                 color: var(--paper-blue-grey-50);
                 margin: 0;
                 width: 100%;
+            }
+            .card-actions paper-button:hover {
+                background-color: var(--paper-blue-grey-700);
+                -o-transition: .1s;
+                -moz-transition: .1s;
+                -webkit-transition: .1s;
+                transition: .1s;
             }
 
             paper-input-container, paper-input {
@@ -88,6 +95,36 @@
                 width: 50px;
             }
 
+            .card-header {
+                @apply(--paper-font-headline);
+                background-color: var(--paper-blue-grey-900);
+                padding: 16px;
+                font-size: 24px;
+                font-weight: 400;
+                color: #eceff1;
+            }
+
+            .localepicker {
+                float: right;
+            }
+
+            .localepicker paper-button {
+                padding: 0;
+                /*width: 50px;*/
+                color: var(--paper-blue-grey-300);
+                min-width: 0px;
+                font-size: 20px;
+                font-weight: 300;
+            }
+
+            .localepicker paper-button:hover {
+                color: #FFF;
+                -o-transition: .1s;
+                -moz-transition: .1s;
+                -webkit-transition: .1s;
+                transition: .1s;
+            }
+
         </style>
 
         <api-request
@@ -103,23 +140,31 @@
             </div>
         </template>
 
-        <paper-card heading="Registrierung">
+        <paper-card>
+
+            <div class="card-header">
+                <span>{{localize('registrationcard_header')}}</span>
+                <span class="localepicker">
+                    <paper-button style="float:right" on-tap="initSwitchLocale">{{ language }}</paper-button>
+                    <paper-tooltip offset="5">{{localize('logincard_locale button tooltip')}}</paper-tooltip>
+                </span>
+            </div>
 
             <div class="card-content">
 
                 <!-- Description text -->
-                <p>Studenten und Tutoren, die in UniworX für den Kurs
+                <p>{{localize('registrationcard_descr text-1')}}
                     <a href="https://uniworx.ifi.lmu.de/?action=uniworxCourseWelcome&id=654"
-                    target="_blank">Medientechnik</a> angemeldet sind, können sich hier für die Organisationsplattform registrieren.
+                    target="_blank">{{localize('c_medientechnik')}}</a> {{localize('registrationcard_descr text-2')}}
                 </p>
 
                 <!-- Email input -->
                 <paper-input
                         id="emailInput"
-                        label="Campus-E-Mail-Adresse"
+                        label="{{localize('registrationcard_campus email')}}"
                         value="{{ userInput.email }}"
                         on-keydown="_onEnterFireRegisterRequest"
-                        error-message="Pflichtfeld"
+                        error-message="{{localize('registrationcard_mandatory')}}"
                         auto-validate
                         required
                         invalid="{{ invalid.email }}">
@@ -129,12 +174,12 @@
                 <!-- Password input -->
                 <paper-input
                         id="passwordInput"
-                        label="Passwort"
+                        label="{{localize('registrationcard_password')}}"
                         type="password"
                         value="{{ userInput.password }}"
                         on-keydown="_onEnterFireRegisterRequest"
                         on-input="_validateConfirmPasswordInput"
-                        error-message="Pflichtfeld"
+                        error-message="{{localize('registrationcard_mandatory')}}"
                         auto-validate
                         required
                         invalid="{{ invalid.password }}">
@@ -144,11 +189,11 @@
                 <!-- Confirm password input -->
                 <paper-input
                         id="confirmPasswordInput"
-                        label="Passwort bestätigen"
+                        label="{{localize('registrationcard_confirm')}}"
                         type="password"
                         value="{{ userInput.confirmPassword }}"
                         on-keydown="_onEnterFireRegisterRequest"
-                        error-message="Passwörter stimmen nicht überein"
+                        error-message="{{localize('registrationcard_mismatch')}}"
                         invalid="{{ invalid.confirmPassword }}"
                         on-input="_validateConfirmPasswordInput"
                         required>
@@ -157,7 +202,7 @@
 
                 <!-- API error message -->
                 <p class="error hide" id="apiErrorMessage">
-                    Deine Eingaben enthalten Fehler. Bitte überprüfe deine E-Mail-Adresse.
+                    {{localize('registrationcard_error')}}
                 </p>
 
             </div>
@@ -166,8 +211,8 @@
 
                 <paper-button
                         on-tap="_fireRegisterRequest"
-                        disabled="{{ buttonDisabled }}">Account erstellen</paper-button>
-                <p><a href="#/login/">Zurück zum Login</a></p>
+                        disabled="{{ buttonDisabled }}">{{localize('registrationcard_new account')}}</paper-button>
+                <p><a href="#/login/">{{localize('registrationcard_back')}}</a></p>
             </div>
 
         </paper-card>
@@ -239,7 +284,7 @@
                 },
                 language: {
                     type: String,
-                    value: 'en'
+                    value: 'de'
                 }
             },
 
@@ -249,6 +294,15 @@
                 '_invalidChanged(invalid.confirmPassword)'
             ],
 
+            /**
+             * Localization setup
+             */
+            behaviors: [
+                Polymer.AppLocalizeBehavior
+            ],
+            attached: function() {
+                this.loadResources(this.resolveUrl('../shared/locales.json'));
+            },
             _switchLocale: function() {
                 this.language = (this.language == 'en') ? 'de' : 'en';
             },
@@ -338,6 +392,10 @@
                     this.set('page', '/');
 
                 }
+            },
+
+            initSwitchLocale: function(e) {
+                this.fire("iron-signal", {name: "switchlocale"});
             }
 
         });

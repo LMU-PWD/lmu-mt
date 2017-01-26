@@ -240,26 +240,40 @@
               readOnly: false,
               value: {}
             },
-            language: {
-                type: String,
-                value: 'en'
-            },
             page: {
-                type: String,
-                reflectToAttribute: false,
-                observer: '_pageChanged'
+              type: String,
+              reflectToAttribute: false,
+              observer: '_pageChanged'
             },
             route: {
-                type: Object,
-                notify: true
+              type: Object,
+              notify: true
             },
             routeData:{
-                type: Object
+              type: Object
+            },
+            language: {
+              type: String,
+              value: 'de'
             }
         },
-        observers: [
-            '_routePageChanged(routeData.page)'
+
+        behaviors: [
+            Polymer.AppLocalizeBehavior
         ],
+
+        attached: function() {
+            this.loadResources(this.resolveUrl('../shared/locales.json'));
+        },
+
+      ready: function () {
+
+      },
+
+      observers: [
+        '_routePageChanged(routeData.page)'
+      ],
+
         _userIdChanged: function () {
 
             this.set('userId', this.userId);
@@ -323,6 +337,11 @@
           return true;
         }
       },
+
+      _switchLocale: function() {
+        this.language = (this.language == 'en') ? 'de' : 'en';
+      },
+
         /**
          * Handle tap on Back-Button
          */
