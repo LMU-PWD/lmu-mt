@@ -77,7 +77,7 @@
             </div>
             -->
             <div class="notification_item">
-                <span class="text">Keine Benachrichtigungen.</span>
+                <span class="text">{{localize('notifications-card none')}}</span>
             </div>
             <iron-signals on-iron-signal-switchlocale="_switchLocale"></iron-signals>
         </div>
@@ -101,6 +101,16 @@
         observers: [
           '_toggleList(showlist)'
         ],
+
+        /**
+         * Localization setup
+         */
+        behaviors: [
+            Polymer.AppLocalizeBehavior
+        ],
+        attached: function() {
+            this.loadResources(this.resolveUrl('../shared/locales.json'));
+        },
         _switchLocale: function() {
             this.language = (this.language == 'en') ? 'de' : 'en';
         }

@@ -300,7 +300,7 @@
             behaviors: [
                 Polymer.AppLocalizeBehavior
             ],
-            attached: function() {
+            ready: function() {
                 this.loadResources(this.resolveUrl('../shared/locales.json'));
             },
             _switchLocale: function() {
