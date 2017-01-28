@@ -13,10 +13,10 @@
     <template>
 
         <style include="shared-styles">
-            :host{
+            :host {
                 height: auto;
                 min-width: 320px;
-                width: 100% ;
+                width: 100%;
                 background-color: var(--paper-blue-grey-100);
                 display: block;
                 position: relative;
@@ -25,7 +25,7 @@
                 /*border-radius: 0 0 5px 5px;*/
             }
 
-            .info{
+            .info {
                 display: block;
                 padding: 5px;
             }
@@ -60,61 +60,62 @@
                 color: var(--paper-blue-grey-700);
             }
 
-            .create-group{
+            .create-group {
                 background-color: var(--paper-blue-grey-50);
                 border-radius: 5px;
-                padding:10px 20px;
+                padding: 10px 20px;
             }
 
             .create-group-input iron-icon {
                 margin-right: 5px;
             }
 
-            .error{
+            .error {
                 position: relative;
                 display: none;
                 text-align: center;
                 white-space: normal;
             }
 
-            .error[invalid]{
+            .error[invalid] {
                 display: block;
             }
-            .random{
+
+            .random {
                 background-color: var(--paper-blue-grey-50);
                 border-radius: 5px;
-                padding:10px 20px;
+                padding: 10px 20px;
                 margin-bottom: 5px;
 
             }
 
-            .join{
+            .join {
                 display: block;
-                padding:20px;
+                padding: 20px;
             }
 
-            paper-spinner{
+            paper-spinner {
                 display: none;
             }
 
-            paper-input{
+            paper-input {
                 --paper-input-container-color: var(--paper-blue-grey-600);
                 --paper-input-container-focus-color: var(--paper-blue-grey-800);
             }
 
-            paper-spinner[active]{
+            paper-spinner[active] {
                 display: block;
                 position: absolute;
                 height: 50px;
                 width: 50px;
                 left: 0;
                 top: 0;
-                background-color: rgba(255,255,255,0.8);
-                padding:calc(50% - 10px) calc(50% - 25px);
+                background-color: rgba(255, 255, 255, 0.8);
+                padding: calc(50% - 10px) calc(50% - 25px);
                 z-index: 100;
             }
 
-            paper-input[wronginput]{
+            paper-input[wronginput] {
                 color: var(--paper-red-500);
             }
         </style>
@@ -145,8 +146,11 @@
                                 user-id="[[member.id]]"
                                 name="{{member.name}}"
                                 mail="{{member.mail}}"></get-user-info>
-                        <a id="mail-[[member.id]]" href="mailto:[[member.mail]]" tabindex="-1"><paper-icon-button icon="icons:mail"></paper-icon-button></a>
-                        <paper-tooltip for="mail-[[member.id]]" offset="5">{{localize('groupdetail_write mail')}}</paper-tooltip>
+                        <a id="mail-[[member.id]]" href="mailto:[[member.mail]]" tabindex="-1">
+                            <paper-icon-button icon="icons:mail"></paper-icon-button>
+                        </a>
+                        <paper-tooltip for="mail-[[member.id]]" offset="5">{{localize('groupdetail_write mail')}}
+                        </paper-tooltip>
                         <h2>[[member.name]]</h2>
                     </div>
                 </template>
@@ -242,10 +246,10 @@
                         groupId: ''
                     }
                 },
-              language: {
-                type: String,
-                value: 'de'
-              }
+                language: {
+                    type: String,
+                    value: 'de'
+                }
             },
             observers: [
                 '_selfInfoGroupIdChanged(selfInfo.groupId)'
@@ -255,20 +259,20 @@
              * Localization setup
              */
             behaviors: [
-              Polymer.AppLocalizeBehavior
+                Polymer.AppLocalizeBehavior
             ],
-            attached: function() {
-              this.loadResources(this.resolveUrl('../shared/locales.json'));
+            attached: function () {
+                this.loadResources(this.resolveUrl('../shared/locales.json'));
             },
-            _switchLocale: function() {
+            _switchLocale: function () {
                 this.language = (this.language == 'en') ? 'de' : 'en';
             },
 
-            ready: function() {
+            ready: function () {
 
-                this.members= [];
-                for (var i=1;i<this.groupSize;i++){
-                    this.members.push({"name":""});
+                this.members = [];
+                for (var i = 1; i < this.groupSize; i++) {
+                    this.members.push({"name": ""});
                 }
             },
             _selfInfoGroupIdChanged: function () {
@@ -283,7 +287,6 @@
                         method: 'GET',
                         endpoint: '/groups/' + this.selfInfo.groupId
                     }
-
                 }
 
             },
@@ -292,27 +295,27 @@
                 if (!mail) {
                     return "";
                 } else if (mail.includes("@campus.lmu.de")) {
-                    return mail.slice(0,-14);
+                    return mail.slice(0, -14);
                 }
                 return mail.split("@")[0];
             },
 
-            _createNewGroup: function(){
+            _createNewGroup: function () {
                 var checked = true;
 
                 //Restet Errors to not visible
-                this.$$('#requestError').toggleAttribute("invalid",false);
-                this.$$('#inputError').toggleAttribute("invalid",false);
+                this.$$('#requestError').toggleAttribute("invalid", false);
+                this.$$('#inputError').toggleAttribute("invalid", false);
 
                 //Check for empty inputs
-                this.members.forEach(function(element) {
-                    if(element.name==""){
+                this.members.forEach(function (element) {
+                    if (element.name == "") {
                         console.log('element was empty');
                         checked = false;
                     }
                 });
 
-                if(checked){
+                if (checked) {
                     var mails = [];
                     //Add suffix back to Mails and Push to Array
                     this.members.forEach(function (element) {
@@ -329,13 +332,13 @@
                         },
                         endpoint: '/groups/createbymail/'
                     };
-                }else {
-                    this.$$('#inputError').toggleAttribute("invalid",true);
+                } else {
+                    this.$$('#inputError').toggleAttribute("invalid", true);
                 }
             },
 
             calcNaturalIndex: function (index) {
-                return index+1;
+                return index + 1;
             },
 
             /**
@@ -345,14 +348,18 @@
              */
             _apiGetGroupResponseChanged: function (response) {
 
-                if (response.type == 'response'){
+                if (response.type == 'response') {
                     var self = this;
                     var receivedGroup = response.data;
                     this.set('group', receivedGroup);
 
                     //Change groupMemberIds to Array Containing Objects with ID, Name and Mail
                     this.group.groupMemberIds.forEach(function () {
-                        self.push('group.groupMemberIds',{"id":self.shift('group.groupMemberIds'),"name":"","mail":""});
+                        self.push('group.groupMemberIds', {
+                            "id": self.shift('group.groupMemberIds'),
+                            "name": "",
+                            "mail": ""
+                        });
                     });
                 }
             },
@@ -362,15 +369,15 @@
              * @param apiResponse
              * @private
              */
-            _apiCreateGroupResponseChanged: function(apiResponse){
+            _apiCreateGroupResponseChanged: function (apiResponse) {
 
                 if (apiResponse.type == 'response') {
                     var result = apiResponse.data.group;
-                    if(result){
+                    if (result) {
                         this.set('selfInfo.groupId', result.id);
                     }
                 } else if (apiResponse.type == 'error') {
-                    this.$$('#requestError').toggleAttribute("invalid",true);
+                    this.$$('#requestError').toggleAttribute("invalid", true);
                 }
             }
         });
