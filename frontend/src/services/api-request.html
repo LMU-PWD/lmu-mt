@@ -71,6 +71,12 @@
                     value: ''
                 },
 
+                semesterFilter: {
+                    type: String,
+                    value: '',
+                    observer: '_computeUrl'
+                },
+
                 url: {
                     type: String,
                     reflectToAttribute: false
@@ -92,7 +98,15 @@
             },
 
             _computeUrl: function () {
-                this.url = this.baseUrl + this.endpoint;
+                if (this.baseUrl && this.endpoint && this.baseUrl != '' && this.endpoint != '') {
+
+                    this.url =
+                            this.baseUrl +
+                            this.endpoint +
+                            ((this.semesterFilter != '')
+                                    ? '?filter[where][semesterId]=' + this.semesterFilter
+                                    : '');
+                }
             }
 
         });
