@@ -32,6 +32,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="components/navigation-bar.html">
 <link rel="import" href="components/notifications-card.html">
 <link rel="import" href="services/api-request.html">
+<link rel="import" href="services/redux-store.html">
 <link rel="import" href="shared/shared-styles.html">
 
 <dom-module id="my-app">
@@ -92,6 +93,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     <app-location route="{{route}}" use-hash-as-path></app-location>
 
+    <!-- Fetches info about currently logged in user -->
+    <api-request
+            headers="[[ ajax.headers ]]"
+            method="[[ ajax.method ]]"
+            endpoint="[[ ajax.endpoint ]]"
+            response="{{ apiResponse }}"></api-request>
+
     <app-route
         route="{{route}}"
         pattern="/:page"
@@ -110,9 +118,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             <main-view
                name="main"
-               access-token="{{ session.accessToken }}"
-               logged-in="{{ session.loggedIn }}"
-               user-id="{{ session.userId }}"
                show-notifications="{{ showDesktopNotifications }}"></main-view>
             <login-view
                 name="login"
@@ -148,12 +153,41 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           type: Object,
           notify: true
         },
+        apiResponse: {
+          type: Object,
+          reflectToAttribute: false,
+          observer: '_apiResponseChanged'
+        },
         session: {
           type: Object,
-          value: {
+          statePath: 'session'
+        /*value: {
             accessToken: null,
             loggedIn: false,
             userId: null
+          }*/
+        },
+        user: {
+          type: Object,
+          statePath: 'user'
+        }
+      },
+
+      behaviors: [
+              ReduxBehavior
+      ],
+
+      actions:{
+        session: function (detail) {
+          return{
+            type: 'UPDATE_SESSION',
+            detail: detail
+          }
+        },
+        user: function(user){
+          return {
+            type: 'UPDATE_USER',
+            detail: user
           }
         }
       },
@@ -167,6 +201,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       ready: function () {
 
+        console.log(this.session.loggedIn);
+
         // Check for valid session cookies
         var cookieAccessToken = this._getCookie('mt-api-accesstoken');
         var cookieUserId = this._getCookie('mt-api-userid');
@@ -174,11 +210,41 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           if (cookieAccessToken !== '' && cookieUserId !== '') {
 
           // TODO: Verify validity of cookies with API request
-          this.set('session.accessToken', cookieAccessToken);
+          /*this.set('session.accessToken', cookieAccessToken);
           this.set('session.userId', cookieUserId);
-          this.set('session.loggedIn', true);
+          this.set('session.loggedIn', true);*/
+            this.dispatch('session', {accessToken: cookieAccessToken, loggedIn: true, userId: cookieUserId});
+
+
+            this.ajax = {
+              headers: {
+                Authorization: cookieAccessToken
+              },
+              method: 'GET',
+              endpoint: '/platformusers/' + cookieUserId
+            };
         }
 
+      },
+
+      _apiResponseChanged: function (response) {
+        console.log('got user');
+        if (response.type == 'response') {
+          this.dispatch('user',response.data);
+
+
+          // Check for valid session cookies
+          var cookieAccessToken = this._getCookie('mt-api-accesstoken');
+          var cookieUserId = this._getCookie('mt-api-userid');
+          console.log({accessToken: cookieAccessToken, loggedIn: true, userId: cookieUserId});
+          this.dispatch('session', {accessToken: cookieAccessToken, loggedIn: true, userId: cookieUserId});
+
+          /*var userResponse = response.data;
+           this.set('user.email', userResponse.email);
+           this.set('user.firstName', userResponse.firstName);
+           this.set('user.groupId', userResponse.groupId);
+           this.set('user.name', userResponse.name);*/
+        }
       },
 
       /**
@@ -232,6 +298,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
          */
       _pageChanged: function(page) {
 
+        console.log(this.session);
+
         if (!this.session.loggedIn && page !== 'login') {
           this.set('route.path', '/login');
           return;
@@ -265,7 +333,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         } else {
           this.set('route.path', '/login');
         }
-      },
+      }
 
     });
   </script>

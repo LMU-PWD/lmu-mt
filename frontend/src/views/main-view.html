@@ -87,12 +87,7 @@
       }
     </style>
 
-    <!-- Fetches info about currently logged in user -->
-    <api-request
-            headers="[[ ajax.headers ]]"
-            method="[[ ajax.method ]]"
-            endpoint="[[ ajax.endpoint ]]"
-            response="{{ apiResponse }}"></api-request>
+
 
     <app-header fixed>
       <navigation-bar
@@ -143,12 +138,8 @@
 
             accessToken: {
               type: String,
-              observer: '_accessTokenChanged'
-            },
-            apiResponse: {
-              type: Object,
-              reflectToAttribute: false,
-              observer: '_apiResponseChanged'
+                statePath: 'user.accessToken'
+              //observer: '_accessTokenChanged'
             },
             group: {
               type: Object,
@@ -158,7 +149,8 @@
             },
             loggedIn: {
               type: Boolean,
-              notify: true
+              statePath: 'user.loggedIn'
+              /*notify: true*/
             },
             showNotifications: {
               type: Boolean,
@@ -166,8 +158,9 @@
             },
             userId: {
               type: String,
-              notify: true,
-              observer: '_userIdChanged'
+              statePath: 'user.userId'
+              /*notify: true,
+              observer: '_userIdChanged'*/
             },
             user: {
               type: Object,
@@ -219,7 +212,7 @@
 
         _accessTokenChanged: function () {
 
-            if (this.userId && this.accessToken) {
+           /* if (this.userId && this.accessToken) {
 
               this.ajax = {
                 headers: {
@@ -229,22 +222,11 @@
                 endpoint: '/platformusers/' + this.userId
               };
 
-            }
+            }*/
 
         },
 
-        _apiResponseChanged: function (response) {
 
-            if (response.type == 'response') {
-                this.dispatch('user',response.data);
-
-                /*var userResponse = response.data;
-                this.set('user.email', userResponse.email);
-                this.set('user.firstName', userResponse.firstName);
-                this.set('user.groupId', userResponse.groupId);
-                this.set('user.name', userResponse.name);*/
-            }
-        },
 
       toggleGroup: function () {
         var mq = window.matchMedia( "(max-width: 767px)" );

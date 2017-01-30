@@ -1,5 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../services/get-access-token.html">
+<link rel="import" href="../services/redux-store.html">
 
 <dom-module id="get-user-info">
     <template>
@@ -20,6 +21,10 @@
             properties: {
                 accessToken: {
                     type: String
+                },
+                session: {
+                    type: Object,
+                    statePath: 'session'
                 },
                 apiResponse: {
                     type: Object,
@@ -46,11 +51,14 @@
                     readOnly: true
                 }
             },
+            behaviors: [
+                    ReduxBehavior
+            ],
             ready: function() {
 
                 this.ajax = {
                     headers: {
-                        Authorization: this.accessToken
+                        Authorization: this.session.accessToken
                     },
                     method: 'GET',
                     endpoint: '/platformusers/' + this.userId

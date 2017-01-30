@@ -32,11 +32,16 @@
     };*/
 
     function reducer(state, action) {
-        console.log(state);
+        //console.log(state);
         if(!state){
             return initialState;
         }
         switch (action.type){
+            case 'UPDATE_SESSION':
+                const session = action.detail;
+                console.log(session);
+                console.log(Object.assign({}, state, {session: session}));
+                return Object.assign({}, state, {session: session});
             case 'UPDATE_USER':
                 const user = action.detail;
                 return Object.assign({}, state, {user: user});
