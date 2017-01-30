@@ -121,9 +121,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                show-notifications="{{ showDesktopNotifications }}"></main-view>
             <login-view
                 name="login"
-                access-token="{{ session.accessToken }}"
-                logged-in="{{ session.loggedIn }}"
-                user-id="{{ session.userId }}"
                 route="{{ subroute }}"></login-view>
             <error-view name="error"></error-view>
 
@@ -143,25 +140,33 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         page: {
           type: String,
           reflectToAttribute: false,
-          statePath: 'routing.myApp.page',
           observer: '_pageChanged'
         },
         route: {
           type: Object,
-          statePath: 'routing.myApp.route'
+          notify: true
         },
         subroute: {
           type: Object,
-          statePath: 'routing.myApp.subroute'
+          notify: true
         },
         apiResponse: {
           type: Object,
           reflectToAttribute: false,
           observer: '_apiResponseChanged'
         },
-        session: {
-          type: Object,
-          statePath: 'session'
+        accessToken: {
+          type: String,
+          statePath: 'session.accessToken'
+        },
+        userId: {
+          type: String,
+          statePath: 'session.userId'
+        },
+        loggedIn: {
+          type: String,
+          statePath: 'session.loggedIn',
+          observer: '_loginStateChanged'
         },
         user: {
           type: Object,
@@ -174,30 +179,51 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       actions: {
 
         session: function (detail) {
-          return{
+          return {
             type: 'UPDATE_SESSION',
             detail: detail
-          }
+          };
+        },
+
+        sessionAccessToken: function (accessToken) {
+          return {
+            type: 'UPDATE_SESSION_ACCESSTOKEN',
+            detail: accessToken
+          };
+        },
+
+        sessionLoggedIn: function (loggedIn) {
+          return {
+            type: 'UPDATE_SESSION_LOGGEDIN',
+            detail: loggedIn
+          };
+        },
+
+        sessionUserId: function (userId) {
+          return {
+            type: 'UPDATE_SESSION_USERID',
+            detail: userId
+          };
         },
 
         user: function (user){
           return {
             type: 'UPDATE_USER',
             detail: user
-          }
+          };
         },
 
-        page: function (page) {
+        updateRoutingMyappPage: function (detail) {
           return {
             type: 'UPDATE_ROUTING_MYAPP_PAGE',
-            detail: page
-          }
+            detail: detail
+          };
         }
       },
 
       observers: [
-        '_routePageChanged(routeData.page)',
-        '_loginStateChanged(session.loggedIn)'
+        '_routePageChanged(routeData.page)'
+        //'_loginStateChanged(session.loggedIn)'
       ],
 
       ready: function () {
@@ -208,18 +234,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
           if (cookieAccessToken !== '' && cookieUserId !== '') {
 
-            this.dispatch('session', {
-              accessToken: cookieAccessToken,
-              loggedIn: true,
-              userId: cookieUserId
-            });
+            this.dispatch('sessionAccessToken', cookieAccessToken);
+            this.dispatch('sessionLoggedIn', true);
+            this.dispatch('sessionUserId', cookieUserId);
 
             this.ajax = {
               headers: {
-                Authorization: cookieAccessToken
+                Authorization: this.accessToken
               },
               method: 'GET',
-              endpoint: '/platformusers/' + cookieUserId
+              endpoint: '/platformusers/' + this.userId
             };
         }
 
@@ -227,15 +251,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       _apiResponseChanged: function (response) {
 
+        console.log(response);
+
         if (response.type == 'response') {
 
           this.dispatch('user', response.data);
 
           // Check for valid session cookies
-          var cookieAccessToken = this._getCookie('mt-api-accesstoken');
+          /*var cookieAccessToken = this._getCookie('mt-api-accesstoken');
           var cookieUserId = this._getCookie('mt-api-userid');
           console.log({accessToken: cookieAccessToken, loggedIn: true, userId: cookieUserId});
-          this.dispatch('session', {accessToken: cookieAccessToken, loggedIn: true, userId: cookieUserId});
+          this.dispatch('session', {accessToken: cookieAccessToken, loggedIn: true, userId: cookieUserId});*/
 
         }
       },
@@ -271,8 +297,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
        */
       _routePageChanged: function(page) {
 
-        var pageval = page || 'main';
-        this.dispatch('page', pageval);
+        console.log("ROUTE PAGE CHANGED: "+page);
+
+        this.page = page || 'main';
 
         // check if mobile or desktop notifications are needed
         var screenwidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
@@ -292,17 +319,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
          */
       _pageChanged: function(page) {
 
-        console.log(this.session);
+        console.log("PAGE CHANGED: "+page);
+        console.log("LOGGED IN: "+this.loggedIn);
 
-        if ((this.session && !this.session.loggedIn && page !== 'login')
-            || !this.session) {
+        if (!this.loggedIn && page !== 'login') {
           this.set('route.path', '/login');
           return;
         }
 
         // Load page import on demand.
-        var resolvedPageUrl = this.resolveUrl('./views/' + page + '-view.html');
-        this.importHref(resolvedPageUrl, null, this._showPage404, true);
+        //var resolvedPageUrl = this.resolveUrl('./views/' + page + '-view.html');
+        //this.importHref(resolvedPageUrl, null, this._showPage404, true);
 
         this.unfoldNotifications = (this.page === 'main') ? true : false;
 
@@ -323,10 +350,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
        * @private
          */
       _loginStateChanged: function(loggedIn) {
+        console.log("LOGIN STATE CHANGED: "+loggedIn);
         if (loggedIn) {
-          this.set('route.path', '/');
+          this.set('routeData.page', '/');
         } else {
-          this.set('route.path', '/login');
+          this.set('routeData.page', '/login');
         }
       }
 

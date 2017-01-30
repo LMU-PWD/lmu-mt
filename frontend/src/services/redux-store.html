@@ -16,18 +16,6 @@
             labIds: [],
             priorityIds: []
         },
-        routing: {
-            myApp: {
-                page: '',
-                route: '',
-                subroute: ''
-            },
-            loginView: {
-                page: '',
-                route: '',
-                subroute: ''
-            }
-        },
         session: {
             accessToken: null,
             loggedIn: false,
@@ -48,6 +36,11 @@
 
     function reducer(state, action) {
 
+        console.log("state");
+        console.log(state);
+        console.log("action");
+        console.log(action);
+
         if (!state) {
             return initialState;
         }
@@ -65,15 +58,6 @@
             case 'UPDATE_GROUP_ADD_LAB_ID':
             case 'UPDATE_GROUP_ADD_PRIORITY_ID':
                 return Object.assign({}, state, {group: group(state.group, action)});
-
-            case 'UPDATE_ROUTING':
-            case 'UPDATE_ROUTING_MYAPP_PAGE':
-            case 'UPDATE_ROUTING_MYAPP_ROUTE':
-            case 'UPDATE_ROUTING_MYAPP_SUBROUTE':
-            case 'UPDATE_ROUTING_LOGINVIEW_PAGE':
-            case 'UPDATE_ROUTING_LOGINVIEW_ROUTE':
-            case 'UPDATE_ROUTING_LOGINVIEW_SUBROUTE':
-                return Object.assign({}, state, {routing: routing(state.routing, action)});
 
             case 'UPDATE_SESSION':
             case 'UPDATE_SESSION_ACCESSTOKEN':
@@ -160,38 +144,6 @@
         }
     }
 
-    function routing (state, action) {
-
-        if (!state) {
-            return initialState.routing;
-        }
-
-        switch (action.type) {
-
-            case 'UPDATE_ROUTING':
-                return action.detail;
-
-            case 'UPDATE_ROUTING_MYAPP_PAGE':
-                return Object.assign({}, state, {myApp: {page: action.detail}});
-
-            case 'UPDATE_ROUTING_MYAPP_ROUTE':
-                return Object.assign({}, state, {myApp: {route: action.detail}});
-
-            case 'UPDATE_ROUTING_MYAPP_SUBROUTE':
-                return Object.assign({}, state, {myApp: {subroute: action.detail}});
-
-            case 'UPDATE_ROUTING_LOGINVIEW_PAGE':
-                return Object.assign({}, state, {loginView: {page: action.detail}});
-
-            case 'UPDATE_ROUTING_LOGINVIEW_ROUTE':
-                return Object.assign({}, state, {loginView: {route: action.detail}});
-
-            case 'UPDATE_ROUTING_LOGINVIEW_SUBROUTE':
-                return Object.assign({}, state, {loginView: {subroute: action.detail}});
-
-        }
-    }
-
     function session (state, action) {
 
         if (!state) {
@@ -219,7 +171,7 @@
 
     function user (state, action) {
 
-        if (!sate) {
+        if (!state) {
             return initialState.user;
         }
 
