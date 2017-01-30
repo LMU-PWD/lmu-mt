@@ -1,6 +1,7 @@
 <link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/paper-tooltip/paper-tooltip.html">
 
 <dom-module id="admin-toolbar">
 
@@ -15,6 +16,8 @@
 
             paper-dropdown-menu {
                 margin: 0 10px;
+                --paper-input-container-color: var(--paper-blue-grey-500);
+                --paper-input-container-focus-color: var(--paper-blue-grey-900);
             }
 
             @media screen and (max-width: 767px) {
@@ -32,18 +35,31 @@
             response="{{ semestersResponse }}"></api-request>
 
         <paper-dropdown-menu label="Semester">
-            <paper-listbox class="dropdown-content">
+            <paper-listbox class="dropdown-content" selected="{{ selectedSemester }}">
                 <template is="dom-repeat" items="[[ semesters ]]" as="semester">
                     <paper-item>[[ semester.term ]]</paper-item>
                 </template>
             </paper-listbox>
         </paper-dropdown-menu>
 
-        <paper-icon-button icon="icons:add-circle-outline"></paper-icon-button>
+        <paper-icon-button
+                id="newSemesterButton"
+                icon="icons:add-circle-outline"
+                on-tap="_buttonTapDebugger"></paper-icon-button>
+        <paper-tooltip
+                for="newSemesterButton"
+                position="bottom"
+                animation-delay="0"
+                fit-to-visible-bounds="true">[[ localize('admin_toolbar_new_semester_tooltip') ]]</paper-tooltip>
+
+        <iron-signals on-iron-signal-switchlocale="_switchLocale"></iron-signals>
 
     </template>
 
     <script>
+
+        // TODO:
+        // - change content globally on selection change
 
         Polymer({
 
@@ -56,25 +72,53 @@
                     value: ""
                 },
 
-                userId: {
+                dropdownSelectedItemLabel: {
                     type: String,
-                    value: ""
+                    notify: true
+                },
+
+                language: {
+                    value: 'de',
+                    type: String
+                },
+
+                selectedSemester: {
+                    type: Number,
+                    observer: '_selectedSemesterChanged'
                 },
 
                 semesters: {
                     type: Array,
-                    value: []
+                    notify: true
                 },
 
                 semestersResponse: {
                     type: Object,
                     value: {},
                     observer: '_semestersResponseChanged'
+                },
+
+                user: {
+                    type: Object
+                },
+
+                userId: {
+                    type: String,
+                    value: ""
                 }
 
             },
 
+            /**
+             * Localization setup
+             */
+            behaviors: [
+                Polymer.AppLocalizeBehavior
+            ],
+
             attached: function () {
+
+                this.loadResources(this.resolveUrl('../shared/locales.json'));
 
                 this.ajax = {
                     headers: {
@@ -85,12 +129,73 @@
                 }
             },
 
-            _semestersResponseChanged: function (response) {
+            /** Helper function for determining preselected semester by examining
+             *  start and end dates. If current time is between start and end date
+             *  of a semester, returns index of that semester. Otherwise returns
+             *  index of upcoming semester. If no upcoming semesters exist, returns
+             *  index of most recently ended semester.
+             *
+             * @param semesters
+             * @returns {number}
+             * @private
+             */
+            _calcPreselectedSemester: function (semesters) {
 
-                if (response.type != 'error') {
-                    this.semesters = response.data;
+                // Sort semesters by start date
+                this.semesters.sort(function(a,b){
+                    return (new Date(a.start_date).getTime()) - (new Date(b.start_date).getTime());
+                });
+
+                // Iterate over semesters
+                var now = new Date();
+                var futureSemesterIndices = [];
+                this.semesters.forEach(function(semester, index){
+
+                    var semStartDate = new Date(semester.start_date);
+                    var semEndDate = new Date(semester.end_date);
+
+                    // If now lies between start and end date, return
+                    // current index
+                    if (semStartDate < now && now < semEndDate) {
+                        return index;
+                    }
+
+                    // If semester start date lies in the future,
+                    // append index to the future list
+                    if (semStartDate > now) {
+                        futureSemesterIndices.push(index);
+                    }
+                });
+
+                // If we collected any future semesters, return the
+                // index of the upcoming semester
+                if (futureSemesterIndices.length > 0) {
+                    return Math.max.apply(null, futureSemesterIndices);
                 }
 
+                // In all other cases return the highest index in our
+                // semester array
+                return this.semesters.length - 1;
+
+            },
+
+            _switchLocale: function(e) {
+                this.language = (this.language == 'en') ? 'de' : 'en';
+            },
+
+            _selectedSemesterChanged: function (selection) {
+                console.log(selection);
+            },
+
+            _semestersResponseChanged: function (response) {
+                if (response.type && response.type != 'error') {
+                    this.semesters = response.data;
+                    this.selectedSemester = this._calcPreselectedSemester();
+                }
+            },
+
+            _buttonTapDebugger: function () {
+                console.log(this.selectedSemesterValue);
             }
 
         });

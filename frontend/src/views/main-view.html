@@ -21,16 +21,9 @@
       }
       .group-info{
         width: 100%;
-        /*height: 275px;*/
       }
       .practicalsContainer {
         float: left;
-      }
-      .notification-placeholder{
-        /*width:100%;
-        height:200px;
-        position: fixed;
-        background-color: blue;*/
       }
 
       iron-collapse{
@@ -79,24 +72,9 @@
           margin:10px;
           width: calc(35% - 20px);
         }
-        .notification-placeholder{
-          margin:10px;
-          width: calc(30% - 20px);
-          height: 200px;
-          /*background-color: blue;*/
-          float: right;
-        }
-        .notificationsContainer {
-          /*margin:10px;*/
-          /*width: calc(30% - 20px);*/
-          /*height: 200px;*/
-          /*!*background-color: blue;*!*/
-          /*float: right;*/
-        }
       }
     </style>
 
-    <!--app-location route="{{route}}" use-hash-as-path></app-location--><!--zugriff auf url; get ulr mäßig; use-hash-as-path: # vor path-->
     <app-route
             route="{{route}}"
             pattern="/:page"
@@ -128,7 +106,7 @@
 
     <!-- A D M I N   T O O L B A R -->
     <template is="dom-if" if="[[ user.isAdmin ]]">
-        <admin-toolbar></admin-toolbar>
+        <admin-toolbar user="[[ user ]]"></admin-toolbar>
     </template>
 
     <!-- P A G E S -->

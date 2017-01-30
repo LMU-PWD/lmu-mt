@@ -36,7 +36,9 @@
     "groupsadmin_dialog text-3": "(This action can't be undone!)",
 
     "c_button_cancel": "Cancel",
-    "c_medientechnik": "Media Technology"
+    "c_medientechnik": "Media Technology",
+
+    "admin_toolbar_new_semester_tooltip": "Create new semester"
   },
 
   "de": {
@@ -59,7 +61,6 @@
 
     "mainview_praktikum typ": "Photo ",
 
-
     "registrationcard_header": "Registrierung",
     "registrationcard_descr text-1": "Studenten und Tutoren, die in UniworX für den Kurs",
     "registrationcard_descr text-2": " angemeldet sind, können sich hier für die Organisationsplattform registrieren.",
@@ -77,6 +78,8 @@
     "groupsadmin_dialog text-3": "(Diese Aktion kann nicht rückgängig gemacht werden!)",
 
     "c_button_cancel": "Abbrechen",
-    "c_medientechnik": "Medientechnik"
+    "c_medientechnik": "Medientechnik",
+
+    "admin_toolbar_new_semester_tooltip": "Neues Semester anlegen"
   }
 }
