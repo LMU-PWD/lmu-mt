@@ -1,87 +1,280 @@
- <link rel="import" href="../../bower_components/polymer-redux/polymer-redux.html">
+<link rel="import" href="../../bower_components/polymer-redux/polymer-redux.html">
 
 <script>
     const initialState = {
-        friends: ["Peter","Hans","Monica"],
-        userId: "",
-        accessToken: "",
-        user: {
-            userID: "",
-            groupID: "",
+        api: {
+            baseUrl: 'http://localhost:3000/api'
+            //baseUrl: 'https://lmu-mt-api.herokuapp.com/api'
         },
         group: {
-            name: "",
+            id: '',
+            name: '',
             members: [
-                    {id:"",name:"", mail: ""}
+                {id:'',name:'', mail: ''}
             ],
-            semesterId: "",
-            labsIds: [],
+            semesterId: '',
+            labIds: [],
             priorityIds: []
         },
-        apiStuff: {},
-        semester: {},
+        routing: {
+            myApp: {
+                page: '',
+                route: '',
+                subroute: ''
+            },
+            loginView: {
+                page: '',
+                route: '',
+                subroute: ''
+            }
+        },
         session: {
             accessToken: null,
             loggedIn: false,
-            userId: null
+            userId: ''
+        },
+        user: {
+            id: '',
+            email: '',
+            firstName: '',
+            groupId: '',
+            name: ''
+        },
+        view: {
+            language: 'en',
+            showNotifications: false
         }
     };
 
-    /*const reducer = (state,action) => {
-        if(!state) return initialState;
-    };*/
-
     function reducer(state, action) {
-        //console.log(state);
-        if(!state){
+
+        if (!state) {
             return initialState;
         }
+
         switch (action.type){
-            case 'UPDATE_SESSION':
-                const session = action.detail;
-                console.log(session);
-                console.log(Object.assign({}, state, {session: session}));
-                return Object.assign({}, state, {session: session});
-            case 'UPDATE_USER':
-                const user = action.detail;
-                return Object.assign({}, state, {user: user});
+
+            case 'UPDATE_API':
+                return Object.assign({}, state, {api: api(state.api, action)});
+
             case 'UPDATE_GROUP':
-                const group = action.detail;
-                //Change groupMemberIds to Array Containing Objects with ID, Name and Mail
-                group.groupMemberIds.forEach(function (element) {
-                    group.groupMemberIds.push({"id":group.groupMemberIds.shift(),"name":"","mail":""});
-                });
-                return Object.assign({}, state, {group: group});
+            case 'UPDATE_GROUP_ID':
+            case 'UPDATE_GROUP_NAME':
+            case 'UPDATE_GROUP_ADD_MEMBER':
+            case 'UPDATE_GROUP_SEMESTERID':
+            case 'UPDATE_GROUP_ADD_LAB_ID':
+            case 'UPDATE_GROUP_ADD_PRIORITY_ID':
+                return Object.assign({}, state, {group: group(state.group, action)});
+
+            case 'UPDATE_ROUTING':
+            case 'UPDATE_ROUTING_MYAPP_PAGE':
+            case 'UPDATE_ROUTING_MYAPP_ROUTE':
+            case 'UPDATE_ROUTING_MYAPP_SUBROUTE':
+            case 'UPDATE_ROUTING_LOGINVIEW_PAGE':
+            case 'UPDATE_ROUTING_LOGINVIEW_ROUTE':
+            case 'UPDATE_ROUTING_LOGINVIEW_SUBROUTE':
+                return Object.assign({}, state, {routing: routing(state.routing, action)});
+
+            case 'UPDATE_SESSION':
+            case 'UPDATE_SESSION_ACCESSTOKEN':
+            case 'UPDATE_SESSION_LOGGEDIN':
+            case 'UPDATE_SESSION_USERID':
+                return Object.assign({}, state, {session: session(state.session, action)});
+
+            case 'UPDATE_USER':
+            case 'UPDATE_USER_ID':
+            case 'UPDATE_USER_EMAIL':
+            case 'UPDATE_USER_FIRSTNAME':
+            case 'UPDATE_USER_GROUPID':
+            case 'UPDATE_USER_NAME':
+                return Object.assign({}, state, {user: user(state.user, action)});
+
+            case 'UPDATE_VIEW':
+            case 'UPDATE_VIEW_LANGUAGE':
+            case 'UPDATE_VIEW_SHOWNOTIFICATIONS':
+                return Object.assign({}, state, {view: view(state.view, action)});
+
             case 'RESET':
                 return initialState;
-            default: return state;
+
+            default:
+                return state;
         }
+    }
+
+    function api (state, action) {
+
+        if (!state) {
+            return initialState.api;
+        }
+
+        switch (action.type) {
+
+            case 'UPDATE_API':
+                return action.default;
+
+            case 'UPDATE_API_BASEURL':
+                const baseUrl = action.default;
+                return Object.assign({}, state, {baseUrl: baseUrl});
+
+        }
+    }
+
+    function group (state, action) {
+
+        if (!state) {
+            return initialState.group;
+        }
+
+        switch (action.type) {
+
+            case 'UPDATE_GROUP':
+                return action.detail;
+
+            case 'UPDATE_GROUP_ID':
+                const id = action.detail;
+                return Object.assign({}, state, {id: id});
+
+            case 'UPDATE_GROUP_NAME':
+                const name = action.detail;
+                return Object.assign({}, state, {name: name});
+
+            case 'UPDATE_GROUP_ADD_MEMBER':
+                var members = state.members.slice(0);
+                members.push(action.detail);
+                return Object.assign({}, state, {members: members});
+
+            case 'UPDATE_GROUP_SEMESTERID':
+                const semesterId = action.detail;
+                return Object.assign({}, state, {semesterId: semesterId});
+
+            case 'UPDATE_GROUP_ADD_LAB_ID':
+                var labIds = state.labIds.slice(0);
+                labIds.push(action.detail);
+                return Object.assign({}, state, {labIds: labIds});
+
+            case 'UPDATE_GROUP_ADD_PRIORITY_ID':
+                var priorityIds = state.priorityIds.slice(0);
+                priorityIds.push(action.detail);
+                return Object.assign({}, state, {priorityIds: priorityIds});
+        }
+    }
+
+    function routing (state, action) {
+
+        if (!state) {
+            return initialState.routing;
+        }
+
+        switch (action.type) {
+
+            case 'UPDATE_ROUTING':
+                return action.detail;
+
+            case 'UPDATE_ROUTING_MYAPP_PAGE':
+                return Object.assign({}, state, {myApp: {page: action.detail}});
+
+            case 'UPDATE_ROUTING_MYAPP_ROUTE':
+                return Object.assign({}, state, {myApp: {route: action.detail}});
+
+            case 'UPDATE_ROUTING_MYAPP_SUBROUTE':
+                return Object.assign({}, state, {myApp: {subroute: action.detail}});
+
+            case 'UPDATE_ROUTING_LOGINVIEW_PAGE':
+                return Object.assign({}, state, {loginView: {page: action.detail}});
+
+            case 'UPDATE_ROUTING_LOGINVIEW_ROUTE':
+                return Object.assign({}, state, {loginView: {route: action.detail}});
+
+            case 'UPDATE_ROUTING_LOGINVIEW_SUBROUTE':
+                return Object.assign({}, state, {loginView: {subroute: action.detail}});
+
+        }
+    }
+
+    function session (state, action) {
+
+        if (!state) {
+            return initialState.session;
+        }
+
+        switch (action.type) {
+
+            case 'UPDATE_SESSION':
+                return action.detail;
+
+            case 'UPDATE_SESSION_ACCESSTOKEN':
+                const accessToken = action.detail;
+                return Object.assign({}, state, {accessToken: accessToken});
+
+            case 'UPDATE_SESSION_LOGGEDIN':
+                const loggedIn = action.detail;
+                return Object.assign({}, state, {loggedIn: loggedIn});
+
+            case 'UPDATE_SESSION_USERID':
+                const userId = action.detail;
+                return Object.assign({}, state, {userId: userId});
+        }
+    }
+
+    function user (state, action) {
+
+        if (!sate) {
+            return initialState.user;
+        }
+
+        switch (action.type) {
+
+            case 'UPDATE_USER':
+                return action.detail;
+
+            case 'UPDATE_USER_ID':
+                const id = action.detail;
+                return Object.assign({}, state, {id: id});
+
+            case 'UPDATE_USER_EMAIL':
+                const email = action.detail;
+                return Object.assign({}, state, {email: email});
+
+            case 'UPDATE_USER_FIRSTNAME':
+                const firstName = action.detail;
+                return Object.assign({}, state, {firstName: firstName});
+
+            case 'UPDATE_USER_GROUPID':
+                const groupId = action.detail;
+                return Object.assign({}, state, {groupId: groupId});
+
+            case 'UPDATE_USER_NAME':
+                const name = action.detail;
+                return Object.assign({}, state, {name: name});
+
+        }
+    }
+
+    function view (state, action) {
+
+        if (!state) {
+            return initialState.view;
+        }
+
+        switch (action.type) {
+
+            case 'UPDATE_VIEW':
+                return action.detail;
+
+            case 'UPDATE_VIEW_LANGUAGE':
+                const language = action.detail;
+                return Object.assign({}, state, {language: language});
+
+            case 'UPDATE_VIEW_SHOWNOTIFICATIONS':
+                const showNotifications = action.detail;
+                return Object.assign({}, state, {showNotifications: showNotifications});
+
+        }
+
     }
 
     const store = Redux.createStore(reducer);
     const ReduxBehavior = PolymerRedux(store);
 
 </script>
-<!--<link rel="import" href="../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../bower_components/polymer/polymer.html">
-
-<dom-module id="redux-store">
-    <template>
-        <style>
-            :host{
-            }
-        </style>
-        <div></div>
-    </template>
-    <script>
-        Polymer({
-            is: 'redux-store',
-            properties: {
-            
-            },
-            ready: function() {
-            
-            }
-        });
-    </script>
-</dom-module>-->
