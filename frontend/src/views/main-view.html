@@ -3,6 +3,7 @@
 <link rel="import" href="../components/group-card.html">
 <link rel="import" href="../components/group-detail.html">
 <link rel="import" href="../components/groups-admin.html">
+<link rel="import" href="../components/students-admin.html">
 <link rel="import" href="../components/notifications-card.html">
 <link rel="import" href="../components/navigation-bar.html">
 <link rel="import" href="../shared/shared-styles.html">
@@ -140,6 +141,8 @@
                                       self-info="{{user}}" ></groups-admin>
                     </iron-collapse>
                 </div>
+                <students-admin
+                        access-token="[[ accessToken ]]"></students-admin>
             </template>
 
             <template is="dom-if" if="[[user.isStudent]]">

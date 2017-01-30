@@ -1,0 +1,68 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../shared/shared-styles.html">
+
+<dom-module id="students-admin">
+    <template>
+        <style include="shared-styles">
+            :host{
+            }
+        </style>
+
+        <!-- Fetches all current Users -->
+        <api-request
+                headers="[[ ajax.headers ]]"
+                method="[[ ajax.method ]]"
+                endpoint="[[ ajax.endpoint ]]"
+                response="{{ apiGetStudentsResponse }}"></api-request>
+
+        <div></div>
+        <template is="dom-repeat" items="[[users]]" as="user" filter="isStudent">
+            <h1>[[user.name]]</h1>
+        </template>
+    </template>
+    <script>
+        Polymer({
+            is: 'students-admin',
+            properties: {
+                accessToken: String,
+                apiGetStudentsResponse: {
+                    type: Object,
+                    observer: '_apiGetStudentsResponseChanged'
+                },
+                students: {
+                    type: Array
+                },
+                users: {
+                    type: Array
+                }
+            
+            },
+            ready: function() {
+                    this.ajax = {
+                        contentType: 'application/json',
+                        headers: {
+                            Authorization: this.accessToken
+                        },
+                        method: 'GET',
+                        endpoint: '/platformUsers/'
+                    }
+            },
+            /**
+             * Callback fired when api-request responds to GET on current group.
+             * @param response
+             * @private
+             */
+            _apiGetStudentsResponseChanged: function (response) {
+                if(response.type == 'response'){
+                    console.log(response);
+                    this.set('users',response.data);
+                    console.log(this.users);
+                }
+            },
+            
+            isStudent: function (item) {
+                return (item.isAdmin)?(false):((item.isTutor)?(false):(true));
+            }
+        });
+    </script>
+</dom-module>
