@@ -35,7 +35,7 @@
             response="{{ semestersResponse }}"></api-request>
 
         <paper-dropdown-menu label="Semester">
-            <paper-listbox class="dropdown-content" selected="{{ selectedSemester }}">
+            <paper-listbox class="dropdown-content" selected="{{ selectedSemesterIndex }}">
                 <template is="dom-repeat" items="[[ semesters ]]" as="semester">
                     <paper-item>[[ semester.term ]]</paper-item>
                 </template>
@@ -83,8 +83,13 @@
                 },
 
                 selectedSemester: {
-                    type: Number,
-                    observer: '_selectedSemesterChanged'
+                    type: String,
+                    notify: true,
+                    computed: '_getSelectedSemesterId(selectedSemesterIndex)'
+                },
+
+                selectedSemesterIndex: {
+                    type: Number
                 },
 
                 semesters: {
@@ -183,19 +188,15 @@
                 this.language = (this.language == 'en') ? 'de' : 'en';
             },
 
-            _selectedSemesterChanged: function (selection) {
-                console.log(selection);
-            },
-
             _semestersResponseChanged: function (response) {
                 if (response.type && response.type != 'error') {
                     this.semesters = response.data;
-                    this.selectedSemester = this._calcPreselectedSemester();
+                    this.selectedSemesterIndex = this._calcPreselectedSemester();
                 }
             },
 
-            _buttonTapDebugger: function () {
-                console.log(this.selectedSemesterValue);
+            _getSelectedSemesterId: function (index) {
+                return this.semesters[index].id;
             }
 
         });

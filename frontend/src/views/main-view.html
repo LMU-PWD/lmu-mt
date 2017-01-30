@@ -103,10 +103,11 @@
       <notifications-card showlist="{{ showMobileNotifications }}"></notifications-card>
     </template>
 
-
     <!-- A D M I N   T O O L B A R -->
     <template is="dom-if" if="[[ user.isAdmin ]]">
-        <admin-toolbar user="[[ user ]]"></admin-toolbar>
+        <admin-toolbar
+                user="[[ user ]]"
+                selected-semester="{{ adminSelectedSemesterId }}"></admin-toolbar>
     </template>
 
     <!-- P A G E S -->
@@ -130,7 +131,8 @@
                     <iron-collapse id="collapse" opened=true>
                         <groups-admin class="group-info"
                                       access-token="[[ accessToken ]]"
-                                      self-info="{{user}}" ></groups-admin>
+                                      self-info="{{user}}"
+                                      selected-semester="[[ adminSelectedSemesterId ]]"></groups-admin>
                     </iron-collapse>
                 </div>
             </template>
@@ -203,6 +205,9 @@
             accessToken: {
               type: String,
               observer: '_accessTokenChanged'
+            },
+            adminSelectedSemesterId: {
+                type: String
             },
             apiResponse: {
               type: Object,

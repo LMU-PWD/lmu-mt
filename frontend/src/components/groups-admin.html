@@ -113,6 +113,7 @@
                 headers="[[ ajax.headers ]]"
                 method="[[ ajax.method ]]"
                 endpoint="[[ ajax.endpoint ]]"
+                semester-filter="[[ selectedSemester ]]"
                 response="{{ apiGetGroupsResponse }}"></api-request>
 
         <!-- Deletes Specific group -->
@@ -178,6 +179,9 @@
                 language: {
                     type: String,
                     value: 'de'
+                },
+                selectedSemester: {
+                    type: String
                 }
             },
 
@@ -215,7 +219,6 @@
              * @private
              */
             _apiGetGroupsResponseChanged: function (response) {
-
                 if (response.type == 'response'){
                     var self = this;
                     var receivedGroup = response.data;
@@ -228,25 +231,18 @@
                         });
                     });
                 }
-                //console.log(this.groups);
             },
 
             _apiDeleteGroupResponseChanged: function (response) {
-                //console.log(response);
-
                 this._groupsChanged();
             },
 
             _deleteGroup: function(event, groupId){
-                //console.log(event);
-                //console.log(event.model.__data__.group.id);
-
                 var groupID = event.model.__data__.group.id;
                 var groupName = event.model.__data__.group.name;
                 //Pass Group ID Through deleteDialog
                 this.$.deleteDialog.dataset.groupID = groupID;
                 this.$$('#deleteDialog > div > H1 > span').textContent = groupName;
-                //console.log(this.$$('#deleteDialog > div > H1 > span').textContent);
                 this.$.deleteDialog.open();
             },
 
@@ -269,7 +265,6 @@
             },
 
             _toggleCollapse: function (event) {
-                //console.log(event);
                 index = event.model.__key__.slice(1);
                 this.$$('#collapse'+index).toggle();
             }
