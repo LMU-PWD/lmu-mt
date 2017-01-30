@@ -6,6 +6,7 @@
 <link rel="import" href="../components/notifications-card.html">
 <link rel="import" href="../components/navigation-bar.html">
 <link rel="import" href="../components/admin-toolbar.html">
+<link rel="import" href="semester-setup-view.html">
 <link rel="import" href="../shared/shared-styles.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../../bower_components/iron-collapse/iron-collapse.html">
@@ -103,20 +104,22 @@
       <notifications-card showlist="{{ showMobileNotifications }}"></notifications-card>
     </template>
 
-    <!-- A D M I N   T O O L B A R -->
-    <template is="dom-if" if="[[ user.isAdmin ]]">
-        <admin-toolbar
-                user="[[ user ]]"
-                selected-semester="{{ adminSelectedSemesterId }}"></admin-toolbar>
-    </template>
-
     <!-- P A G E S -->
     <iron-pages
             selected="[[page]]"
             attr-for-selected="name"
             fallback-selection="error">
 
+        <!-- Dashboard Page -->
         <div class="main-page" name="dashboard">
+
+            <!-- A D M I N   T O O L B A R -->
+            <template is="dom-if" if="[[ user.isAdmin ]]">
+                <admin-toolbar
+                        user="[[ user ]]"
+                        selected-semester="{{ adminSelectedSemesterId }}"
+                        main-view-page="{{ page }}"></admin-toolbar>
+            </template>
 
             <!-- NOTIFICATIONS -->
             <div class="notificationsContainer">
@@ -163,6 +166,7 @@
           </div>
         </div>
 
+        <!-- Practical Detail Pages -->
         <practicals-view
               name="foto-practicals"
               type= "Foto"
@@ -190,6 +194,10 @@
               access-token="{{ session.accessToken }}"
               logged-in="{{ session.loggedIn }}"
               user-id="{{ session.userId }}"></practicals-view>
+
+        <!-- Semester Setup Pages (Admin only) -->
+        <semester-setup-view
+              name="semester-setup"></semester-setup-view>
 
     </iron-pages>
 

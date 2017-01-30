@@ -45,7 +45,7 @@
         <paper-icon-button
                 id="newSemesterButton"
                 icon="icons:add-circle-outline"
-                on-tap="_buttonTapDebugger"></paper-icon-button>
+                on-tap="_buttonTapped"></paper-icon-button>
         <paper-tooltip
                 for="newSemesterButton"
                 position="bottom"
@@ -80,6 +80,11 @@
                 language: {
                     value: 'de',
                     type: String
+                },
+
+                mainViewPage: {
+                    type: String,
+                    notify: true
                 },
 
                 selectedSemester: {
@@ -197,6 +202,10 @@
 
             _getSelectedSemesterId: function (index) {
                 return this.semesters[index].id;
+            },
+
+            _buttonTapped: function () {
+                this.mainViewPage = 'semester-setup';
             }
 
         });
