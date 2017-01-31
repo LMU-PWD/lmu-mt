@@ -5,7 +5,8 @@
 
     <template>
 
-        <iron-ajax auto
+        <iron-ajax id="request"
+                auto
                    body="[[ body ]]"
                    content-type="[[ contentType ]]"
                    handle-as="json"
@@ -27,7 +28,8 @@
 
             properties: {
                 accessToken: {
-                    type: String
+                    type: String,
+//                    computed: "_getAccessToken"
                 },
 
                 baseUrl: {
@@ -81,7 +83,7 @@
             },
 
             ready: function () {
-                var cookieAccessToken = this._getCookie('mt-api-accesstoken');
+                cookieAccessToken = this._getCookie('mt-api-accesstoken');
                 this.headers.Authorization = cookieAccessToken;
             },
 
@@ -97,13 +99,17 @@
                     data: response.detail.error,
                     type: 'error'
                 };
-                console.log("# error #")
+                console.log("# Ajax error #")
                 console.log(response)
             },
 
             _computeUrl: function () {
                 this.url = this.baseUrl + this.endpoint;
             },
+
+//            makeRequest: function() {
+//                this.$.request.generateRequest();
+//            },
 
             _getCookie: function (cookieName) {
 
@@ -120,7 +126,7 @@
                     }
                 }
                 return '';
-            }
+            },
         });
 
     </script>

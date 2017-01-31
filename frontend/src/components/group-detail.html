@@ -185,10 +185,10 @@
                     </template>
                     <paper-button on-tap="_createNewGroup">{{localize('groupdetail_create group')}}</paper-button>
                     <paper-input-error id="inputError" class="error">
-                        Du musst zu viert sein um eine neue Gruppe zu erstellen
+                        {{ localize('groupdetail_group comment')}}
                     </paper-input-error>
                     <paper-input-error id="requestError" class="error">
-                        Uuups... hat haben wohl die E-Mails nicht gestimmt
+                        {{ localize('groupdetail_create error')}}
                     </paper-input-error>
 
                     <api-request

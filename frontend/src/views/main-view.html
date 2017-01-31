@@ -190,8 +190,9 @@
                     type="Foto"
                     icon="[[icon]]"
                     route="{{subroute}}"
+                    group="[[ group ]]"
                     on-back-click="_handleBackTap"
-                    access-token="{{ session.accessToken }}"
+                    access-token="{{ accessToken }}"
                     logged-in="{{ session.loggedIn }}"
                     user-id="{{ session.userId }}"></practicals-view>
             <practicals-view
@@ -199,8 +200,9 @@
                     type="Video"
                     icon="[[icon]]"
                     route="{{subroute}}"
+                    group="[[ group ]]"
                     on-back-click="_handleBackTap"
-                    access-token="{{ session.accessToken }}"
+                    access-token="{{ accessToken }}"
                     logged-in="{{ session.loggedIn }}"
                     user-id="{{ session.userId }}"></practicals-view>
             <practicals-view
@@ -208,8 +210,9 @@
                     type="Audio"
                     icon="[[icon]]"
                     route="{{subroute}}"
+                    group="[[ group ]]"
                     on-back-click="_handleBackTap"
-                    access-token="{{ session.accessToken }}"
+                    access-token="{{ accessToken }}"
                     logged-in="{{ session.loggedIn }}"
                     user-id="{{ session.userId }}"></practicals-view>
 
@@ -284,7 +287,6 @@
             },
 
             ready: function () {
-
             },
 
             observers: [
@@ -341,7 +343,6 @@
                     }
                 }
             },
-
             toggleGroup: function () {
                 var mq = window.matchMedia("(max-width: 767px)");
                 if (mq.matches) {

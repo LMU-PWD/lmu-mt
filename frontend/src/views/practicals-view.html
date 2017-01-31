@@ -73,6 +73,9 @@
 
         <div class="page">
             <img class="icon" src=[[icon]] z-index="1">
+
+            <ajax-tst accesstoken="[[accessToken]]"></ajax-tst>
+
             <paper-tabs selected="{{selectedTab}}" class="tabheader" no-slide>
                 <paper-icon-button class="tabheaderbuttons backbutton" icon="icons:arrow-back"
                                    on-tap="_backClicked"></paper-icon-button>
@@ -82,32 +85,57 @@
             <div class="content">
                 <h2>[[type]] Praktikum</h2>
                 <iron-pages selected="[[selectedTab]]">
-                    <div>Page 1 Text</div>
+                    <div>
+                        <template is="dom-if" if="[[ practical_data.registration_open ]]">
+                            Die Registrierungsphase ist noch bis zum [[ practical_data.registration_deadline-string ]] aktiv.<br>
+                            Bitte tragt eure Prioritäten für die Termine ein.<br>
+                            Eure Prioritäten:
+                            [[ group.priorityIds ]]
+                        </template>
+                    </div>
                     <div>
                         <api-request
+                                id="ajax_labtypes"
                                 body="[[ ajax.body ]]"
                                 headers="[[ ajax.headers ]]"
                                 method="[[ ajax.method ]]"
                                 endpoint="[[ ajax.endpoint ]]"
-                                response="{{ registrationOpen }}"
+                                response="{{ response }}"
+                                loading="{{ isLoading }}"></api-request>
+                        <api-request
+                                id="ajax_priorities"
+                                body="[[ ajax.body ]]"
+                                headers="[[ ajax.headers ]]"
+                                method="[[ ajax.method ]]"
+                                endpoint="[[ ajax.endpoint ]]"
+                                response="{{ group_priorities }}"
+                                loading="{{ isLoading }}"></api-request>
+                        <api-request
+                                id="ajax_priorities"
+                                body="[[ ajax.body ]]"
+                                headers="[[ ajax.headers ]]"
+                                method="[[ ajax.method ]]"
+                                endpoint="[[ ajax.endpoint ]]"
+                                response="{{ group_labIds }}"
                                 loading="{{ isLoading }}"></api-request>
 
-                        <template is="dom-if" if="{{ registrationOpen }}">
-                            <practical-date-detail id="practicalDateDetail" type="[[type]]"
+                        <template is="dom-if" if="[[ practical_data.registration_open ]]">
+                            <practical-date-detail id="practicalDateDetail_[[type]]" type="[[type]]"
                                                    practical_date="[[practical_date]]"
                                                    timeslots="[[timeslots]]"
+                                                   access-token="[[ accessToken ]]"
                                                    on-save-click="_handleSaveClick"
                                                    on-reset-click="_handleResetClick"></practical-date-detail>
                         </template>
-                        <template is="dom-if" if="!{{ registrationOpen }}">
-                            Registration is closed.
+                        <template is="dom-if" if="![[ practical_data.registration_open ]]">
+                            Die Registrierungsphase ist abgeschlossen.<br>
+
                         </template>
 
                     </div>
                 </iron-pages>
             </div>
         </div>
-        <get-access-token token="{{ accessToken }}"></get-access-token>
     </template>
 
     <script>
@@ -146,10 +174,9 @@
                     notify: true,
                     value: ""
                 },
-                registrationOpen: {
-                    type: Boolean,
-                    value: false,
-                    observer: "_isRegistrationOpen"
+                practical_data: {
+                    type: Object,
+                    value: {}
                 },
                 headers: {
                     type: Object,
@@ -158,6 +185,15 @@
                 isReady: {
                     type: Boolean,
                     value: false
+                },
+                group: Object,
+                group_priorities: {
+                    type: Object,
+                    observer: "_prioritiesChanged"
+                },
+                response: {
+                    type: Object,
+                    observer: "_processApiResponse"
                 }
             },
             ready: function () {
@@ -168,14 +204,23 @@
                 this.isReady = true;
 
                 // CHECK IF REGISTRATION IS OPEN
-                this.ajax = {
-                    contentType: 'application/json',
-                    method: 'GET',
-                    headers: {
-                        'Authorization': this.accessToken.Authorization
-                    },
-                    endpoint: '/LabTypes/findOne?filter[where][type_str]=' + this.type
-                };
+//                this.responseType = "labtype";
+//                this.ajax = {
+//                    contentType: 'application/json',
+//                    method: 'GET',
+//                    headers: {
+//                        'Authorization': this.accessToken
+//                    },
+//                    endpoint: '/LabTypes/findOne?filter[where][type_str]=' + this.type
+//                };
+                this.$.ajax_labtypes.endpoint = '/LabTypes/findOne?filter[where][type_str]=' + this.type;
+//                this.$.ajax_labtypes.makeRequest();
+
+                this.responseType = "priorities";
+                for (var i = 0; i < this.group.priorityIds.length; i++) {
+                    this.$.ajax_priorities.endpoint = '/Priorities/' + this.group.priorityIds[i];
+//                    this.$.ajax_priorities.makeRequest();
+                }
             },
 
             /**
@@ -184,16 +229,32 @@
             _backClicked: function () {
                 this.type = "";
                 this.fire("back-click");
-                this.$.practicalDateDetail._handleResetClick();
+                if (typeof this.$.practicalDateDetail !== 'undefined')
+                    this.$.practicalDateDetail._handleResetClick();
             },
 
-            _isRegistrationOpen: function (response) {
+            _processApiResponse: function (response) {
 
                 if (!this.isReady)
                     return;
 
+                console.log("api response");
+                console.log(response);
+
                 if (typeof response !== 'undefined' && response.data != 0) {
-                    this.registrationOpen = response.data.registration_open;
+
+                    deadline_date = new Date(response.data.registration_deadline);
+
+                    course = {
+                        "registration_open": response.data.registration_open,
+                        "registration_deadline-object": deadline_date,
+                        "registration_deadline-string": deadline_date.getDate() + "." + (deadline_date.getMonth()+1) +
+                            "." + deadline_date.getFullYear() + ", " + deadline_date.getHours() + ":" + deadline_date.getMinutes(),
+                        "description_tutor": response.data.description_tutor,
+                        "description_student": response.data.description_student
+                    };
+                    this.practical_data = course;
+//                    console.log(this.practical_data);
                 }
                 else {
                     console.log("error!");
@@ -207,8 +268,9 @@
              * @private
              */
             _handleSaveClick: function (e) {
-                this.chosenslots = this.$.practicalDateDetail.chosenslots;
-                console.log(this.chosenslots);
+                var dateselect_element = this.$$("#practicalDateDetail_" + this.type);
+                chosenslots = dateselect_element.chosenslots;
+                console.log(chosenslots);
             },
 
             _handleResetClick: function (e) {
@@ -284,7 +346,12 @@
                 }
                 return transformedSlots;
             },
-
+            _prioritiesChanged: function (response) {
+                if (!this.isReady)
+                    return;
+                console.log("priorities changed")
+                console.log(response)
+            }
         });
     </script>
 </dom-module>

@@ -11,6 +11,7 @@
 
     "groupdetail_create group": "Create new group",
     "groupdetail_group comment": "You have to be 4 people to create a new group.",
+    "groupdetail_create error": "Ooops... the e-mail addresses seem not to be correct.",
     "groupdetail_write mail": "Send an e-mail",
 
     "groupcard_tritt bei": "Join a group now!",
@@ -51,6 +52,7 @@
 
     "groupdetail_create group": "Neue Gruppe Erstellen",
     "groupdetail_group comment": "Ihr müsst zu viert sein, um eine neue Gruppe zu erstellen.",
+    "groupdetail_create error": "Uuups... hat haben wohl die E-Mails nicht gestimmt",
     "groupdetail_write mail": "E-Mail senden",
 
     "groupcard_tritt bei": "Tritt jetzt einer Gruppe bei!",
