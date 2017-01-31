@@ -1,42 +1,352 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/neon-animation/neon-animatable-behavior.html">
+<link rel="import" href="../../bower_components/neon-animation/animations/slide-from-bottom-animation.html">
+<link rel="import" href="../../bower_components/neon-animation/animations/slide-down-animation.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../bower_components/paper-date-picker/paper-date-picker.html">
+<link rel="import" href="../../bower_components/paper-slider/paper-slider.html">
 
 <dom-module is="semester-setup-view">
 
     <template>
 
-        <style>
+        <style include="iron-flex">
+
+            :root {
+                --semester-setup-primary-color: var(--paper-blue-grey-700);
+                --semester-setup-primary-light-color: var(--paper-blue-grey-500);
+                --semester-setup-secondary-color: var(--paper-blue-grey-50);
+                --semester-setup-background-color: var(--paper-blue-grey-100);
+            }
 
             :host {
                 text-align: center;
             }
 
-            div {
-                background: black;
+            .setup-container {
                 margin: auto;
-                max-width: 1200px;
-                padding: 10px;
-                height: 500px;
+                max-width: 1000px;
+                text-align: left;
+                width: 100%;
+            }
+
+            .setup-header {
+                margin: 50px auto 0;
+                max-width: 1000px;
+                width: 100%;
+            }
+
+            .setup-header > .setup-header-breadcrumb {
+                float: left;
+                margin: 0 40px 20px;
+            }
+
+            .setup-header-breadcrumb > .mobile {
+                display: none;
+            }
+
+            paper-button.setup-header-breadcrumb-done, paper-button.setup-header-breadcrumb-mobile {
+                background: var(--semester-setup-primary-light-color);
+                color: var(--semester-setup-secondary-color);
+            }
+
+            paper-button.setup-header-breadcrumb-active {
+                background: var(--semester-setup-primary-color);
+                color: var(--semester-setup-secondary-color);
+            }
+
+            .setup-header > .setup-header-actions {
+                float: right;
+                margin: 0 20px;
+            }
+
+            .setup-footer {
+                margin: 0 auto 20px;
+                max-with: 1000px;
+                text-align: center;
+                width: 100%;
+            }
+
+            .setup-footer > .setup-footer-navigation {
+                display: inline-block;
+                margin: auto;
+            }
+
+            .setup-footer > .setup-footer-navigation > paper-button {
+                float: left;
+            }
+
+            paper-card {
+                display: block;
+                margin: 0 20px 20px;
+                width: auto;
+
+                --paper-card-background-color: var(--semester-setup-background-color);
+                --paper-card-header-color: var(--semester-setup-secondary-color);
+
+                --paper-card-header: {
+                    background: var(--semester-setup-primary-color);
+                };
+            }
+
+            paper-input {
+                --paper-input-container-color: var(--semester-setup-primary-light-color);
+                --paper-input-container-focus-color: var(--semester-setup-primary-color);
+            }
+
+            paper-slider {
+                --paper-slider-active-color: var(--semester-setup-primary-color);
+                --paper-slider-knob-color: var(--semester-setup-primary-color);
+                --paper-slider-pin-color: var(--semester-setup-primary-color);
+            }
+
+            paper-date-picker {
+                --default-primary-color: var(--semester-setup-primary-color);
             }
 
             h1 {
                 color: white;
             }
 
+            @media screen and (max-width: 767px) {
+
+                .setup-header-breadcrumb > .mobile {
+                    display: block;
+                }
+
+                .setup-header-breadcrumb > .desktop {
+                    display: none;
+                }
+
+            }
+
         </style>
 
-        <div>
-            <h1>I am the semester setup view</h1>
+        <paper-dialog id="closeDialog">
+            <h2>Close semester setup?</h2>
+            <p>Leaving this page will discard all your inputs. Are you sure you want to continue?</p>
+            <p>If you don't have any tutors, students or dates for this semester yet, you can just skip these steps and add data later.</p>
+            <div class="buttons">
+                <paper-button dialog-dismiss>Stay here</paper-button>
+                <paper-button dialog-confirm autofocus on-tap="_closeDialogCloseButtonTapped">Close</paper-button>
+            </div>
+        </paper-dialog>
+
+        <div class="setup-container vertical layout">
+
+            <div class="setup-header">
+                <div class="setup-header-actions">
+                    <paper-icon-button
+                            id="closeSetupButton"
+                            icon="icons:close"
+                            on-tap="_closeButtonTapped"></paper-icon-button>
+                    <paper-tooltip
+                            for="closeSetupButton"
+                            position="bottom"
+                            animation-delay="0"
+                            fit-to-visible-bounds="true">Discard new semester</paper-tooltip>
+                </div>
+                <div class="setup-header-breadcrumb">
+                    <div class="desktop">
+                        <template is="dom-repeat" items="[[ breadcrumbStatus ]]" as="breadcrumb">
+                            <template is="dom-if" if="[[ breadcrumb.done ]]">
+                                <paper-button class="setup-header-breadcrumb-done" disabled>[[ breadcrumb.label ]]</paper-button>
+                            </template>
+                            <template is="dom-if" if="[[ breadcrumb.active ]]">
+                                <paper-button class="setup-header-breadcrumb-active" disabled>[[ breadcrumb.label ]]</paper-button>
+                            </template>
+                            <template is="dom-if" if="[[ breadcrumb.todo ]]">
+                                <paper-button class="setup-header-breadcrumb-todo" disabled>[[ breadcrumb.label ]]</paper-button>
+                            </template>
+                        </template>
+                    </div>
+                    <div class="mobile">
+                        <paper-button class="setup-header-breadcrumb-mobile" disabled>[[ activeIndexNatural ]]/5 [[ activeLabel ]]</paper-button>
+                    </div>
+                </div>
+            </div>
+
+            <iron-pages selected="[[activeIndex]]">
+
+                <!-- BASICS -->
+                <paper-card heading="Create a new Semester" class="flex">
+                    <div class="card-content">
+
+                        <p>Please give us some basic info about the semester.</p>
+
+                        <h4>What's the name of this semester? (e.g. WS 2016/17, SS 2017)</h4>
+                        <paper-input></paper-input>
+
+                        <h4>When does the semester start?</h4>
+                        <paper-date-picker></paper-date-picker>
+
+                        <h4>When will it be over?</h4>
+                        <paper-date-picker></paper-date-picker>
+
+                        <h4>All student groups should be of the same size. What is the ideal group size this year?</h4>
+                        <p>Group size: [[ groupSizeSliderImmediateValue ]]</p>
+                        <paper-slider min="2" max="10" value="{{ userInput.groupSize }}" immediate-value="{{ groupSizeSliderImmediateValue }}" pin></paper-slider>
+
+
+                    </div>
+                </paper-card>
+
+                <!-- PRACTICALS -->
+                <paper-card heading="Add Practical Types" class="flex">
+                    <div class="card-content">
+
+                    </div>
+                </paper-card>
+
+                <!-- TUTORS -->
+                <paper-card heading="Add Tutors" class="flex">
+                    <div class="card-content">
+
+                    </div>
+                </paper-card>
+
+                <!-- STUDENTS -->
+                <paper-card heading="Add Students" class="flex">
+                    <div class="card-content">
+
+                    </div>
+                </paper-card>
+
+                <!-- DATES -->
+                <paper-card heading="Add Dates" class="flex">
+                    <div class="card-content">
+
+                    </div>
+                </paper-card>
+
+            </iron-pages>
+
+            <div class="setup-footer">
+                <div class="setup-footer-navigation">
+                    <paper-button on-tap="_stepBack"><iron-icon icon="icons:chevron-left"></iron-icon> Back</paper-button>
+                    <paper-button on-tap="_stepForward">Next <iron-icon icon="icons:chevron-right"></iron-icon></paper-button>
+                </div>
+            </div>
+
+            <!-- TODOS -->
+
+            <!-- PRAKTIKUMSARTEN ANLEGEN -->
+
+            <!-- TUTOREN HINZUFÜGEN -->
+
+            <!-- STUDENTEN HINZUFÜGEN -->
+
+            <!-- GLOBALE TERMINE ANLEGEN -->
+
         </div>
 
     </template>
 
     <script>
 
+        // TODO
+        // - Lokalisation
+        // - Seiten-Navi
+        // - CSV parsen
+        // - API requests
+        // - Back-Navi
+
         Polymer({
 
-            is: 'semester-setup-view'
+            is: 'semester-setup-view',
 
-            // Here goes the logic
+            properties: {
+
+                activeIndex: {
+                    type: Number,
+                    value: 0
+                },
+
+                activeIndexNatural: {
+                    type: Number,
+                    computed: '_getActiveIndexNatural(activeIndex)'
+                },
+
+                activeLabel: {
+                    type: String,
+                    computed: '_getActiveLabel(activeIndex)'
+                },
+
+                page: {
+                    type: String,
+                    notify: true
+                },
+
+                breadcrumbStatus: {
+                    type: Array,
+                    computed: '_computeBreadcrumbStatus(activeIndex)'
+                },
+
+                userInput: {
+                    type: Object,
+                    notify: true,
+                    value: {
+                        groupSize: 4
+                    }
+                }
+            },
+
+            _getActiveLabel: function (index) {
+                var labels = [
+                    'Basics',
+                    'Practicals',
+                    'Tutors',
+                    'Students',
+                    'Dates'
+                ];
+                return labels[index];
+            },
+
+            _getActiveIndexNatural: function (index) {
+                return index + 1;
+            },
+
+            _computeBreadcrumbStatus: function (index) {
+                var result = [
+                    {label: '1. Basics', done: false, active: false, todo: false},
+                    {label: '2. Practicals', done: false, active: false, todo: false},
+                    {label: '3. Tutors', done: false, active: false, todo: false},
+                    {label: '4. Students', done: false, active: false, todo: false},
+                    {label: '5. Dates', done: false, active: false, todo: false}
+                ];
+                head = 0;
+                while (head < index) {
+                    result[head].done = true;
+                    head++;
+                }
+                result[head].active = true;
+                head++;
+                while (head < result.length) {
+                    result[head].todo = true;
+                    head++;
+                }
+                return result;
+            },
+
+            _closeButtonTapped: function () {
+                this.$.closeDialog.open();
+            },
+
+            _closeDialogCloseButtonTapped: function () {
+                this.page = 'dashboard';
+            },
+
+            _stepBack: function () {
+                if (this.activeIndex > 0) {
+                    this.activeIndex -= 1;
+                }
+            },
+
+            _stepForward: function () {
+                if (this.activeIndex < 4) {
+                    this.activeIndex += 1
+                }
+            }
 
         });
 

@@ -11,7 +11,6 @@
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../../bower_components/iron-collapse/iron-collapse.html">
 
-
 <dom-module id="main-view">
 
   <template>
@@ -99,7 +98,6 @@
               show="{{ showMobileNotifications }}"></navigation-bar>
     </app-header>
 
-
     <template is="dom-if" if="{{ showMobileNotifications }}">
       <notifications-card showlist="{{ showMobileNotifications }}"></notifications-card>
     </template>
@@ -123,9 +121,9 @@
 
             <!-- NOTIFICATIONS -->
             <div class="notificationsContainer">
-            <template is="dom-if" if="{{ showNotifications }}">
-              <notifications-card showlist="{{ showlist }}"></notifications-card>
-            </template>
+                <template is="dom-if" if="{{ showNotifications }}">
+                    <notifications-card showlist="{{ showlist }}"></notifications-card>
+                </template>
             </div>
 
             <template is="dom-if" if="[[user.isAdmin]]">
@@ -153,51 +151,52 @@
                 </div>
             </template>
 
-          <div class="practicalsContainer">
-            <div on-tap="_handleFotoTap">
-                <index-card type="Fotopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:" info2="18.05.16, 14-16"></index-card>
+            <div class="practicalsContainer">
+                <div on-tap="_handleFotoTap">
+                    <index-card type="Fotopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:" info2="18.05.16, 14-16"></index-card>
+                </div>
+                <div on-tap="_handleVideoTap">
+                    <index-card type="Videopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:" info2="18.05.16, 14-16"></index-card>
+                </div>
+                <div on-tap="_handleAudioTap">
+                    <index-card type="Audiopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:" info2="18.05.16, 14-16"></index-card>
+                </div>
             </div>
-            <div on-tap="_handleVideoTap">
-                <index-card type="Videopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:" info2="18.05.16, 14-16"></index-card>
-            </div>
-            <div on-tap="_handleAudioTap">
-                <index-card type="Audiopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:" info2="18.05.16, 14-16"></index-card>
-            </div>
-          </div>
         </div>
 
         <!-- Practical Detail Pages -->
         <practicals-view
-              name="foto-practicals"
-              type= "Foto"
-              icon="[[icon]]"
-              route="{{subroute}}"
-              on-back-click="_handleBackTap"
-              access-token="{{ session.accessToken }}"
-              logged-in="{{ session.loggedIn }}"
-              user-id="{{ session.userId }}"></practicals-view>
+                name="foto-practicals"
+                type= "Foto"
+                icon="[[icon]]"
+                route="{{subroute}}"
+                on-back-click="_handleBackTap"
+                access-token="{{ session.accessToken }}"
+                logged-in="{{ session.loggedIn }}"
+                user-id="{{ session.userId }}"></practicals-view>
         <practicals-view
-              name="video-practicals"
-              type= "Video"
-              icon="[[icon]]"
-              route="{{subroute}}"
-              on-back-click="_handleBackTap"
-              access-token="{{ session.accessToken }}"
-              logged-in="{{ session.loggedIn }}"
-              user-id="{{ session.userId }}"></practicals-view>
+                name="video-practicals"
+                type= "Video"
+                icon="[[icon]]"
+                route="{{subroute}}"
+                on-back-click="_handleBackTap"
+                access-token="{{ session.accessToken }}"
+                logged-in="{{ session.loggedIn }}"
+                user-id="{{ session.userId }}"></practicals-view>
         <practicals-view
-              name="audio-practicals"
-              type="Audio"
-              icon="[[icon]]"
-              route="{{subroute}}"
-              on-back-click="_handleBackTap"
-              access-token="{{ session.accessToken }}"
-              logged-in="{{ session.loggedIn }}"
-              user-id="{{ session.userId }}"></practicals-view>
+                name="audio-practicals"
+                type="Audio"
+                icon="[[icon]]"
+                route="{{subroute}}"
+                on-back-click="_handleBackTap"
+                access-token="{{ session.accessToken }}"
+                logged-in="{{ session.loggedIn }}"
+                user-id="{{ session.userId }}"></practicals-view>
 
         <!-- Semester Setup Pages (Admin only) -->
         <semester-setup-view
-              name="semester-setup"></semester-setup-view>
+            name="semester-setup"
+            page="{{ page }}"></semester-setup-view>
 
     </iron-pages>
 
