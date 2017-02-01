@@ -8,15 +8,17 @@
         <div class="saved-dates-shower">Deine Gruppe hat diese Termine ausgewählt:
             <ol type="1">
                 <!--[[chosenslots]]-->
-                <template is="dom-repeat" items="[[chosenslots]]" as="chosen">
+                <template id="saved_dates" is="dom-repeat" items="[[chosenslots]]" as="chosen">
                     <li>[[_getTimeSlotString(chosen)]]</li>
                     <!--li>[[chosen]]</li-->
                 </template>
             </ol>
-            <paper-button raised class="changeButton" on-tap="_handleChangeClick">
-                <iron-icon icon="reply"></iron-icon>
-                Auswahl ändern
-            </paper-button>
+            <template is="dom-if" if="[[practical_date]]">
+                <paper-button raised class="changeButton" on-tap="_handleChangeClick">
+                    <iron-icon icon="reply"></iron-icon>
+                    Auswahl ändern
+                </paper-button>
+            </template>
         </div>
     </template>
     <script>
@@ -27,16 +29,25 @@
                     type: Array,
                     value: [],
                     observer: "_slotsChanged"
+                },
+                practical_date:{
+                    type: Date,
+                    notify: true
                 }
             },
             ready: function(){
-
+                console.log(this.chosenslots);
             },
             _handleChangeClick: function(e){
                 this.fire("change-slots-click");
             },
-            _slotsChanged: function(){
+            _slotsChanged: function(e){
                 console.log(this.chosenslots);
+                //var saveddates = Polymer.dom(this.root).querySelector("#saved_dates");
+                //console.log(saveddates);
+                //saveddates.render();
+                //this.notifyPath(this.chosenslots,saveddates);
+                //this.$.saved_dates.render();
             },
             /**
              * Creates string from the given date

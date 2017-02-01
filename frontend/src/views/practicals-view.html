@@ -78,16 +78,20 @@
           <div>
             <template is="dom-if" if="[[registration_open]]">
               <!-- Registration Open Bool from Api is true -->
-              <template is="dom-if" if="[[!slots_already_chosen]]">
+              <template is="dom-if" if="[[!slots_already_chosen]]" >
                 <!-- Deadline is not over -->
-                <practicals-date-selector id="practicalsDateSelector" type="[[type]]" practical_date="[[practical_date]]"
+                <practicals-date-selector  id="practicalsDateSelector" type="[[type]]"
+                                       practical_date="[[practical_date]]"
                                        timeslots="[[timeslots]]"
                                        on-save-click="_handleSaveClick"
                                        on-reset-click="_handleResetClick"></practicals-date-selector>
               </template>
               <template is="dom-if" if="[[slots_already_chosen]]">
                 <!-- Deadline is over -->
-                <practicals-show-saved-dates chosenslots="[[chosenslots]]" on-change-slots-click="_handleChangeClick"></practicals-show-saved-dates>
+                <practicals-show-saved-dates id="practicals_show_saved_dates"
+                                             chosenslots="[[chosenslots]]"
+                                             practical_date="[[practical_date]]"
+                                             on-change-slots-click="_handleChangeClick"></practicals-show-saved-dates>
               </template>
             </template>
             <template is="dom-if" if="[[!registration_open]]">
@@ -155,6 +159,7 @@
         ready: function () {
             this.practical_date = this._getDate();
             this.timeslots = this._getTimeslots();
+            this.chosenslots = this._getChosenslots();
             //console.log(this.accessToken);
             //console.log(this.route);
         },
@@ -162,9 +167,7 @@
          * Back-button click handler
          */
         _backClicked: function(e) {
-          this.type = "";
           this.fire("back-click");
-          this._handleResetClick(e);
         },
 
         /**
@@ -185,7 +188,7 @@
                 this.slots_already_chosen = true;
             }
             else{
-                console.log("Error: Not enogh slots chosen. Just "+slotcounter+" slots chosen.");
+                alert("Error: Not enogh slots chosen. Just "+slotcounter+" slots chosen.");
             }
         },
         /**
@@ -203,15 +206,32 @@
          */
         _handleChangeClick: function(e){
             this.slots_already_chosen = false;
+            var practicals_date_selector = Polymer.dom(this.root).querySelector("#practicalsDateSelector");
+            //console.log(practicals_date_selector);
+            practicals_date_selector._handleResetClick();
         },
         /**
          * Function that checks for the practial course date
-         * @param {String} date - date that will be transformed to String
          */
         _getDate: function(){
             //TODO: Check for Practicalsdates in Backend
-            //return null;
-            return new Date(2017,2,25,14,0);
+            return null;
+            //return new Date(2017,2,25,14,0);
+        },
+
+        /**
+         * Function that checks for the practial course date
+         */
+        _getChosenslots: function(){
+            //TODO: Get Timeslots from Backend
+            //var timeslots =[];
+            //timeslots = [[new Date(2017,1,2,1,0),new Date(2017,1,2,2,0)],[new Date(2017,1,2,3,0),new Date(2017,1,2,4,0)],[new Date(2017,1,2,5,0),
+            //    new Date(2017,1,10,14,0)],[new Date(2017,1,10,15,0),new Date(2017,1,10,16,0)],[new Date(2017,1,10,17,0),new Date(2017,1,10,18,0)]];
+
+            //this.slots_already_chosen = true;
+            this.slots_already_chosen = false;
+            //return timeslots;
+            return null;
         },
 
         /**
