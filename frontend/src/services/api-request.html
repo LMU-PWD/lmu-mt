@@ -6,7 +6,7 @@
     <template>
 
         <iron-ajax id="request"
-                auto
+                  auto
                    body="[[ body ]]"
                    content-type="[[ contentType ]]"
                    handle-as="json"
@@ -27,6 +27,7 @@
             is: 'api-request',
 
             properties: {
+
                 accessToken: {
                     type: String,
 //                    computed: "_getAccessToken"
@@ -106,10 +107,6 @@
             _computeUrl: function () {
                 this.url = this.baseUrl + this.endpoint;
             },
-
-//            makeRequest: function() {
-//                this.$.request.generateRequest();
-//            },
 
             _getCookie: function (cookieName) {
 
