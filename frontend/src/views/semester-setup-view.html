@@ -1,23 +1,21 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../bower_components/neon-animation/neon-animatable-behavior.html">
-<link rel="import" href="../../bower_components/neon-animation/animations/slide-from-bottom-animation.html">
-<link rel="import" href="../../bower_components/neon-animation/animations/slide-down-animation.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
-<link rel="import" href="../../bower_components/paper-date-picker/paper-date-picker.html">
-<link rel="import" href="../../bower_components/paper-slider/paper-slider.html">
+
+<link rel="import" href="../components/semester-setup-basics.html">
+<link rel="import" href="../components/semester-setup-practicals.html">
+<link rel="import" href="../components/semester-setup-tutors.html">
+<link rel="import" href="../components/semester-setup-students.html">
+<link rel="import" href="../components/semester-setup-dates.html">
+<link rel="import" href="../shared/semester-setup-shared.html">
+
 
 <dom-module is="semester-setup-view">
 
     <template>
 
-        <style include="iron-flex">
-
-            :root {
-                --semester-setup-primary-color: var(--paper-blue-grey-700);
-                --semester-setup-primary-light-color: var(--paper-blue-grey-500);
-                --semester-setup-secondary-color: var(--paper-blue-grey-50);
-                --semester-setup-background-color: var(--paper-blue-grey-100);
-            }
+        <style include="iron-flex"></style>
+        <style include="semester-setup-shared"></style>
+        <style>
 
             :host {
                 text-align: center;
@@ -55,6 +53,11 @@
                 color: var(--semester-setup-secondary-color);
             }
 
+            paper-button.setup-header-breadcrumb-todo {
+                background: none;
+                color: var(--semester-setup-secondary-dark-color);
+            }
+
             .setup-header > .setup-header-actions {
                 float: right;
                 margin: 0 20px;
@@ -76,37 +79,9 @@
                 float: left;
             }
 
-            paper-card {
-                display: block;
-                margin: 0 20px 20px;
-                width: auto;
-
-                --paper-card-background-color: var(--semester-setup-background-color);
-                --paper-card-header-color: var(--semester-setup-secondary-color);
-
-                --paper-card-header: {
-                    background: var(--semester-setup-primary-color);
-                };
-            }
-
-            paper-input {
-                --paper-input-container-color: var(--semester-setup-primary-light-color);
-                --paper-input-container-focus-color: var(--semester-setup-primary-color);
-            }
-
-            paper-slider {
-                --paper-slider-active-color: var(--semester-setup-primary-color);
-                --paper-slider-knob-color: var(--semester-setup-primary-color);
-                --paper-slider-pin-color: var(--semester-setup-primary-color);
-            }
-
-            paper-date-picker {
-                --default-primary-color: var(--semester-setup-primary-color);
-            }
-
-            h1 {
-                color: white;
-            }
+            /* * * * * * * * * * * * * * * * * * * * * * *
+             *               Media Queries               *
+             * * * * * * * * * * * * * * * * * * * * * * */
 
             @media screen and (max-width: 767px) {
 
@@ -150,13 +125,22 @@
                     <div class="desktop">
                         <template is="dom-repeat" items="[[ breadcrumbStatus ]]" as="breadcrumb">
                             <template is="dom-if" if="[[ breadcrumb.done ]]">
-                                <paper-button class="setup-header-breadcrumb-done" disabled>[[ breadcrumb.label ]]</paper-button>
+                                <paper-button
+                                        class="setup-header-breadcrumb-done"
+                                        data-breadcrumb-index="[[ breadcrumb.index ]]"
+                                        on-tap="_jumpToPage">[[ breadcrumb.label ]]</paper-button>
                             </template>
                             <template is="dom-if" if="[[ breadcrumb.active ]]">
-                                <paper-button class="setup-header-breadcrumb-active" disabled>[[ breadcrumb.label ]]</paper-button>
+                                <paper-button
+                                        class="setup-header-breadcrumb-active"
+                                        data-breadcrumb-index="[[ breadcrumb.index ]]"
+                                        on-tap="_jumpToPage">[[ breadcrumb.label ]]</paper-button>
                             </template>
                             <template is="dom-if" if="[[ breadcrumb.todo ]]">
-                                <paper-button class="setup-header-breadcrumb-todo" disabled>[[ breadcrumb.label ]]</paper-button>
+                                <paper-button
+                                        class="setup-header-breadcrumb-todo"
+                                        data-breadcrumb-index="[[ breadcrumb.index ]]"
+                                        on-tap="_jumpToPage">[[ breadcrumb.label ]]</paper-button>
                             </template>
                         </template>
                     </div>
@@ -169,62 +153,26 @@
             <iron-pages selected="[[activeIndex]]">
 
                 <!-- BASICS -->
-                <paper-card heading="Create a new Semester" class="flex">
-                    <div class="card-content">
-
-                        <p>Please give us some basic info about the semester.</p>
-
-                        <h4>What's the name of this semester? (e.g. WS 2016/17, SS 2017)</h4>
-                        <paper-input></paper-input>
-
-                        <h4>When does the semester start?</h4>
-                        <paper-date-picker></paper-date-picker>
-
-                        <h4>When will it be over?</h4>
-                        <paper-date-picker></paper-date-picker>
-
-                        <h4>All student groups should be of the same size. What is the ideal group size this year?</h4>
-                        <p>Group size: [[ groupSizeSliderImmediateValue ]]</p>
-                        <paper-slider min="2" max="10" value="{{ userInput.groupSize }}" immediate-value="{{ groupSizeSliderImmediateValue }}" pin></paper-slider>
-
-
-                    </div>
-                </paper-card>
+                <semester-setup-basics></semester-setup-basics>
 
                 <!-- PRACTICALS -->
-                <paper-card heading="Add Practical Types" class="flex">
-                    <div class="card-content">
-
-                    </div>
-                </paper-card>
+                <semester-setup-practicals></semester-setup-practicals>
 
                 <!-- TUTORS -->
-                <paper-card heading="Add Tutors" class="flex">
-                    <div class="card-content">
-
-                    </div>
-                </paper-card>
+                <semester-setup-tutors></semester-setup-tutors>
 
                 <!-- STUDENTS -->
-                <paper-card heading="Add Students" class="flex">
-                    <div class="card-content">
-
-                    </div>
-                </paper-card>
+                <semester-setup-students></semester-setup-students>
 
                 <!-- DATES -->
-                <paper-card heading="Add Dates" class="flex">
-                    <div class="card-content">
-
-                    </div>
-                </paper-card>
+                <semester-setup-dates></semester-setup-dates>
 
             </iron-pages>
 
             <div class="setup-footer">
                 <div class="setup-footer-navigation">
-                    <paper-button on-tap="_stepBack"><iron-icon icon="icons:chevron-left"></iron-icon> Back</paper-button>
-                    <paper-button on-tap="_stepForward">Next <iron-icon icon="icons:chevron-right"></iron-icon></paper-button>
+                    <paper-button on-tap="_stepBack" disabled="[[ backDisabled ]]"><iron-icon icon="icons:chevron-left"></iron-icon> Back</paper-button>
+                    <paper-button on-tap="_stepForward" disabled="[[ nextDisabled ]]">Next <iron-icon icon="icons:chevron-right"></iron-icon></paper-button>
                 </div>
             </div>
 
@@ -246,10 +194,8 @@
 
         // TODO
         // - Lokalisation
-        // - Seiten-Navi
         // - CSV parsen
         // - API requests
-        // - Back-Navi
 
         Polymer({
 
@@ -272,14 +218,24 @@
                     computed: '_getActiveLabel(activeIndex)'
                 },
 
-                page: {
-                    type: String,
-                    notify: true
+                backDisabled: {
+                    type: Boolean,
+                    value: true
                 },
 
                 breadcrumbStatus: {
                     type: Array,
                     computed: '_computeBreadcrumbStatus(activeIndex)'
+                },
+
+                nextDisabled: {
+                    type: Boolean,
+                    value: false
+                },
+
+                page: {
+                    type: String,
+                    notify: true
                 },
 
                 userInput: {
@@ -308,11 +264,11 @@
 
             _computeBreadcrumbStatus: function (index) {
                 var result = [
-                    {label: '1. Basics', done: false, active: false, todo: false},
-                    {label: '2. Practicals', done: false, active: false, todo: false},
-                    {label: '3. Tutors', done: false, active: false, todo: false},
-                    {label: '4. Students', done: false, active: false, todo: false},
-                    {label: '5. Dates', done: false, active: false, todo: false}
+                    {label: '1. Basics', index: 0, done: false, active: false, todo: false},
+                    {label: '2. Practicals', index: 1, done: false, active: false, todo: false},
+                    {label: '3. Tutors', index: 2, done: false, active: false, todo: false},
+                    {label: '4. Students', index: 3, done: false, active: false, todo: false},
+                    {label: '5. Dates', index: 4, done: false, active: false, todo: false}
                 ];
                 head = 0;
                 while (head < index) {
@@ -336,16 +292,36 @@
                 this.page = 'dashboard';
             },
 
+            _updateNavButtons: function () {
+                if (this.activeIndex == 0) {
+                    this.backDisabled = true;
+                    this.nextDisabled = false;
+                } else if (this.activeIndex == (this.breadcrumbStatus.length - 1)) {
+                    this.backDisabled = false;
+                    this.nextDisabled = true;
+                } else {
+                    this.backDisabled = false;
+                    this.nextDisabled = false;
+                }
+            },
+
             _stepBack: function () {
                 if (this.activeIndex > 0) {
                     this.activeIndex -= 1;
                 }
+                this._updateNavButtons();
             },
 
             _stepForward: function () {
                 if (this.activeIndex < 4) {
                     this.activeIndex += 1
                 }
+                this._updateNavButtons();
+            },
+
+            _jumpToPage: function (event) {
+                this.activeIndex = event.path[0].dataBreadcrumbIndex;
+                this._updateNavButtons();
             }
 
         });

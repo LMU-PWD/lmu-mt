@@ -1,0 +1,93 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
+<link rel="import" href="../components/time-picker.html">
+
+<link rel="import" href="../shared/semester-setup-shared.html">
+
+<dom-module id="semester-setup-dates">
+
+    <template>
+
+        <style include="semester-setup-shared"></style>
+        <style>
+
+            paper-button.date-header {
+                background: var(--semester-setup-primary-light-color);
+                color: var(--semester-setup-secondary-color);
+                margin: 10px 0;
+                text-transform: none;
+                width: 100%;
+            }
+
+            paper-button.add-date-button {
+                float:right;
+            }
+
+        </style>
+
+        <paper-card heading="Add Dates" class="flex">
+            <div class="card-content">
+
+                <p>Have you already determined some of the dates that apply to all students (e. g. lecture dates, exam date, final presentation)? You can add them here.</p>
+
+                <p>Of course you can still add, edit and delete dates later.</p>
+
+                <paper-button class="date-header">25.06.2017 - 16:00: Exam</paper-button>
+                <paper-button class="date-header">30.06.2017 - 10:00: Final Presentation</paper-button>
+                <paper-button class="date-header">21.07.2017 - 16:00: IRT Excursion</paper-button>
+
+                <paper-button class="add-date-button" on-tap="_openDateDialog">
+                    Add date&nbsp;<iron-icon icon="icons:add-circle-outline"></iron-icon></paper-button>
+
+                <div style="clear: both;"></div>
+
+                <paper-dialog id="dateDialog">
+
+                    <h2>Add a new date</h2>
+
+                    <paper-dialog-scrollable>
+
+                        <h3>Starting at</h3>
+                        <paper-date-picker></paper-date-picker>
+                        <time-picker></time-picker>
+
+                        <paper-input type="number" min="0" label="Duration">
+                            <div suffix>minutes</div>
+                        </paper-input>
+
+                        <paper-input label="Title of the event"></paper-input>
+
+                        <paper-input label="Location"></paper-input>
+
+                    </paper-dialog-scrollable>
+
+                    <div class="buttons">
+                        <paper-button dialog-dismiss>Discard</paper-button>
+                        <paper-button dialog-confirm autofocus on-tap="_closeDialogCloseButtonTapped">Save</paper-button>
+                    </div>
+                </paper-dialog>
+
+            </div>
+        </paper-card>
+
+    </template>
+
+    <script>
+
+        Polymer({
+
+            is: 'semester-setup-dates',
+
+            properties: {
+
+            },
+
+            _openDateDialog: function () {
+                this.$.dateDialog.open();
+            }
+
+        });
+
+    </script>
+
+</dom-module>

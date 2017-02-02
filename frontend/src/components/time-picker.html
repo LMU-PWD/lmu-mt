@@ -1,0 +1,60 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="time-picker">
+
+    <template>
+
+        <style>
+
+            :host {
+                white-space: nowrap;
+            }
+
+            paper-dropdown-menu {
+                width: 75px;
+            }
+
+        </style>
+
+        <paper-dropdown-menu label="hour">
+            <paper-listbox class="dropdown-content">
+                <paper-item>0</paper-item><paper-item>1</paper-item><paper-item>2</paper-item><paper-item>3</paper-item>
+                <paper-item>4</paper-item><paper-item>5</paper-item><paper-item>6</paper-item><paper-item>7</paper-item>
+                <paper-item>8</paper-item><paper-item>9</paper-item><paper-item>10</paper-item><paper-item>11</paper-item>
+                <paper-item>12</paper-item><paper-item>13</paper-item><paper-item>14</paper-item><paper-item>15</paper-item>
+                <paper-item>16</paper-item><paper-item>17</paper-item><paper-item>18</paper-item><paper-item>19</paper-item>
+                <paper-item>20</paper-item><paper-item>21</paper-item><paper-item>22</paper-item><paper-item>23</paper-item>
+            </paper-listbox>
+        </paper-dropdown-menu>
+        &nbsp;:&nbsp;
+        <paper-dropdown-menu label="min">
+            <paper-listbox class="dropdown-content">
+                <paper-item>00</paper-item><paper-item>01</paper-item><paper-item>02</paper-item><paper-item>03</paper-item>
+                <paper-item>04</paper-item><paper-item>05</paper-item><paper-item>06</paper-item><paper-item>07</paper-item>
+                <paper-item>08</paper-item><paper-item>09</paper-item><paper-item>10</paper-item><paper-item>11</paper-item>
+                <paper-item>12</paper-item><paper-item>13</paper-item><paper-item>14</paper-item><paper-item>15</paper-item>
+                <paper-item>16</paper-item><paper-item>17</paper-item><paper-item>18</paper-item><paper-item>19</paper-item>
+                <paper-item>20</paper-item><paper-item>21</paper-item><paper-item>22</paper-item><paper-item>23</paper-item>
+                <paper-item>24</paper-item><paper-item>25</paper-item><paper-item>26</paper-item><paper-item>27</paper-item>
+                <paper-item>28</paper-item><paper-item>29</paper-item><paper-item>30</paper-item><paper-item>31</paper-item>
+                <paper-item>32</paper-item><paper-item>33</paper-item><paper-item>34</paper-item><paper-item>35</paper-item>
+                <paper-item>36</paper-item><paper-item>37</paper-item><paper-item>38</paper-item><paper-item>39</paper-item>
+                <paper-item>40</paper-item><paper-item>41</paper-item><paper-item>42</paper-item><paper-item>43</paper-item>
+                <paper-item>44</paper-item><paper-item>45</paper-item><paper-item>46</paper-item><paper-item>47</paper-item>
+                <paper-item>48</paper-item><paper-item>49</paper-item><paper-item>50</paper-item><paper-item>51</paper-item>
+                <paper-item>52</paper-item><paper-item>53</paper-item><paper-item>54</paper-item><paper-item>55</paper-item>
+                <paper-item>56</paper-item><paper-item>57</paper-item><paper-item>58</paper-item><paper-item>59</paper-item>
+            </paper-listbox>
+        </paper-dropdown-menu>
+
+    </template>
+
+    <script>
+
+        Polymer({
+            is: 'time-picker'
+        });
+
+    </script>
+
+</dom-module>

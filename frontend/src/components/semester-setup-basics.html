@@ -1,0 +1,123 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-slider/paper-slider.html">
+<link rel="import" href="../../bower_components/paper-date-picker/paper-date-picker.html">
+
+<link rel="import" href="../shared/semester-setup-shared.html">
+
+<dom-module id="semester-setup-basics">
+
+    <template>
+
+        <style include="semester-setup-shared"></style>
+        <style>
+
+            .basics-groupsize {
+                color: var(--semester-setup-primary-color);
+                margin: 0 16px;
+            }
+
+            iron-icon {
+                margin-right: 5px;
+            }
+
+        </style>
+
+        <paper-card heading="Create a new Semester" class="flex">
+            <div class="card-content">
+
+                <p>Please give us some basic info about the semester.</p>
+
+                <paper-input
+                        label="What's the name of this semester? (e.g. WS 2016/17, SS 2017)"
+                        value="{{ semesterTitle }}"></paper-input>
+
+                <paper-input label="When does this semester start? (dd / mm / yyyy)"
+                             on-tap="_openStartPickerDialog"
+                             allowed-pattern="/[1-9]{1}\d? \/ [1-9]{1}\d? \/ [1-9]{1}\d{3}/"
+                             value="[[ startDateFormatted ]]">
+                    <iron-icon icon="icons:date-range" prefix></iron-icon>
+                </paper-input>
+                <paper-dialog id="semesterStart" class="paper-date-picker-dialog">
+                    <p>Pick a start date</p>
+                    <paper-date-picker id="picker" date="{{ startDate }}"></paper-date-picker>
+                    <div class="buttons">
+                        <paper-button dialog-confirm>OK</paper-button>
+                    </div>
+                </paper-dialog>
+
+                <paper-input label="When will this semester end? (dd / mm / yyyy)"
+                             on-tap="_openEndPickerDialog"
+                             allowed-pattern="/[1-9]{1}\d? \/ [1-9]{1}\d? \/ [1-9]{1}\d{3}/"
+                             value="[[ endDateFormatted ]]">
+                    <iron-icon icon="icons:date-range" prefix></iron-icon>
+                </paper-input>
+                <paper-dialog id="semesterEnd" class="paper-date-picker-dialog">
+                    <p>Pick an end date</p>
+                    <paper-date-picker id="picker" date="{{ endDate }}"></paper-date-picker>
+                    <div class="buttons">
+                        <paper-button dialog-confirm>OK</paper-button>
+                    </div>
+                </paper-dialog>
+
+                <p>All student groups should be of the same size. What is the ideal number of group members this year?</p>
+                <p class="basics-groupsize">[[ groupSizeSliderImmediateValue ]]</p>
+                <paper-slider min="2" max="10" value="{{ groupSize }}" immediate-value="{{ groupSizeSliderImmediateValue }}" pin></paper-slider>
+
+            </div>
+        </paper-card>
+
+    </template>
+
+    <script>
+
+        Polymer({
+
+            is: 'semester-setup-basics',
+
+            properties: {
+
+                endDate: {
+                    type: Date
+                },
+
+                endDateFormatted: {
+                    type: String,
+                    computed: '_formatDate(endDate)'
+                },
+
+                groupSize: {
+                    type: Number,
+                    value: 4
+                },
+
+                semesterTitle: {
+                    type: String
+                },
+
+                startDate: {
+                    type: Date
+                },
+
+                startDateFormatted: {
+                    type: String,
+                    computed: '_formatDate(startDate)'
+                }
+            },
+
+            _openStartPickerDialog: function () {
+                this.$.semesterStart.open();
+            },
+
+            _openEndPickerDialog: function () {
+                this.$.semesterEnd.open();
+            },
+
+            _formatDate: function (date) {
+                return date.getDate() + ' / ' + date.getMonth() + ' / ' + date.getFullYear();
+            }
+
+        });
+
+    </script>
+
+</dom-module>

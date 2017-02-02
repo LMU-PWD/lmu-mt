@@ -1,0 +1,67 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/papa-parser/papa-parser.html">
+
+<link rel="import" href="../shared/semester-setup-shared.html">
+
+<dom-module id="semester-setup-tutors">
+
+    <template>
+
+        <style include="semester-setup-shared"></style>
+        <style>
+
+
+
+        </style>
+
+        <paper-card heading="Add Tutors" class="flex">
+            <div class="card-content">
+
+                <p>Have you already registered tutors for this course in UniWorX? You can add them to this semester by uploading the .csv table.</p>
+
+                <!-- TODO: Modularize this to reuse it in admin menu -->
+                <paper-button><papa-parser label="Upload .csv" output-data="{{ papaParserJson }}"></papa-parser></paper-button>
+
+                <h4>DEBUG: CSV dump</h4>
+                <pre>[[ stringifiedJson ]]</pre>
+
+            </div>
+        </paper-card>
+
+    </template>
+
+    <script>
+
+        Polymer({
+
+            is: 'semester-setup-tutors',
+
+            properties: {
+
+                papaParserJson: {
+                    type: Object,
+                    notify: true,
+                    observer: '_logParsedJson'
+                },
+
+                stringifiedJson: {
+                    type: String,
+                    computed: 'stringify(papaParserJson)'
+                }
+            },
+
+            _logParsedJson: function () {
+
+                console.log(this.papaParserJson);
+
+            },
+
+            stringify: function(json) {
+                return JSON.stringify(json).replace(/],\[/g, '],\n[');
+            }
+
+        });
+
+    </script>
+
+</dom-module>
