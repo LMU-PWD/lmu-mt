@@ -84,6 +84,25 @@
                 float: left;
             }
 
+            .spinner-container {
+                background-color: rgba(255,255,255,0.8);
+                display: block;
+                height: 100%;
+                left: 0;
+                position: absolute;
+                text-align: center;
+                top: 0;
+                width: 100vw;
+                z-index: 100;
+            }
+
+            paper-spinner[active]{
+                height: 50px;
+                margin: auto;
+                top: calc(50% - 25px);
+                width: 50px;
+            }
+
             /* * * * * * * * * * * * * * * * * * * * * * *
              *               Media Queries               *
              * * * * * * * * * * * * * * * * * * * * * * */
@@ -198,8 +217,15 @@
             </div>
         </div>
 
+        <template is="dom-if" if="[[ processingCreateRequest ]]">
+            <div class="spinner-container">
+                <paper-spinner active="[[ processingCreateRequest ]]"></paper-spinner>
+            </div>
+        </template>
+
         <create-semester-request
             id="createSemesterRequest"
+            access-token="[[ accessToken ]]"
             semester-term="[[ semesterTitle ]]"
             semester-start-date="[[ semesterStartDate ]]"
             semester-end-date="[[ semesterEndDate ]]"
@@ -207,7 +233,8 @@
             lab-types="[[ labTypes ]]"
             tutors="[[ tutors ]]"
             students="[[ students ]]"
-            dates="[[ dates ]]"></create-semester-request>
+            dates="[[ dates ]]"
+            loading="{{ processingCreateRequest }}"></create-semester-request>
 
     </template>
 
@@ -253,6 +280,10 @@
                     notify: true,
                     computed: '_showPracticalsPage(activeIndex)' },
 
+                // API credentials
+                accessToken: {
+                    type: String },
+
                 // Data for API
                 semesterTitle: {
                     type: String },
@@ -289,7 +320,10 @@
                 dates: {
                     type: Array,
                     notify: true,
-                    value: [] }
+                    value: [] },
+                processingCreateRequest: {
+                    type: Boolean,
+                    value: false }
             },
 
             _getActiveLabel: function (index) {
@@ -378,12 +412,12 @@
             },
 
             _postToApi: function () {
-                this.$.createSemesterRequest.fire();
+                this.$.createSemesterRequest.submitSemester();
             },
 
             _labTypeAudioChanged: function () {
                 var newLabTypesObject = this.labTypes.slice();
-                newLabTypesObject[0] = this.labTypeAudio;
+                newLabTypesObject[2] = this.labTypeAudio;
                 this.labTypes = newLabTypesObject;
             },
 
@@ -395,7 +429,7 @@
 
             _labTypePhotoChanged: function () {
                 var newLabTypesObject = this.labTypes.slice();
-                newLabTypesObject[2] = this.labTypePhoto;
+                newLabTypesObject[0] = this.labTypePhoto;
                 this.labTypes = newLabTypesObject;
             }
         });

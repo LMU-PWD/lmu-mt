@@ -6,23 +6,39 @@
     <template>
 
         <api-request
-            endpoint="[[ ajax.endpoint ]]"
-            headers="[[ ajax.headers ]]"
-            body="[[ ajax.body ]]"
+            method="[[ semesterAjax.method ]]"
+            endpoint="[[ semesterAjax.endpoint ]]"
+            headers="[[ semesterAjax.headers ]]"
+            body="[[ semesterAjax.body ]]"
             response="{{ semesterRequestApiResponse }}"></api-request>
 
-        <pre>
-            create-semester-request Debug Area:
+        <api-request
+                method="[[ labtypeAjax.method ]]"
+                endpoint="[[ labtypeAjax.endpoint ]]"
+                headers="[[ labtypeAjax.headers ]]"
+                body="[[ labtypeAjax.body ]]"
+                response="{{ labTypeRequestApiResponse }}"></api-request>
 
-            semesterTerm: [[ semesterTerm ]]
-            semesterStartDate: [[ semesterStartDate ]]
-            semesterEndDate: [[ semesterEndDate ]]
-            semesterGroupSize: [[ semesterGroupSize ]]
+        <api-request
+                method="[[ tutorAjax.method ]]"
+                endpoint="[[ tutorAjax.endpoint ]]"
+                headers="[[ tutorAjax.headers ]]"
+                body="[[ tutorAjax.body ]]"
+                response="{{ tutorRequestApiResponse }}"></api-request>
 
-            tutors: [[ tutorsStringified ]]
-            students: [[ studentsStringified ]]
-            dates: [[ datesStringified ]]
-        </pre>
+        <api-request
+                method="[[ studentAjax.method ]]"
+                endpoint="[[ studentAjax.endpoint ]]"
+                headers="[[ studentAjax.headers ]]"
+                body="[[ studentAjax.body ]]"
+                response="{{ studentRequestApiResponse }}"></api-request>
+
+        <api-request
+                method="[[ datesAjax.method ]]"
+                endpoint="[[ datesAjax.endpoint ]]"
+                headers="[[ datesAjax.headers ]]"
+                body="[[ datesAjax.body ]]"
+                response="{{ datesRequestApiResponse }}"></api-request>
 
     </template>
 
@@ -55,16 +71,37 @@
                 // Attributes upward data flow
                 loading: {
                     type: Boolean,
+                    notify: true,
                     value: false },
 
                 // Internals
+                accessToken: {
+                    type: String },
                 semesterId: {
                     type: String,
                     reflectToAttribute: false },
                 semesterRequestApiResponse: {
                     type: Object,
+                    observer: '_semesterRequestAnswerReceived',
+                    reflectToAttribute: false },
+                labTypeRequestApiResponse: {
+                    type: Object,
+                    observer: '_labTypeRequestAnswerReceived',
+                    reflectToAttribute: false },
+                tutorRequestApiResponse: {
+                    type: Object,
+                    observer: '_tutorRequestAnswerReceived',
+                    reflectToAttribute: false },
+                studentRequestApiResponse: {
+                    type: Object,
+                    observer: '_studentRequestAnswerReceived',
+                    reflectToAttribute: false },
+                datesRequestApiResponse: {
+                    type: Object,
+                    observer: '_datesRequestAnswerReceived',
                     reflectToAttribute: false },
 
+                // DEBUG
                 tutorsStringified: {
                     type: String,
                     reflectToAttribute: false,
@@ -82,8 +119,209 @@
                 }
             },
 
-            fire: function () {
-                console.log('Firing create semester request');
+            submitSemester: function () {
+                this.loading = true;
+
+                var term = this.semesterTerm.slice();
+                var start_date = new Date(this.semesterStartDate.getTime());
+                var end_date = new Date(this.semesterEndDate.getTime());
+                var group_size = this.semesterGroupSize;
+
+                this.semesterAjax = {
+                    method: 'POST',
+                    endpoint: '/semesters/',
+                    headers: {
+                        Authorization: this.accessToken
+                    },
+                    body: {
+                        term: term,
+                        start_date: start_date,
+                        end_date: end_date,
+                        group_size: group_size
+                    }
+                };
+            },
+
+            _semesterRequestAnswerReceived: function (answer) {
+
+                this.semesterAjax = null;
+
+                if (answer) {
+
+                    if (answer.type == 'response') {
+
+                        console.log("semester created");
+
+                        this.semesterId = answer.data.id;
+
+                        var photo = this.labTypes[0];
+                        var video = this.labTypes[1];
+                        var audio = this.labTypes[2];
+                        var body =
+                                [{
+                                    type: 0,
+                                    type_str: photo.title,
+                                    registration_deadline: photo.deadline,
+                                    registration_open: false,
+                                    description_tutor: photo.descriptionTutor,
+                                    description_student: photo.descriptionStudent,
+                                    semesterId: this.semesterId
+                                },{
+                                    type: 1,
+                                    type_str: video.title,
+                                    registration_deadline: video.deadline,
+                                    registration_open: false,
+                                    description_tutor: video.descriptionTutor,
+                                    description_student: video.descriptionStudent,
+                                    semesterId: this.semesterId
+                                },{
+                                    type: 2,
+                                    type_str: audio.title,
+                                    registration_deadline: audio.deadline,
+                                    registration_open: false,
+                                    description_tutor: audio.descriptionTutor,
+                                    description_student: audio.descriptionStudent,
+                                    semesterId: this.semesterId
+                                }];
+                        this.labtypeAjax = {
+                            method: 'POST',
+                            endpoint: '/labtypes/',
+                            headers: {
+                                Authorization: this.accessToken
+                            },
+                            body: body
+                        }
+                    } else {
+                        throw answer.data;
+                    }
+
+                }
+
+            },
+
+            _labTypeRequestAnswerReceived: function (answer) {
+
+                this.labtypeAjax = null;
+
+                if (answer) {
+
+                    if (answer.type == 'response') {
+
+                        console.log("labtypes created");
+
+                        var body = this.tutors.map(function(item){
+                            return {
+                                name: item.name,
+                                first_name: item.first_name,
+                                email: item.email,
+                                isTutor: true,
+                                isAdmin: false
+                            };
+                        });
+
+                        this.tutorAjax = {
+                            method: 'POST',
+                            endpoint: '/pendingplatformusers/',
+                            headers: {
+                                Authorization: this.accessToken
+                            },
+                            body: body
+                        }
+
+                    } else {
+                        throw answer.data;
+                    }
+
+                }
+
+            },
+
+            _tutorRequestAnswerReceived: function (answer) {
+
+                this.tutorAjax = null;
+
+                if (answer) {
+
+                    if (answer.type == 'response') {
+
+                        console.log("tutors created");
+
+                        var body = this.students.map(function(item){
+                            return {
+                                name: item.name,
+                                first_name: item.first_name,
+                                email: item.email,
+                                isTutor: false,
+                                isAdmin: false
+                            };
+                        });
+
+                        this.studentAjax = {
+                            method: 'POST',
+                            endpoint: '/pendingplatformusers/',
+                            headers: {
+                                Authorization: this.accessToken
+                            },
+                            body: body
+                        }
+
+                    } else {
+                        throw answer.data;
+                    }
+
+                }
+            },
+
+            _studentRequestAnswerReceived: function (answer) {
+
+                this.studentAjax = null;
+
+                if (answer) {
+
+                    if (answer.type == 'response') {
+
+                        console.log("students created");
+
+                        var dateBody = this.dates.map(function(item){
+                            return {
+                                semesterId: this.semesterId,
+                                name: item.title,
+                                date: item.date,
+                                location: item.location,
+                                duration: item.duration
+                            };
+                        });
+
+                        this.datesAjax = {
+                            method: 'POST',
+                            endpoint: '/uniquedates/',
+                            headers: {
+                                Authorization: this.accessToken
+                            },
+                            body: dateBody
+                        }
+
+                    } else {
+                        throw answer.data;
+                    }
+
+                }
+            },
+
+            _datesRequestAnswerReceived: function (answer) {
+
+                this.datesAjax = null;
+
+                if (answer) {
+
+                    if (answer.type == 'response') {
+                        console.log("dates created");
+                        this.loading = false;
+                    } else {
+                        throw answer.data;
+                    }
+
+                }
             },
 
             stringify: function (tutors) {

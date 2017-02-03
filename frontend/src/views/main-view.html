@@ -197,7 +197,8 @@
         <template is="dom-if" if="[[ user.isAdmin ]]">
             <semester-setup-view
                     name="semester-setup"
-                    page="{{ page }}"></semester-setup-view>
+                    page="{{ page }}"
+                    access-token="[[ accessToken ]]"></semester-setup-view>
         </template>
 
     </iron-pages>
