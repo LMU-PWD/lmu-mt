@@ -36,7 +36,10 @@
     "groupsadmin_dialog text-3": "(This action can't be undone!)",
 
     "c_button_cancel": "Cancel",
-    "c_medientechnik": "Media Technology"
+    "c_medientechnik": "Media Technology",
+
+    "tutor_admin title": "Tutors",
+    "student_admin title": "Studens"
   },
 
   "de": {
@@ -77,6 +80,10 @@
     "groupsadmin_dialog text-3": "(Diese Aktion kann nicht rückgängig gemacht werden!)",
 
     "c_button_cancel": "Abbrechen",
-    "c_medientechnik": "Medientechnik"
+    "c_medientechnik": "Medientechnik",
+
+    "tutor_admin title": "Tutoren",
+    "student_admin title": "Studenten"
+
   }
 }

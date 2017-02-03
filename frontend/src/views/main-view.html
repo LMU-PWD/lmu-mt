@@ -1,5 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../components/index-card.html">
+<link rel="import" href="../components/admin-card.html">
 <link rel="import" href="../components/group-card.html">
 <link rel="import" href="../components/group-detail.html">
 <link rel="import" href="../components/groups-admin.html">
@@ -141,8 +142,11 @@
                                       self-info="{{user}}" ></groups-admin>
                     </iron-collapse>
                 </div>
-                <students-admin
+                <students-admin class="group-placeholder"
                         access-token="[[ accessToken ]]"></students-admin>
+                <admin-card students></admin-card>
+                <admin-card tutors></admin-card>
+                <admin-card groups></admin-card>
             </template>
 
             <template is="dom-if" if="[[user.isStudent]]">
