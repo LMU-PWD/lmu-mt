@@ -18,6 +18,10 @@
                 width: 100%;
             }
 
+            paper-dialog {
+                min-width: 380px;
+            }
+
         </style>
 
         <template is="dom-if" if="[[ show ]]">
@@ -45,7 +49,7 @@
                                     label="Title that will be shown to users"
                                     value="{{ photoTitle }}"></paper-input>
 
-                            <paper-input label="Enrollment deadline (dd / mm / yyyy)"
+                            <paper-input label="Deadline for student groups to enroll (dd / mm / yyyy)"
                                          on-tap="_openPhotoPickerDialog"
                                          allowed-pattern="/[1-9]{1}\d? \/ [1-9]{1}\d? \/ [1-9]{1}\d{3}/"
                                          value="[[ photoDeadlineFormatted ]]">
@@ -89,7 +93,7 @@
                                     label="Title that will be shown to users"
                                     value="{{ videoTitle }}"></paper-input>
 
-                            <paper-input label="Enrollment deadline (dd / mm / yyyy)"
+                            <paper-input label="Deadline for student groups to enroll (dd / mm / yyyy)"
                                          on-tap="_openVideoPickerDialog"
                                          allowed-pattern="/[1-9]{1}\d? \/ [1-9]{1}\d? \/ [1-9]{1}\d{3}/"
                                          value="[[ videoDeadlineFormatted ]]">
@@ -133,7 +137,7 @@
                                     label="Title that will be shown to users"
                                     value="{{ audioTitle }}"></paper-input>
 
-                            <paper-input label="Enrollment deadline (dd / mm / yyyy)"
+                            <paper-input label="Deadline for student groups to enroll (dd / mm / yyyy)"
                                          on-tap="_openAudioPickerDialog"
                                          allowed-pattern="/[1-9]{1}\d? \/ [1-9]{1}\d? \/ [1-9]{1}\d{3}/"
                                          value="[[ audioDeadlineFormatted ]]">
@@ -167,21 +171,30 @@
         </template>
 
         <paper-dialog id="photoDeadlineDialog" class="paper-date-picker-dialog">
-            <paper-date-picker id="picker" date="{{ photoDeadline }}"></paper-date-picker>
+            <paper-date-picker
+                    id="picker"
+                    date="{{ photoDeadline }}"
+                    responsive-width="630px"></paper-date-picker>
             <div class="buttons">
                 <paper-button dialog-confirm>OK</paper-button>
             </div>
         </paper-dialog>
 
         <paper-dialog id="videoDeadlineDialog" class="paper-date-picker-dialog">
-            <paper-date-picker id="picker" date="{{ videoDeadline }}"></paper-date-picker>
+            <paper-date-picker
+                    id="picker"
+                    date="{{ videoDeadline }}"
+                    responsive-width="630px"></paper-date-picker>
             <div class="buttons">
                 <paper-button dialog-confirm>OK</paper-button>
             </div>
         </paper-dialog>
 
         <paper-dialog id="audioDeadlineDialog" class="paper-date-picker-dialog">
-            <paper-date-picker id="picker" date="{{ audioDeadline }}"></paper-date-picker>
+            <paper-date-picker
+                    id="picker"
+                    date="{{ audioDeadline }}"
+                    responsive-width="630px"></paper-date-picker>
             <div class="buttons">
                 <paper-button dialog-confirm>OK</paper-button>
             </div>

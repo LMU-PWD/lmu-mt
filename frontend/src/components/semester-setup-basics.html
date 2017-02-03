@@ -16,6 +16,10 @@
                 margin: 0 16px;
             }
 
+            paper-dialog {
+                min-width: 380px;
+            }
+
         </style>
 
         <paper-card heading="Create a new Semester" class="flex">
@@ -35,7 +39,10 @@
                 </paper-input>
                 <paper-dialog id="semesterStart" class="paper-date-picker-dialog">
                     <p>Pick a start date</p>
-                    <paper-date-picker id="picker" date="{{ startDate }}"></paper-date-picker>
+                    <paper-date-picker
+                            id="picker"
+                            date="{{ startDate }}"
+                            responsive-width="630px"></paper-date-picker>
                     <div class="buttons">
                         <paper-button dialog-confirm>OK</paper-button>
                     </div>
@@ -49,7 +56,10 @@
                 </paper-input>
                 <paper-dialog id="semesterEnd" class="paper-date-picker-dialog">
                     <p>Pick an end date</p>
-                    <paper-date-picker id="picker" date="{{ endDate }}"></paper-date-picker>
+                    <paper-date-picker
+                            id="picker"
+                            date="{{ endDate }}"
+                            responsive-width="630px"></paper-date-picker>
                     <div class="buttons">
                         <paper-button dialog-confirm>OK</paper-button>
                     </div>

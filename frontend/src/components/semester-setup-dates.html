@@ -22,6 +22,10 @@
                 margin-right: 5px;
             }
 
+            paper-dialog {
+                min-width: 380px;
+            }
+
         </style>
 
         <paper-card heading="Add Dates" class="flex">
@@ -81,7 +85,9 @@
                     <paper-dialog-scrollable>
 
                         <h3>Starting at</h3>
-                        <paper-date-picker date="{{ dialogDate }}"></paper-date-picker>
+                        <paper-date-picker
+                                date="{{ dialogDate }}"
+                                responsive-width="630px"></paper-date-picker>
                         <time-picker hour="{{ dialogHour }}" min="{{ dialogMin }}"></time-picker>
 
                         <paper-input type="number" min="0" label="Duration" value="{{ dialogDuration }}">
