@@ -39,6 +39,50 @@
             paper-date-picker {
                 --default-primary-color: var(--semester-setup-primary-color);
             }
+
+            iron-icon[prefix] {
+                margin-right: 5px;
+            }
+
+            iron-data-table {
+                --iron-data-table-header: {
+                    font-weight: bold;
+                };
+                --iron-data-table-row: {
+                    border-bottom: 1px solid var(--paper-blue-grey-200);
+                };
+                --iron-data-table-row-hover: {
+                    background: var(--paper-blue-grey-200)
+                };
+            }
+
+            .list-detail {
+                background: var(--semester-setup-secondary-color);
+                border: 2px solid var(--semester-setup-primary-light-color);
+                margin: 0 -24px;
+                padding: 10px 24px;
+                width: 100%;
+            }
+
+            .list-detail paper-input {
+                float: left;
+                margin-right: 10px;
+                width: 25%;
+            }
+
+            /* * * * * * * * * * * * * * * * * * * * * * *
+             *               Media Queries               *
+             * * * * * * * * * * * * * * * * * * * * * * */
+
+            @media screen and (max-width: 767px) {
+
+                .list-detail paper-input {
+                    float: none;
+                    margin: 0;
+                    width: auto;
+                }
+            }
+
         </style>
     </template>
 </dom-module>

@@ -194,9 +194,11 @@
                 user-id="{{ session.userId }}"></practicals-view>
 
         <!-- Semester Setup Pages (Admin only) -->
-        <semester-setup-view
-            name="semester-setup"
-            page="{{ page }}"></semester-setup-view>
+        <template is="dom-if" if="[[ user.isAdmin ]]">
+            <semester-setup-view
+                    name="semester-setup"
+                    page="{{ page }}"></semester-setup-view>
+        </template>
 
     </iron-pages>
 

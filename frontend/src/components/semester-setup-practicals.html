@@ -20,149 +20,172 @@
 
         </style>
 
-        <paper-card heading="Edit Practical Types" class="flex">
-            <div class="card-content">
+        <template is="dom-if" if="[[ show ]]">
 
-                <p>Each group of students will have to pass three practicals: <strong>Photo, Video and Audio</strong>. If you can, please provide some details.</p>
+            <paper-card heading="Edit Practical Types" class="flex">
+                <div class="card-content">
 
-                <p>Never mind if some information is still uncertain - just leave those fields blank and add data later.</p>
+                    <p>Each group of students will have to pass three labs: <strong>Photo, Video and Audio</strong>. If you can, please provide some details.</p>
 
-                <div>
-                    <paper-button
-                            class="practicals-collapse-header"
-                            on-tap="_toggleCollapse"
-                            data-practical-type="photo">
-                        Photo Lab
-                        <iron-icon
-                                icon="hardware:keyboard-arrow-down"
-                                data-practical-type="photo"></iron-icon>
+                    <p>Never mind if some information is still uncertain - just leave those fields blank and add data later.</p>
 
-                    </paper-button>
-                    <iron-collapse id="photoCollapsible">
-                        <paper-input
-                            label="Title that will be shown to users"
-                            value="Photo Lab"></paper-input>
+                    <div>
+                        <paper-button
+                                class="practicals-collapse-header"
+                                on-tap="_toggleCollapse"
+                                data-practical-type="photo">
+                            Photo Lab
+                            <iron-icon
+                                    icon="hardware:keyboard-arrow-down"
+                                    data-practical-type="photo"></iron-icon>
 
-                        <paper-input label="What is the deadline for student groups to choose their favorite timeslot?"
-                                     on-tap="_openPickerDialog"
-                                     data-dialog-id="photo-registration-deadline"></paper-input>
-                        <paper-dialog id="photo-registration-deadline" class="paper-date-picker-dialog"
-                                      on-iron-overlay-closed="dismissDialog">
-                            <paper-date-picker id="picker" date="[[date]]"></paper-date-picker>
-                            <div class="buttons">
-                                <paper-button dialog-dismiss>Cancel</paper-button>
-                                <paper-button dialog-confirm>OK</paper-button>
-                            </div>
-                        </paper-dialog>
+                        </paper-button>
+                        <iron-collapse id="photoCollapsible">
+                            <paper-input
+                                    label="Title that will be shown to users"
+                                    value="{{ photoTitle }}"></paper-input>
 
-                        <p>Add some content to the page <strong>tutors</strong> will see when they click on the
-                            photo lab. You can use
-                            <a target="_blank" href="https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet">
-                                Markdown syntax</a>.</p>
-                        <!-- Access editor content in js with this.$.photoDescriptionTutor.editorValue -->
-                        <ace-widget id="photoDescriptionTutor"></ace-widget>
+                            <paper-input label="Enrollment deadline (dd / mm / yyyy)"
+                                         on-tap="_openPhotoPickerDialog"
+                                         allowed-pattern="/[1-9]{1}\d? \/ [1-9]{1}\d? \/ [1-9]{1}\d{3}/"
+                                         value="[[ photoDeadlineFormatted ]]">
+                                <iron-icon icon="icons:date-range" prefix></iron-icon>
+                            </paper-input>
 
-                        <p>Add some content to the page <strong>students</strong> will see when they click on the
-                            photo lab. You can use
-                            <a target="_blank" href="https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet">
-                                Markdown syntax</a>.</p>
-                        <!-- Access editor content in js with this.$.photoDescriptionTutor.editorValue -->
-                        <ace-widget id="photoDescriptionStudent"></ace-widget>
-                    </iron-collapse>
+                            <p>Add some content to the page <strong>tutors</strong> will see when they click on the
+                                photo lab. You can use
+                                <a target="_blank" href="https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet">
+                                    Markdown syntax</a>.</p>
+                            <ace-widget
+                                    on-editor-content="_aceValueChanged"
+                                    data-reflecting-property="photoDescriptionTutor"
+                                    theme="[[ editorTheme ]]"></ace-widget>
+
+                            <p>Add some content to the page <strong>students</strong> will see when they click on the
+                                photo lab. You can use
+                                <a target="_blank" href="https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet">
+                                    Markdown syntax</a>.</p>
+                            <ace-widget
+                                    on-editor-content="_aceValueChanged"
+                                    data-reflecting-property="photoDescriptionStudent"
+                                    theme="[[ editorTheme ]]"></ace-widget>
+
+                        </iron-collapse>
+                    </div>
+
+                    <div>
+                        <paper-button
+                                class="practicals-collapse-header"
+                                on-tap="_toggleCollapse"
+                                data-practical-type="video">
+                            Video Lab
+                            <iron-icon
+                                    icon="hardware:keyboard-arrow-down"
+                                    data-practical-type="video"></iron-icon>
+                        </paper-button>
+                        <iron-collapse id="videoCollapsible">
+
+                            <paper-input
+                                    label="Title that will be shown to users"
+                                    value="{{ videoTitle }}"></paper-input>
+
+                            <paper-input label="Enrollment deadline (dd / mm / yyyy)"
+                                         on-tap="_openVideoPickerDialog"
+                                         allowed-pattern="/[1-9]{1}\d? \/ [1-9]{1}\d? \/ [1-9]{1}\d{3}/"
+                                         value="[[ videoDeadlineFormatted ]]">
+                                <iron-icon icon="icons:date-range" prefix></iron-icon>
+                            </paper-input>
+
+                            <p>Add some content to the page <strong>tutors</strong> will see when they click on the
+                                video lab. You can use
+                                <a target="_blank" href="https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet">
+                                    Markdown syntax</a>.</p>
+                            <ace-widget
+                                    on-editor-content="_aceValueChanged"
+                                    data-reflecting-property="videoDescriptionTutor"
+                                    theme="[[ editorTheme ]]"></ace-widget>
+
+                            <p>Add some content to the page <strong>students</strong> will see when they click on the
+                                video lab. You can use
+                                <a target="_blank" href="https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet">
+                                    Markdown syntax</a>.</p>
+                            <ace-widget
+                                    on-editor-content="_aceValueChanged"
+                                    data-reflecting-property="videoDescriptionStudent"
+                                    theme="[[ editorTheme ]]"></ace-widget>
+
+                        </iron-collapse>
+                    </div>
+
+                    <div>
+                        <paper-button
+                                class="practicals-collapse-header"
+                                on-tap="_toggleCollapse"
+                                data-practical-type="audio">
+                            Audio Lab
+                            <iron-icon
+                                    icon="hardware:keyboard-arrow-down"
+                                    data-practical-type="audio"></iron-icon>
+                        </paper-button>
+                        <iron-collapse id="audioCollapsible">
+
+                            <paper-input
+                                    label="Title that will be shown to users"
+                                    value="{{ audioTitle }}"></paper-input>
+
+                            <paper-input label="Enrollment deadline (dd / mm / yyyy)"
+                                         on-tap="_openAudioPickerDialog"
+                                         allowed-pattern="/[1-9]{1}\d? \/ [1-9]{1}\d? \/ [1-9]{1}\d{3}/"
+                                         value="[[ audioDeadlineFormatted ]]">
+                                <iron-icon icon="icons:date-range" prefix></iron-icon>
+                            </paper-input>
+
+                            <p>Add some content to the page <strong>tutors</strong> will see when they click on the
+                                audiolab. You can use
+                                <a target=_blank" href="https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet">
+                                    Markdown syntax</a>.</p>
+                            <ace-widget
+                                    on-editor-content="_aceValueChanged"
+                                    data-reflecting-property="audioDescriptionTutor"
+                                    theme="[[ editorTheme ]]"></ace-widget>
+
+                            <p>Add some content to the page <strong>students</strong> will see when they click on the
+                                audio lab. You can use
+                                <a target="_blank" href="https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet">
+                                    Markdown syntax</a>.</p>
+                            <ace-widget
+                                    on-editor-content="_aceValueChanged"
+                                    data-reflecting-property="audioDescriptionStudent"
+                                    theme="[[ editorTheme ]]"></ace-widget>
+
+                        </iron-collapse>
+                    </div>
+
                 </div>
+            </paper-card>
 
-                <div>
-                    <paper-button
-                            class="practicals-collapse-header"
-                            on-tap="_toggleCollapse"
-                            data-practical-type="video">
-                        Video Lab
-                        <iron-icon
-                                icon="hardware:keyboard-arrow-down"
-                                data-practical-type="video"></iron-icon>
-                    </paper-button>
-                    <iron-collapse id="videoCollapsible">
+        </template>
 
-                        <paper-input
-                                label="Title that will be shown to users"
-                                value="Video Lab"></paper-input>
-
-                        <paper-input label="What is the deadline for student groups to choose their favorite timeslot?"
-                                     on-tap="_openPickerDialog"
-                                     data-dialog-id="video-registration-deadline"></paper-input>
-                        <paper-dialog id="video-registration-deadline" class="paper-date-picker-dialog"
-                                      on-iron-overlay-closed="dismissDialog">
-                            <paper-date-picker id="picker" date="[[date]]"></paper-date-picker>
-                            <div class="buttons">
-                                <paper-button dialog-dismiss>Cancel</paper-button>
-                                <paper-button dialog-confirm>OK</paper-button>
-                            </div>
-                        </paper-dialog>
-
-                        <p>Add some content to the page <strong>tutors</strong> will see when they click on the
-                            video lab. You can use
-                            <a target="_blank" href="https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet">
-                                Markdown syntax</a>.</p>
-                        <!-- Access editor content in js with this.$.photoDescriptionTutor.editorValue -->
-                        <ace-widget id="videoDescriptionTutor"></ace-widget>
-
-                        <p>Add some content to the page <strong>students</strong> will see when they click on the
-                            video lab. You can use
-                            <a target="_blank" href="https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet">
-                                Markdown syntax</a>.</p>
-                        <!-- Access editor content in js with this.$.photoDescriptionTutor.editorValue -->
-                        <ace-widget id="videoDescriptionStudent"></ace-widget>
-
-                    </iron-collapse>
-                </div>
-
-                <div>
-                    <paper-button
-                            class="practicals-collapse-header"
-                            on-tap="_toggleCollapse"
-                            data-practical-type="audio">
-                        Audio Lab
-                        <iron-icon
-                                icon="hardware:keyboard-arrow-down"
-                                data-practical-type="audio"></iron-icon>
-                    </paper-button>
-                    <iron-collapse id="audioCollapsible">
-
-                        <paper-input
-                                label="Title that will be shown to users"
-                                value="Audio Lab"></paper-input>
-
-                        <paper-input label="What is the deadline for student groups to choose their favorite timeslot?"
-                                     on-tap="_openPickerDialog"
-                                     data-dialog-id="audio-registration-deadline"></paper-input>
-                        <paper-dialog id="audio-registration-deadline" class="paper-date-picker-dialog"
-                                      on-iron-overlay-closed="dismissDialog">
-                            <paper-date-picker id="picker" date="[[date]]"></paper-date-picker>
-                            <div class="buttons">
-                                <paper-button dialog-dismiss>Cancel</paper-button>
-                                <paper-button dialog-confirm>OK</paper-button>
-                            </div>
-                        </paper-dialog>
-
-                        <p>Add some content to the page <strong>tutors</strong> will see when they click on the
-                            audiolab. You can use
-                            <a target=_blank" href="https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet">
-                                Markdown syntax</a>.</p>
-                        <!-- Access editor content in js with this.$.photoDescriptionTutor.editorValue -->
-                        <ace-widget id="audioDescriptionTutor"></ace-widget>
-
-                        <p>Add some content to the page <strong>students</strong> will see when they click on the
-                            audio lab. You can use
-                            <a target="_blank" href="https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet">
-                                Markdown syntax</a>.</p>
-                        <!-- Access editor content in js with this.$.photoDescriptionTutor.editorValue -->
-                        <ace-widget id="audioDescriptionStudent"></ace-widget>
-
-                    </iron-collapse>
-                </div>
-
+        <paper-dialog id="photoDeadlineDialog" class="paper-date-picker-dialog">
+            <paper-date-picker id="picker" date="{{ photoDeadline }}"></paper-date-picker>
+            <div class="buttons">
+                <paper-button dialog-confirm>OK</paper-button>
             </div>
-        </paper-card>
+        </paper-dialog>
+
+        <paper-dialog id="videoDeadlineDialog" class="paper-date-picker-dialog">
+            <paper-date-picker id="picker" date="{{ videoDeadline }}"></paper-date-picker>
+            <div class="buttons">
+                <paper-button dialog-confirm>OK</paper-button>
+            </div>
+        </paper-dialog>
+
+        <paper-dialog id="audioDeadlineDialog" class="paper-date-picker-dialog">
+            <paper-date-picker id="picker" date="{{ audioDeadline }}"></paper-date-picker>
+            <div class="buttons">
+                <paper-button dialog-confirm>OK</paper-button>
+            </div>
+        </paper-dialog>
 
     </template>
 
@@ -174,16 +197,66 @@
 
             properties: {
 
-                aceValue: {
+                audioDeadline: {
+                    type: Date },
+                audioDeadlineFormatted: {
                     type: String,
-                    notify: true,
-                    value: 'Default string'
-                }
+                    computed: '_formatDate(audioDeadline)',
+                    reflectToAttribute: false },
+                audioDescriptionTutor: {
+                    type: String,
+                    notify: true },
+                audioDescriptionStudent: {
+                    type: String },
+                audioTitle: {
+                    type: String,
+                    value: 'Audiopratikum' },
 
+
+                photoDeadline: {
+                    type: Date },
+                photoDeadlineFormatted: {
+                    type: String,
+                    computed: '_formatDate(photoDeadline)',
+                    reflectToAttribute: false },
+                photoDescriptionTutor: {
+                    type: String,
+                    notify: true },
+                photoDescriptionStudent: {
+                    type: String },
+                photoTitle: {
+                    type: String,
+                    value: 'Fotopraktikum' },
+
+
+                videoDeadline: {
+                    type: Date },
+                videoDeadlineFormatted: {
+                    type: String,
+                    computed: '_formatDate(videoDeadline)',
+                    reflectToAttribute: false },
+                videoDescriptionTutor: {
+                    type: String,
+                    notify: true },
+                videoDescriptionStudent: {
+                    type: String },
+                videoTitle: {
+                    type: String,
+                    value: 'Videopraktikum' },
+
+
+                editorTheme: {
+                    type: String,
+                    reflectToAttribute: false,
+                    value: 'ace/theme/kuroir'
+                },
+                show: {
+                    type: Boolean,
+                    notify: true
+                }
             },
 
             _toggleCollapse: function (event) {
-                console.log(event);
                 var idPrefix = '#';
                 var idSuffix = 'Collapsible';
                 var practicalType = event.path[0].getAttribute('data-practical-type');
@@ -191,9 +264,46 @@
                 element.toggle();
             },
 
-            _openPickerDialog: function (event) {
-                var dialogId = event.path[7].getAttribute('data-dialog-id');
-                this.$$('#'+dialogId).open();
+            _openPhotoPickerDialog: function () {
+                this.$.photoDeadlineDialog.open();
+            },
+
+            _openVideoPickerDialog: function () {
+                this.$.videoDeadlineDialog.open();
+            },
+
+            _openAudioPickerDialog: function () {
+                this.$.audioDeadlineDialog.open();
+            },
+
+            _formatDate: function (date) {
+                return date.getDate() + ' / ' + (date.getMonth() + 1) + ' / ' + date.getFullYear();
+            },
+
+            _aceValueChanged: function (event) {
+                var propertyName = event.path[0].getAttribute('data-reflecting-property');
+                switch (propertyName) {
+                    case 'audioDescriptionTutor':
+                        this.audioDescriptionTutor = event.detail.value;
+                        break;
+                    case 'audioDescriptionStudent':
+                        this.audioDescriptionStudent = event.detail.value;
+                        break;
+                    case 'photoDescriptionTutor':
+                        this.photoDescriptionTutor = event.detail.value;
+                        break;
+                    case 'photoDescriptionStudent':
+                        this.photoDescriptionStudent = event.detail.value;
+                        break;
+                    case 'videoDescriptionTutor':
+                        this.videoDescriptionTutor = event.detail.value;
+                        break;
+                    case 'videoDescriptionStudent':
+                        this.videoDescriptionStudent = event.detail.value;
+                        break;
+                    default:
+                        console.error('Reflecting Property ' + propertyName + ' not found');
+                }
             }
 
         });

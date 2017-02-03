@@ -156,7 +156,9 @@
                 <semester-setup-basics></semester-setup-basics>
 
                 <!-- PRACTICALS -->
-                <semester-setup-practicals></semester-setup-practicals>
+                <!-- This page is hidden by default because of heavyweight code editors that
+                     should not be loaded without reason -->
+                <semester-setup-practicals show="[[ showPracticalsPage ]]"></semester-setup-practicals>
 
                 <!-- TUTORS -->
                 <semester-setup-tutors></semester-setup-tutors>
@@ -175,17 +177,6 @@
                     <paper-button on-tap="_stepForward" disabled="[[ nextDisabled ]]">Next <iron-icon icon="icons:chevron-right"></iron-icon></paper-button>
                 </div>
             </div>
-
-            <!-- TODOS -->
-
-            <!-- PRAKTIKUMSARTEN ANLEGEN -->
-
-            <!-- TUTOREN HINZUFÜGEN -->
-
-            <!-- STUDENTEN HINZUFÜGEN -->
-
-            <!-- GLOBALE TERMINE ANLEGEN -->
-
         </div>
 
     </template>
@@ -236,6 +227,12 @@
                 page: {
                     type: String,
                     notify: true
+                },
+
+                showPracticalsPage: {
+                    type: Boolean,
+                    notify: true,
+                    computed: '_showPracticalsPage(activeIndex)'
                 },
 
                 userInput: {
@@ -322,8 +319,11 @@
             _jumpToPage: function (event) {
                 this.activeIndex = event.path[0].dataBreadcrumbIndex;
                 this._updateNavButtons();
-            }
+            },
 
+            _showPracticalsPage: function (activeIndex) {
+                return (activeIndex == 1);
+            }
         });
 
     </script>

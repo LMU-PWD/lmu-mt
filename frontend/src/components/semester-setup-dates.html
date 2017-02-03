@@ -1,7 +1,9 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
-<link rel="import" href="../components/time-picker.html">
+<link rel="import" href="../../bower_components/iron-data-table/iron-data-table.html">
 
+
+<link rel="import" href="../components/time-picker.html">
 <link rel="import" href="../shared/semester-setup-shared.html">
 
 <dom-module id="semester-setup-dates">
@@ -11,16 +13,12 @@
         <style include="semester-setup-shared"></style>
         <style>
 
-            paper-button.date-header {
-                background: var(--semester-setup-primary-light-color);
-                color: var(--semester-setup-secondary-color);
-                margin: 10px 0;
-                text-transform: none;
-                width: 100%;
-            }
-
             paper-button.add-date-button {
                 float:right;
+            }
+
+            iron-icon {
+                margin-right: 5px;
             }
 
         </style>
@@ -30,40 +28,71 @@
 
                 <p>Have you already determined some of the dates that apply to all students (e. g. lecture dates, exam date, final presentation)? You can add them here.</p>
 
-                <p>Of course you can still add, edit and delete dates later.</p>
+                <p>You can still add, edit and delete dates later.</p>
 
-                <paper-button class="date-header">25.06.2017 - 16:00: Exam</paper-button>
-                <paper-button class="date-header">30.06.2017 - 10:00: Final Presentation</paper-button>
-                <paper-button class="date-header">21.07.2017 - 16:00: IRT Excursion</paper-button>
+                <p><em>Click or tap on any item in the list below to edit it.</em></p>
+
+                <iron-data-table items="[[ dates ]]" details-enabled>
+                    <template is="row-detail">
+                        <div class="list-detail">
+                            <!-- TODO: Make date and time editable -->
+                            <paper-input label="Title" value="{{ item.title }}"></paper-input>
+                            <paper-input label="Location" value="{{ item.location }}"></paper-input>
+                            <paper-input label="Duration" type="number" value="{{ item.duration }}"></paper-input>
+                        </div>
+                    </template>
+                    <data-table-column name="Date">
+                        <template>
+                            <iron-icon icon="icons:date-range"></iron-icon>
+                            [[ _dateAsFormattedString(item.date) ]]
+                        </template>
+                    </data-table-column>
+                    <data-table-column name="Event title">
+                        <template>[[ item.title ]]</template>
+                    </data-table-column>
+                    <data-table-column name="Actions">
+                        <template>
+                            <paper-icon-button
+                                    id="delete-[[ item.id ]]"
+                                    icon="icons:delete"
+                                    on-tap="_removeDate"></paper-icon-button>
+                            <paper-tooltip
+                                    for="delete-[[ item.id ]]"
+                                    position="right"
+                                    animation-delay="0"
+                                    fit-to-visible-bounds="true">Remove from list</paper-tooltip>
+                        </template>
+                    </data-table-column>
+                </iron-data-table>
 
                 <paper-button class="add-date-button" on-tap="_openDateDialog">
                     Add date&nbsp;<iron-icon icon="icons:add-circle-outline"></iron-icon></paper-button>
 
                 <div style="clear: both;"></div>
 
-                <paper-dialog id="dateDialog">
+                <paper-dialog id="dateDialog" on-iron-overlay-closed="_discardDateDialog">
 
                     <h2>Add a new date</h2>
 
                     <paper-dialog-scrollable>
 
                         <h3>Starting at</h3>
-                        <paper-date-picker></paper-date-picker>
-                        <time-picker></time-picker>
+                        <paper-date-picker date="{{ dialogDate }}"></paper-date-picker>
+                        <time-picker hour="{{ dialogHour }}" min="{{ dialogMin }}"></time-picker>
 
-                        <paper-input type="number" min="0" label="Duration">
+                        <paper-input type="number" min="0" label="Duration" value="{{ dialogDuration }}">
                             <div suffix>minutes</div>
                         </paper-input>
 
-                        <paper-input label="Title of the event"></paper-input>
+                        <paper-input label="Title of the event" value="{{ dialogTitle }}"></paper-input>
 
-                        <paper-input label="Location"></paper-input>
+                        <paper-input label="Location" value="{{ dialogLocation }}"></paper-input>
 
                     </paper-dialog-scrollable>
 
                     <div class="buttons">
                         <paper-button dialog-dismiss>Discard</paper-button>
-                        <paper-button dialog-confirm autofocus on-tap="_closeDialogCloseButtonTapped">Save</paper-button>
+                        <paper-button dialog-confirm autofocus on-tap="_storeNewDate">Save</paper-button>
                     </div>
                 </paper-dialog>
 
@@ -80,10 +109,90 @@
 
             properties: {
 
+                dates: {
+                    type: Array,
+                    notify: true,
+                    value: [] },
+
+                dialogDate: {
+                    type: Date,
+                    value: new Date() },
+                dialogHour: {
+                    type: Number,
+                    value: 0 },
+                dialogMin: {
+                    type: Number,
+                    value: 0 },
+                dialogDuration: {
+                    type: Number,
+                    value: 0 },
+                dialogTitle: {
+                    type: String,
+                    value: '' },
+                dialogLocation: {
+                    type: String,
+                    value: '' }
+
             },
 
             _openDateDialog: function () {
                 this.$.dateDialog.open();
+            },
+
+            _storeNewDate: function () {
+                var dateObject = {
+                    id: this._generateId(),
+                    date: this.dialogDate,
+                    duration: this.dialogDuration,
+                    title: this.dialogTitle,
+                    location: this.dialogLocation
+                };
+                dateObject.date.setHours(this.dialogHour);
+                dateObject.date.setMinutes(this.dialogMin);
+                var newDates = this.dates.slice();
+                newDates.push(dateObject);
+                this.dates = newDates;
+                console.log(this.dates);
+            },
+
+            _discardDateDialog: function (event) {
+                if (event.path[0].id != 'dropdown') {
+                    this.dialogDate = new Date();
+                    this.dialogHour = 0;
+                    this.dialogMin = 0;
+                    this.dialogDuration = 0;
+                    this.dialogTitle = '';
+                    this.dialogLocation = '';
+                }
+            },
+
+            _dateAsFormattedString: function (date) {
+                return date.getDate() + "/" + date.getMonth() + "/" + date.getFullYear()
+                        + " - " + date.getHours() + ":" + date.getMinutes();
+            },
+
+            // Taken from http://stackoverflow.com/questions/1349404/generate-random-string-characters-in-javascript
+            _generateId: function () {
+                var text = "";
+                var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+                for( var i=0; i < 5; i++ )
+                    text += possible.charAt(Math.floor(Math.random() * possible.length));
+                return text;
+            },
+
+            _removeDate: function (event) {
+                // If user hits just the button and not the iron-icon inside of it,
+                // this is the correct id
+                var id = event.path[0].getAttribute('id');
+                if (id == 'icon') {
+                    // User has hit the icon, therefore we need the id of the
+                    // icon's ancestor paper-icon-button
+                    id = event.path[2].getAttribute('id');
+                }
+                id = id.split('delete-')[1];
+                this.dates = this.dates.filter(function(item){
+                    return (item.id != id);
+                });
             }
 
         });

@@ -10,7 +10,10 @@
         <style include="semester-setup-shared"></style>
         <style>
 
-
+            paper-button {
+                background: var(--semester-setup-primary-light-color);
+                color: var(--semester-setup-secondary-color);
+            }
 
         </style>
 
@@ -22,8 +25,39 @@
                 <!-- TODO: Modularize this to reuse it in admin menu -->
                 <paper-button><papa-parser label="Upload .csv" output-data="{{ papaParserJson }}"></papa-parser></paper-button>
 
-                <h4>DEBUG: CSV dump</h4>
-                <pre>[[ stringifiedJson ]]</pre>
+                <p><em>Click or tap on any row in the table below to edit data.</em></p>
+
+                <iron-data-table items="[[ studentData ]]" details-enabled>
+                    <template is="row-detail">
+                        <div class="list-detail">
+                            <paper-input label="First name" value="{{ item.first_name }}"></paper-input>
+                            <paper-input label="Last name" value="{{ item.name }}"></paper-input>
+                            <paper-input label="Email" type="email" value="{{ item.email }}"></paper-input>
+                        </div>
+                    </template>
+                    <data-table-column name="First name">
+                        <template>[[ item.first_name ]]</template>
+                    </data-table-column>
+                    <data-table-column name="Last name">
+                        <template>[[ item.name ]]</template>
+                    </data-table-column>
+                    <data-table-column name="Email">
+                        <template>[[ item.email ]]</template>
+                    </data-table-column>
+                    <data-table-column name="Actions">
+                        <template>
+                            <paper-icon-button
+                                    id="delete-[[ item.id ]]"
+                                    icon="icons:delete"
+                                    on-tap="_removeStudent"></paper-icon-button>
+                            <paper-tooltip
+                                    for="delete-[[ item.id ]]"
+                                    position="right"
+                                    animation-delay="0"
+                                    fit-to-visible-bounds="true">Remove from list</paper-tooltip>
+                        </template>
+                    </data-table-column>
+                </iron-data-table>
 
             </div>
         </paper-card>
@@ -41,23 +75,52 @@
                 papaParserJson: {
                     type: Object,
                     notify: true,
-                    observer: '_logParsedJson'
+                    reflectToAttribute: false,
+                    observer: '_processParsedJson'
                 },
 
-                stringifiedJson: {
-                    type: String,
-                    computed: 'stringify(papaParserJson)'
+                studentData: {
+                    type: Array,
+                    notify: true
                 }
             },
 
-            _logParsedJson: function () {
+            _processParsedJson: function (json) {
 
-                console.log(this.papaParserJson);
-
+                var plainData = json.slice(1);
+                var that = this;
+                this.studentData = plainData.map(function(object, index) {
+                    return {
+                        first_name: object[2],
+                        name: object[3],
+                        email: object[4],
+                        id: that._generateId()
+                    };
+                });
             },
 
-            stringify: function(json) {
-                return JSON.stringify(json).replace(/],\[/g, '],\n[');
+            _removeStudent: function (event) {
+                // If user hits just the button and not the iron-icon inside of it,
+                // this is the correct id
+                var id = event.path[0].getAttribute('id');
+                if (id == 'icon') {
+                    // User has hit the icon, therefore we need the id of the
+                    // icon's ancestor paper-icon-button
+                    id = event.path[2].getAttribute('id');
+                }
+                id = id.split('delete-')[1];
+                this.studentData = this.studentData.filter(function(item){
+                    return (item.id != id);
+                });
+            },
+
+            // Taken from http://stackoverflow.com/questions/1349404/generate-random-string-characters-in-javascript
+            _generateId: function () {
+                var text = "";
+                var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+                for( var i=0; i < 5; i++ )
+                    text += possible.charAt(Math.floor(Math.random() * possible.length));
+                return text;
             }
 
         });

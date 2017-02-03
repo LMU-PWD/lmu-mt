@@ -16,10 +16,6 @@
                 margin: 0 16px;
             }
 
-            iron-icon {
-                margin-right: 5px;
-            }
-
         </style>
 
         <paper-card heading="Create a new Semester" class="flex">
@@ -82,7 +78,8 @@
 
                 endDateFormatted: {
                     type: String,
-                    computed: '_formatDate(endDate)'
+                    computed: '_formatDate(endDate)',
+                    reflectToAttribute: false
                 },
 
                 groupSize: {
@@ -100,7 +97,8 @@
 
                 startDateFormatted: {
                     type: String,
-                    computed: '_formatDate(startDate)'
+                    computed: '_formatDate(startDate)',
+                    reflectToAttribute: false
                 }
             },
 
@@ -113,7 +111,7 @@
             },
 
             _formatDate: function (date) {
-                return date.getDate() + ' / ' + date.getMonth() + ' / ' + date.getFullYear();
+                return date.getDate() + ' / ' + (date.getMonth() + 1) + ' / ' + date.getFullYear();
             }
 
         });
