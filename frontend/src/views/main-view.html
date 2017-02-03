@@ -103,17 +103,44 @@
         <!--app-location route="{{route}}" use-hash-as-path></app-location-->
         <!--zugriff auf url; get ulr mäßig; use-hash-as-path: # vor path-->
         <app-route
-                route="{{route}}"
-                pattern="/:page"
-                data="{{routeData}}"
-                tail="{{subroute}}"></app-route>
+            route="{{route}}"
+            pattern="/:page"
+            data="{{routeData}}"
+            tail="{{subroute}}"></app-route>
 
         <!-- Fetches info about currently logged in user -->
         <api-request
+                id="ajax_user"
+            headers="[[ ajax.headers ]]"
+            method="[[ ajax.method ]]"
+            endpoint="[[ ajax.endpoint ]]"
+            response="{{ apiResponse }}"></api-request>
+
+        <api-request
+            id="ajax_labTypes"
+            body="[[ ajax.body ]]"
+            headers="[[ ajax.headers ]]"
+            method="[[ ajax.method ]]"
+            endpoint="[[ ajax.endpoint ]]"
+            response="{{ response_labTypes }}"
+            loading="{{ isLoading }}"></api-request>
+
+        <api-request
+            id="ajax_prios"
+            body="[[ ajax.body ]]"
+            headers="[[ ajax.headers ]]"
+            method="[[ ajax.method ]]"
+            endpoint="[[ ajax.endpoint ]]"
+            response="{{ response_prios }}"
+            loading="{{ isLoading }}"></api-request>
+        <api-request
+                id="ajax_labs"
+                body="[[ ajax.body ]]"
                 headers="[[ ajax.headers ]]"
                 method="[[ ajax.method ]]"
                 endpoint="[[ ajax.endpoint ]]"
-                response="{{ apiResponse }}"></api-request>
+                response="{{ response_labs }}"
+                loading="{{ isLoading }}"></api-request>
 
         <app-header fixed>
             <navigation-bar
@@ -191,6 +218,8 @@
                     icon="[[icon]]"
                     route="{{subroute}}"
                     group="[[ group ]]"
+                    labtype="[[ labtype_foto ]]"
+                    labdata="[[ groupdata_foto ]]"
                     on-back-click="_handleBackTap"
                     access-token="{{ accessToken }}"
                     logged-in="{{ session.loggedIn }}"
@@ -201,6 +230,8 @@
                     icon="[[icon]]"
                     route="{{subroute}}"
                     group="[[ group ]]"
+                    labtype="[[ labtype_video ]]"
+                    labdata="[[ groupdata_video ]]"
                     on-back-click="_handleBackTap"
                     access-token="{{ accessToken }}"
                     logged-in="{{ session.loggedIn }}"
@@ -211,6 +242,8 @@
                     icon="[[icon]]"
                     route="{{subroute}}"
                     group="[[ group ]]"
+                    labtype="[[ labtype_audio ]]"
+                    labdata="[[ groupdata_audio ]]"
                     on-back-click="_handleBackTap"
                     access-token="{{ accessToken }}"
                     logged-in="{{ session.loggedIn }}"
@@ -239,7 +272,7 @@
                 group: {
                     type: Object,
                     notify: true,
-                    value: {}
+                    observer: '_groupChanged'
                 },
                 loggedIn: {
                     type: Boolean,
@@ -275,6 +308,22 @@
                 language: {
                     type: String,
                     value: 'de'
+                },
+                response_labTypes: {
+                    type: Object,
+                    observer: "_labTypesFromApi"
+                },
+                response_prios: {
+                    type: Object,
+                    observer: '_priosFromApi'
+                },
+                response_labs: {
+                    type: Object,
+                    observer: '_labsFromApi'
+                },
+                isReady: {
+                    type: Boolean,
+                    value: false
                 }
             },
 
@@ -287,6 +336,15 @@
             },
 
             ready: function () {
+                this.isReady = true;
+                this.$.ajax_labTypes.endpoint = '/Labtypes';
+
+                this.groupdata_audio = {};
+                this.groupdata_audio.priorities = [];
+                this.groupdata_video = {};
+                this.groupdata_video.priorities = [];
+                this.groupdata_foto = {};
+                this.groupdata_foto.priorities = [];
             },
 
             observers: [
@@ -299,13 +357,21 @@
 
                 if (this.userId && this.accessToken) {
 
-                    this.ajax = {
-                        headers: {
-                            Authorization: this.accessToken
-                        },
-                        method: 'GET',
-                        endpoint: '/platformusers/' + this.userId
+                    this.$.ajax_user.headers = {
+                        Authorization: this.accessToken
                     };
+                    this.$.ajax_user.method = 'GET';
+                    this.$.ajax_user.endpoint =  '/platformusers/' + this.userId;
+                    this.$.ajax_user.$.request.generateRequest();
+
+//                  OLD:
+//                    this.ajax = {
+//                        headers: {
+//                            Authorization: this.accessToken
+//                        },
+//                        method: 'GET',
+//                        endpoint: '/platformusers/' + this.userId
+//                    };
                 }
             },
 
@@ -318,13 +384,21 @@
             _accessTokenChanged: function () {
                 if (this.userId && this.accessToken) {
 
-                    this.ajax = {
-                        headers: {
-                            Authorization: this.accessToken
-                        },
-                        method: 'GET',
-                        endpoint: '/platformusers/' + this.userId
+                    this.$.ajax_user.headers = {
+                        Authorization: this.accessToken
                     };
+                    this.$.ajax_user.method = 'GET';
+                    this.$.ajax_user.endpoint =  '/platformusers/' + this.userId;
+                    this.$.ajax_user.$.request.generateRequest();
+
+//                  OLD:
+//                    this.ajax = {
+//                        headers: {
+//                            Authorization: this.accessToken
+//                        },
+//                        method: 'GET',
+//                        endpoint: '/platformusers/' + this.userId
+//                    };
                 }
             },
             _apiResponseChanged: function (response) {
@@ -406,6 +480,92 @@
                     var resolvedPageUrl = this.resolveUrl('./practicals-view.html');
                     this.importHref(resolvedPageUrl, null, this._showPage404, true);
                 }
+            },
+
+            /**
+             * Gets labtypes from API and initializes labtype-property for each labtype
+             * @param response
+             * @private
+             */
+            _labTypesFromApi: function(response) {
+                if(!this.isReady || response.type != 'response')
+                    return;
+
+                // Set labtype's registration_open to true if registration_deadline is in future otherwise false
+                var today = Date.now();
+
+                for (var i = 0; i < response.data.length; i++) {
+                    response.data[i].registration_open = today < new Date(response.data[i].registration_deadline);
+                    if (response.data[i].type_str == "Audio") {
+                        this.labtype_audio = response.data[i];
+                    }
+                    else if (response.data[i].type_str == "Video") {
+                        this.labtype_video = response.data[i];
+                    }
+                    else if (response.data[i].type_str == "Foto") {
+                        this.labtype_foto = response.data[i];
+                    }
+                }
+            },
+
+            /**
+             * Initializes and sets priorities-property for each labtype
+             * @param response
+             * @private
+             */
+            _priosFromApi: function(response) {
+
+                if(!this.isReady || response.type != 'response')
+                    return;
+
+                if (response.data.labTypeId == this.labtype_audio.id)
+                    this.groupdata_audio.priorities.push(response.data)
+                if (response.data.labTypeId == this.labtype_video.id)
+                    this.groupdata_video.priorities.push(response.data)
+                if (response.data.labTypeId == this.labtype_foto.id)
+                    this.groupdata_foto.priorities.push(response.data)
+            },
+
+            /**
+             * Observes group changes and initiates API calls to get priorities and lab data for each labtype
+             * @param response
+             * @private
+             */
+            _groupChanged: function(response) {
+                if (!this.isReady)
+                    return;
+
+                // Get priorities
+                this.$.ajax_prios.$.request.auto = false;
+                for (var i = 0; i < this.group.priorityIds.length; i++) {
+                    this.$.ajax_prios.endpoint = "/priorities/" + this.group.priorityIds[i];
+                    this.$.ajax_prios.$.request.generateRequest();
+                }
+//                this.$.ajax_prios.$.request.auto = true;
+
+                // Get labs
+                this.$.ajax_prios.$.request.auto = false;
+                for (i = 0; i < this.group.labIds.length; i++) {
+                    this.$.ajax_labs.endpoint = "/labs/" + this.group.labIds[i];
+                    this.$.ajax_labs.$.request.generateRequest();
+                }
+            },
+
+            /**
+             * Gets lab data from API and sets them for each labtype
+             * @param response
+             * @private
+             */
+            _labsFromApi: function(response) {
+                if(!this.isReady || response.type != 'response')
+                    return;
+
+                if (response.data.labTypeId == this.labtype_audio.id)
+                    this.groupdata_audio.lab = response.data;
+                if (response.data.labTypeId == this.labtype_video.id)
+                    this.groupdata_video.lab = response.data;
+                if (response.data.labTypeId == this.labtype_foto.id)
+                    this.groupdata_foto.lab = response.data
             }
         });
     </script>

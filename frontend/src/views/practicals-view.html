@@ -71,9 +71,17 @@
             }
         </style>
 
+        <api-request
+                id="ajax_savePriorities"
+                body="[[ ajax.body ]]"
+                headers="[[ ajax.headers ]]"
+                method="[[ ajax.method ]]"
+                endpoint="[[ ajax.endpoint ]]"
+                response="{{ response_savePriorities }}"
+                loading="{{ isLoading }}"></api-request>
+
         <div class="page">
             <img class="icon" src=[[icon]] z-index="1">
-
             <paper-tabs selected="{{selectedTab}}" class="tabheader" no-slide>
                 <paper-icon-button class="tabheaderbuttons backbutton" icon="icons:arrow-back"
                                    on-tap="_backClicked"></paper-icon-button>
@@ -84,58 +92,32 @@
                 <h2>[[type]] Praktikum</h2>
                 <iron-pages selected="[[selectedTab]]">
                     <div>
-                        <template is="dom-if" if="[[ practical_data.registration_open ]]">
-                            Die Registrierungsphase ist noch bis zum [[ practical_data.registration_deadline-string ]] aktiv.<br>
-                            Bitte tragt eure Prioritäten für die Termine ein.<br>
+                        <template is="dom-if" if="[[ !labtype.registration_open ]]">
+                            Die Prioritätenwahl für die Termine ist beendet.<br>
+                            <template is="dom-if" if="[[ labdata.lab ]]">
+                                Ihr habt einen Termin für das [[ labtype.type_str ]] Praktikum erhalten: [[
+                                labdata.lab.date ]]
+                            </template>
                         </template>
-                        <template is="dom-if" if="[[ !practical_data.registration_open ]]">
-                            Die Registrierungsphase ist abgeschlossen. <br>
+                        <template is="dom-if" if="[[ labtype.registration_open ]]">
+                            Bitte tragt eure Prioritäten im Termine-Tab ein!<br>
+                            Die Prioritätenwahl-Deadline ist am [[ labtype.registration_deadline ]]
                         </template>
-                        Eure Prioritäten für dieses Praktikum:
-                        <ul>
-                        <template is="dom-repeat" items="[[ lab_prios ]]" as="item">
-                            <li>Priorität [[item.priority]] für den Termin am [[item.lab]]</li>
-                        </template>
-                        </ul>
                     </div>
                     <div>
-                        <api-request
-                                id="ajax_labtypes"
-                                body="[[ ajax.body ]]"
-                                headers="[[ ajax.headers ]]"
-                                method="[[ ajax.method ]]"
-                                endpoint="[[ ajax.endpoint ]]"
-                                response="{{ response_labtypes }}"
-                                loading="{{ isLoading }}"></api-request>
-                        <api-request
-                                id="ajax_priorities"
-                                body="[[ ajax.body ]]"
-                                headers="[[ ajax.headers ]]"
-                                method="[[ ajax.method ]]"
-                                endpoint="[[ ajax.endpoint ]]"
-                                response="{{ response_priorities }}"
-                                loading="{{ isLoading }}"></api-request>
-                        <api-request
-                                id="ajax_labIds"
-                                body="[[ ajax.body ]]"
-                                headers="[[ ajax.headers ]]"
-                                method="[[ ajax.method ]]"
-                                endpoint="[[ ajax.endpoint ]]"
-                                response="{{ response_labIds }}"
-                                loading="{{ isLoading }}"></api-request>
-
-                        <template is="dom-if" if="[[ practical_data.registration_open ]]">
-                            <practical-date-detail id="practicalDateDetail_[[type]]" type="[[type]]"
-                                                   practical_date="[[practical_date]]"
-                                                   timeslots="[[timeslots]]"
-                                                   access-token="[[ accessToken ]]"
-                                                   on-save-click="_handleSaveClick"
-                                                   on-reset-click="_handleResetClick"></practical-date-detail>
+                        <template is="dom-if" if="[[ labtype.registration_open ]]">
+                            <practical-date-detail
+                                    id="practicalDateDetail"
+                                    type="[[type]]"
+                                    apipriorities="{{ labdata.priorities }}"
+                                    practical_date="[[practical_date]]"
+                                    timeslots="[[timeslots]]"
+                                    on-save-click="_handleSaveClick"
+                                    on-reset-click="_handleResetClick"></practical-date-detail>
                         </template>
-                        <template is="dom-if" if="![[ practical_data.registration_open ]]">
-                            Die Registrierungsphase ist abgeschlossen.<br>
+                        <template is="dom-if" if="[[ !labtype.registration_open ]]">
+                            Die Prioritätenwahl für die Termine ist beendet.
                         </template>
-
                     </div>
                 </iron-pages>
             </div>
@@ -148,7 +130,8 @@
             is: 'practicals-view',
             properties: {
                 accessToken: {
-                    type: String
+                    type: String,
+                    notify: true
                 },
                 chosenslots: {
                     type: Array,
@@ -178,45 +161,26 @@
                     notify: true,
                     value: ""
                 },
-                practical_data: {
-                    type: Object,
-                    value: {}
-                },
-                headers: {
-                    type: Object,
-                    value: {}
-                },
                 isReady: {
                     type: Boolean,
                     value: false
                 },
-                group: Object,
-                lab_prios: {
-                    type: Array,
-                    observer: '_labpriosChanged'
-                },
-                response_priorities: {
+                response_savePriorities: {
                     type: Object,
-                    observer: "_prioritiesChanged"
+                    observer: '_savedPrioritiesFromAPI'
                 },
-                response_labtypes: {
-                    type: Object,
-                    observer: "_labtypesChanged"
-                },
-                response_labIds: {
-                    type: Object,
-                    observer: "_labIdsChanged"
-                }
+                labdata: Object,
+                labtype: Object
+
             },
             ready: function () {
+                this.isReady = true;
                 this.practical_date = this._getDate();
                 if (this.practical_date == null) {
                     this.timeslots = this._getTimeslots();
                 }
-                this.isReady = true;
-
-                // Get labTypeId for current lab (in order to fetch priorities later)
-                this.$.ajax_labtypes.endpoint = '/LabTypes/findOne?filter[where][type_str]=' + this.type;
+//            console.log(this.labtype);
+//            console.log(this.labdata);
             },
 
             /**
@@ -225,39 +189,8 @@
             _backClicked: function () {
                 this.type = "";
                 this.fire("back-click");
-                if (typeof this.$.practicalDateDetail !== 'undefined')
+                if (typeof this.$.practicalDateDetail != 'undefined')
                     this.$.practicalDateDetail._handleResetClick();
-            },
-
-            _labtypesChanged: function (response) {
-
-                if (!this.isReady)
-                    return;
-
-//                console.log("_labtypes changed for " + this.type);
-//                console.log(response);
-
-                if (typeof response !== 'undefined' && response.data != 0) {
-
-                    deadline_date = new Date(response.data.registration_deadline);
-
-                    course = {
-                        "registration_open": response.data.registration_open,
-                        "registration_deadline-object": deadline_date,
-                        "registration_deadline-string": deadline_date.getDate() + "." + (deadline_date.getMonth()+1) +
-                            "." + deadline_date.getFullYear() + ", " + deadline_date.getHours() + ":" + deadline_date.getMinutes(),
-                        "description_tutor": response.data.description_tutor,
-                        "description_student": response.data.description_student,
-                        "labtype_id": response.data.id
-                    };
-                    this.practical_data = course;
-//                    console.log("type= " + this.type)
-                    this.$.ajax_priorities.endpoint = '/Groups/' + this.group.id + '/priorities?filter[where][labTypeId]=' + course.labtype_id;
-                }
-                else {
-                    console.log("error!");
-                    console.log(response);
-                }
             },
 
             /**
@@ -266,9 +199,13 @@
              * @private
              */
             _handleSaveClick: function (e) {
-                var dateselect_element = this.$$("#practicalDateDetail_" + this.type);
-                chosenslots = dateselect_element.chosenslots;
-                console.log(chosenslots);
+                chosenslots = e.detail;
+                console.log(chosenslots.length);
+
+                for (var i = 0; i < chosenslots.length; i++)  {
+                    console.log(chosenslots[i])
+//                    var date = new Date(chosenslots[i][0]);
+                }
             },
 
             _handleResetClick: function (e) {
@@ -281,8 +218,12 @@
              */
             _getDate: function () {
                 //TODO: Check for Practicalsdates in Backend
-                return null;
-                //return new Date(2017,2,25,14,0);
+                if (typeof this.labdata.lab == 'undefined') {
+                    console.log("Lab is not set for practical " + this.type)
+                    return null;
+                }
+                else
+                    return new Date(this.labdata.lab.date)
 
             },
 
@@ -345,80 +286,8 @@
                 return transformedSlots;
             },
 
-            /**
-             * Handler to process priority data from API
-             * @param response
-             * @private
-             */
-            _prioritiesChanged: function (response) {
-                if (!this.isReady || typeof response == 'undefined' || response.data.length == 0)
-                    return;
-
-                var newPrios = [];
-                var type = this.type;
-
-                for (var i = 0; i < response.data.length; i ++) {
-                    var append = true;
-                    for (var j = 0; j <  newPrios.length; j++) {
-                        if (newPrios[j].id == response.data[i].id) {
-                            if (newPrios[j].labId != response.data[i].labId || newPrios[j].priority != response.data[i].priority) {
-                                append = false;
-                                newPrios[j].id = response.data[i].id;
-                                newPrios[j].priority = response.data[i].priority;
-                                newPrios[j].labId = response.data[i].labId;
-                            }
-                        }
-                        if (!append)
-                            break;
-                    }
-                    if (append) {
-                        var prio = {
-                            id : response.data[i].id,
-                            priority : response.data[i].priority,
-                            labId : response.data[i].labId
-                        };
-                        newPrios.push(prio);
-                    }
-                }
-
-//                console.log("priorities is now for type " + this.type)
-//                console.log(newPrios)
-
-                this.lab_prios = newPrios;
-            },
-
-            /**
-             * Handler to process lab data per priority from API.
-             * @param response
-             * @private
-             */
-            _labIdsChanged: function (response){
-                if (!this.isReady)
-                    return;
-                console.log("lab is at " + response.data.date  + " // Type " + this.type)
+            _savedPrioritiesFromAPI: function(response) {
                 console.log(response);
-
-                for(var i = 0; i < this.lab_prios.length; i++) {
-                    if (response.data.id == this.lab_prios[i].labId) {
-                        this.lab_prios[i].lab = response.data;
-                    }
-                }
-                console.log(this.lab_prios)
-            },
-
-            /**
-             * Handler to fetch lab data, for priorities that have been changed, from API
-             * @param priorities
-             * @private
-             */
-            _labpriosChanged: function(priorities) {
-                if (!this.isReady)
-                    return;
-                console.log("PRIO CHANGED for " + this.type)
-                console.log(priorities)
-                for (var i = 0; i < priorities.length; i++) {
-                   this.$.ajax_labIds.endpoint = '/Priorities/' + priorities[i].id + '/lab';
-                }
             }
         });
     </script>

@@ -60,13 +60,6 @@
             }
         </style>
         <calculate-timeslots></calculate-timeslots>
-        <api-request
-                body="[[ ajax.body ]]"
-                headers="[[ ajax.headers ]]"
-                method="[[ ajax.method ]]"
-                endpoint="[[ ajax.endpoint ]]"
-                response="{{ response }}"
-                loading="{{ isLoading }}"></api-request>
         <!-- Checking for PracticalDate to know, if the date is already chosen-->
         <template is="dom-if" if="[[!practical_date]]">
             <div>
@@ -98,9 +91,6 @@
         Polymer({
             is: 'practical-date-detail',
             properties: {
-                accessToken: {
-                    type: String
-                },
                 type:{
                     type: String,
                     notify: true,
@@ -133,9 +123,9 @@
                     type: Array,
                     value: []
                 },
-                api_response: {
-                    type: Object,
-                    observer: "_processApiResponse"
+                apipriorities: {
+                    value: Object,
+                    notify: true
                 }
             },
 
@@ -144,16 +134,7 @@
                     this.practical_date_string = this._getDateString(this.practical_date);
                 }
                 this._fillPrioritiesArray();
-
-                // CHECK IF REGISTRATION IS OPEN
-                this.ajax = {
-                    contentType: 'application/json',
-                    method: 'GET',
-                    headers: {
-                        'Authorization': this.accessToken
-                    },
-                    endpoint: '/LabTypes/findOne?filter[where][type_str]=' + this.type
-                };
+                console.log(this.oldpriorities);
             },
 
             _fillPrioritiesArray: function(){
@@ -249,7 +230,7 @@
              * @private
              */
             _handleSaveClick: function(e){
-                this.fire("save-click");
+                this.fire("save-click", this.chosenslots);
             },
 
             /**
@@ -264,9 +245,6 @@
                         this.priorities[i] = i+1;
                     }
                 }
-            },
-            _processApiResponse: function(response) {
-                console.log(response)
             }
         });
     </script>
