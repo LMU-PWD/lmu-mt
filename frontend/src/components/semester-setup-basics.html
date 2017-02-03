@@ -22,55 +22,55 @@
 
         </style>
 
-        <paper-card heading="Create a new Semester" class="flex">
+        <paper-card heading="[[ localize('semester_setup_page_title_basics') ]]" class="flex">
             <div class="card-content">
 
-                <p>Please give us some basic info about the semester.</p>
+                <p>[[ localize('semester_setup_basics_intro') ]]</p>
 
                 <paper-input
-                        label="What's the name of this semester? (e.g. WS 2016/17, SS 2017)"
+                        label="[[ localize('semester_setup_basics_title_input') ]]"
                         value="{{ semesterTitle }}"></paper-input>
 
-                <paper-input label="When does this semester start? (dd / mm / yyyy)"
+                <paper-input label="[[ localize('semester_setup_basics_startdate_input') ]]"
                              on-tap="_openStartPickerDialog"
                              allowed-pattern="/[1-9]{1}\d? \/ [1-9]{1}\d? \/ [1-9]{1}\d{3}/"
                              value="[[ startDateFormatted ]]">
                     <iron-icon icon="icons:date-range" prefix></iron-icon>
                 </paper-input>
                 <paper-dialog id="semesterStart" class="paper-date-picker-dialog">
-                    <p>Pick a start date</p>
                     <paper-date-picker
                             id="picker"
                             date="{{ startDate }}"
                             responsive-width="630px"></paper-date-picker>
                     <div class="buttons">
-                        <paper-button dialog-confirm>OK</paper-button>
+                        <paper-button dialog-confirm>[[ localize('c_button_ok') ]]</paper-button>
                     </div>
                 </paper-dialog>
 
-                <paper-input label="When will this semester end? (dd / mm / yyyy)"
+                <paper-input label="[[ localize('semester_setup_basics_enddate_input') ]]"
                              on-tap="_openEndPickerDialog"
                              allowed-pattern="/[1-9]{1}\d? \/ [1-9]{1}\d? \/ [1-9]{1}\d{3}/"
                              value="[[ endDateFormatted ]]">
                     <iron-icon icon="icons:date-range" prefix></iron-icon>
                 </paper-input>
                 <paper-dialog id="semesterEnd" class="paper-date-picker-dialog">
-                    <p>Pick an end date</p>
                     <paper-date-picker
                             id="picker"
                             date="{{ endDate }}"
                             responsive-width="630px"></paper-date-picker>
                     <div class="buttons">
-                        <paper-button dialog-confirm>OK</paper-button>
+                        <paper-button dialog-confirm>[[ localize('c_button_ok') ]]</paper-button>
                     </div>
                 </paper-dialog>
 
-                <p>All student groups should be of the same size. What is the ideal number of group members this year?</p>
+                <p>[[ localize('semester_setup_basics_groupsize_label') ]]</p>
                 <p class="basics-groupsize">[[ groupSizeSliderImmediateValue ]]</p>
                 <paper-slider min="2" max="10" value="{{ groupSize }}" immediate-value="{{ groupSizeSliderImmediateValue }}" pin></paper-slider>
 
             </div>
         </paper-card>
+
+        <iron-signals on-iron-signal-switchlocale="_switchLocale"></iron-signals>
 
     </template>
 
@@ -99,6 +99,11 @@
                     value: 4
                 },
 
+                language: {
+                    type: String,
+                    value: 'en'
+                },
+
                 semesterTitle: {
                     type: String,
                     notify: true
@@ -114,6 +119,19 @@
                     computed: '_formatDate(startDate)',
                     reflectToAttribute: false
                 }
+            },
+
+            /**
+             * Localization setup
+             */
+            behaviors: [
+                Polymer.AppLocalizeBehavior
+            ],
+            attached: function() {
+                this.loadResources(this.resolveUrl('../shared/locales.json'));
+            },
+            _switchLocale: function() {
+                this.language = (this.language == 'en') ? 'de' : 'en';
             },
 
             _openStartPickerDialog: function () {

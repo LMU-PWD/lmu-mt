@@ -17,34 +17,34 @@
 
         </style>
 
-        <paper-card heading="Add Students" class="flex">
+        <paper-card heading="[[ localize('semester_setup_page_title_students') ]]" class="flex">
             <div class="card-content">
 
-                <p>Have students already registered for this course in UniWorX? You can add them as well by uploading the .csv table.</p>
+                <p>[[ localize('semester_setup_students_intro') ]]</p>
 
                 <!-- TODO: Modularize this to reuse it in admin menu -->
-                <paper-button><papa-parser label="Upload .csv" output-data="{{ papaParserJson }}"></papa-parser></paper-button>
+                <paper-button><papa-parser label="[[ localize('semester_setup_users_upload_button') ]]" output-data="{{ papaParserJson }}"></papa-parser></paper-button>
 
-                <p><em>Click or tap on any row in the table below to edit data.</em></p>
+                <p><em>[[ localize('semester_setup_table_usage_tip') ]]</em></p>
 
                 <iron-data-table items="[[ studentData ]]" details-enabled>
                     <template is="row-detail">
                         <div class="list-detail">
-                            <paper-input label="First name" value="{{ item.first_name }}"></paper-input>
-                            <paper-input label="Last name" value="{{ item.name }}"></paper-input>
-                            <paper-input label="Email" type="email" value="{{ item.email }}"></paper-input>
+                            <paper-input label="[[ localize('semester_setup_users_table_firstname') ]]" value="{{ item.first_name }}"></paper-input>
+                            <paper-input label="[[ localize('semester_setup_users_table_lastname') ]]" value="{{ item.name }}"></paper-input>
+                            <paper-input label="[[ localize('semester_setup_users_table_email') ]]" type="email" value="{{ item.email }}"></paper-input>
                         </div>
                     </template>
-                    <data-table-column name="First name">
+                    <data-table-column name="[[ localize('semester_setup_users_table_firstname') ]]">
                         <template>[[ item.first_name ]]</template>
                     </data-table-column>
-                    <data-table-column name="Last name">
+                    <data-table-column name="[[ localize('semester_setup_users_table_lastname') ]]">
                         <template>[[ item.name ]]</template>
                     </data-table-column>
-                    <data-table-column name="Email">
+                    <data-table-column name="[[ localize('semester_setup_users_table_email') ]]">
                         <template>[[ item.email ]]</template>
                     </data-table-column>
-                    <data-table-column name="Actions">
+                    <data-table-column name="[[ localize('semester_setup_users_table_actions') ]]">
                         <template>
                             <paper-icon-button
                                     id="delete-[[ item.id ]]"
@@ -54,18 +54,20 @@
                                     for="delete-[[ item.id ]]"
                                     position="right"
                                     animation-delay="0"
-                                    fit-to-visible-bounds="true">Remove from list</paper-tooltip>
+                                    fit-to-visible-bounds="true">[[ localize('semester_setup_users_table_delete_tooltip') ]]</paper-tooltip>
                         </template>
                     </data-table-column>
                 </iron-data-table>
 
                 <paper-button class="save-button" on-tap="_saveTable">
-                    Save table&nbsp;<iron-icon icon="icons:save"></iron-icon></paper-button>
+                    [[ localize('c_button_save_table') ]]&nbsp;<iron-icon icon="icons:save"></iron-icon></paper-button>
 
                 <div style="clear: both;"></div>
 
             </div>
         </paper-card>
+
+        <iron-signals on-iron-signal-switchlocale="_switchLocale"></iron-signals>
 
     </template>
 
@@ -76,6 +78,11 @@
             is: 'semester-setup-students',
 
             properties: {
+
+                language: {
+                    type: String,
+                    value: 'en'
+                },
 
                 papaParserJson: {
                     type: Object,
@@ -88,6 +95,19 @@
                     type: Array,
                     notify: true
                 }
+            },
+
+            /**
+             * Localization setup
+             */
+            behaviors: [
+                Polymer.AppLocalizeBehavior
+            ],
+            attached: function() {
+                this.loadResources(this.resolveUrl('../shared/locales.json'));
+            },
+            _switchLocale: function() {
+                this.language = (this.language == 'en') ? 'de' : 'en';
             },
 
             _processParsedJson: function (json) {

@@ -122,12 +122,12 @@
         </style>
 
         <paper-dialog id="closeDialog">
-            <h2>Close semester setup?</h2>
-            <p>Leaving this page will discard all your inputs. Are you sure you want to continue?</p>
-            <p>If you don't have any tutors, students or dates for this semester yet, you can just skip these steps and add data later.</p>
+            <h2>[[ localize('semester_setup_close_dialog_heading') ]]</h2>
+            <p>[[ localize('semester_setup_close_dialog_p1') ]]</p>
+            <p>[[ localize('semester_setup_close_dialog_p2') ]]</p>
             <div class="buttons">
-                <paper-button dialog-dismiss>Stay here</paper-button>
-                <paper-button dialog-confirm autofocus on-tap="_closeDialogCloseButtonTapped">Close</paper-button>
+                <paper-button dialog-dismiss>[[ localize('semester_setup_close_dialog_cancel_button') ]]</paper-button>
+                <paper-button dialog-confirm autofocus on-tap="_closeDialogCloseButtonTapped">[[ localize('semester_setup_close_dialog_confirm_button') ]]</paper-button>
             </div>
         </paper-dialog>
 
@@ -143,7 +143,7 @@
                             for="closeSetupButton"
                             position="bottom"
                             animation-delay="0"
-                            fit-to-visible-bounds="true">Discard new semester</paper-tooltip>
+                            fit-to-visible-bounds="true">[[ localize('semester_setup_close_button_tooltip') ]]</paper-tooltip>
                 </div>
                 <div class="setup-header-breadcrumb">
                     <div class="desktop">
@@ -152,24 +152,24 @@
                                 <paper-button
                                         class="setup-header-breadcrumb-done"
                                         data-breadcrumb-index="[[ breadcrumb.index ]]"
-                                        on-tap="_jumpToPage">[[ breadcrumb.label ]]</paper-button>
+                                        on-tap="_jumpToPage">[[ localize(breadcrumb.label) ]]</paper-button>
                             </template>
                             <template is="dom-if" if="[[ breadcrumb.active ]]">
                                 <paper-button
                                         class="setup-header-breadcrumb-active"
                                         data-breadcrumb-index="[[ breadcrumb.index ]]"
-                                        on-tap="_jumpToPage">[[ breadcrumb.label ]]</paper-button>
+                                        on-tap="_jumpToPage">[[ localize(breadcrumb.label) ]]</paper-button>
                             </template>
                             <template is="dom-if" if="[[ breadcrumb.todo ]]">
                                 <paper-button
                                         class="setup-header-breadcrumb-todo"
                                         data-breadcrumb-index="[[ breadcrumb.index ]]"
-                                        on-tap="_jumpToPage">[[ breadcrumb.label ]]</paper-button>
+                                        on-tap="_jumpToPage">[[ localize(breadcrumb.label) ]]</paper-button>
                             </template>
                         </template>
                     </div>
                     <div class="mobile">
-                        <paper-button class="setup-header-breadcrumb-mobile" disabled>[[ activeIndexNatural ]]/5 [[ activeLabel ]]</paper-button>
+                        <paper-button class="setup-header-breadcrumb-mobile" disabled>[[ activeIndexNatural ]]/5 [[ localize(activeLabel) ]]</paper-button>
                     </div>
                 </div>
             </div>
@@ -205,12 +205,12 @@
 
             <div class="setup-footer">
                 <div class="setup-footer-navigation">
-                    <paper-button on-tap="_stepBack" disabled="[[ backDisabled ]]"><iron-icon icon="icons:chevron-left"></iron-icon> Back</paper-button>
+                    <paper-button on-tap="_stepBack" disabled="[[ backDisabled ]]"><iron-icon icon="icons:chevron-left"></iron-icon> [[ localize('c_button_back') ]]</paper-button>
                     <template is="dom-if" if="[[ !isLastPage ]]">
-                        <paper-button on-tap="_stepForward" disabled="[[ nextDisabled ]]">Next <iron-icon icon="icons:chevron-right"></iron-icon></paper-button>
+                        <paper-button on-tap="_stepForward" disabled="[[ nextDisabled ]]">[[ localize('c_button_next') ]] <iron-icon icon="icons:chevron-right"></iron-icon></paper-button>
                     </template>
                     <template is="dom-if" if="[[ isLastPage ]]">
-                        <paper-button on-tap="_postToApi" class="positive"><iron-icon icon="icons:check-circle"></iron-icon>&nbsp;Create semester</paper-button>
+                        <paper-button on-tap="_postToApi" class="positive"><iron-icon icon="icons:check-circle"></iron-icon>&nbsp;[[ localize('semester_setup_navigation_create_button') ]]</paper-button>
                     </template>
 
                 </div>
@@ -235,6 +235,8 @@
             students="[[ students ]]"
             dates="[[ dates ]]"
             loading="{{ processingCreateRequest }}"></create-semester-request>
+
+        <iron-signals on-iron-signal-switchlocale="_switchLocale"></iron-signals>
 
     </template>
 
@@ -323,16 +325,33 @@
                     value: [] },
                 processingCreateRequest: {
                     type: Boolean,
-                    value: false }
+                    value: false },
+
+                language: {
+                    type: String,
+                    value: 'en' }
+            },
+
+            /**
+             * Localization setup
+             */
+            behaviors: [
+                Polymer.AppLocalizeBehavior
+            ],
+            attached: function() {
+                this.loadResources(this.resolveUrl('../shared/locales.json'));
+            },
+            _switchLocale: function() {
+                this.language = (this.language == 'en') ? 'de' : 'en';
             },
 
             _getActiveLabel: function (index) {
                 var labels = [
-                    'Basics',
-                    'Practicals',
-                    'Tutors',
-                    'Students',
-                    'Dates'
+                    'semester_setup_page_title_basics_breadcrumb',
+                    'semester_setup_page_title_practicals_breadcrumb',
+                    'semester_setup_page_title_tutors_breadcrumb',
+                    'semester_setup_page_title_students_breadcrumb',
+                    'semester_setup_page_title_dates_breadcrumb'
                 ];
                 return labels[index];
             },
@@ -343,11 +362,11 @@
 
             _computeBreadcrumbStatus: function (index) {
                 var result = [
-                    {label: '1. Basics', index: 0, done: false, active: false, todo: false},
-                    {label: '2. Practicals', index: 1, done: false, active: false, todo: false},
-                    {label: '3. Tutors', index: 2, done: false, active: false, todo: false},
-                    {label: '4. Students', index: 3, done: false, active: false, todo: false},
-                    {label: '5. Dates', index: 4, done: false, active: false, todo: false}
+                    {label: 'semester_setup_page_title_basics_breadcrumb_indexed', index: 0, done: false, active: false, todo: false},
+                    {label: 'semester_setup_page_title_practicals_breadcrumb_indexed', index: 1, done: false, active: false, todo: false},
+                    {label: 'semester_setup_page_title_tutors_breadcrumb_indexed', index: 2, done: false, active: false, todo: false},
+                    {label: 'semester_setup_page_title_students_breadcrumb_indexed', index: 3, done: false, active: false, todo: false},
+                    {label: 'semester_setup_page_title_dates_breadcrumb_indexed', index: 4, done: false, active: false, todo: false}
                 ];
                 head = 0;
                 while (head < index) {

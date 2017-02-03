@@ -26,19 +26,20 @@
 
         <template is="dom-if" if="[[ show ]]">
 
-            <paper-card heading="Edit Practical Types" class="flex">
+            <paper-card heading="[[ localize('semester_setup_page_title_practicals') ]]" class="flex">
                 <div class="card-content">
 
-                    <p>Each group of students will have to pass three labs: <strong>Photo, Video and Audio</strong>. If you can, please provide some details.</p>
+                    <p>[[ localize('semester_setup_practicals_intro_p1_1') ]]
+                        <strong>[[ localize('semester_setup_practicals_intro_p1_2') ]]</strong>[[ localize('semester_setup_practicals_intro_p1_3') ]]</p>
 
-                    <p>Never mind if some information is still uncertain - just leave those fields blank and add data later.</p>
+                    <p>[[ localize('semester_setup_practicals_intro_p2') ]]</p>
 
                     <div>
                         <paper-button
                                 class="practicals-collapse-header"
                                 on-tap="_toggleCollapse"
                                 data-practical-type="photo">
-                            Photo Lab
+                            [[ localize('semester_setup_practicals_photo') ]] [[ localize('semester_setup_practicals_lab') ]]
                             <iron-icon
                                     icon="hardware:keyboard-arrow-down"
                                     data-practical-type="photo"></iron-icon>
@@ -46,29 +47,31 @@
                         </paper-button>
                         <iron-collapse id="photoCollapsible">
                             <paper-input
-                                    label="Title that will be shown to users"
+                                    label="[[ localize('semester_setup_practicals_title_input') ]]"
                                     value="{{ photoTitle }}"></paper-input>
 
-                            <paper-input label="Deadline for student groups to enroll (dd / mm / yyyy)"
+                            <paper-input label="[[ localize('semester_setup_practicals_deadline_input') ]]"
                                          on-tap="_openPhotoPickerDialog"
                                          allowed-pattern="/[1-9]{1}\d? \/ [1-9]{1}\d? \/ [1-9]{1}\d{3}/"
                                          value="[[ photoDeadlineFormatted ]]">
                                 <iron-icon icon="icons:date-range" prefix></iron-icon>
                             </paper-input>
 
-                            <p>Add some content to the page <strong>tutors</strong> will see when they click on the
-                                photo lab. You can use
+                            <p>[[ localize('semester_setup_practicals_description_label_1') ]]
+                                <strong>[[ localize('semester_setup_practicals_tutors') ]]</strong>[[ localize('semester_setup_practicals_description_label_2') ]]
+                                [[ localize('semester_setup_practicals_photo') ]][[ localize('semester_setup_practicals_description_label_3') ]]
                                 <a target="_blank" href="https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet">
-                                    Markdown syntax</a>.</p>
+                                    [[ localize('semester_setup_practicals_markdown') ]]</a>[[ localize('semester_setup_practicals_description_label_4') ]]</p>
                             <ace-widget
                                     on-editor-content="_aceValueChanged"
                                     data-reflecting-property="photoDescriptionTutor"
                                     theme="[[ editorTheme ]]"></ace-widget>
 
-                            <p>Add some content to the page <strong>students</strong> will see when they click on the
-                                photo lab. You can use
+                            <p>[[ localize('semester_setup_practicals_description_label_1') ]]
+                                <strong>[[ localize('semester_setup_practicals_students') ]]</strong>[[ localize('semester_setup_practicals_description_label_2') ]]
+                                [[ localize('semester_setup_practicals_photo') ]][[ localize('semester_setup_practicals_description_label_3') ]]
                                 <a target="_blank" href="https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet">
-                                    Markdown syntax</a>.</p>
+                                    [[ localize('semester_setup_practicals_markdown') ]]</a>[[ localize('semester_setup_practicals_description_label_4') ]]</p>
                             <ace-widget
                                     on-editor-content="_aceValueChanged"
                                     data-reflecting-property="photoDescriptionStudent"
@@ -82,7 +85,7 @@
                                 class="practicals-collapse-header"
                                 on-tap="_toggleCollapse"
                                 data-practical-type="video">
-                            Video Lab
+                            [[ localize('semester_setup_practicals_video') ]] [[ localize('semester_setup_practicals_lab') ]]
                             <iron-icon
                                     icon="hardware:keyboard-arrow-down"
                                     data-practical-type="video"></iron-icon>
@@ -90,29 +93,31 @@
                         <iron-collapse id="videoCollapsible">
 
                             <paper-input
-                                    label="Title that will be shown to users"
+                                    label="[[ localize('semester_setup_practicals_title_input') ]]"
                                     value="{{ videoTitle }}"></paper-input>
 
-                            <paper-input label="Deadline for student groups to enroll (dd / mm / yyyy)"
+                            <paper-input label="[[ localize('semester_setup_practicals_deadline_input') ]]"
                                          on-tap="_openVideoPickerDialog"
                                          allowed-pattern="/[1-9]{1}\d? \/ [1-9]{1}\d? \/ [1-9]{1}\d{3}/"
                                          value="[[ videoDeadlineFormatted ]]">
                                 <iron-icon icon="icons:date-range" prefix></iron-icon>
                             </paper-input>
 
-                            <p>Add some content to the page <strong>tutors</strong> will see when they click on the
-                                video lab. You can use
+                            <p>[[ localize('semester_setup_practicals_description_label_1') ]]
+                                <strong>[[ localize('semester_setup_practicals_tutors') ]]</strong>[[ localize('semester_setup_practicals_description_label_2') ]]
+                                [[ localize('semester_setup_practicals_video') ]][[ localize('semester_setup_practicals_description_label_3') ]]
                                 <a target="_blank" href="https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet">
-                                    Markdown syntax</a>.</p>
+                                    [[ localize('semester_setup_practicals_markdown') ]]</a>[[ localize('semester_setup_practicals_description_label_4') ]]</p>
                             <ace-widget
                                     on-editor-content="_aceValueChanged"
                                     data-reflecting-property="videoDescriptionTutor"
                                     theme="[[ editorTheme ]]"></ace-widget>
 
-                            <p>Add some content to the page <strong>students</strong> will see when they click on the
-                                video lab. You can use
+                            <p>[[ localize('semester_setup_practicals_description_label_1') ]]
+                                <strong>[[ localize('semester_setup_practicals_students') ]]</strong>[[ localize('semester_setup_practicals_description_label_2') ]]
+                                [[ localize('semester_setup_practicals_video') ]][[ localize('semester_setup_practicals_description_label_3') ]]
                                 <a target="_blank" href="https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet">
-                                    Markdown syntax</a>.</p>
+                                    [[ localize('semester_setup_practicals_markdown') ]]</a>[[ localize('semester_setup_practicals_description_label_4') ]]</p>
                             <ace-widget
                                     on-editor-content="_aceValueChanged"
                                     data-reflecting-property="videoDescriptionStudent"
@@ -126,7 +131,7 @@
                                 class="practicals-collapse-header"
                                 on-tap="_toggleCollapse"
                                 data-practical-type="audio">
-                            Audio Lab
+                            [[ localize('semester_setup_practicals_audio') ]] [[ localize('semester_setup_practicals_lab') ]]
                             <iron-icon
                                     icon="hardware:keyboard-arrow-down"
                                     data-practical-type="audio"></iron-icon>
@@ -134,29 +139,31 @@
                         <iron-collapse id="audioCollapsible">
 
                             <paper-input
-                                    label="Title that will be shown to users"
+                                    label="[[ localize('semester_setup_practicals_title_input') ]]"
                                     value="{{ audioTitle }}"></paper-input>
 
-                            <paper-input label="Deadline for student groups to enroll (dd / mm / yyyy)"
+                            <paper-input label="[[ localize('semester_setup_practicals_deadline_input') ]]"
                                          on-tap="_openAudioPickerDialog"
                                          allowed-pattern="/[1-9]{1}\d? \/ [1-9]{1}\d? \/ [1-9]{1}\d{3}/"
                                          value="[[ audioDeadlineFormatted ]]">
                                 <iron-icon icon="icons:date-range" prefix></iron-icon>
                             </paper-input>
 
-                            <p>Add some content to the page <strong>tutors</strong> will see when they click on the
-                                audiolab. You can use
-                                <a target=_blank" href="https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet">
-                                    Markdown syntax</a>.</p>
+                            <p>[[ localize('semester_setup_practicals_description_label_1') ]]
+                                <strong>[[ localize('semester_setup_practicals_tutors') ]]</strong>[[ localize('semester_setup_practicals_description_label_2') ]]
+                                [[ localize('semester_setup_practicals_audio') ]][[ localize('semester_setup_practicals_description_label_3') ]]
+                                <a target="_blank" href="https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet">
+                                    [[ localize('semester_setup_practicals_markdown') ]]</a>[[ localize('semester_setup_practicals_description_label_4') ]]</p>
                             <ace-widget
                                     on-editor-content="_aceValueChanged"
                                     data-reflecting-property="audioDescriptionTutor"
                                     theme="[[ editorTheme ]]"></ace-widget>
 
-                            <p>Add some content to the page <strong>students</strong> will see when they click on the
-                                audio lab. You can use
+                            <p>[[ localize('semester_setup_practicals_description_label_1') ]]
+                                <strong>[[ localize('semester_setup_practicals_students') ]]</strong>[[ localize('semester_setup_practicals_description_label_2') ]]
+                                [[ localize('semester_setup_practicals_audio') ]][[ localize('semester_setup_practicals_description_label_3') ]]
                                 <a target="_blank" href="https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet">
-                                    Markdown syntax</a>.</p>
+                                    [[ localize('semester_setup_practicals_markdown') ]]</a>[[ localize('semester_setup_practicals_description_label_4') ]]</p>
                             <ace-widget
                                     on-editor-content="_aceValueChanged"
                                     data-reflecting-property="audioDescriptionStudent"
@@ -176,7 +183,7 @@
                     date="{{ photoDeadline }}"
                     responsive-width="630px"></paper-date-picker>
             <div class="buttons">
-                <paper-button dialog-confirm>OK</paper-button>
+                <paper-button dialog-confirm>[[ localize('c_button_ok') ]]</paper-button>
             </div>
         </paper-dialog>
 
@@ -186,7 +193,7 @@
                     date="{{ videoDeadline }}"
                     responsive-width="630px"></paper-date-picker>
             <div class="buttons">
-                <paper-button dialog-confirm>OK</paper-button>
+                <paper-button dialog-confirm>[[ localize('c_button_ok') ]]</paper-button>
             </div>
         </paper-dialog>
 
@@ -196,9 +203,11 @@
                     date="{{ audioDeadline }}"
                     responsive-width="630px"></paper-date-picker>
             <div class="buttons">
-                <paper-button dialog-confirm>OK</paper-button>
+                <paper-button dialog-confirm>[[ localize('c_button_ok') ]]</paper-button>
             </div>
         </paper-dialog>
+
+        <iron-signals on-iron-signal-switchlocale="_switchLocale"></iron-signals>
 
     </template>
 
@@ -286,7 +295,24 @@
                 show: {
                     type: Boolean,
                     notify: true
+                },
+                language: {
+                    type: String,
+                    value: 'en'
                 }
+            },
+
+            /**
+             * Localization setup
+             */
+            behaviors: [
+                Polymer.AppLocalizeBehavior
+            ],
+            attached: function() {
+                this.loadResources(this.resolveUrl('../shared/locales.json'));
+            },
+            _switchLocale: function() {
+                this.language = (this.language == 'en') ? 'de' : 'en';
             },
 
             _toggleCollapse: function (event) {

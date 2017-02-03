@@ -28,34 +28,34 @@
 
         </style>
 
-        <paper-card heading="Add Dates" class="flex">
+        <paper-card heading="[[ localize('semester_setup_page_title_dates') ]]" class="flex">
             <div class="card-content">
 
-                <p>Have you already determined some of the dates that apply to all students (e. g. lecture dates, exam date, final presentation)? You can add them here.</p>
+                <p>[[ localize('semester_setup_dates_intro_p1') ]]</p>
 
-                <p>You can still add, edit and delete dates later.</p>
+                <p>[[ localize('semester_setup_dates_intro_p2') ]]</p>
 
-                <p><em>Click or tap on any item in the list below to edit it.</em></p>
+                <p><em>[[ localize('semester_setup_table_usage_tip') ]]</em></p>
 
                 <iron-data-table items="[[ dates ]]" details-enabled>
                     <template is="row-detail">
                         <div class="list-detail">
                             <!-- TODO: Make date and time editable -->
-                            <paper-input label="Title" value="{{ item.title }}"></paper-input>
-                            <paper-input label="Location" value="{{ item.location }}"></paper-input>
-                            <paper-input label="Duration" type="number" value="{{ item.duration }}"></paper-input>
+                            <paper-input label="[[ localize('semester_setup_dates_title') ]]" value="{{ item.title }}"></paper-input>
+                            <paper-input label="[[ localize('semester_setup_dates_location') ]]" value="{{ item.location }}"></paper-input>
+                            <paper-input label="[[ localize('semester_setup_dates_duration') ]]" type="number" value="{{ item.duration }}"></paper-input>
                         </div>
                     </template>
-                    <data-table-column name="Date">
+                    <data-table-column name="[[ localize('semester_setup_dates_datelabel') ]]">
                         <template>
                             <iron-icon icon="icons:date-range"></iron-icon>
                             [[ _dateAsFormattedString(item.date) ]]
                         </template>
                     </data-table-column>
-                    <data-table-column name="Event title">
+                    <data-table-column name="[[ localize('semester_setup_dates_title') ]]">
                         <template>[[ item.title ]]</template>
                     </data-table-column>
-                    <data-table-column name="Actions">
+                    <data-table-column name="[[ localize('semester_setup_table_actions') ]]">
                         <template>
                             <paper-icon-button
                                     id="delete-[[ item.id ]]"
@@ -65,49 +65,51 @@
                                     for="delete-[[ item.id ]]"
                                     position="right"
                                     animation-delay="0"
-                                    fit-to-visible-bounds="true">Remove from list</paper-tooltip>
+                                    fit-to-visible-bounds="true">[[ localize('semester_setup_table_delete_tooltip') ]]</paper-tooltip>
                         </template>
                     </data-table-column>
                 </iron-data-table>
 
                 <paper-button class="save-button" on-tap="_openDateDialog">
-                    Add date&nbsp;<iron-icon icon="icons:add-circle-outline"></iron-icon></paper-button>
+                    [[ localize('semester_setup_dates_button_add') ]]&nbsp;<iron-icon icon="icons:add-circle-outline"></iron-icon></paper-button>
 
                 <paper-button class="save-button" on-tap="_saveTable">
-                    Save table&nbsp;<iron-icon icon="icons:save"></iron-icon></paper-button>
+                    [[ localize('c_button_save_table') ]]&nbsp;<iron-icon icon="icons:save"></iron-icon></paper-button>
 
                 <div style="clear: both;"></div>
 
                 <paper-dialog id="dateDialog" on-iron-overlay-closed="_discardDateDialog">
 
-                    <h2>Add a new date</h2>
+                    <h2>[[ localize('semester_setup_dates_dialog_heading') ]]</h2>
 
                     <paper-dialog-scrollable>
 
-                        <h3>Starting at</h3>
+                        <h3>[[ localize('semester_setup_dates_dialog_startingat') ]]</h3>
                         <paper-date-picker
                                 date="{{ dialogDate }}"
                                 responsive-width="630px"></paper-date-picker>
                         <time-picker hour="{{ dialogHour }}" min="{{ dialogMin }}"></time-picker>
 
-                        <paper-input type="number" min="0" label="Duration" value="{{ dialogDuration }}">
-                            <div suffix>minutes</div>
+                        <paper-input type="number" min="0" label="[[ localize('semester_setup_dates_duration') ]]" value="{{ dialogDuration }}">
+                            <div suffix>[[ localize('c_minutes') ]]</div>
                         </paper-input>
 
-                        <paper-input label="Title of the event" value="{{ dialogTitle }}"></paper-input>
+                        <paper-input label="[[ localize('semester_setup_dates_title_long') ]]" value="{{ dialogTitle }}"></paper-input>
 
-                        <paper-input label="Location" value="{{ dialogLocation }}"></paper-input>
+                        <paper-input label="[[ localize('semester_setup_dates_location') ]]" value="{{ dialogLocation }}"></paper-input>
 
                     </paper-dialog-scrollable>
 
                     <div class="buttons">
-                        <paper-button dialog-dismiss>Discard</paper-button>
-                        <paper-button dialog-confirm autofocus on-tap="_storeNewDate">Save</paper-button>
+                        <paper-button dialog-dismiss>[[ localize('c_button_discard') ]]</paper-button>
+                        <paper-button dialog-confirm autofocus on-tap="_storeNewDate">[[ localize('c_button_save') ]]</paper-button>
                     </div>
                 </paper-dialog>
 
             </div>
         </paper-card>
+
+        <iron-signals on-iron-signal-switchlocale="_switchLocale"></iron-signals>
 
     </template>
 
@@ -141,8 +143,25 @@
                     value: '' },
                 dialogLocation: {
                     type: String,
-                    value: '' }
+                    value: '' },
 
+                language: {
+                    type: String,
+                    value: 'en' }
+
+            },
+
+            /**
+             * Localization setup
+             */
+            behaviors: [
+                Polymer.AppLocalizeBehavior
+            ],
+            attached: function() {
+                this.loadResources(this.resolveUrl('../shared/locales.json'));
+            },
+            _switchLocale: function() {
+                this.language = (this.language == 'en') ? 'de' : 'en';
             },
 
             _openDateDialog: function () {

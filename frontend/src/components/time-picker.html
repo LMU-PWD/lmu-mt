@@ -16,7 +16,7 @@
 
         </style>
 
-        <paper-dropdown-menu label="hour">
+        <paper-dropdown-menu label="[[ localize('c_hours') ]]">
             <paper-listbox class="dropdown-content" selected="{{ hour }}">
                 <paper-item>0</paper-item><paper-item>1</paper-item><paper-item>2</paper-item><paper-item>3</paper-item>
                 <paper-item>4</paper-item><paper-item>5</paper-item><paper-item>6</paper-item><paper-item>7</paper-item>
@@ -27,7 +27,7 @@
             </paper-listbox>
         </paper-dropdown-menu>
         &nbsp;:&nbsp;
-        <paper-dropdown-menu label="min">
+        <paper-dropdown-menu label="[[ localize('c_minutes') ]]">
             <paper-listbox class="dropdown-content" selected="{{ min }}">
                 <paper-item>00</paper-item><paper-item>01</paper-item><paper-item>02</paper-item><paper-item>03</paper-item>
                 <paper-item>04</paper-item><paper-item>05</paper-item><paper-item>06</paper-item><paper-item>07</paper-item>
@@ -46,6 +46,8 @@
                 <paper-item>56</paper-item><paper-item>57</paper-item><paper-item>58</paper-item><paper-item>59</paper-item>
             </paper-listbox>
         </paper-dropdown-menu>
+
+        <iron-signals on-iron-signal-switchlocale="_switchLocale"></iron-signals>
 
     </template>
 
@@ -67,8 +69,26 @@
                     type: Number,
                     notify: true,
                     value: 0
+                },
+
+                language: {
+                    type: String,
+                    value: 'en'
                 }
-            }
+            },
+
+            /**
+             * Localization setup
+             */
+            behaviors: [
+                Polymer.AppLocalizeBehavior
+            ],
+            attached: function() {
+                this.loadResources(this.resolveUrl('../shared/locales.json'));
+            },
+            _switchLocale: function() {
+                this.language = (this.language == 'en') ? 'de' : 'en';
+            },
 
         });
 
