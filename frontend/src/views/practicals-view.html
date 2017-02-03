@@ -83,7 +83,8 @@
         <div class="page">
             <img class="icon" src=[[icon]] z-index="1">
             <paper-tabs selected="{{selectedTab}}" class="tabheader" no-slide>
-                <paper-icon-button class="tabheaderbuttons backbutton" icon="icons:arrow-back"
+                <paper-icon-button class="tabheaderbuttons backbutton"
+                                   icon="icons:arrow-back"
                                    on-tap="_backClicked"></paper-icon-button>
                 <paper-tab class="tabheaderbuttons firsttab">Allgemein</paper-tab>
                 <paper-tab class="tabheaderbuttons">Termine</paper-tab>
@@ -91,33 +92,17 @@
             <div class="content">
                 <h2>[[type]] Praktikum</h2>
                 <iron-pages selected="[[selectedTab]]">
+                    <div>Page 1 Text</div>
                     <div>
-                        <template is="dom-if" if="[[ !labtype.registration_open ]]">
-                            Die Prioritätenwahl für die Termine ist beendet.<br>
-                            <template is="dom-if" if="[[ labdata.lab ]]">
-                                Ihr habt einen Termin für das [[ labtype.type_str ]] Praktikum erhalten: [[
-                                labdata.lab.date ]]
-                            </template>
-                        </template>
-                        <template is="dom-if" if="[[ labtype.registration_open ]]">
-                            Bitte tragt eure Prioritäten im Termine-Tab ein!<br>
-                            Die Prioritätenwahl-Deadline ist am [[ labtype.registration_deadline ]]
-                        </template>
-                    </div>
-                    <div>
-                        <template is="dom-if" if="[[ labtype.registration_open ]]">
-                            <practical-date-detail
-                                    id="practicalDateDetail"
-                                    type="[[type]]"
-                                    apipriorities="{{ labdata.priorities }}"
-                                    practical_date="[[practical_date]]"
-                                    timeslots="[[timeslots]]"
-                                    on-save-click="_handleSaveClick"
-                                    on-reset-click="_handleResetClick"></practical-date-detail>
-                        </template>
-                        <template is="dom-if" if="[[ !labtype.registration_open ]]">
-                            Die Prioritätenwahl für die Termine ist beendet.
-                        </template>
+                        <practical-date-detail
+                            id="practicalDateDetail"
+                            type="[[type]]"
+                            api-priorities="{{ labdata.priorities }}"
+                            practical_date="[[practical_date]]"
+                            timeslots="[[timeslots]]"
+                            on-save-click="_handleSaveClick"
+                            on-reset-click="_handleResetClick">
+                        </practical-date-detail>
                     </div>
                 </iron-pages>
             </div>
@@ -167,10 +152,10 @@
                 },
                 response_savePriorities: {
                     type: Object,
-                    observer: '_savedPrioritiesFromAPI'
-                },
-                labdata: Object,
-                labtype: Object
+                    observer: '_responseFromPrioritySave'
+                }
+                labData: Object,
+                labType: Object
 
             },
             ready: function () {
@@ -179,8 +164,6 @@
                 if (this.practical_date == null) {
                     this.timeslots = this._getTimeslots();
                 }
-//            console.log(this.labtype);
-//            console.log(this.labdata);
             },
 
             /**
@@ -202,9 +185,44 @@
                 chosenslots = e.detail;
                 console.log(chosenslots.length);
 
-                for (var i = 0; i < chosenslots.length; i++)  {
-                    console.log(chosenslots[i])
-//                    var date = new Date(chosenslots[i][0]);
+                // TODO: Deliver chosen slots as lab objects (with Id)
+
+                // IMPORTANT: This is the example process for saving priorities.
+                // The process has to be done for each set priority (every
+                // entry in chosenslots)
+
+                for (var i = 0; i < chosenslots.length; i++) {
+
+                    // TODO: Replace this by chosenslot entry as lab object
+                    var dummyLab = {};
+
+                    // Step 1. check if this priority has been in the DB for this group already
+                    var found = false;
+                    for (var i = 0; i < this.labdata.priorities.length; i ++) {
+                        if (this.labdata.priorities[i].id == dummyLab.id) {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (found)
+                        // take next priority / go on in loop over chosenslots
+                        break;
+
+                    // Step 2. Save a new priority object
+                    this.ajax = {
+                        endpoint: '/groups/' + this.group.id + 'priorities',
+                        method: 'POST',
+                        headers: {
+                            'Authorization' : this.accessToken
+                        },
+                        body: {
+                            priority: 3,
+                            groupId: this.group.id,
+                            labId: dummyLab.id, // TODO: Set this (= current slot's lab id)
+                            semesterId: this.group.semesterId,
+                            labTypeId: this.labType.id
+                        }
+                    }
                 }
             },
 
@@ -219,7 +237,7 @@
             _getDate: function () {
                 //TODO: Check for Practicalsdates in Backend
                 if (typeof this.labdata.lab == 'undefined') {
-                    console.log("Lab is not set for practical " + this.type)
+                    // Lab is not set for this practical
                     return null;
                 }
                 else
@@ -286,8 +304,13 @@
                 return transformedSlots;
             },
 
-            _savedPrioritiesFromAPI: function(response) {
-                console.log(response);
+            /**
+             * Gets response from API call to create a new priority
+             * @param response
+             * @private
+             */
+            _responseFromPrioritySave: function(response) {
+                console.log(response)
             }
         });
     </script>

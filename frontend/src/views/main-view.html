@@ -218,8 +218,8 @@
                     icon="[[icon]]"
                     route="{{subroute}}"
                     group="[[ group ]]"
-                    labtype="[[ labtype_foto ]]"
-                    labdata="[[ groupdata_foto ]]"
+                    lab-type="[[ labtype_foto ]]"
+                    lab-data="[[ groupdata_foto ]]"
                     on-back-click="_handleBackTap"
                     access-token="{{ accessToken }}"
                     logged-in="{{ session.loggedIn }}"
@@ -309,6 +309,15 @@
                     type: String,
                     value: 'de'
                 },
+                isReady: {
+                    type: Boolean,
+                    value: false
+                },
+                semesterId: {
+                    type: String
+                },
+
+                // API Responses
                 response_labTypes: {
                     type: Object,
                     observer: "_labTypesFromApi"
@@ -321,10 +330,6 @@
                     type: Object,
                     observer: '_labsFromApi'
                 },
-                isReady: {
-                    type: Boolean,
-                    value: false
-                }
             },
 
             behaviors: [
@@ -375,12 +380,6 @@
                 }
             },
 
-            toggleGroup: function () {
-                var mq = window.matchMedia("(max-width: 767px)");
-                if (mq.matches) {
-                    this.$.collapse.toggle();
-                }
-            },
             _accessTokenChanged: function () {
                 if (this.userId && this.accessToken) {
 
@@ -534,6 +533,8 @@
             _groupChanged: function(response) {
                 if (!this.isReady)
                     return;
+
+                this.semesterId = response.semesterId;
 
                 // Get priorities
                 this.$.ajax_prios.$.request.auto = false;
