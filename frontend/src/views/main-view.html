@@ -316,6 +316,10 @@
                 semesterId: {
                     type: String
                 },
+                labTypesRequestSent: {
+                    type: Boolean,
+                    value: false
+                },
 
                 // API Responses
                 response_labTypes: {
@@ -342,7 +346,6 @@
 
             ready: function () {
                 this.isReady = true;
-                this.$.ajax_labTypes.endpoint = '/Labtypes';
 
                 this.groupdata_audio = {};
                 this.groupdata_audio.priorities = [];
@@ -361,6 +364,7 @@
                 this.set('userId', this.userId);
 
                 if (this.userId && this.accessToken) {
+                    console.log("userid jchange")
 
                     this.$.ajax_user.headers = {
                         Authorization: this.accessToken
@@ -404,6 +408,7 @@
 
                 if (response.type == 'response') {
                     var userResponse = response.data;
+                    this.semesterId = userResponse.semesterId;
                     this.set('user.email', userResponse.email);
                     this.set('user.firstName', userResponse.firstName);
                     this.set('user.groupId', userResponse.groupId);
@@ -415,6 +420,11 @@
                         //console.log("true");
                     }
                 }
+                if (this.semesterId && !this.labTypesRequestSent) {
+                    this.$.ajax_labTypes.endpoint = '/Labtypes?filter[where][semesterId]=' + this.semesterId;
+                    this.labTypesRequestSent = !this.labTypesRequestSent;
+                }
+
             },
             toggleGroup: function () {
                 var mq = window.matchMedia("(max-width: 767px)");
@@ -490,11 +500,7 @@
                 if(!this.isReady || response.type != 'response')
                     return;
 
-                // Set labtype's registration_open to true if registration_deadline is in future otherwise false
-                var today = Date.now();
-
                 for (var i = 0; i < response.data.length; i++) {
-                    response.data[i].registration_open = today < new Date(response.data[i].registration_deadline);
                     if (response.data[i].type_str == "Audio") {
                         this.labtype_audio = response.data[i];
                     }
@@ -539,7 +545,7 @@
                 // Get priorities
                 this.$.ajax_prios.$.request.auto = false;
                 for (var i = 0; i < this.group.priorityIds.length; i++) {
-                    this.$.ajax_prios.endpoint = "/priorities/" + this.group.priorityIds[i];
+                    this.$.ajax_prios.endpoint = "/priorities/" + this.group.priorityIds[i] + '?filter[where][semesterId]=' + this.semesterId;
                     this.$.ajax_prios.$.request.generateRequest();
                 }
 //                this.$.ajax_prios.$.request.auto = true;
@@ -547,7 +553,7 @@
                 // Get labs
                 this.$.ajax_prios.$.request.auto = false;
                 for (i = 0; i < this.group.labIds.length; i++) {
-                    this.$.ajax_labs.endpoint = "/labs/" + this.group.labIds[i];
+                    this.$.ajax_labs.endpoint = "/labs/" + this.group.labIds[i] + '?filter[where][semesterId]=' + this.semesterId;
                     this.$.ajax_labs.$.request.generateRequest();
                 }
             },

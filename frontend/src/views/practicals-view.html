@@ -153,7 +153,7 @@
                 response_savePriorities: {
                     type: Object,
                     observer: '_responseFromPrioritySave'
-                }
+                },
                 labData: Object,
                 labType: Object
 
@@ -210,7 +210,7 @@
 
                     // Step 2. Save a new priority object
                     this.ajax = {
-                        endpoint: '/groups/' + this.group.id + 'priorities',
+                        endpoint: '/groups/' + this.group.id + 'priorities?filter[where][semesterId]=' + this.group.semesterId,
                         method: 'POST',
                         headers: {
                             'Authorization' : this.accessToken
@@ -236,12 +236,12 @@
              */
             _getDate: function () {
                 //TODO: Check for Practicalsdates in Backend
-                if (typeof this.labdata.lab == 'undefined') {
-                    // Lab is not set for this practical
+//                if (typeof this.labdata.lab == 'undefined') {
+//                    // Lab is not set for this practical
                     return null;
-                }
-                else
-                    return new Date(this.labdata.lab.date)
+//                }
+//                else
+//                    return new Date(this.labdata.lab.date)
 
             },
 
@@ -310,6 +310,8 @@
              * @private
              */
             _responseFromPrioritySave: function(response) {
+                if (!this.isReady)
+                    return;
                 console.log(response)
             }
         });
