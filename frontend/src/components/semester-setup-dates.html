@@ -13,8 +13,9 @@
         <style include="semester-setup-shared"></style>
         <style>
 
-            paper-button.add-date-button {
-                float:right;
+            paper-button {
+                background: var(--semester-setup-primary-light-color);
+                color: var(--semester-setup-secondary-color);
             }
 
             iron-icon {
@@ -65,8 +66,11 @@
                     </data-table-column>
                 </iron-data-table>
 
-                <paper-button class="add-date-button" on-tap="_openDateDialog">
+                <paper-button class="save-button" on-tap="_openDateDialog">
                     Add date&nbsp;<iron-icon icon="icons:add-circle-outline"></iron-icon></paper-button>
+
+                <paper-button class="save-button" on-tap="_saveTable">
+                    Save table&nbsp;<iron-icon icon="icons:save"></iron-icon></paper-button>
 
                 <div style="clear: both;"></div>
 
@@ -152,7 +156,6 @@
                 var newDates = this.dates.slice();
                 newDates.push(dateObject);
                 this.dates = newDates;
-                console.log(this.dates);
             },
 
             _discardDateDialog: function (event) {
@@ -193,6 +196,10 @@
                 this.dates = this.dates.filter(function(item){
                     return (item.id != id);
                 });
+            },
+
+            _saveTable: function () {
+                this.dates = this.dates.slice();
             }
 
         });

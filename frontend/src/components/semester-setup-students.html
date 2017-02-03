@@ -59,6 +59,11 @@
                     </data-table-column>
                 </iron-data-table>
 
+                <paper-button class="save-button" on-tap="_saveTable">
+                    Save table&nbsp;<iron-icon icon="icons:save"></iron-icon></paper-button>
+
+                <div style="clear: both;"></div>
+
             </div>
         </paper-card>
 
@@ -121,6 +126,10 @@
                 for( var i=0; i < 5; i++ )
                     text += possible.charAt(Math.floor(Math.random() * possible.length));
                 return text;
+            },
+
+            _saveTable: function () {
+                this.studentData = this.studentData.slice();
             }
 
         });

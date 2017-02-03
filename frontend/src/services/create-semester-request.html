@@ -1,0 +1,97 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="./api-request.html">
+
+<dom-module id="create-semester-request">
+
+    <template>
+
+        <api-request
+            endpoint="[[ ajax.endpoint ]]"
+            headers="[[ ajax.headers ]]"
+            body="[[ ajax.body ]]"
+            response="{{ semesterRequestApiResponse }}"></api-request>
+
+        <pre>
+            create-semester-request Debug Area:
+
+            semesterTerm: [[ semesterTerm ]]
+            semesterStartDate: [[ semesterStartDate ]]
+            semesterEndDate: [[ semesterEndDate ]]
+            semesterGroupSize: [[ semesterGroupSize ]]
+
+            tutors: [[ tutorsStringified ]]
+            students: [[ studentsStringified ]]
+            dates: [[ datesStringified ]]
+        </pre>
+
+    </template>
+
+    <script>
+
+        Polymer({
+
+            is: 'create-semester-request',
+
+            properties: {
+
+                // Attributes downward data flow
+                semesterTerm: {
+                    type: String },
+                semesterStartDate: {
+                    type: Date },
+                semesterEndDate: {
+                    type: Date },
+                semesterGroupSize: {
+                    type: Number },
+                labTypes: {
+                    type: Array },
+                tutors: {
+                    type: Array },
+                students: {
+                    type: Array },
+                dates: {
+                    type: Array },
+
+                // Attributes upward data flow
+                loading: {
+                    type: Boolean,
+                    value: false },
+
+                // Internals
+                semesterId: {
+                    type: String,
+                    reflectToAttribute: false },
+                semesterRequestApiResponse: {
+                    type: Object,
+                    reflectToAttribute: false },
+
+                tutorsStringified: {
+                    type: String,
+                    reflectToAttribute: false,
+                    computed: 'stringify(tutors)'
+                },
+                studentsStringified: {
+                    type: String,
+                    reflectToAttribute: false,
+                    computed: 'stringify(students)'
+                },
+                datesStringified: {
+                    type: String,
+                    reflectToAttribute: false,
+                    computed: 'stringify(dates)'
+                }
+            },
+
+            fire: function () {
+                console.log('Firing create semester request');
+            },
+
+            stringify: function (tutors) {
+                return JSON.stringify(tutors);
+            }
+
+        });
+
+    </script>
+
+</dom-module>

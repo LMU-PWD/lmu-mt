@@ -6,6 +6,7 @@
 <link rel="import" href="../components/semester-setup-tutors.html">
 <link rel="import" href="../components/semester-setup-students.html">
 <link rel="import" href="../components/semester-setup-dates.html">
+<link rel="import" href="../services/create-semester-request.html">
 <link rel="import" href="../shared/semester-setup-shared.html">
 
 
@@ -56,6 +57,10 @@
             paper-button.setup-header-breadcrumb-todo {
                 background: none;
                 color: var(--semester-setup-secondary-dark-color);
+            }
+
+            paper-button.positive {
+                background: var(--paper-light-green-300);
             }
 
             .setup-header > .setup-header-actions {
@@ -153,31 +158,56 @@
             <iron-pages selected="[[activeIndex]]">
 
                 <!-- BASICS -->
-                <semester-setup-basics></semester-setup-basics>
+                <semester-setup-basics
+                    semester-title="{{ semesterTitle }}"
+                    start-date="{{ semesterStartDate }}"
+                    end-date="{{ semesterEndDate }}"
+                    group-size="{{ semesterGroupSize }}"></semester-setup-basics>
 
                 <!-- PRACTICALS -->
                 <!-- This page is hidden by default because of heavyweight code editors that
                      should not be loaded without reason -->
-                <semester-setup-practicals show="[[ showPracticalsPage ]]"></semester-setup-practicals>
+                <semester-setup-practicals
+                    show="[[ showPracticalsPage ]]"
+                    audio-object="{{ labTypeAudio }}"
+                    photo-object="{{ labTypePhoto }}"
+                    video-object="{{ labTypeVideo }}"></semester-setup-practicals>
 
                 <!-- TUTORS -->
-                <semester-setup-tutors></semester-setup-tutors>
+                <semester-setup-tutors tutor-data="{{ tutors }}"></semester-setup-tutors>
 
                 <!-- STUDENTS -->
-                <semester-setup-students></semester-setup-students>
+                <semester-setup-students student-data="{{ students }}"></semester-setup-students>
 
                 <!-- DATES -->
-                <semester-setup-dates></semester-setup-dates>
+                <semester-setup-dates dates="{{ dates }}"></semester-setup-dates>
 
             </iron-pages>
 
             <div class="setup-footer">
                 <div class="setup-footer-navigation">
                     <paper-button on-tap="_stepBack" disabled="[[ backDisabled ]]"><iron-icon icon="icons:chevron-left"></iron-icon> Back</paper-button>
-                    <paper-button on-tap="_stepForward" disabled="[[ nextDisabled ]]">Next <iron-icon icon="icons:chevron-right"></iron-icon></paper-button>
+                    <template is="dom-if" if="[[ !isLastPage ]]">
+                        <paper-button on-tap="_stepForward" disabled="[[ nextDisabled ]]">Next <iron-icon icon="icons:chevron-right"></iron-icon></paper-button>
+                    </template>
+                    <template is="dom-if" if="[[ isLastPage ]]">
+                        <paper-button on-tap="_postToApi" class="positive"><iron-icon icon="icons:check-circle"></iron-icon>&nbsp;Create semester</paper-button>
+                    </template>
+
                 </div>
             </div>
         </div>
+
+        <create-semester-request
+            id="createSemesterRequest"
+            semester-term="[[ semesterTitle ]]"
+            semester-start-date="[[ semesterStartDate ]]"
+            semester-end-date="[[ semesterEndDate ]]"
+            semester-group-size="[[ semesterGroupSize ]]"
+            lab-types="[[ labTypes ]]"
+            tutors="[[ tutors ]]"
+            students="[[ students ]]"
+            dates="[[ dates ]]"></create-semester-request>
 
     </template>
 
@@ -185,7 +215,6 @@
 
         // TODO
         // - Lokalisation
-        // - CSV parsen
         // - API requests
 
         Polymer({
@@ -194,54 +223,73 @@
 
             properties: {
 
+                // Page navigation
                 activeIndex: {
                     type: Number,
-                    value: 0
-                },
-
+                    value: 0 },
                 activeIndexNatural: {
                     type: Number,
-                    computed: '_getActiveIndexNatural(activeIndex)'
-                },
-
+                    computed: '_getActiveIndexNatural(activeIndex)' },
                 activeLabel: {
                     type: String,
-                    computed: '_getActiveLabel(activeIndex)'
-                },
-
+                    computed: '_getActiveLabel(activeIndex)' },
                 backDisabled: {
                     type: Boolean,
-                    value: true
-                },
-
+                    value: true },
                 breadcrumbStatus: {
                     type: Array,
-                    computed: '_computeBreadcrumbStatus(activeIndex)'
-                },
-
+                    computed: '_computeBreadcrumbStatus(activeIndex)' },
+                isLastPage: {
+                    type: Boolean,
+                    computed: '_computeIsLastPage(activeIndex)' },
                 nextDisabled: {
                     type: Boolean,
-                    value: false
-                },
-
+                    value: false },
                 page: {
                     type: String,
-                    notify: true
-                },
-
+                    notify: true },
                 showPracticalsPage: {
                     type: Boolean,
                     notify: true,
-                    computed: '_showPracticalsPage(activeIndex)'
-                },
+                    computed: '_showPracticalsPage(activeIndex)' },
 
-                userInput: {
+                // Data for API
+                semesterTitle: {
+                    type: String },
+                semesterStartDate: {
+                    type: Date },
+                semesterEndDate: {
+                    type: Date },
+                semesterGroupSize: {
+                    type: Number },
+                labTypeAudio: {
                     type: Object,
+                    observer: '_labTypeAudioChanged',
+                    notify: true },
+                labTypeVideo: {
+                    type: Object,
+                    observer: '_labTypeVideoChanged',
+                    notify: true },
+                labTypePhoto: {
+                    type: Object,
+                    observer: '_labTypePhotoChanged',
+                    notify: true },
+                labTypes: {
+                    type: Array,
                     notify: true,
-                    value: {
-                        groupSize: 4
-                    }
-                }
+                    value: [] },
+                tutors: {
+                    type: Array,
+                    notify: true,
+                    value: [] },
+                students: {
+                    type: Array,
+                    notify: true,
+                    value: [] },
+                dates: {
+                    type: Array,
+                    notify: true,
+                    value: [] }
             },
 
             _getActiveLabel: function (index) {
@@ -323,6 +371,32 @@
 
             _showPracticalsPage: function (activeIndex) {
                 return (activeIndex == 1);
+            },
+
+            _computeIsLastPage: function (index) {
+                return (index == (this.breadcrumbStatus.length - 1));
+            },
+
+            _postToApi: function () {
+                this.$.createSemesterRequest.fire();
+            },
+
+            _labTypeAudioChanged: function () {
+                var newLabTypesObject = this.labTypes.slice();
+                newLabTypesObject[0] = this.labTypeAudio;
+                this.labTypes = newLabTypesObject;
+            },
+
+            _labTypeVideoChanged: function () {
+                var newLabTypesObject = this.labTypes.slice();
+                newLabTypesObject[1] = this.labTypeVideo;
+                this.labTypes = newLabTypesObject;
+            },
+
+            _labTypePhotoChanged: function () {
+                var newLabTypesObject = this.labTypes.slice();
+                newLabTypesObject[2] = this.labTypePhoto;
+                this.labTypes = newLabTypesObject;
             }
         });
 

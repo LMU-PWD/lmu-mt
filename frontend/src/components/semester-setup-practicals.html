@@ -197,51 +197,71 @@
 
             properties: {
 
+                audioObject: {
+                    type: Object,
+                    notify: true },
+                photoObject: {
+                    type: Object,
+                    notify: true },
+                videoObject: {
+                    type: Object,
+                    notify: true },
+
                 audioDeadline: {
-                    type: Date },
+                    type: Date,
+                    observer: '_audioChanged' },
                 audioDeadlineFormatted: {
                     type: String,
                     computed: '_formatDate(audioDeadline)',
                     reflectToAttribute: false },
                 audioDescriptionTutor: {
                     type: String,
+                    observer: '_audioChanged',
                     notify: true },
                 audioDescriptionStudent: {
-                    type: String },
+                    type: String,
+                    observer: '_audioChanged' },
                 audioTitle: {
                     type: String,
-                    value: 'Audiopratikum' },
+                    value: 'Audiopraktikum',
+                    observer: '_audioChanged' },
 
 
                 photoDeadline: {
-                    type: Date },
+                    type: Date,
+                    observer: '_photoChanged' },
                 photoDeadlineFormatted: {
                     type: String,
                     computed: '_formatDate(photoDeadline)',
                     reflectToAttribute: false },
                 photoDescriptionTutor: {
                     type: String,
-                    notify: true },
+                    observer: '_photoChanged' },
                 photoDescriptionStudent: {
-                    type: String },
+                    type: String,
+                    observer: '_photoChanged' },
                 photoTitle: {
                     type: String,
+                    observer: '_photoChanged',
                     value: 'Fotopraktikum' },
 
 
                 videoDeadline: {
-                    type: Date },
+                    type: Date,
+                    observer: '_videoChanged' },
                 videoDeadlineFormatted: {
                     type: String,
                     computed: '_formatDate(videoDeadline)',
                     reflectToAttribute: false },
                 videoDescriptionTutor: {
                     type: String,
-                    notify: true },
+                    observer: '_videoChanged' },
                 videoDescriptionStudent: {
-                    type: String },
+                    type: String,
+                    observer: '_videoChanged'},
                 videoTitle: {
                     type: String,
+                    observer: '_videoChanged',
                     value: 'Videopraktikum' },
 
 
@@ -304,6 +324,33 @@
                     default:
                         console.error('Reflecting Property ' + propertyName + ' not found');
                 }
+            },
+
+            _audioChanged: function () {
+                this.audioObject = {
+                    deadline: this.audioDeadline,
+                    title: this.audioTitle,
+                    descriptionStudent: this.audioDescriptionStudent,
+                    descriptionTutor: this.audioDescriptionTutor
+                };
+            },
+
+            _photoChanged: function () {
+                this.photoObject = {
+                    deadline: this.photoDeadline,
+                    title: this.photoTitle,
+                    descriptionStudent: this.photoDescriptionStudent,
+                    descriptionTutor: this.photoDescriptionTutor
+                };
+            },
+
+            _videoChanged: function () {
+                this.videoObject = {
+                    deadline: this.videoDeadline,
+                    title: this.videoTitle,
+                    descriptionStudent: this.videoDescriptionStudent,
+                    descriptionTutor: this.videoDescriptionTutor
+                };
             }
 
         });

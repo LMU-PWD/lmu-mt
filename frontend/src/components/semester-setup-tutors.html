@@ -30,7 +30,6 @@
                 color: var(--semester-setup-secondary-color);
             }
 
-
             iron-data-table {
                 --iron-data-table-header: {
                     font-weight: bold;
@@ -55,7 +54,7 @@
 
                 <p><em>Click or tap on any row in the table below to edit data.</em></p>
 
-                <iron-data-table items="[[ tutorData ]]" details-enabled>
+                <iron-data-table items="{{ tutorData }}" on-expanding-item="itemExpanded" details-enabled>
                     <template is="row-detail">
                         <div class="list-detail">
                             <paper-input label="First name" value="{{ item.first_name }}"></paper-input>
@@ -86,6 +85,11 @@
                         </template>
                     </data-table-column>
                 </iron-data-table>
+
+                <paper-button class="save-button" on-tap="_saveTable">
+                    Save table&nbsp;<iron-icon icon="icons:save"></iron-icon></paper-button>
+
+                <div style="clear: both;"></div>
 
             </div>
         </paper-card>
@@ -149,6 +153,10 @@
                 for( var i=0; i < 5; i++ )
                     text += possible.charAt(Math.floor(Math.random() * possible.length));
                 return text;
+            },
+
+            _saveTable: function () {
+                this.tutorData = this.tutorData.slice();
             }
 
         });
