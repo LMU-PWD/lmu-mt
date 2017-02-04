@@ -12,383 +12,541 @@
 
 <dom-module id="main-view">
 
-  <template>
+    <template>
 
-    <style include="shared-styles">
-      .group-placeholder{
-        float: left;
-      }
-      .group-info{
-        width: 100%;
-        /*height: 275px;*/
-      }
-      .practicalsContainer {
-        float: left;
-      }
-      .notification-placeholder{
-        /*width:100%;
-        height:200px;
-        position: fixed;
-        background-color: blue;*/
-      }
+        <style include="shared-styles">
+             .group-placeholder{
+                float: left;
+             }
+            .group-info{
+                width: 100%;
+                /*height: 275px;*/
+            }
+            .practicalsContainer {
+                float: left;
+            }
 
-      iron-collapse{
-        width: 100%;
-      }
+            .notification-placeholder{
+                /*width:100%;
+                height:200px;
+                position: fixed;
+                background-color: blue;*/
+            }
 
-      /*Phone*/
-      @media screen and (max-width: 767px) {
-        .group-placeholder{
-          width: 100%;
-          min-width: 320px;
-        }
+            iron-collapse{
+                width: 100%;
+            }
 
-        .practicalsContainer{
-          min-width: 320px;
-          width: 100%;
+            /*Phone*/
+            @media screen and (max-width: 767px) {
+                .group-placeholder{
+                    width: 100%;
+                    min-width: 320px;
+                }
 
-        }
-      }
-      /*Tablet*/
-      @media screen and (min-width: 768px) and (max-width: 1023px) {
-        .group-placeholder{
-          margin: 10px;
-          width: calc(50% - 20px);
-        }
-        .practicalsContainer{
-          margin:10px;
-          width: calc(50% - 20px);
-        }
-      }
-      /*Desktop*/
-      @media screen and (min-width: 1024px) {
-        .group-placeholder{
-          margin:10px;
-          width: calc(35% - 20px);
-        }
-        .practicalsContainer{
-          margin:10px;
-          width: calc(35% - 20px);
-        }
-        .notification-placeholder{
-          margin:10px;
-          width: calc(30% - 20px);
-          height: 200px;
-          /*background-color: blue;*/
-          float: right;
-        }
-        .notificationsContainer {
-          /*margin:10px;*/
-          /*width: calc(30% - 20px);*/
-          /*height: 200px;*/
-          /*!*background-color: blue;*!*/
-          /*float: right;*/
-        }
-      }
-    </style>
+                .practicalsContainer{
+                    min-width: 320px;
+                    width: 100%;
+                }
+            }
+            /*Tablet*/
+            @media screen and (min-width: 768px) and (max-width: 1023px) {
+                .group-placeholder{
+                    margin: 10px;
+                    width: calc(50% - 20px);
+                }
+                .practicalsContainer{
+                    margin:10px;
+                    width: calc(50% - 20px);
+                }
+            }
+            /*Desktop*/
+            @media screen and (min-width: 1024px) {
+                .group-placeholder{
+                    margin:10px;
+                    width: calc(35% - 20px);
+                }
+                .practicalsContainer{
+                    margin:10px;
+                    width: calc(35% - 20px);
+                }
+                .notification-placeholder{
+                    margin:10px;
+                    width: calc(30% - 20px);
+                    height: 200px;
+                    /*background-color: blue;*/
+                    float: right;
+                }
+                .notificationsContainer {
+                    /*margin:10px;*/
+                    /*width: calc(30% - 20px);*/
+                    /*height: 200px;*/
+                    /*!*background-color: blue;*!*/
+                    /*float: right;*/
+                }
+            }
+        </style>
 
-    <!--app-location route="{{route}}" use-hash-as-path></app-location--><!--zugriff auf url; get ulr mäßig; use-hash-as-path: # vor path-->
-    <app-route
+        <app-route
             route="{{route}}"
             pattern="/:page"
             data="{{routeData}}"
             tail="{{subroute}}"></app-route>
 
-    <!-- Fetches info about currently logged in user -->
-    <api-request
+        <!-- Fetches info about currently logged in user -->
+        <api-request
+            id="ajax_user"
             headers="[[ ajax.headers ]]"
             method="[[ ajax.method ]]"
             endpoint="[[ ajax.endpoint ]]"
             response="{{ apiResponse }}"></api-request>
 
-    <app-header fixed>
-      <navigation-bar
-              access-token="{{ accessToken }}"
-              group="{{ group }}"
-              logged-in="{{ loggedIn }}"
-              user-id="{{ userId }}"
-              user="{{ user }}"
-              show="{{ showMobileNotifications }}"></navigation-bar>
-    </app-header>
+        <api-request
+            id="ajax_labTypes"
+            body="[[ ajax.body ]]"
+            headers="[[ ajax.headers ]]"
+            method="[[ ajax.method ]]"
+            endpoint="[[ ajax.endpoint ]]"
+            response="{{ response_labTypes }}"
+            loading="{{ isLoading }}"></api-request>
 
+        <api-request
+            id="ajax_prios"
+            body="[[ ajax.body ]]"
+            headers="[[ ajax.headers ]]"
+            method="[[ ajax.method ]]"
+            endpoint="[[ ajax.endpoint ]]"
+            response="{{ response_prios }}"
+            loading="{{ isLoading }}"></api-request>
+        <api-request
+            id="ajax_labs"
+            body="[[ ajax.body ]]"
+            headers="[[ ajax.headers ]]"
+            method="[[ ajax.method ]]"
+            endpoint="[[ ajax.endpoint ]]"
+            response="{{ response_labs }}"
+            loading="{{ isLoading }}"></api-request>
 
-    <template is="dom-if" if="{{ showMobileNotifications }}">
-      <notifications-card showlist="{{ showMobileNotifications }}"></notifications-card>
+        <app-header fixed>
+            <navigation-bar
+                access-token="{{ accessToken }}"
+                group="{{ group }}"
+                logged-in="{{ loggedIn }}"
+                user-id="{{ userId }}"
+                user="{{ user }}"
+                show="{{ showMobileNotifications }}"></navigation-bar>
+        </app-header>
+
+        <template is="dom-if" if="{{ showMobileNotifications }}">
+            <notifications-card showlist="{{ showMobileNotifications }}"></notifications-card>
+        </template>
+
+        <!-- P A G E S -->
+        <iron-pages
+                selected="[[page]]"
+                attr-for-selected="name"
+                fallback-selection="error">
+
+            <div class="main-page" name="dashboard">
+
+                <!-- NOTIFICATIONS -->
+                <div class="notificationsContainer">
+                <template is="dom-if" if="{{ showNotifications }}">
+                  <notifications-card showlist="{{ showlist }}"></notifications-card>
+                </template>
+                </div>
+
+                <template is="dom-if" if="[[user.isAdmin]]">
+                    <div class="group-placeholder">
+                        <group-card group-name="Gruppen" on-tap="toggleGroup"></group-card>
+                        <iron-collapse id="collapse" opened=true>
+                            <groups-admin class="group-info"
+                                          access-token="[[ accessToken ]]"
+                                          self-info="{{user}}" ></groups-admin>
+                        </iron-collapse>
+                    </div>
+                </template>
+
+                <template is="dom-if" if="[[user.isStudent]]">
+                    <div class="group-placeholder light-color-text">
+                        <group-card group-name=[[group.name]] on-tap="toggleGroup"></group-card>
+                        <iron-collapse id="collapse" opened=true>
+                            <group-detail class="group-info"
+                                          access-token="[[ accessToken ]]"
+                                          group="{{ group }}"
+                                          self-info="{{user}}"
+                                          group-name="{{groupName}}"></group-detail>
+                        </iron-collapse>
+                    </div>
+                </template>
+
+                <div class="practicalsContainer">
+                    <div on-tap="_handleFotoTap">
+                        <index-card type="Fotopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:" info2="18.05.16, 14-16"></index-card>
+                    </div>
+                    <div on-tap="_handleVideoTap">
+                        <index-card type="Videopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:" info2="18.05.16, 14-16"></index-card>
+                    </div>
+                    <div on-tap="_handleAudioTap">
+                        <index-card type="Audiopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:" info2="18.05.16, 14-16"></index-card>
+                    </div>
+                </div>
+            </div>
+
+            <practicals-view
+                  name="foto-practicals"
+                  type= "Foto"
+                  icon="[[icon]]"
+                  route="{{subroute}}"
+                  on-back-click="_handleBackTap"
+                  access-token="{{ session.accessToken }}"
+                  logged-in="{{ session.loggedIn }}"
+                  user-id="{{ session.userId }}"></practicals-view>
+            <practicals-view
+                  name="video-practicals"
+                  type= "Video"
+                  icon="[[icon]]"
+                  route="{{subroute}}"
+                  on-back-click="_handleBackTap"
+                  access-token="{{ session.accessToken }}"
+                  logged-in="{{ session.loggedIn }}"
+                  user-id="{{ session.userId }}"></practicals-view>
+            <practicals-view
+                  name="audio-practicals"
+                  type="Audio"
+                  icon="[[icon]]"
+                  route="{{subroute}}"
+                  on-back-click="_handleBackTap"
+                  access-token="{{ session.accessToken }}"
+                  logged-in="{{ session.loggedIn }}"
+                  user-id="{{ session.userId }}"></practicals-view>
+
+        </iron-pages>
+
     </template>
 
-    <!-- P A G E S -->
-    <iron-pages
-            selected="[[page]]"
-            attr-for-selected="name"
-            fallback-selection="error">
+    <script>
+        Polymer({
+            is: 'main-view',
 
-        <div class="main-page" name="dashboard">
+            properties: {
 
-            <!-- NOTIFICATIONS -->
-            <div class="notificationsContainer">
-            <template is="dom-if" if="{{ showNotifications }}">
-              <notifications-card showlist="{{ showlist }}"></notifications-card>
-            </template>
-            </div>
+                accessToken: {
+                    type: String,
+                    observer: '_accessTokenChanged'
+                },
+                adminSelectedSemesterId: {
+                    type: String
+                },
+                apiResponse: {
+                    type: Object,
+                    reflectToAttribute: false,
+                    observer: '_apiResponseChanged'
+                },
+                group: {
+                    type: Object,
+                    notify: true,
+                    value: {}
+                },
+                loggedIn: {
+                    type: Boolean,
+                    notify: true
+                },
+                showNotifications: {
+                    type: Boolean,
+                    value: false
+                },
+                userId: {
+                    type: String,
+                    notify: true,
+                    observer: '_userIdChanged'
+                },
+                user: {
+                    type: Object,
+                    notify: true,
+                    readOnly: false,
+                    value: {}
+                },
+                page: {
+                    type: String,
+                    reflectToAttribute: false,
+                    observer: '_pageChanged'
+                },
+                route: {
+                    type: Object,
+                    notify: true
+                },
+                routeData:{
+                    type: Object
+                },
+                language: {
+                    type: String,
+                    value: 'de'
+                },
 
-            <template is="dom-if" if="[[user.isAdmin]]">
-                <div class="group-placeholder">
-                    <group-card group-name="Gruppen" on-tap="toggleGroup"></group-card>
-                    <iron-collapse id="collapse" opened=true>
-                        <groups-admin class="group-info"
-                                      access-token="[[ accessToken ]]"
-                                      self-info="{{user}}" ></groups-admin>
-                    </iron-collapse>
-                </div>
-            </template>
+                isReady: {
+                    type: Boolean,
+                    value: false
+                },
+                semesterId: {
+                    type: String
+                },
+                labTypesRequestSent: {
+                    type: Boolean,
+                    value: false
+                },
 
-            <template is="dom-if" if="[[user.isStudent]]">
-                <div class="group-placeholder light-color-text">
-                    <group-card group-name=[[group.name]] on-tap="toggleGroup"></group-card>
-                    <iron-collapse id="collapse" opened=true>
-                        <group-detail class="group-info"
-                                      access-token="[[ accessToken ]]"
-                                      group="{{ group }}"
-                                      self-info="{{user}}"
-                                      group-name="{{groupName}}"></group-detail>
-                    </iron-collapse>
-                </div>
-            </template>
-
-          <div class="practicalsContainer">
-            <div on-tap="_handleFotoTap">
-                <index-card type="Fotopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:" info2="18.05.16, 14-16"></index-card>
-            </div>
-            <div on-tap="_handleVideoTap">
-                <index-card type="Videopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:" info2="18.05.16, 14-16"></index-card>
-            </div>
-            <div on-tap="_handleAudioTap">
-                <index-card type="Audiopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:" info2="18.05.16, 14-16"></index-card>
-            </div>
-          </div>
-        </div>
-
-        <practicals-view
-              name="foto-practicals"
-              type= "Foto"
-              icon="[[icon]]"
-              route="{{subroute}}"
-              on-back-click="_handleBackTap"
-              access-token="{{ session.accessToken }}"
-              logged-in="{{ session.loggedIn }}"
-              user-id="{{ session.userId }}"></practicals-view>
-        <practicals-view
-              name="video-practicals"
-              type= "Video"
-              icon="[[icon]]"
-              route="{{subroute}}"
-              on-back-click="_handleBackTap"
-              access-token="{{ session.accessToken }}"
-              logged-in="{{ session.loggedIn }}"
-              user-id="{{ session.userId }}"></practicals-view>
-        <practicals-view
-              name="audio-practicals"
-              type="Audio"
-              icon="[[icon]]"
-              route="{{subroute}}"
-              on-back-click="_handleBackTap"
-              access-token="{{ session.accessToken }}"
-              logged-in="{{ session.loggedIn }}"
-              user-id="{{ session.userId }}"></practicals-view>
-
-    </iron-pages>
-
-  </template>
-
-  <script>
-    Polymer({
-
-        is: 'main-view',
-
-        properties: {
-
-            accessToken: {
-              type: String,
-              observer: '_accessTokenChanged'
+                // API Responses
+                response_labTypes: {
+                      type: Object,
+                      observer: "_labTypesFromApi"
+                },
+                response_prios: {
+                      type: Object,
+                      observer: '_priosFromApi'
+                },
+                response_labs: {
+                      type: Object,
+                      observer: '_labsFromApi'
+                }
             },
-            apiResponse: {
-              type: Object,
-              reflectToAttribute: false,
-              observer: '_apiResponseChanged'
+
+            behaviors: [
+                Polymer.AppLocalizeBehavior
+            ],
+
+            attached: function() {
+                this.loadResources(this.resolveUrl('../shared/locales.json'));
             },
-            group: {
-              type: Object,
-              notify: true,
-              value: {}
+
+            ready: function () {
+                this.isReady = true;
+
+                this.groupdata_audio = {};
+                this.groupdata_audio.priorities = [];
+                this.groupdata_video = {};
+                this.groupdata_video.priorities = [];
+                this.groupdata_foto = {};
+                this.groupdata_foto.priorities = [];
             },
-            loggedIn: {
-              type: Boolean,
-              notify: true
+
+            observers: [
+                '_routePageChanged(routeData.page)'
+            ],
+
+            _userIdChanged: function () {
+
+                this.set('userId', this.userId);
+
+                if (this.userId && this.accessToken) {
+                    console.log("userid jchange");
+
+                    this.$.ajax_user.headers = {
+                        Authorization: this.accessToken
+                    };
+                    this.$.ajax_user.method = 'GET';
+                    this.$.ajax_user.endpoint =  '/platformusers/' + this.userId;
+                    this.$.ajax_user.$.request.generateRequest();
+
+        //              OLD:
+        //                this.ajax = {
+        //                    headers: {
+        //                        Authorization: this.accessToken
+        //                    },
+        //                    method: 'GET',
+        //                    endpoint: '/platformusers/' + this.userId
+        //                };
+                }
             },
-            showNotifications: {
-              type: Boolean,
-              value: false
+            _accessTokenChanged: function () {
+                if (this.userId && this.accessToken) {
+
+                    this.$.ajax_user.headers = {
+                        Authorization: this.accessToken
+                    };
+                    this.$.ajax_user.method = 'GET';
+                    this.$.ajax_user.endpoint =  '/platformusers/' + this.userId;
+                    this.$.ajax_user.$.request.generateRequest();
+
+        //                OLD:
+        //                  this.ajax = {
+        //                      headers: {
+        //                          Authorization: this.accessToken
+        //                      },
+        //                      method: 'GET',
+        //                      endpoint: '/platformusers/' + this.userId
+        //                  };
+                }
             },
-            userId: {
-              type: String,
-              notify: true,
-              observer: '_userIdChanged'
+            _apiResponseChanged: function (response) {
+
+                if (response.type == 'response') {
+                    var userResponse = response.data;
+                    this.semesterId = userResponse.semesterId;
+                    this.set('user.email', userResponse.email);
+                    this.set('user.firstName', userResponse.firstName);
+                    this.set('user.groupId', userResponse.groupId);
+                    this.set('user.name', userResponse.name);
+                    this.set('user.isAdmin', userResponse.isAdmin);
+                    this.set('user.isTutor', userResponse.isTutor);
+                    if (!this.user.isAdmin && !this.user.isTutor) {
+                        this.set('user.isStudent', true);
+                        //console.log("true");
+                    }
+                }
+                if (this.semesterId && !this.labTypesRequestSent) {
+                    this.$.ajax_labTypes.endpoint = '/Labtypes?filter[where][semesterId]=' + this.semesterId;
+                    this.labTypesRequestSent = !this.labTypesRequestSent;
+                }
+
             },
-            user: {
-              type: Object,
-              notify: true,
-              readOnly: false,
-              value: {}
+
+            toggleGroup: function () {
+                var mq = window.matchMedia( "(max-width: 767px)" );
+                if(mq.matches){
+                    this.$$('#collapse').toggle();
+                }
             },
-            page: {
-              type: String,
-              reflectToAttribute: false,
-              observer: '_pageChanged'
+
+            isStudent: function () {
+                if(!this.user.isAdmin && !this.user.isTutor){
+                    return true;
+                }
             },
-            route: {
-              type: Object,
-              notify: true
+
+            _switchLocale: function() {
+                this.language = (this.language == 'en') ? 'de' : 'en';
             },
-            routeData:{
-              type: Object
+
+            /**
+             * Handle tap on Back-Button
+             */
+            _handleBackTap: function(){
+                this.page = 'dashboard';
             },
-            language: {
-              type: String,
-              value: 'de'
+            /**
+            * Handle tap on Foto-Button
+            */
+            _handleFotoTap: function(){
+                this.page  = "foto-practicals";
+                this.icon = "../../../images/photo.svg";
+            },
+            /**
+             * Handle tap on Video-Button
+             */
+            _handleVideoTap: function(){
+                this.page  = "video-practicals";
+                this.icon = "../../../images/video.svg";
+            },
+            /**
+             * Handle tap on Audio-Button
+            */
+            _handleAudioTap: function(){
+                this.page  = "audio-practicals";
+                this.icon = "../../../images/audio.svg";
+            },
+            /**
+            * Callback fired when the applications route changes
+            * @param {String} page - new value of routeData.page
+            * @private
+            */
+            _routePageChanged: function(page) {
+                this.page  = page || 'dashboard';
+            },
+            /**
+             * Callback fired when the applications page property changes
+             * @param {String} page - new value of page property
+             * @private
+             */
+            _pageChanged: function(page) {
+                // Load page import on demand.
+                if(page.search('practicals')>=0) {
+                    var resolvedPageUrl = this.resolveUrl('./practicals-view.html');
+                    this.importHref(resolvedPageUrl, null, this._showPage404, true);
+                }
+            },
+            /**
+             * Gets labtypes from API and initializes labtype-property for each labtype
+             * @param response
+             * @private
+             */
+            _labTypesFromApi: function(response) {
+                if(!this.isReady || response.type != 'response')
+                    return;
+
+                for (var i = 0; i < response.data.length; i++) {
+                    if (response.data[i].type_str == "Audio") {
+                        this.labtype_audio = response.data[i];
+                    }
+                    else if (response.data[i].type_str == "Video") {
+                        this.labtype_video = response.data[i];
+                    }
+                    else if (response.data[i].type_str == "Foto") {
+                        this.labtype_foto = response.data[i];
+                    }
+                }
+            },
+
+            /**
+             * Initializes and sets priorities-property for each labtype
+             * @param response
+             * @private
+             */
+            _priosFromApi: function(response) {
+
+                if(!this.isReady || response.type != 'response')
+                    return;
+
+                if (response.data.labTypeId == this.labtype_audio.id)
+                    this.groupdata_audio.priorities.push(response.data);
+                if (response.data.labTypeId == this.labtype_video.id)
+                    this.groupdata_video.priorities.push(response.data);
+                if (response.data.labTypeId == this.labtype_foto.id)
+                    this.groupdata_foto.priorities.push(response.data);
+            },
+
+            /**
+             * Observes group changes and initiates API calls to get priorities and lab data for each labtype
+             * @param response
+             * @private
+             */
+            _groupChanged: function(response) {
+                if (!this.isReady)
+                    return;
+
+                this.semesterId = response.semesterId;
+
+                // Get priorities
+                this.$.ajax_prios.$.request.auto = false;
+                for (var i = 0; i < this.group.priorityIds.length; i++) {
+                    this.$.ajax_prios.endpoint = "/priorities/" + this.group.priorityIds[i] + '?filter[where][semesterId]=' + this.semesterId;
+                    this.$.ajax_prios.$.request.generateRequest();
+                }
+    //                this.$.ajax_prios.$.request.auto = true;
+
+                // Get labs
+                this.$.ajax_prios.$.request.auto = false;
+                for (i = 0; i < this.group.labIds.length; i++) {
+                    this.$.ajax_labs.endpoint = "/labs/" + this.group.labIds[i] + '?filter[where][semesterId]=' + this.semesterId;
+                    this.$.ajax_labs.$.request.generateRequest();
+                }
+            },
+
+            /**
+            * Gets lab data from API and sets them for each labtype
+            * @param response
+            * @private
+            */
+            _labsFromApi: function(response) {
+                if(!this.isReady || response.type != 'response')
+                    return;
+                if (response.data.labTypeId == this.labtype_audio.id)
+                    this.groupdata_audio.lab = response.data;
+                if (response.data.labTypeId == this.labtype_video.id)
+                    this.groupdata_video.lab = response.data;
+                if (response.data.labTypeId == this.labtype_foto.id)
+                    this.groupdata_foto.lab = response.data
             }
-        },
-
-        behaviors: [
-            Polymer.AppLocalizeBehavior
-        ],
-
-        attached: function() {
-            this.loadResources(this.resolveUrl('../shared/locales.json'));
-        },
-
-      ready: function () {
-
-      },
-
-      observers: [
-        '_routePageChanged(routeData.page)'
-      ],
-
-        _userIdChanged: function () {
-
-            this.set('userId', this.userId);
-
-            if (this.userId && this.accessToken) {
-
-                  this.ajax = {
-                      headers: {
-                          Authorization: this.accessToken
-                      },
-                      method: 'GET',
-                      endpoint: '/platformusers/' + this.userId
-                  };
-            }
-        },
-
-        toggleGroup: function () {
-            var mq = window.matchMedia( "(max-width: 767px)" );
-            if(mq.matches){
-              this.$.collapse.toggle();
-            }
-        },
-        _accessTokenChanged: function () {
-            if (this.userId && this.accessToken) {
-
-                  this.ajax = {
-                      headers: {
-                          Authorization: this.accessToken
-                      },
-                      method: 'GET',
-                      endpoint: '/platformusers/' + this.userId
-                  };
-            }
-        },
-        _apiResponseChanged: function (response) {
-
-          if (response.type == 'response') {
-                var userResponse = response.data;
-                this.set('user.email', userResponse.email);
-                this.set('user.firstName', userResponse.firstName);
-                this.set('user.groupId', userResponse.groupId);
-                this.set('user.name', userResponse.name);
-                this.set('user.isAdmin', userResponse.isAdmin);
-                this.set('user.isTutor', userResponse.isTutor);
-            if(!this.user.isAdmin && !this.user.isTutor){
-              this.set('user.isStudent', true);
-              //console.log("true");
-            }
-            }
-        },
-
-      toggleGroup: function () {
-        var mq = window.matchMedia( "(max-width: 767px)" );
-        if(mq.matches){
-          this.$$('#collapse').toggle();
-        }
-      },
-
-      isStudent: function () {
-        if(!this.user.isAdmin && !this.user.isTutor){
-          return true;
-        }
-      },
-
-      _switchLocale: function() {
-        this.language = (this.language == 'en') ? 'de' : 'en';
-      },
-
-        /**
-         * Handle tap on Back-Button
-         */
-        _handleBackTap: function(){
-            this.page = 'dashboard';
-        },
-        /**
-         * Handle tap on Foto-Button
-         */
-        _handleFotoTap: function(){
-            this.page  = "foto-practicals";
-            this.icon = "../../../images/photo.svg";
-        },
-        /**
-         * Handle tap on Video-Button
-         */
-        _handleVideoTap: function(){
-            this.page  = "video-practicals";
-            this.icon = "../../../images/video.svg";
-        },
-        /**
-         * Handle tap on Audio-Button
-         */
-        _handleAudioTap: function(){
-            this.page  = "audio-practicals";
-            this.icon = "../../../images/audio.svg";
-        },
-        /**
-         * Callback fired when the applications route changes
-         * @param {String} page - new value of routeData.page
-         * @private
-         */
-        _routePageChanged: function(page) {
-            this.page  = page || 'dashboard';
-        },
-        /**
-         * Callback fired when the applications page property changes
-         * @param {String} page - new value of page property
-         * @private
-         */
-        _pageChanged: function(page) {
-            // Load page import on demand.
-            if(page.search('practicals')>=0) {
-                var resolvedPageUrl = this.resolveUrl('./practicals-view.html');
-                this.importHref(resolvedPageUrl, null, this._showPage404, true);
-            }
-        }
-    });
-  </script>
+        });
+    </script>
 </dom-module>

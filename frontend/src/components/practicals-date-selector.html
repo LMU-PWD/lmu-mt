@@ -102,8 +102,7 @@
                     value: []
                 },
                 priority:{
-                    type: Number,
-                    value: 5
+                    type: Number
                 },
                 priorities:{
                     type: Array,
@@ -112,6 +111,12 @@
                 chosenslots:{
                     type: Array,
                     value: []
+                },
+
+                // Priorities from API
+                apiPriorities: {
+                    value: Object,
+                    notify: true
                 }
             },
 
@@ -215,7 +220,7 @@
              * @private
              */
             _handleSaveClick: function(e){
-                this.fire("save-click");
+                this.fire("save-click", this.chosenslots);
             },
 
             /**
