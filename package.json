@@ -16,5 +16,8 @@
     "morgan": "~1.7.0",
     "polymer-cli": "^0.17.0",
     "serve-favicon": "~2.3.0"
+  },
+  "devDependencies": {
+    "nodemailer": "^3.0.1"
   }
 }

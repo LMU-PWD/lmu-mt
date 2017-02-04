@@ -3,11 +3,12 @@
     "logincard_welcome text-1": "Welcome to",
     "logincard_welcome text-2": ". Please login with your campus mail address.",
     "logincard_register success": " your registration succeeded. You can login now.",
-    "logincard_locale button tooltip": "Change to German",
+    "logincard_locale button tooltip": "In Deutsch anzeigen",
     "logincard_login button": "Login",
     "logincard_password placeholder": "Password",
     "logincard_register text": "New here?",
     "logincard_register button": "Register",
+    "logincard_forgot password button": "Forgot password",
 
     "groupdetail_create group": "Create new group",
     "groupdetail_group comment": "You have to be 4 people to create a new group.",
@@ -119,19 +120,25 @@
     "semester_setup_dates_duration": "Duration",
     "semester_setup_dates_button_add": "Add date",
     "semester_setup_dates_dialog_heading": "Add a new date",
-    "semester_setup_dates_dialog_startingat": "Starting at"
+    "semester_setup_dates_dialog_startingat": "Starting at",
 
+    "resetpasswordcard_title": "Reset Password",
+    "resetpasswordcard_button-reset": "Reset password",
+    "resetpasswordcard_infotext": "Please insert your e-mail address to reset your password.",
+    "resetpasswordcard_mail sent-1": "An e-mail with a new password has been sent to ",
+    "resetpasswordcard_mail sent-2": ". Please sign in and change it soon."
   },
 
   "de": {
     "logincard_welcome text-1": "Willkommen bei ",
     "logincard_welcome text-2": ". Bitte logge dich mit deiner Campus Mail-Adresse ein.",
     "logincard_register success": "Deine Registrierung war erfolgreich. Du kannst dich nun einloggen.",
-    "logincard_locale button tooltip": "In Englisch anzeigen",
+    "logincard_locale button tooltip": "Display in English",
     "logincard_login button": "Einloggen",
     "logincard_password placeholder": "Passwort",
     "logincard_register text": "Neu hier?",
     "logincard_register button": "Registrieren",
+    "logincard_forgot password button": "Passwort vergessen",
 
     "groupdetail_create group": "Neue Gruppe Erstellen",
     "groupdetail_group comment": "Ihr müsst zu viert sein, um eine neue Gruppe zu erstellen.",
@@ -243,6 +250,12 @@
     "semester_setup_dates_duration": "Dauer",
     "semester_setup_dates_button_add": "Termin hinzufügen",
     "semester_setup_dates_dialog_heading": "Neuen Termin hinzufügen",
-    "semester_setup_dates_dialog_startingat": "Beginn:"
+    "semester_setup_dates_dialog_startingat": "Beginn:",
+
+    "resetpasswordcard_title": "Passwort vergessen",
+    "resetpasswordcard_button-reset": "Passwort zurücksetzen",
+    "resetpasswordcard_infotext": "Bitte gib deine E-Mail-Adresse ein, damit wir dir ein neues Passwort zuschicken können.",
+    "resetpasswordcard_mail sent-1": "Eine E-Mail mit einem neuen Passwort wurde an ",
+    "resetpasswordcard_mail sent-2": " gesendet. Bitte melde dich damit an und ändere es möglichst bald."
   }
 }

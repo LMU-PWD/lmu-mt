@@ -74,6 +74,10 @@
                 transition: height 1s;
             }
 
+            iron-icon[prefix] {
+                margin-right: 5px;
+            }
+
             .card-content p.hide {
                 display: none;
             }
@@ -161,16 +165,23 @@
                         label="E-Mail"
                         type="email"
                         value="{{ userInput.email }}"
-                        on-keydown="_onEnterFireLoginRequest"></paper-input>
+                        on-keydown="_onEnterFireLoginRequest">
+                    <iron-icon icon="mail" prefix></iron-icon>
+                </paper-input>
                 <paper-input
                         label="{{localize('logincard_password placeholder')}}"
                         type="password"
                         value="{{ userInput.password }}"
-                        on-keydown="_onEnterFireLoginRequest"></paper-input>
+                        on-keydown="_onEnterFireLoginRequest">
+                    <iron-icon icon="communication:vpn-key" prefix></iron-icon>
+                </paper-input>
             </div>
             <div class="card-actions" style="padding: 20px">
                 <paper-button on-tap="_fireLoginRequest">{{localize('logincard_login button')}}</paper-button>
-                <p>{{localize('logincard_register text')}} <a href="#/login/register">{{localize('logincard_register button')}}</a></p>
+                <p>{{localize('logincard_register text')}}
+                    <a href="#/login/register">{{localize('logincard_register button')}}</a>
+                    <a href="#/login/resetpassword" style="float: right">{{localize('logincard_forgot password button')}}</a>
+                </p>
             </div>
         </paper-card>
         <iron-signals on-iron-signal-switchlocale="_switchLocale"></iron-signals>

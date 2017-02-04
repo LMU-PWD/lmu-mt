@@ -1,6 +1,7 @@
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../components/login-card.html">
 <link rel="import" href="../components/registration-card.html">
+<link rel="import" href="../components/reset-password-card.html">
 
 <dom-module id="login-view">
 
@@ -8,7 +9,7 @@
 
         <style include="iron-flex iron-flex-alignment">
 
-            login-card, registration-card {
+            login-card, registration-card, reset-password-card {
                 margin-top: 50px;
             }
 
@@ -39,7 +40,12 @@
                         preset-email="{{ presetEmail }}"
                         preset-name="{{ presetName }}"></registration-card>
             </div>
-
+            <div name="resetpassword" class="horizontal center-justified layout">
+                <reset-password-card
+                        page="{{ route.path }}"
+                        preset-email="{{ presetEmail }}"
+                        preset-name="{{ presetName }}"></reset-password-card>
+            </div>
         </iron-pages>
 
     </template>
