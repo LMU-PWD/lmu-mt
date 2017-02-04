@@ -2,8 +2,9 @@
 <link rel="import" href="../shared/shared-styles.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../../bower_components/paper-tabs/paper-tabs.html">
-<link rel="import" href="../components/practicals-date-selector.html">
-<link rel="import" href="../components/practicals-show-saved-dates.html">
+<!--link rel="import" href="../components/practicals-date-selector.html">
+<link rel="import" href="../components/practicals-show-saved-dates.html"-->
+<link rel="import" href="../components/practicals-students-date-detail.html">
 
 
 <dom-module id="practicals-view">
@@ -80,53 +81,21 @@
                 <paper-tab class="tabheaderbuttons">Termine</paper-tab>
             </paper-tabs>
             <div class="content">
-                <h2>[[type]] Praktikum</h2>
+                <h1>[[type]] Praktikum</h1>
                 <iron-pages selected="[[selectedTab]]">
-                    <div>Page 1 Text</div>
                     <div>
-                        <template is="dom-if" if="[[registration_open]]">
-                            <!-- Registration Open Bool from Api is true -->
-                            <template is="dom-if" if="[[before_deadline]]">
-                              <template is="dom-if" if="[[!slots_already_chosen]]" >
-                                  <!-- Deadline is not over, Registration Open and no dates selected; Select your dates!-->
-                                  <practicals-date-selector  id="practicalsDateSelector" type="[[type]]"
-                                                         practical_date="[[practical_date]]"
-                                                         timeslots="[[timeslots]]"
-                                                         priority="[[priority]]"
-                                                         api-priorities="{{ labdata.priorities }}"
-                                                         on-save-click="_handleSaveClick"
-                                                         on-reset-click="_handleResetClick"></practicals-date-selector>
-                                </template>
-                                <template is="dom-if" if="[[slots_already_chosen]]">
-                                    <!-- Deadline is not over, Registration Open and dates selected; Show saved dates!-->
-                                    <practicals-show-saved-dates id="practicals_show_saved_dates"
-                                                                 chosenslots="[[chosenslots]]"></practicals-show-saved-dates>
-                                    <paper-button raised class="changeButton" on-tap="_handleChangeClick">
-                                        <iron-icon icon="reply"></iron-icon>
-                                        Auswahl ändern
-                                    </paper-button>
-                                </template>
-                            </template>
-                            <template is="dom-if" if="[[!before_deadline]]">
-                                <!-- Deadline is over but Registration has been started-->
-                                <template is="dom-if" if="[[!practical_date_exists]]">
-                                    <!-- Deadline is over, Registration has been started but Practical Date is not given -->
-                                    <practicals-show-saved-dates chosenslots="[[chosenslots]]"></practicals-show-saved-dates>
-                                </template>
-                                <template is="dom-if" if="[[practical_date_exists]]">
-                                    <!-- Deadline is over, Registration has been started and Practical Date is given-->
-                                    <div>
-                                       Dein Praktikumstermin ist am [[practical_date_string]]
-                                    </div>
-                                </template>
-                            </template>
-                        </template>
-                        <template is="dom-if" if="[[!registration_open]]">
-                            <!-- Registration Open Bool from Api is false; Registration not opened yet -->
-                            <div>
-                                Die Terminwahl ist noch nicht freigeschalten!
-                            </div>
-                        </template>
+                        <h1>Informationen</h1>
+                        [[informationText]]
+                    </div>
+                    <div>
+                        <h1>Terminauswahl</h1>
+                        <practicals-students-date-detail group="[[ group ]]"
+                                                         lab-type="[[labType]]"
+                                                         lab-data="[[labData]]"
+                                                         on-back-click="_handleBackTap"
+                                                         access-token="{{ accessToken }}"
+                                                         logged-in="{{ session.loggedIn }}"
+                                                         user-id="{{ session.userId }}"></practicals-students-date-detail>
                     </div>
                 </iron-pages>
             </div>
@@ -141,14 +110,6 @@
                     type: String,
                     notify: true
                 },
-                before_deadline:{
-                    type: Boolean,
-                    value: true
-                },
-                chosenslots:{
-                    type: Array,
-                    value: []
-                },
                 icon:{
                     type: String
                 },
@@ -156,32 +117,13 @@
                     type: Date,
                     notify: true
                 },
-                practical_date_exists:{
-                    type: Boolean
-                },
-                priority:{
-                    type: Number,
-                    value: 2
-                },
-                registration_open:{
-                    type: Boolean,
-                    value: true
-                },
                 route: {
                     type: Object,
                     notify: true
                 },
-                slots_already_chosen:{
-                    type: Boolean,
-                    value: false
-                },
                 selectedTab:{
                     type: String,
                     value: "0"
-                },
-                timeslots:{
-                    type: Array,
-                    value: []
                 },
                 type:{
                     type: String,
@@ -196,33 +138,18 @@
                     type: Object,
                     observer: '_responseFromPrioritySave'
                 },
+                user: Object,
+                group: Object,
                 labData: Object,
                 labType: Object
             },
             ready: function () {
-                this.practical_date = this._getDate();
-                if(this.practical_date == null){
-                  this.practical_date_exists = false;
+                if(this.user.isStudent){
+                    this.informationText = this.labType.description_student;
                 }
-                else{
-                    this.practical_date_exists = true;
+                if(this.user.isTutor){
+                    this.informationText = this.labType.description_tutor;
                 }
-                if(this.practical_date_exists){
-                    this.practical_date_string = this._getDateString(this.practical_date);
-                }
-                else{
-                    this.timeslots = this._getTimeslots();
-                    this.chosenslots = this._getChosenslots();
-                    if(this.chosenslots == null || this.chosenslots == []){
-                        this.slots_already_chosen = false;
-                    }
-                    else{
-                        this.slots_already_chosen = true;
-                    }
-                }
-
-                //console.log(this.accessToken);
-                //console.log(this.route);
             },
             /**
              * Back-button click handler
@@ -237,24 +164,6 @@
              * @private
              */
             _handleSaveClick: function(e){
-                var slotcounter = 0;
-                for(i=0; i< e.target.chosenslots.length; i++){
-                    if(e.target.chosenslots[i] != null){
-                        slotcounter++;
-                    }
-                }
-                if(slotcounter == e.target.chosenslots.length){
-                    //this.chosenslots = [];
-                    this.chosenslots = e.target.chosenslots;
-                    this.slots_already_chosen = true;
-                    var practicals_show_saved_dates = Polymer.dom(this.root).querySelector("#practicals_show_saved_dates");
-                    if(practicals_show_saved_dates) {
-                        practicals_show_saved_dates._slotsChanged(this.chosenslots);
-                    }
-                }
-                else{
-                    alert("Error: Not enogh slots chosen. Just "+slotcounter+" slots chosen.");
-                }
             },
             /**
              * Handle reset click
@@ -262,7 +171,6 @@
              * @private
              */
             _handleResetClick: function(e){
-                this.chosenslots = [];
             },
             /**
              * Handle change click
@@ -270,130 +178,6 @@
              * @private
              */
             _handleChangeClick: function(e){
-                this.slots_already_chosen = false;
-                var practicals_date_selector = Polymer.dom(this.root).querySelector("#practicalsDateSelector");
-                if(practicals_date_selector) {
-                    practicals_date_selector._handleResetClick();
-                }
-            },
-            /**
-             * Function that checks for the practial course date
-             */
-            _getDate: function(){
-                //TODO: Check for Practicalsdates in Backend
-                return null;
-                //return new Date(2017,2,25,14,0);
-            },
-            /**
-             * Function that checks for the practial course date
-             */
-            _getChosenslots: function(){
-                //TODO: Get Timeslots from Backend
-                var timeslots =[];
-                timeslots = [[new Date(2017,1,2,1,0),new Date(2017,1,2,2,0)],[new Date(2017,1,2,3,0),new Date(2017,1,2,4,0)],[new Date(2017,1,2,5,0),
-                    new Date(2017,1,10,14,0)],[new Date(2017,1,10,15,0),new Date(2017,1,10,16,0)],[new Date(2017,1,10,17,0),new Date(2017,1,10,18,0)]];
-
-                //return timeslots;
-                return null;
-            },
-
-            /**
-             * Function that checks for the practial course date
-             * @param {String} date - date that will be transformed to String
-             */
-            _getTimeslots: function(){
-                //TODO: Get Timeslots from Backend
-                var timeslots =[];
-                timeslots.starttimes = [new Date(2017,1,2,1,0),new Date(2017,1,2,2,0),new Date(2017,1,2,3,0),new Date(2017,1,2,4,0),new Date(2017,1,2,5,0),
-                    new Date(2017,1,10,14,0),new Date(2017,1,10,15,0),new Date(2017,1,10,16,0),new Date(2017,1,10,17,0),new Date(2017,1,10,18,0),new Date(2017,1,10,19,0),new Date(2017,1,10,20,0),
-                    new Date(2017,1,12,12,0),new Date(2017,1,12,13,0),new Date(2017,1,12,14,0),new Date(2017,1,12,15,0),new Date(2017,1,14,14,0),new Date(2017,1,14,15,0)];
-                timeslots.sizes =[60,60,60,60,60,60,60,60,60,60,60,60,60,60,60,60,60,60];
-
-                return this._transformTimeslots(timeslots);
-                //return null;
-            },
-            /**
-             * Creates string from the given date
-             * @param {String} date - date that will be transformed to String
-             */
-            _getDateString: function(date){
-                var datestring = "";
-                switch(date.getDay()){
-                    case 0:
-                        datestring = "Sonntag, den ";
-                        break;
-                    case 1:
-                        datestring = "Montag, den ";
-                        break;
-                    case 2:
-                        datestring = "Dienstag, den ";
-                        break;
-                    case 3:
-                        datestring = "Mittwoch, den ";
-                        break;
-                    case 4:
-                        datestring = "Donnerstag, den ";
-                        break;
-                    case 5:
-                        datestring = "Freitag, den ";
-                        break;
-                    case 6:
-                        datestring = "Samstag, den ";
-                        break;
-                }
-                var hours = date.getHours();
-                var minutes = date.getMinutes();
-                if(hours<10){
-                    hours = "0"+hours;
-                }
-                if(minutes<10){
-                    minutes = "0"+minutes;
-                }
-                datestring = datestring+date.getDate()+"."+date.getMonth()+"."+date.getFullYear()+
-                    " um "+hours+":"+minutes+" Uhr";
-                return datestring;
-            },
-            /**
-             * Transform the Format of the given Timeslots from the Api, so it will be easier to handle in the frontend
-             * @param slotsFromApi - Contains the given timeslots
-             * @returns {Array} - timeslots in new format
-             * @private
-             */
-            _transformTimeslots: function(slotsFromApi){
-                var transformedSlots = []; //Store return-Array here
-                var lastSlot = slotsFromApi.starttimes[0];
-                var countDates = 0; //Date counter
-                var countSlots = 0; //Slot counter
-                var dates = [];
-
-                for(i=0; i<slotsFromApi.starttimes.length; i++){
-                    // Create a new array-entrie if date from recent slot is different from date of the last slot
-                    if(slotsFromApi.starttimes[i].getFullYear() != lastSlot.getFullYear() ||
-                        slotsFromApi.starttimes[i].getMonth() != lastSlot.getMonth() ||
-                        slotsFromApi.starttimes[i].getDate() != lastSlot.getDate()) {
-                        dates = [];
-                        lastSlot = slotsFromApi.starttimes[i];
-                        transformedSlots.push([]);
-                        countDates++;
-                        countSlots = 0;
-                    }
-                    var endtime = new Date(slotsFromApi.starttimes[i].getFullYear(), slotsFromApi.starttimes[i].getMonth(), slotsFromApi.starttimes[i].getDate());
-                    if((slotsFromApi.starttimes[i].getMinutes() + (slotsFromApi.sizes[i] % 60)) > 60){
-                        endtime.setHours(1+Math.floor(slotsFromApi.starttimes[i].getHours()+(slotsFromApi.sizes[i]) / 60));
-                        endtime.setMinutes(slotsFromApi.starttimes[i].getMinutes() + (slotsFromApi.sizes[i] % 60)-60);
-                    }
-                    else{
-                        endtime.setHours(Math.floor(slotsFromApi.starttimes[i].getHours()+(slotsFromApi.sizes[i]) / 60));
-                        endtime.setMinutes(slotsFromApi.starttimes[i].getMinutes() + (slotsFromApi.sizes[i] % 60));
-                    }
-
-                    var slot = [];
-                    slot = [slotsFromApi.starttimes[i], endtime];
-                    dates[countSlots] = slot;
-                    transformedSlots[countDates] = dates;
-                    countSlots++;
-                }
-                return transformedSlots;
             },
             /**
              * Gets response from API call to create a new priority
@@ -403,7 +187,7 @@
             _responseFromPrioritySave: function(response) {
                 if (!this.isReady)
                     return;
-                console.log(response)
+                console.log(response);
             }
         });
     </script>
