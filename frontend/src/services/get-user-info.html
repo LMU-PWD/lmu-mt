@@ -29,6 +29,7 @@
                 apiResponse: {
                     type: Object,
                     reflectToAttribute: false,
+                    notify: true,
                     observer: '_apiResponseChanged'
                 },
                 userId: {
@@ -55,18 +56,35 @@
                     ReduxBehavior
             ],
             ready: function() {
-
-                this.ajax = {
+                /*this.ajax = {
                     headers: {
                         Authorization: this.session.accessToken
                     },
                     method: 'GET',
                     endpoint: '/platformusers/' + this.userId
-                }
+                }*/
             },
 
-            _userIdChanged: function () {
-                this.set('ajax.endpoint', '/platformusers/' + this.userId);
+            _userIdChanged: function (userId) {
+                console.debug('[get-user-info.html] userIdChanged: ', userId);
+                console.log(this.session);
+                var at = "";
+
+                if (this.accessToken && this.accessToken != "") {
+                    console.log("Chose this.accessToken");
+                    at = this.accessToken;
+                } else if (this.session) {
+                    console.log("Chose session object");
+                    at = this.session.accessToken;
+                }
+                console.debug('[get-user-info.html] also I know this accessToken: ', at);
+                this.ajax = {
+                    headers: {
+                        Authorization: at
+                    },
+                    method: 'GET',
+                    endpoint: '/platformusers/' + userId
+                };
             },
 
             //Function for setting Mail & Name on Ajax response

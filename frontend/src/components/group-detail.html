@@ -141,10 +141,9 @@
                         response="{{ apiGetGroupResponse }}"
                         loading="{{ isLoading }}"></api-request>
 
-                <template is="dom-repeat" items="[[group.groupMemberIds]]" as="member">
+                <template is="dom-repeat" items="[[members]]" as="member">
                     <div class="member">
                         <get-user-info
-                                access-token="[[ accessToken ]]"
                                 user-id="[[member.id]]"
                                 name="{{member.name}}"
                                 mail="{{member.mail}}"></get-user-info>
@@ -202,20 +201,21 @@
             <iron-signals on-iron-signal-switchlocale="_switchLocale"></iron-signals>
         </template>
 
+        <pre style="color:black;">[[ group.groupMemberIds ]]</pre>
+
     </template>
     <script>
         Polymer({
             is: 'group-detail',
             properties: {
-                reduxTestFriends: {
-                    type: Array,
-                    statePath: 'friends'
-                },
                 session: {
                     type: Object,
                     statePath: 'session'
                 },
-                accessToken: String,
+                accessToken: {
+                    type: String,
+                    statePath: 'session.accessToken'
+                },
                 apiGetGroupResponse: {
                     type: String,
                     reflectToAttribute: false,
@@ -247,11 +247,6 @@
                 selfInfo: {
                     type: Object,
                     statePath: 'user'
-                    /*notify: true,
-                    readOnly: false,
-                    value: {
-                        groupId: ''
-                    }*/
                 },
               language: {
                 type: String,
@@ -303,9 +298,7 @@
                         method: 'GET',
                         endpoint: '/groups/' + this.selfInfo.groupId
                     }
-
                 }
-
             },
 
             convertMail: function (mail) {
@@ -366,6 +359,13 @@
             _apiGetGroupResponseChanged: function (response) {
                 if (response.type == 'response'){
                     this.dispatch('group', response.data);
+                    this.members = response.data.groupMemberIds.map(function(value){
+                        return {
+                            name: "",
+                            email: "",
+                            id: value
+                        };
+                    });
                 }
             },
 

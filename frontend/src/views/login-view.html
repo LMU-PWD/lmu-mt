@@ -23,7 +23,7 @@
         <iron-pages
                 selected="[[page]]"
                 attr-for-selected="name"
-                fallback-selection="login">
+                fallback-selection="auth">
 
             <div name="auth" class="horizontal center-justified layout">
                 <login-card
@@ -87,6 +87,7 @@
             ],
 
             _routePageChanged: function (page) {
+                console.debug('[login-view] routePageChanged: '+page);
                 this.page = page || 'auth';
             }
 

@@ -202,9 +202,10 @@
                     document.cookie = "mt-api-userid=" + jsonResponse.userId + ';expires=' + expires.toUTCString() + ';';
 
                     // Set global session properties
-                    this.set('accessToken', jsonResponse.id);
-                    this.set('userId', jsonResponse.userId);
-                    this.set('loggedIn', true);
+                    this.fire('login-succeed', {
+                        accessToken: jsonResponse.id,
+                        userId: jsonResponse.userId
+                    });
                     this.set('presetEmail', '');
                     this.set('presetName', '');
                     this.customWelcomeText = false;

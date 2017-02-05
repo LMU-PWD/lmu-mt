@@ -27,6 +27,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../bower_components/iron-signals/iron-signals.html">
 
+<link rel="import" href="./views/main-view.html">
+<link rel="import" href="./views/login-view.html">
+<link rel="import" href="./views/error-view.html">
 <link rel="import" href="components/index-card.html">
 <link rel="import" href="components/group-card.html">
 <link rel="import" href="components/navigation-bar.html">
@@ -118,11 +121,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
             <main-view
                name="main"
-               show-notifications="{{ showDesktopNotifications }}"></main-view>
+               show-notifications="{{ showDesktopNotifications }}"
+                route="{{ subroute }}"></main-view>
             <login-view
                 name="login"
-                route="{{ subroute }}"></login-view>
+                route="{{ subroute }}"
+                on-login-succeed="_handleLoginSucceed"></login-view>
             <error-view name="error"></error-view>
+          <!--div name="main">Main</div>
+          <div name="login">Login</div>
+          <div name="main">Error</div-->
 
         </iron-pages>
 
@@ -140,6 +148,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         page: {
           type: String,
           reflectToAttribute: false,
+          notify: true,
           observer: '_pageChanged'
         },
         route: {
@@ -299,7 +308,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         console.log("ROUTE PAGE CHANGED: "+page);
 
-        this.page = page || 'main';
+        if (!page || page == '/') {
+          this.page = 'main';
+        } else {
+          this.page = page;
+        }
 
         // check if mobile or desktop notifications are needed
         var screenwidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
@@ -356,6 +369,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         } else {
           this.set('routeData.page', '/login');
         }
+      },
+
+      _handleLoginSucceed: function (event) {
+        this.dispatch('sessionAccessToken', event.detail.accessToken);
+        this.dispatch('sessionUserId', event.detail.userId);
+        this.dispatch('sessionLoggedIn', true);
+
+        this.ajax = {
+          headers: {
+            Authorization: this.accessToken
+          },
+          method: 'GET',
+          endpoint: '/platformusers/' + this.userId
+        };
       }
 
     });

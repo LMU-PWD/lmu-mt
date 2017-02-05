@@ -87,7 +87,11 @@
       }
     </style>
 
-
+      <app-route
+              route="{{route}}"
+              pattern="/:page"
+              data="{{routeData}}"
+              tail="{{subroute}}"></app-route>
 
     <app-header fixed>
       <navigation-bar
@@ -152,6 +156,14 @@
               statePath: 'user.loggedIn'
               /*notify: true*/
             },
+            page: {
+                type: String,
+                reflectToAttribute: false
+            },
+            route: {
+                type: Object,
+                notify: true
+            },
             showNotifications: {
               type: Boolean,
               value: false
@@ -174,6 +186,10 @@
               value: 'en'
           }
         },
+
+        observers: [
+            '_routePageChanged(routeData.page)'
+        ],
 
         behaviors: [
             Polymer.AppLocalizeBehavior, ReduxBehavior
@@ -207,7 +223,10 @@
               };
 
             }
+        },
 
+        _routePageChanged: function (page) {
+            this.page = page || 'dashboard';
         },
 
         _accessTokenChanged: function () {
