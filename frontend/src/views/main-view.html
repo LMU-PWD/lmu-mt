@@ -3,6 +3,7 @@
 <link rel="import" href="../components/group-card.html">
 <link rel="import" href="../components/group-detail.html">
 <link rel="import" href="../components/groups-admin.html">
+<link rel="import" href="../components/groups-tutor.html">
 <link rel="import" href="../components/notifications-card.html">
 <link rel="import" href="../components/navigation-bar.html">
 <link rel="import" href="../components/admin-toolbar.html">
@@ -138,7 +139,18 @@
                 </div>
             </template>
 
-            <template is="dom-if" if="[[user.isStudent]]">
+            <template is="dom-if" if="[[user.isTutor]]">
+                <div class="group-placeholder">
+                    <!--<group-card group-name=[[group.name]] on-tap="toggleGroup"></group-card>-->
+                    <groups-tutor>
+                    </groups-tutor>
+                    <iron-collapse id="collapse" opened=true>
+
+                    </iron-collapse>
+                </div>
+            </template>
+
+            <template is="dom-if" if="[[user.isStudent]]">git
                 <div class="group-placeholder light-color-text">
                     <group-card group-name=[[group.name]] on-tap="toggleGroup"></group-card>
                     <iron-collapse id="collapse" opened=true>

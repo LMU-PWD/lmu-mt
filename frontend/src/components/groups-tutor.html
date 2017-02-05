@@ -1,0 +1,43 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module is="groups-tutor">
+
+    <template>
+
+        <style include="shared-styles">
+
+        </style>
+drtzrtzrtzr5z
+        <
+
+        <iron-signals on-iron-signal-switchlocale="_switchLocale"></iron-signals>
+    </template>
+    <script>
+        Polymer({
+            is: 'groups-tutor',
+            properties: {
+                accessToken: String,
+                language: {
+                    type: String,
+                    value: 'de'
+                }
+            },
+
+            ready: function () {
+            },
+
+            /**
+             * Localization setup
+             */
+            behaviors: [
+                Polymer.AppLocalizeBehavior
+            ],
+            attached: function() {
+                this.loadResources(this.resolveUrl('../shared/locales.json'));
+            },
+            _switchLocale: function() {
+                this.language = (this.language == 'en') ? 'de' : 'en';
+            },
+        });
+    </script>
+</dom-module>
