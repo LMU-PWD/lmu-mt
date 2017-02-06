@@ -48,7 +48,7 @@
             <div class="icon">
                 <img src="../../../images/group.svg">
             </div>
-            <h1 id="groupname">{{localize('groupcard_tritt bei')}}</h1>
+            <h1 id="groupname">[[localize('groupcard_tritt bei')]]</h1>
         </div>
         <iron-signals on-iron-signal-switchlocale="_switchLocale"></iron-signals>
     </template>
@@ -97,6 +97,7 @@
             },
             _switchLocale: function() {
                 this.language = (this.language == 'en') ? 'de' : 'en';
+                this._onGroupNameSet(this.groupName);
             },
 
             /**
@@ -105,7 +106,11 @@
             * @private
             */
             _onGroupNameSet: function(groupName) {
-                this.$.groupname.textContent = groupName;
+                if (groupName && groupName != '') {
+                    this.$.groupname.textContent = groupName;
+                } else {
+                    this.$.groupname.textContent = this.localize('groupcard_tritt bei');
+                }
             }
 
         });

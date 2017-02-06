@@ -288,13 +288,13 @@
 
             if (this.userId && this.accessToken) {
 
-                  this.ajax = {
-                      headers: {
-                          Authorization: this.accessToken
-                      },
-                      method: 'GET',
-                      endpoint: '/platformusers/' + this.userId
-                  };
+                this.ajax = {
+                    headers: {
+                        Authorization: this.accessToken
+                    },
+                    method: 'GET',
+                    endpoint: '/platformusers/' + this.userId
+                };
             }
         },
 
@@ -328,9 +328,8 @@
                 this.set('user.isTutor', userResponse.isTutor);
             if(!this.user.isAdmin && !this.user.isTutor){
               this.set('user.isStudent', true);
-              //console.log("true");
             }
-            }
+          }
         },
 
       toggleGroup: function () {

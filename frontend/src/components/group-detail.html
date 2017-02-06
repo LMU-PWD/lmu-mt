@@ -128,9 +128,9 @@
         <!-- Dieser Request soll einen User einer zufälligen Gruppe zuweisen -->
         <api-request
                 id="ajax_randomJoin"
-                headers="[[ ajax_randomJoin.headers ]]"
-                method="[[ ajax_randomJoin.method ]]"
-                endpoint="[[ ajax_randomJoin.endpoint ]]"
+                headers="[[ ajaxRandomJoin.headers ]]"
+                method="[[ ajaxRandomJoin.method ]]"
+                endpoint="[[ ajaxRandomJoin.endpoint ]]"
                 response="{{ apiGetRandomJoinResponse }}"
                 loading="{{ isLoading }}"></api-request>
 
@@ -288,7 +288,7 @@
             _selfInfoGroupIdChanged: function () {
 
                 if (typeof this.accessToken == "undefined")
-                    return
+                    return;
 
                 if (this.selfInfo.groupId) {
                     this.ajax = {
@@ -406,7 +406,7 @@
              */
             _onRandomTap: function() {
 
-                this.ajax_randomJoin = {
+                this.ajaxRandomJoin = {
                     headers : {
                         Authorization: this.accessToken
                     },
