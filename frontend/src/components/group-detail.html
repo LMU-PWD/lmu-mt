@@ -167,33 +167,40 @@
         <template is="dom-if" if="{{!selfInfo.groupId}}">
 
             <div class="join">
-                <!-- Random Join Auskommentiert, da noch nicht unterstützt-->
+
+                <!-- Random Join -->
                 <div class="random">
-                    <paper-button on-tap="_onRandomTap">Zufälliger Beitritt</paper-button>
+                    <paper-button on-tap="_onRandomTap">{{localize('groupdetail_button randomjoin')}}</paper-button>
                 </div>
+
                 <div class="create-group">
+
                     <paper-input class="create-group-input"
-                                 label="You"
+                                 label="{{localize('groupdetail_you')}}"
                                  value="{{convertMail(selfInfo.email)}}"
                                  readonly>
                         <iron-icon icon="mail" prefix></iron-icon>
                         <div suffix>@campus.lmu.de</div>
                     </paper-input>
+
                     <template is="dom-repeat" items="{{members}}" as="member">
                         <paper-input class="create-group-input"
-                                     label="Member [[calcNaturalIndex(index)]]"
+                                     label="{{localize('groupdetail_member')}} [[calcNaturalIndex(index)]]"
                                      value="{{member.name}}"
                                      required>
                             <iron-icon icon="mail" prefix></iron-icon>
                             <div suffix>@campus.lmu.de</div>
                         </paper-input>
                     </template>
-                    <paper-button on-tap="_createNewGroup">{{localize('groupdetail_create group')}}</paper-button>
+
+                    <paper-button on-tap="_createNewGroup" style="margin-top: 20px">
+                        {{localize('groupdetail_create group')}}
+                    </paper-button>
                     <paper-input-error id="inputError" class="error">
-                        Du musst zu viert sein um eine neue Gruppe zu erstellen
+                        {{localize('groupdetail_error')}}
                     </paper-input-error>
                     <paper-input-error id="requestError" class="error">
-                        Uuups... hat haben wohl die E-Mails nicht gestimmt
+                        {{localize('groupdetail_email')}}
                     </paper-input-error>
                 </div>
             </div>
@@ -389,6 +396,7 @@
                 if (response.type != "response")
                     return;
                 this.set('selfInfo.groupId', response.data.group.id);
+                this.fire('iron-signal', { name: 'notification', data:'Du bist einer zufälligen Gruppe zugewiesen worden!'});
 
             },
 
