@@ -125,6 +125,15 @@
             </content>
         </div>
 
+        <!-- Dieser Request soll einen User einer zufälligen Gruppe zuweisen -->
+        <api-request
+                id="ajax_randomJoin"
+                headers="[[ ajax_randomJoin.headers ]]"
+                method="[[ ajax_randomJoin.method ]]"
+                endpoint="[[ ajax_randomJoin.endpoint ]]"
+                response="{{ apiGetRandomJoinResponse }}"
+                loading="{{ isLoading }}"></api-request>
+
         <!-- Checking for Group ID if User Joined Group-->
         <template is="dom-if" if="{{selfInfo.groupId}}">
 
@@ -158,10 +167,10 @@
         <template is="dom-if" if="{{!selfInfo.groupId}}">
 
             <div class="join">
-                <!-- Random Join Auskommentiert, da noch nicht unterstützt
+                <!-- Random Join Auskommentiert, da noch nicht unterstützt-->
                 <div class="random">
-                    <paper-button disabled>Zufälliger Beitritt</paper-button>
-                </div>-->
+                    <paper-button on-tap="_onRandomTap">Zufälliger Beitritt</paper-button>
+                </div>
                 <div class="create-group">
                     <paper-input class="create-group-input"
                                  label="You"
@@ -186,14 +195,6 @@
                     <paper-input-error id="requestError" class="error">
                         Uuups... hat haben wohl die E-Mails nicht gestimmt
                     </paper-input-error>
-
-                    <api-request
-                            body="[[ ajax.body ]]"
-                            headers="[[ ajax.headers ]]"
-                            method="[[ ajax.method ]]"
-                            endpoint="[[ ajax.endpoint ]]"
-                            response="{{ apiCreateGroupResponse }}"
-                            loading="{{ isLoading }}"></api-request>
                 </div>
             </div>
             <iron-signals on-iron-signal-switchlocale="_switchLocale"></iron-signals>
@@ -214,6 +215,10 @@
                     type: String,
                     reflectToAttribute: false,
                     observer: '_apiCreateGroupResponseChanged'
+                },
+                apiGetRandomJoinResponse: {
+                    type: String,
+                    observer: '_apiGetRandomJoinResponse'
                 },
                 group: {
                     type: Object,
@@ -242,10 +247,10 @@
                         groupId: ''
                     }
                 },
-              language: {
-                type: String,
-                value: 'de'
-              }
+                language: {
+                    type: String,
+                    value: 'de'
+                }
             },
             observers: [
                 '_selfInfoGroupIdChanged(selfInfo.groupId)'
@@ -255,10 +260,10 @@
              * Localization setup
              */
             behaviors: [
-              Polymer.AppLocalizeBehavior
+                Polymer.AppLocalizeBehavior
             ],
             attached: function() {
-              this.loadResources(this.resolveUrl('../shared/locales.json'));
+                this.loadResources(this.resolveUrl('../shared/locales.json'));
             },
             _switchLocale: function() {
                 this.language = (this.language == 'en') ? 'de' : 'en';
@@ -270,11 +275,15 @@
                 for (var i=1;i<this.groupSize;i++){
                     this.members.push({"name":""});
                 }
+                this._selfInfoGroupIdChanged();
             },
+
             _selfInfoGroupIdChanged: function () {
 
-                if (this.selfInfo.groupId) {
+                if (typeof this.accessToken == "undefined")
+                    return
 
+                if (this.selfInfo.groupId) {
                     this.ajax = {
                         contentType: 'application/json',
                         headers: {
@@ -283,9 +292,7 @@
                         method: 'GET',
                         endpoint: '/groups/' + this.selfInfo.groupId
                     }
-
                 }
-
             },
 
             convertMail: function (mail) {
@@ -372,7 +379,34 @@
                 } else if (apiResponse.type == 'error') {
                     this.$$('#requestError').toggleAttribute("invalid",true);
                 }
+            },
+
+            /**
+             * API response handler after Random Join Request
+             **/
+            _apiGetRandomJoinResponse: function(response) {
+
+                if (response.type != "response")
+                    return;
+                this.set('selfInfo.groupId', response.data.group.id);
+
+            },
+
+            /**
+             * Random join button tap handler
+             * @private
+             */
+            _onRandomTap: function() {
+
+                this.ajax_randomJoin = {
+                    headers : {
+                        Authorization: this.accessToken
+                    },
+                    method:'POST',
+                    endpoint: '/groups/randomJoin/'
+                };
             }
+
         });
     </script>
 </dom-module>
