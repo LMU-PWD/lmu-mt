@@ -1,14 +1,44 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
 
 <dom-module is="groups-tutor">
 
     <template>
 
         <style include="shared-styles">
-
+            paper-button {
+                width: calc(35% - 20px);
+            }
         </style>
-drtzrtzrtzr5z
-        <
+
+        <api-request
+                headers="[[ ajax_labs.headers ]]"
+                method="[[ ajax_labs.method ]]"
+                endpoint="[[ ajax_labs.endpoint ]]"
+                response="{{ apiLabsResponse }}"></api-request>
+        <api-request
+                headers="[[ ajax_exercises.headers ]]"
+                method="[[ ajax_exercises.method ]]"
+                endpoint="[[ ajax_exercises.endpoint ]]"
+                response="{{ apiExercisesResponse }}"></api-request>
+
+        <div>
+            Lab Termine:
+        </div>
+        <template is="dom-repeat" items="[[ futureLabs ]]">
+            [[ item ]]<br>
+        </template>
+        <div>
+            Übungstermine:
+        </div>
+        <template is="dom-repeat" items="[[ futureExercises ]]">
+            [[ item ]]<br>
+        </template>
+        <div>
+            <paper-button on-tap="_onTapChooseDates">
+                Termine wählen
+            </paper-button>
+        </div>
 
         <iron-signals on-iron-signal-switchlocale="_switchLocale"></iron-signals>
     </template>
@@ -20,10 +50,33 @@ drtzrtzrtzr5z
                 language: {
                     type: String,
                     value: 'de'
+                },
+                selfInfo: String,
+                apiLabsResponse: {
+                    type: Object,
+                    observer: '_apiLabsResponse'
+                },
+                apiExercisesResponse: {
+                    type: Object,
+                    observer: '_apiExercisesResponse'
                 }
             },
 
             ready: function () {
+                this.ajax_labs = {
+                    headers: {
+                        Authorization: this.accessToken
+                    },
+                    method: 'GET',
+                    endpoint: '/platformusers/' + this.selfInfo.id + '/tutorlabs'
+                }
+                this.ajax_exercises = {
+                    headers: {
+                        Authorization: this.accessToken
+                    },
+                    method: 'GET',
+                    endpoint: '/platformusers/' + this.selfInfo.id + '/exercise'
+                }
             },
 
             /**
@@ -38,6 +91,38 @@ drtzrtzrtzr5z
             _switchLocale: function() {
                 this.language = (this.language == 'en') ? 'de' : 'en';
             },
+
+            _apiLabsResponse: function(response) {
+                if (response.type != 'response')
+                    return;
+                this.futureLabs = this.getOnlyFutureDates(response.data);
+            },
+            _apiExercisesResponse: function(response) {
+                if (response.type != 'response')
+                    return;
+                this.futureExercises = this.getOnlyFutureDates(response.data);
+            },
+
+            _onTapChooseDates: function(e) {
+                console.log(e)
+                this.page = ""
+            },
+
+            /**
+             * Function to remove objects that have a property 'date' that lies in the past from an array
+             * @param array
+             * @returns {Array}
+             */
+            getOnlyFutureDates: function(array) {
+                var futureDates = [];
+                var today = Date.now();
+                for (var i = 0; i < array.length; i++) {
+                    currentDate = new Date(array[i].date);
+                    if (currentDate > today)
+                        futureDates.push(currentDate)
+                }
+                return futureDates;
+            }
         });
     </script>
 </dom-module>
