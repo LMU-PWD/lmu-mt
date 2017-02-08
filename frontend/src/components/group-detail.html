@@ -134,6 +134,15 @@
                 response="{{ apiGetRandomJoinResponse }}"
                 loading="{{ isLoading }}"></api-request>
 
+        <!-- Create group by mail request -->
+        <api-request
+                headers="[[ ajaxCreateGroup.headers ]]"
+                body="[[ ajaxCreateGroup.body ]]"
+                method="[[ ajaxCreateGroup.method ]]"
+                endpoint="[[ ajaxCreateGroup.endpoint ]]"
+                response="{{ apiCreateGroupResponse }}"
+                loading="{{ isLoading }}"></api-request>
+
         <!-- Checking for Group ID if User Joined Group-->
         <template is="dom-if" if="{{selfInfo.groupId}}">
 
@@ -333,7 +342,9 @@
                         mails.push(element.name.concat("@campus.lmu.de"));
                     });
 
-                    this.ajax = {
+                    console.log(mails);
+
+                    this.ajaxCreateGroup = {
                         headers: {
                             Authorization: this.accessToken
                         },
