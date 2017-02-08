@@ -56,7 +56,7 @@
                 headers="[[ ajax.headers ]]"
                 method="[[ ajax.method ]]"
                 endpoint="[[ ajax.endpoint ]]"
-                response="{{ apiResponse }}"></api-request>
+                on-api-response="_handleLogoutResponse"></api-request>
 
         <app-toolbar class="nav-container">
             <!--<div class="configuration nav-block">-->
@@ -87,12 +87,6 @@
             is: 'navigation-bar',
 
             properties: {
-
-                apiResponse: {
-                    type: String,
-                    reflectToAttribute: false,
-                    observer: '_apiResponseChanged'
-                },
 
                 accessToken: {
                     type: String,
@@ -174,9 +168,7 @@
                 }
             },
 
-            _apiResponseChanged: function (response) {
-
-                if (response.type == 'response') {
+            _handleLogoutResponse: function (event) {
 
                     document.cookie = 'mt-api-accesstoken=; expires=Thu, 01 Jan 1970 00:00:00 UTC';
                     document.cookie = 'mt-api-userid=; expires=Thu, 01 Jan 1970 00:00:00 UTC';
@@ -186,10 +178,8 @@
                     this.set('loggedIn', false);
                     this.set('user', {});
                     this.set('group', {});
-
-                }
-
             },
+
             initSwitchLocale: function(e) {
                 this.fire("iron-signal", {name: "switchlocale"});
             }

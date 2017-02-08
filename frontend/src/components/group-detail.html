@@ -131,7 +131,7 @@
                 headers="[[ ajaxRandomJoin.headers ]]"
                 method="[[ ajaxRandomJoin.method ]]"
                 endpoint="[[ ajaxRandomJoin.endpoint ]]"
-                response="{{ apiGetRandomJoinResponse }}"
+                on-api-response="_handleRandomJoinResponse"
                 loading="{{ isLoading }}"></api-request>
 
         <!-- Create group by mail request -->
@@ -140,7 +140,8 @@
                 body="[[ ajaxCreateGroup.body ]]"
                 method="[[ ajaxCreateGroup.method ]]"
                 endpoint="[[ ajaxCreateGroup.endpoint ]]"
-                response="{{ apiCreateGroupResponse }}"
+                on-api-response="_handleCreateGroupResponse"
+                on-api-error="_handleCreateGroupError"
                 loading="{{ isLoading }}"></api-request>
 
         <!-- Checking for Group ID if User Joined Group-->
@@ -153,7 +154,7 @@
                         headers="[[ ajax.headers ]]"
                         method="[[ ajax.method ]]"
                         endpoint="[[ ajax.endpoint ]]"
-                        response="{{ apiGetGroupResponse }}"
+                        on-api-response="_handleGroupResponse"
                         loading="{{ isLoading }}"></api-request>
 
                 <template is="dom-repeat" items="[[group.groupMemberIds]]" as="member">
@@ -206,10 +207,10 @@
                         {{localize('groupdetail_create group')}}
                     </paper-button>
                     <paper-input-error id="inputError" class="error">
-                        {{localize('groupdetail_error')}}
+                        {{localize('groupdetail_input_error')}}
                     </paper-input-error>
                     <paper-input-error id="requestError" class="error">
-                        {{localize('groupdetail_email')}}
+                        {{localize('groupdetail_request_error')}}
                     </paper-input-error>
                 </div>
             </div>
@@ -222,20 +223,6 @@
             is: 'group-detail',
             properties: {
                 accessToken: String,
-                apiGetGroupResponse: {
-                    type: String,
-                    reflectToAttribute: false,
-                    observer: '_apiGetGroupResponseChanged'
-                },
-                apiCreateGroupResponse: {
-                    type: String,
-                    reflectToAttribute: false,
-                    observer: '_apiCreateGroupResponseChanged'
-                },
-                apiGetRandomJoinResponse: {
-                    type: String,
-                    observer: '_apiGetRandomJoinResponse'
-                },
                 group: {
                     type: Object,
                     notify: true,
@@ -342,8 +329,6 @@
                         mails.push(element.name.concat("@campus.lmu.de"));
                     });
 
-                    console.log(mails);
-
                     this.ajaxCreateGroup = {
                         headers: {
                             Authorization: this.accessToken
@@ -368,18 +353,15 @@
              * @param response
              * @private
              */
-            _apiGetGroupResponseChanged: function (response) {
+            _handleGroupResponse: function (event) {
+                var self = this;
+                var receivedGroup = event.detail;
+                this.set('group', receivedGroup);
 
-                if (response.type == 'response'){
-                    var self = this;
-                    var receivedGroup = response.data;
-                    this.set('group', receivedGroup);
-
-                    //Change groupMemberIds to Array Containing Objects with ID, Name and Mail
-                    this.group.groupMemberIds.forEach(function () {
-                        self.push('group.groupMemberIds',{"id":self.shift('group.groupMemberIds'),"name":"","mail":""});
-                    });
-                }
+                //Change groupMemberIds to Array Containing Objects with ID, Name and Mail
+                this.group.groupMemberIds.forEach(function () {
+                    self.push('group.groupMemberIds',{"id":self.shift('group.groupMemberIds'),"name":"","mail":""});
+                });
             },
 
             /**
@@ -387,28 +369,24 @@
              * @param apiResponse
              * @private
              */
-            _apiCreateGroupResponseChanged: function(apiResponse){
-
-                if (apiResponse.type == 'response') {
-                    var result = apiResponse.data.group;
-                    if(result){
-                        this.set('selfInfo.groupId', result.id);
-                    }
-                } else if (apiResponse.type == 'error') {
-                    this.$$('#requestError').toggleAttribute("invalid",true);
+            _handleCreateGroupResponse: function(event){
+                var result = event.detail.group;
+                if(result){
+                    this.set('selfInfo.groupId', result.id);
                 }
+            },
+
+            _handleCreateGroupError: function (event) {
+                console.log('there has been an error');
+                this.$$('#requestError').toggleAttribute("invalid",true);
             },
 
             /**
              * API response handler after Random Join Request
              **/
-            _apiGetRandomJoinResponse: function(response) {
-
-                if (response.type != "response")
-                    return;
-                this.set('selfInfo.groupId', response.data.group.id);
+            _handleRandomJoinResponse: function(event) {
+                this.set('selfInfo.groupId', event.detail.group.id);
                 this.fire('iron-signal', { name: 'notification', data:'Du bist einer zufälligen Gruppe zugewiesen worden!'});
-
             },
 
             /**
