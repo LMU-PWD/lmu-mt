@@ -150,7 +150,7 @@
 
                     if (answer.type == 'response') {
 
-                        console.log("semester created");
+                        console.log("semester created:", answer.data.id);
 
                         this.semesterId = answer.data.id;
 
@@ -215,7 +215,8 @@
                                 first_name: item.first_name,
                                 email: item.email,
                                 isTutor: true,
-                                isAdmin: false
+                                isAdmin: false,
+                                semesterId: this.semesterId
                             };
                         });
 
@@ -246,13 +247,16 @@
 
                         console.log("tutors created");
 
+                        var that = this;
+
                         var body = this.students.map(function(item){
                             return {
                                 name: item.name,
                                 first_name: item.first_name,
                                 email: item.email,
                                 isTutor: false,
-                                isAdmin: false
+                                isAdmin: false,
+                                semesterId: that.semesterId
                             };
                         });
 
