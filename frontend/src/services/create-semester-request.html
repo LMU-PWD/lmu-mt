@@ -6,39 +6,44 @@
     <template>
 
         <api-request
-            method="[[ semesterAjax.method ]]"
-            endpoint="[[ semesterAjax.endpoint ]]"
-            headers="[[ semesterAjax.headers ]]"
-            body="[[ semesterAjax.body ]]"
-            response="{{ semesterRequestApiResponse }}"></api-request>
+                method="[[ semesterAjax.method ]]"
+                endpoint="[[ semesterAjax.endpoint ]]"
+                headers="[[ semesterAjax.headers ]]"
+                body="[[ semesterAjax.body ]]"
+                on-api-response="_handleSemesterResponse"
+                on-api-error="_handleSemesterError"></api-request>
 
         <api-request
                 method="[[ labtypeAjax.method ]]"
                 endpoint="[[ labtypeAjax.endpoint ]]"
                 headers="[[ labtypeAjax.headers ]]"
                 body="[[ labtypeAjax.body ]]"
-                response="{{ labTypeRequestApiResponse }}"></api-request>
+                on-api-response="_handleLabtypesResponse"
+                on-api-error="_handleLabtypesError"></api-request>
 
         <api-request
                 method="[[ tutorAjax.method ]]"
                 endpoint="[[ tutorAjax.endpoint ]]"
                 headers="[[ tutorAjax.headers ]]"
                 body="[[ tutorAjax.body ]]"
-                response="{{ tutorRequestApiResponse }}"></api-request>
+                on-api-response="_handleTutorsResponse"
+                on-api-error="_handleTutorsError"></api-request>
 
         <api-request
                 method="[[ studentAjax.method ]]"
                 endpoint="[[ studentAjax.endpoint ]]"
                 headers="[[ studentAjax.headers ]]"
                 body="[[ studentAjax.body ]]"
-                response="{{ studentRequestApiResponse }}"></api-request>
+                on-api-response="_handleStudentsResponse"
+                on-api-error="_handleStudentsError"></api-request>
 
         <api-request
                 method="[[ datesAjax.method ]]"
                 endpoint="[[ datesAjax.endpoint ]]"
                 headers="[[ datesAjax.headers ]]"
                 body="[[ datesAjax.body ]]"
-                response="{{ datesRequestApiResponse }}"></api-request>
+                on-api-response="_handleDatesResponse"
+                on-api-error="_handleDatesError"></api-request>
 
     </template>
 
@@ -68,7 +73,7 @@
                 dates: {
                     type: Array },
 
-                // Attributes upward data flow
+                // Attributes for upward data flow
                 loading: {
                     type: Boolean,
                     notify: true,
@@ -79,26 +84,6 @@
                     type: String },
                 semesterId: {
                     type: String,
-                    reflectToAttribute: false },
-                semesterRequestApiResponse: {
-                    type: Object,
-                    observer: '_semesterRequestAnswerReceived',
-                    reflectToAttribute: false },
-                labTypeRequestApiResponse: {
-                    type: Object,
-                    observer: '_labTypeRequestAnswerReceived',
-                    reflectToAttribute: false },
-                tutorRequestApiResponse: {
-                    type: Object,
-                    observer: '_tutorRequestAnswerReceived',
-                    reflectToAttribute: false },
-                studentRequestApiResponse: {
-                    type: Object,
-                    observer: '_studentRequestAnswerReceived',
-                    reflectToAttribute: false },
-                datesRequestApiResponse: {
-                    type: Object,
-                    observer: '_datesRequestAnswerReceived',
                     reflectToAttribute: false },
 
                 // DEBUG
@@ -142,190 +127,159 @@
                 };
             },
 
-            _semesterRequestAnswerReceived: function (answer) {
+            _handleSemesterResponse: function (event) {
 
                 this.semesterAjax = null;
 
-                if (answer) {
+                    console.log("semester created:", event.detail.id);
 
-                    if (answer.type == 'response') {
+                    this.semesterId = event.detail.id;
 
-                        console.log("semester created:", answer.data.id);
-
-                        this.semesterId = answer.data.id;
-
-                        var photo = this.labTypes[0];
-                        var video = this.labTypes[1];
-                        var audio = this.labTypes[2];
-                        var body =
-                                [{
-                                    type: 0,
-                                    type_str: photo.title,
-                                    registration_deadline: photo.deadline,
-                                    registration_open: false,
-                                    description_tutor: photo.descriptionTutor,
-                                    description_student: photo.descriptionStudent,
-                                    semesterId: this.semesterId
-                                },{
-                                    type: 1,
-                                    type_str: video.title,
-                                    registration_deadline: video.deadline,
-                                    registration_open: false,
-                                    description_tutor: video.descriptionTutor,
-                                    description_student: video.descriptionStudent,
-                                    semesterId: this.semesterId
-                                },{
-                                    type: 2,
-                                    type_str: audio.title,
-                                    registration_deadline: audio.deadline,
-                                    registration_open: false,
-                                    description_tutor: audio.descriptionTutor,
-                                    description_student: audio.descriptionStudent,
-                                    semesterId: this.semesterId
-                                }];
-                        this.labtypeAjax = {
-                            method: 'POST',
-                            endpoint: '/labtypes/',
-                            headers: {
-                                Authorization: this.accessToken
-                            },
-                            body: body
-                        }
-                    } else {
-                        throw answer.data;
-                    }
-
-                }
-
+                    var photo = this.labTypes[0];
+                    var video = this.labTypes[1];
+                    var audio = this.labTypes[2];
+                    var body =
+                            [{
+                                type: 0,
+                                type_str: photo.title,
+                                registration_deadline: photo.deadline,
+                                registration_open: false,
+                                description_tutor: photo.descriptionTutor,
+                                description_student: photo.descriptionStudent,
+                                semesterId: this.semesterId
+                            },{
+                                type: 1,
+                                type_str: video.title,
+                                registration_deadline: video.deadline,
+                                registration_open: false,
+                                description_tutor: video.descriptionTutor,
+                                description_student: video.descriptionStudent,
+                                semesterId: this.semesterId
+                            },{
+                                type: 2,
+                                type_str: audio.title,
+                                registration_deadline: audio.deadline,
+                                registration_open: false,
+                                description_tutor: audio.descriptionTutor,
+                                description_student: audio.descriptionStudent,
+                                semesterId: this.semesterId
+                            }];
+                    this.labtypeAjax = {
+                        method: 'POST',
+                        endpoint: '/labtypes/',
+                        headers: {
+                            Authorization: this.accessToken
+                        },
+                        body: body
+                    };
             },
 
-            _labTypeRequestAnswerReceived: function (answer) {
+            _handleSemesterError: function (event) {
+                throw event.detail;
+            },
+
+            _handleLabtypesResponse: function (event) {
 
                 this.labtypeAjax = null;
 
-                if (answer) {
+                console.log("labtypes created");
 
-                    if (answer.type == 'response') {
+                var body = this.tutors.map(function(item){
+                    return {
+                        name: item.name,
+                        first_name: item.first_name,
+                        email: item.email,
+                        isTutor: true,
+                        isAdmin: false,
+                        semesterId: this.semesterId
+                    };
+                });
 
-                        console.log("labtypes created");
-
-                        var body = this.tutors.map(function(item){
-                            return {
-                                name: item.name,
-                                first_name: item.first_name,
-                                email: item.email,
-                                isTutor: true,
-                                isAdmin: false,
-                                semesterId: this.semesterId
-                            };
-                        });
-
-                        this.tutorAjax = {
-                            method: 'POST',
-                            endpoint: '/pendingplatformusers/',
-                            headers: {
-                                Authorization: this.accessToken
-                            },
-                            body: body
-                        }
-
-                    } else {
-                        throw answer.data;
-                    }
-
+                this.tutorAjax = {
+                    method: 'POST',
+                    endpoint: '/pendingplatformusers/',
+                    headers: {
+                        Authorization: this.accessToken
+                    },
+                    body: body
                 }
-
             },
 
-            _tutorRequestAnswerReceived: function (answer) {
+            _handleLabtypesError: function (event) {
+                throw event.detail;
+            },
+
+            _handleTutorsResponse: function (event) {
 
                 this.tutorAjax = null;
 
-                if (answer) {
+                console.log("tutors created");
 
-                    if (answer.type == 'response') {
+                var that = this;
 
-                        console.log("tutors created");
+                var body = this.students.map(function(item){
+                    return {
+                        name: item.name,
+                        first_name: item.first_name,
+                        email: item.email,
+                        isTutor: false,
+                        isAdmin: false,
+                        semesterId: that.semesterId
+                    };
+                });
 
-                        var that = this;
-
-                        var body = this.students.map(function(item){
-                            return {
-                                name: item.name,
-                                first_name: item.first_name,
-                                email: item.email,
-                                isTutor: false,
-                                isAdmin: false,
-                                semesterId: that.semesterId
-                            };
-                        });
-
-                        this.studentAjax = {
-                            method: 'POST',
-                            endpoint: '/pendingplatformusers/',
-                            headers: {
-                                Authorization: this.accessToken
-                            },
-                            body: body
-                        }
-
-                    } else {
-                        throw answer.data;
-                    }
-
+                this.studentAjax = {
+                    method: 'POST',
+                    endpoint: '/pendingplatformusers/',
+                    headers: {
+                        Authorization: this.accessToken
+                    },
+                    body: body
                 }
             },
 
-            _studentRequestAnswerReceived: function (answer) {
+            _handleTutorsError: function (event) {
+                throw event.detail;
+            },
+
+            _handleStudentsResponse: function (event) {
 
                 this.studentAjax = null;
 
-                if (answer) {
+                console.log("students created");
 
-                    if (answer.type == 'response') {
+                var dateBody = this.dates.map(function(item){
+                    return {
+                        semesterId: this.semesterId,
+                        name: item.title,
+                        date: item.date,
+                        location: item.location,
+                        duration: item.duration
+                    };
+                });
 
-                        console.log("students created");
-
-                        var dateBody = this.dates.map(function(item){
-                            return {
-                                semesterId: this.semesterId,
-                                name: item.title,
-                                date: item.date,
-                                location: item.location,
-                                duration: item.duration
-                            };
-                        });
-
-                        this.datesAjax = {
-                            method: 'POST',
-                            endpoint: '/uniquedates/',
-                            headers: {
-                                Authorization: this.accessToken
-                            },
-                            body: dateBody
-                        }
-
-                    } else {
-                        throw answer.data;
-                    }
-
+                this.datesAjax = {
+                    method: 'POST',
+                    endpoint: '/uniquedates/',
+                    headers: {
+                        Authorization: this.accessToken
+                    },
+                    body: dateBody
                 }
             },
 
-            _datesRequestAnswerReceived: function (answer) {
+            _handleStudentsError: function (event) {
+                throw event.detail;
+            },
 
+            _handleDatesResponse: function (event) {
                 this.datesAjax = null;
+                console.log("dates created");
+                this.loading = false;
+            },
 
-                if (answer) {
-
-                    if (answer.type == 'response') {
-                        console.log("dates created");
-                        this.loading = false;
-                    } else {
-                        throw answer.data;
-                    }
-
-                }
+            _handleDatesError: function (event) {
+                throw event.detail;
             },
 
             stringify: function (tutors) {

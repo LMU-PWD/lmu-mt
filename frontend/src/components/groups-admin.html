@@ -114,14 +114,14 @@
                 method="[[ ajax.method ]]"
                 endpoint="[[ ajax.endpoint ]]"
                 semester-filter="[[ selectedSemester ]]"
-                response="{{ apiGetGroupsResponse }}"></api-request>
+                on-api-response="_handleGroupsResponse"></api-request>
 
         <!-- Deletes Specific group -->
         <api-request
                 headers="[[ deleteAjax.headers ]]"
                 method="[[ deleteAjax.method ]]"
                 endpoint="[[ deleteAjax.endpoint ]]"
-                response="{{ apiDeleteGroupResponse }}"></api-request>
+                on-api-response="_handleDeleteGroupResponse"></api-request>
         <!--Lists all Groups-->
         <div class="container">
         <template is="dom-repeat" items="[[groups]]" as="group">
@@ -162,16 +162,6 @@
                     value: {
                         groupId: ''
                     }
-                },
-                apiGetGroupsResponse: {
-                    type: String,
-                    reflectToAttribute: false,
-                    observer: '_apiGetGroupsResponseChanged'
-                },
-                apiDeleteGroupResponse: {
-                    type: String,
-                    reflectToAttribute: false,
-                    observer: '_apiDeleteGroupResponseChanged'
                 },
                 groups: {
                     type: Array
@@ -218,22 +208,20 @@
              * @param response
              * @private
              */
-            _apiGetGroupsResponseChanged: function (response) {
-                if (response.type == 'response'){
-                    var self = this;
-                    var receivedGroup = response.data;
-                    this.set('groups', receivedGroup);
+            _handleGroupsResponse: function (event) {
+                var self = this;
+                var receivedGroup = event.detail;
+                this.set('groups', receivedGroup);
 
-                    //Change groupMemberIds to Array Containing Objects with ID, Name and Mail
-                    this.groups.forEach(function (element, index) {
-                        element.groupMemberIds.forEach(function () {
-                            self.push('groups.'+index+'.groupMemberIds',{"id":self.shift('groups.'+index+'.groupMemberIds'),"name":"","mail":""});
-                        });
+                //Change groupMemberIds to Array Containing Objects with ID, Name and Mail
+                this.groups.forEach(function (element, index) {
+                    element.groupMemberIds.forEach(function () {
+                        self.push('groups.'+index+'.groupMemberIds',{"id":self.shift('groups.'+index+'.groupMemberIds'),"name":"","mail":""});
                     });
-                }
+                });
             },
 
-            _apiDeleteGroupResponseChanged: function (response) {
+            _handleDeleteGroupResponse: function (event) {
                 this._groupsChanged();
             },
 

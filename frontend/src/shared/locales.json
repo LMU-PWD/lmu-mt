@@ -14,7 +14,8 @@
     "groupdetail_write mail": "Send an e-mail",
     "groupdetail_button randomjoin": "Join a random group",
     "groupdetail_member": "Member",
-    "groupdetail_error": "Oops, the e-mails seem to be wrong!",
+    "groupdetail_input_error": "Wrong number of group members provided",
+    "groupdetail_request_error": "Oops, the e-mails seem to be wrong!",
     "groupdetail_you": "You",
 
     "groupcard_tritt bei": "Join a group now!",
@@ -142,7 +143,8 @@
     "groupdetail_write mail": "E-Mail senden",
     "groupdetail_button randomjoin": "Zufallsgruppe beitreten",
     "groupdetail_member": "Mitglied",
-    "groupdetail_error": "Uuups... hat haben wohl die E-Mails nicht gestimmt!",
+    "groupdetail_input_error": "Falsche Anzahl Gruppenmitglieder angegeben",
+    "groupdetail_request_error": "Uuups... hat haben wohl die E-Mails nicht gestimmt!",
     "groupdetail_you": "Du",
 
     "groupcard_tritt bei": "Tritt jetzt einer Gruppe bei!",
