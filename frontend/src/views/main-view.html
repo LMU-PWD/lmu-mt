@@ -87,12 +87,12 @@
                 data="{{routeData}}"
                 tail="{{subroute}}"></app-route>
 
-        <!-- Fetches info about currently logged in user -->
-        <api-request
-                headers="[[ ajax.headers ]]"
-                method="[[ ajax.method ]]"
-                endpoint="[[ ajax.endpoint ]]"
-                response="{{ apiResponse }}"></api-request>
+    <!-- Fetches info about currently logged in user -->
+    <api-request
+            headers="[[ ajax.headers ]]"
+            method="[[ ajax.method ]]"
+            endpoint="[[ ajax.endpoint ]]"
+            on-api-response="_handleLoggedInUserResponse"></api-request>
 
         <app-header fixed>
             <navigation-bar
@@ -329,23 +329,23 @@
                     };
                 }
             },
-            _apiResponseChanged: function (response) {
 
-                if (response.type == 'response') {
-                    var userResponse = response.data;
-                    this.set('user.email', userResponse.email);
-                    this.set('user.firstName', userResponse.firstName);
-                    this.set('user.groupId', userResponse.groupId);
-                    this.set('user.name', userResponse.name);
-                    this.set('user.isAdmin', userResponse.isAdmin);
-                    this.set('user.isTutor', userResponse.isTutor);
-                    this.set('user.id', userResponse.id);
-                    if(!this.user.isAdmin && !this.user.isTutor){
-                        this.set('user.isStudent', true);
-                        //console.log("true");
-                    }
-                }
-            },
+        _handleLoggedInUserResponse: function (event) {
+//            console.log('_handleLoggedInUserResponse()');
+            var userResponse = event.detail;
+//            console.log(userResponse);
+            this.set('user.email', userResponse.email);
+            this.set('user.firstName', userResponse['first_name']);
+            this.set('user.groupId', userResponse.groupId);
+            this.set('user.name', userResponse.name);
+            this.set('user.isAdmin', userResponse.isAdmin);
+            this.set('user.isTutor', userResponse.isTutor);
+            this.set('user.id', userResponse['id']);
+            if(!this.user.isAdmin && !this.user.isTutor){
+              this.set('user.isStudent', true);
+            }
+//            console.log(this.user);
+        },
 
             toggleGroup: function () {
                 var mq = window.matchMedia( "(max-width: 767px)" );

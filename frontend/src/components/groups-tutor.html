@@ -68,7 +68,7 @@
                         Authorization: this.accessToken
                     },
                     method: 'GET',
-                    endpoint: '/platformusers/' + this.selfInfo.id + '/tutorlabs'
+                    endpoint: '/labs/?filter[where][tutorId]' + this.selfInfo.id
                 }
                 this.ajax_exercises = {
                     headers: {

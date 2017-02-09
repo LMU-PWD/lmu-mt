@@ -65,12 +65,6 @@
                     value: 'GET'
                 },
 
-                response: {
-                    type: Object,
-                    notify: true,
-                    value: ''
-                },
-
                 semesterFilter: {
                     type: String,
                     value: '',
@@ -84,17 +78,11 @@
             },
 
             _handleResponse: function (response) {
-                this.response = {
-                    data: response.detail.response,
-                    type: 'response'
-                };
+                this.fire('api-response', response.detail.response);
             },
 
             _handleError: function (response) {
-                this.response = {
-                    data: response.detail.error,
-                    type: 'error'
-                };
+                this.fire('api-error', response.detail.error);
             },
 
             _computeUrl: function () {

@@ -32,7 +32,7 @@
             headers="[[ ajax.headers ]]"
             method="[[ ajax.method ]]"
             endpoint="[[ ajax.endpoint ]]"
-            response="{{ semestersResponse }}"></api-request>
+            on-api-response="_handleSemesterResponse"></api-request>
 
         <paper-dropdown-menu label="Semester">
             <paper-listbox class="dropdown-content" selected="{{ selectedSemesterIndex }}">
@@ -100,12 +100,6 @@
                 semesters: {
                     type: Array,
                     notify: true
-                },
-
-                semestersResponse: {
-                    type: Object,
-                    value: {},
-                    observer: '_semestersResponseChanged'
                 },
 
                 user: {
@@ -193,11 +187,9 @@
                 this.language = (this.language == 'en') ? 'de' : 'en';
             },
 
-            _semestersResponseChanged: function (response) {
-                if (response.type && response.type != 'error') {
-                    this.semesters = response.data;
-                    this.selectedSemesterIndex = this._calcPreselectedSemester();
-                }
+            _handleSemesterResponse: function (event) {
+                this.semesters = event.detail;
+                this.selectedSemesterIndex = this._calcPreselectedSemester();
             },
 
             _getSelectedSemesterId: function (index) {
