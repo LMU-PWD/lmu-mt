@@ -20,7 +20,8 @@
             is: 'get-user-info',
             properties: {
                 accessToken: {
-                    type: String
+                    type: String,
+                    statePath: 'session.accessToken'
                 },
                 session: {
                     type: Object,
@@ -56,6 +57,16 @@
                     ReduxBehavior
             ],
             ready: function() {
+                console.log(this.accessToken);
+
+                this.ajax = {
+                    contentType: 'application/json',
+                    headers: {
+                        Authorization: this.session.accessToken
+                    },
+                    method: 'GET',
+                    endpoint: '/platformusers/' + this.userId
+                };
                 /*this.ajax = {
                     headers: {
                         Authorization: this.session.accessToken
@@ -78,13 +89,13 @@
                     at = this.session.accessToken;
                 }
                 console.debug('[get-user-info.html] also I know this accessToken: ', at);
-                this.ajax = {
+                /*this.ajax = {
                     headers: {
-                        Authorization: at
+                        authorization: 'test'
                     },
                     method: 'GET',
                     endpoint: '/platformusers/' + userId
-                };
+                };*/
             },
 
             //Function for setting Mail & Name on Ajax response

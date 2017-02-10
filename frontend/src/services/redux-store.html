@@ -17,7 +17,7 @@
             priorityIds: []
         },
         session: {
-            accessToken: null,
+            accessToken: 'somewhat',
             loggedIn: false,
             userId: ''
         },
@@ -149,7 +149,7 @@
         if (!state) {
             return initialState.session;
         }
-
+        console.log("Session Object Changed" + action.detail);
         switch (action.type) {
 
             case 'UPDATE_SESSION':
@@ -226,7 +226,7 @@
 
     }
 
-    const store = Redux.createStore(reducer);
+    const store = Redux.createStore(reducer,window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
     const ReduxBehavior = PolymerRedux(store);
 
 </script>
