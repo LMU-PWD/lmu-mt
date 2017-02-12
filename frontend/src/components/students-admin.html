@@ -17,6 +17,10 @@
                 /*border-radius: 5px 5px 0 0;*/
             }
 
+            .card{
+                height: 100px;
+            }
+
             .icon{
                 height: 64px;
                 width: 64px;
@@ -24,18 +28,28 @@
                 margin: 18px 0 18px 18px; /*oben rechts unten links old:calc(20% - 54px)*/
                 float: left;
                 border-radius: 50%;
-                border: 2px solid var(--paper-blue-grey-900);
+                border: 2px solid var(--paper-blue-grey-800);
+            }
+            .icon > iron-icon{
+                --iron-icon-height: 64px;
+                --iron-icon-width: 64px;
+            }
+            .icon > #icon{
+                /*TODO Make Icon in Button 64x64*/
+                --iron-icon-height: 64px;
+                --iron-icon-width: 64px;
             }
             .icon > img {
-                color: var(--paper-blue-grey-900);
+                height: 64px;
+                width: 64px;
             }
             h1{
                 float: right;
                 position: relative;
                 top: 20px;
-                display:flex;
-                align-items:center;
-                width:calc(100% - 128px);
+                display: flex;
+                align-items: center;
+                width: calc(100% - 128px);
                 margin: 0 18px;
                 height: 60px;
                 padding: 0;
@@ -47,21 +61,19 @@
                 }
             }
         </style>
-        <div>
-        <div class="icon">
-        <img src="../../images/student.svg">
-        </div>
+        <div class="card" on-tap="_handleTap">
+        <!--<div class="icon">
+            <img src="../../images/student.svg">
+        </div>-->
+            <!--<iron-icon class="icon" src="../../images/student.svg"></iron-icon>-->
+            <paper-icon-button class="icon" src="../../images/student.svg"></paper-icon-button>
           <h1>{{localize('student_admin title')}}</h1>
-                                                                  </div><div>
-        <div class="icon">
-        <img src="../../images/tutor.svg">
         </div>
-          <h1>{{localize('tutor_admin title')}}</h1>
-                                                                  </div>
+
         <iron-signals on-iron-signal-switchlocale="_switchLocale"></iron-signals>
 
         <!-- Fetches all current Users -->
-        <api-request
+        <!--<api-request
                 headers="[[ ajax.headers ]]"
                 method="[[ ajax.method ]]"
                 endpoint="[[ ajax.endpoint ]]"
@@ -70,7 +82,7 @@
         <div></div>
         <template is="dom-repeat" items="[[users]]" as="user" filter="isStudent">
             <h1>[[user.name]]</h1>
-        </template>
+        </template>-->
     </template>
     <script>
         Polymer({
@@ -136,6 +148,11 @@
             
             isStudent: function (item) {
                 return (item.isAdmin)?(false):((item.isTutor)?(false):(true));
+            },
+            _handleTap: function(event){
+                console.log(event);
+                console.log(event.detail.sourceEvent.target.children[2]);
+                console.log(this.$$('.icon'));
             }
         });
     </script>

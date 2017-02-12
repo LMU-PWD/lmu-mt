@@ -17,7 +17,7 @@
   <template>
 
     <style include="shared-styles">
-      .group-placeholder{
+      .left-col{
         float: left;
       }
       .group-info{
@@ -40,7 +40,7 @@
 
       /*Phone*/
       @media screen and (max-width: 767px) {
-        .group-placeholder{
+        .left-col{
           width: 100%;
           min-width: 320px;
         }
@@ -53,7 +53,7 @@
       }
       /*Tablet*/
       @media screen and (min-width: 768px) and (max-width: 1023px) {
-        .group-placeholder{
+        .left-col{
           margin: 10px;
           width: calc(50% - 20px);
         }
@@ -64,7 +64,7 @@
       }
       /*Desktop*/
       @media screen and (min-width: 1024px) {
-        .group-placeholder{
+        .left-col{
           margin:10px;
           width: calc(35% - 20px);
         }
@@ -91,6 +91,7 @@
 
     <!--app-location route="{{route}}" use-hash-as-path></app-location--><!--zugriff auf url; get ulr mäßig; use-hash-as-path: # vor path-->
     <app-route
+            use-as-hash-path
             route="{{route}}"
             pattern="/:page"
             data="{{routeData}}"
@@ -134,23 +135,25 @@
             </div>
 
             <template is="dom-if" if="[[user.isAdmin]]">
-                <div class="group-placeholder">
+                <div class="left-col">
                     <group-card group-name="Gruppen" on-tap="toggleGroup"></group-card>
                     <iron-collapse id="collapse" opened=true>
                         <groups-admin class="group-info"
                                       access-token="[[ accessToken ]]"
                                       self-info="{{user}}" ></groups-admin>
                     </iron-collapse>
+
+                    <students-admin
+                            name="student-admin"
+                            access-token="[[ accessToken ]]"></students-admin>
                 </div>
-                <students-admin class="group-placeholder"
-                        access-token="[[ accessToken ]]"></students-admin>
-                <admin-card students></admin-card>
+                <!--<admin-card students></admin-card>
                 <admin-card tutors></admin-card>
-                <admin-card groups></admin-card>
+                <admin-card groups></admin-card>-->
             </template>
 
             <template is="dom-if" if="[[user.isStudent]]">
-                <div class="group-placeholder light-color-text">
+                <div class="left-col light-color-text">
                     <group-card group-name=[[group.name]] on-tap="toggleGroup"></group-card>
                     <iron-collapse id="collapse" opened=true>
                         <group-detail class="group-info"
