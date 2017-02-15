@@ -47,7 +47,7 @@
             <template is="dom-if" if="[[registration_open]]">
                 <!-- Registration Open Bool from Api is true -->
                 <template is="dom-if" if="[[before_deadline]]">
-                    <template is="dom-if" if="[[!slots_already_chosen]]" >
+                    <template is="dom-if" if="[[!labs_already_chosen]]" >
                         <!-- Deadline is not over, Registration Open and no dates selected; Select your dates!-->
                         <practicals-date-selector  id="practicalsDateSelector"
                                                    practical_date="[[practical_date]]"
@@ -57,10 +57,10 @@
                                                    on-save-click="_handleSaveClick"
                                                    on-reset-click="_handleResetClick"></practicals-date-selector>
                     </template>
-                    <template is="dom-if" if="[[slots_already_chosen]]">
+                    <template is="dom-if" if="[[labs_already_chosen]]">
                         <!-- Deadline is not over, Registration Open and dates selected; Show saved dates!-->
                         <practicals-show-saved-dates id="practicals_show_saved_dates"
-                                                     chosenslots="[[chosenslots]]"></practicals-show-saved-dates>
+                                                     chosenlabs="[[chosenlabs]]"></practicals-show-saved-dates>
                         <paper-button raised class="changeButton" on-tap="_handleChangeClick">
                             <iron-icon icon="reply"></iron-icon>
                             Auswahl ändern
@@ -71,7 +71,7 @@
                     <!-- Deadline is over but Registration has been started-->
                     <template is="dom-if" if="[[!practical_date_exists]]">
                         <!-- Deadline is over, Registration has been started but Practical Date is not given -->
-                        <practicals-show-saved-dates chosenslots="[[chosenslots]]"></practicals-show-saved-dates>
+                        <practicals-show-saved-dates chosenlabs="[[chosenlabs]]"></practicals-show-saved-dates>
                     </template>
                     <template is="dom-if" if="[[practical_date_exists]]">
                         <!-- Deadline is over, Registration has been started and Practical Date is given-->
@@ -103,7 +103,7 @@
                     type: Boolean,
                     value: true
                 },
-                chosenslots:{
+                chosenlabs:{
                     type: Array,
                     value: []
                 },
@@ -126,7 +126,7 @@
                     type: Object,
                     notify: true
                 },
-                slots_already_chosen:{
+                labs_already_chosen:{
                     type: Boolean
                 },
                 timeslots:{
@@ -142,27 +142,28 @@
                     observer: '_responseFromPrioritySave'
                 },
                 group: Object,
+                allLabs: {
+                    type: Array,
+                    value: []
+                },
                 labData: Object,
                 labType: Object
             },
             ready: function () {
-                console.log("practical_date: " + this.labData.lab);
-                console.log("chosenslots: " + this.labData.priorities);
-                console.log("deadline: " + this.labType.registration_deadline);
                 this.practical_date = this.labData.lab;
+
                 this.practical_date_exists = this._dateExists(this.practical_date);
                 if(this.practical_date_exists){
                     this.practical_date_string = this._getDateString(this.practical_date);
                 }
                 else{
-                    this.timeslots = this._getTimeslots();
-                    this.chosenslots = this.labData.priorities;
-                    this.slots_already_chosen = this._chosenslotsExist(this.chosenslots);
+                    this.labs_already_chosen = this._chosenlabsExist(this.labData.priorities);
+                    if(this.labs_already_chosen){
+                        this.chosenlabs = this._transformLabs(this.labData.priorities,false);
+                    }
                 }
                 this.before_deadline = this._getBeforeDeadline(this.labType.registration_deadline);
-                console.log(this.labData);
-                console.log(this.labType);
-                console.log(this.group);
+                this.timeslots = this._transformLabs(this.allLabs,true);
             },
             /**
              * Back-button click handler
@@ -177,34 +178,35 @@
              * @private
              */
             _handleSaveClick: function(e){
-                var slotcounter = 0;
-                for(i=0; i< e.target.chosenslots.length; i++){
-                    if(e.target.chosenslots[i] != null){
-                        slotcounter++;
+                //console.log(e.target.chosenlabs);
+                var labcounter = 0;
+                for(i=0; i< e.target.chosenlabs.length; i++){
+                    if(e.target.chosenlabs[i] != null){
+                        labcounter++;
                     }
                 }
-                if(slotcounter == e.target.chosenslots.length){
-                    //this.chosenslots = [];
-                    this.chosenslots = e.target.chosenslots;
-                    this.slots_already_chosen = true;
+                if(labcounter == e.target.chosenlabs.length){
+                    this.chosenlabs = [];
+                    this.chosenlabs = e.target.chosenlabs;
+                    this.labs_already_chosen = true;
                     var practicals_show_saved_dates = Polymer.dom(this.root).querySelector("#practicals_show_saved_dates");
                     if(practicals_show_saved_dates) {
-                        practicals_show_saved_dates._slotsChanged(this.chosenslots);
+                        practicals_show_saved_dates._labsChanged(this.chosenlabs);
                     }
                 }
                 else{
-                    alert("Error: Not enogh slots chosen. Just "+slotcounter+" slots chosen.");
+                    alert("Error: Not enogh labs chosen. Just "+labcounter+" labs chosen.");
                 }
 
-                // TODO: Deliver chosen slots as lab objects (with Id)
+                // TODO: Deliver chosen labs as lab objects (with Id)
 
                 // IMPORTANT: This is the example process for saving priorities.
                 // The process has to be done for each set priority (every
-                // entry in chosenslots)
+                // entry in chosenlabs)
 
-                /*for (var i = 0; i < this.chosenslots.length; i++) {
+                /*for (var i = 0; i < this.chosenlabs.length; i++) {
 
-                    // TODO: Replace this by chosenslot entry as lab object
+                    // TODO: Replace this by chosenlab entry as lab object
                     var dummyLab = {};
 
                     // Step 1. check if this priority has been in the DB for this group already
@@ -216,7 +218,7 @@
                         }
                     }
                     if (found)
-                    // take next priority / go on in loop over chosenslots
+                    // take next priority / go on in loop over chosenlabs
                         break;
 
                     // Step 2. Save a new priority object
@@ -229,7 +231,7 @@
                         body: {
                             priority: 3,
                             groupId: this.group.id,
-                            labId: dummyLab.id, // TODO: Set this (= current slot's lab id)
+                            labId: dummyLab.id, // TODO: Set this (= current lab's lab id)
                             semesterId: this.group.semesterId,
                             labTypeId: this.labType.id
                         }
@@ -242,7 +244,7 @@
              * @private
              */
             _handleResetClick: function(e){
-                this.chosenslots = [];
+                this.chosenlabs = [];
             },
             /**
              * Handle change click
@@ -250,7 +252,7 @@
              * @private
              */
             _handleChangeClick: function(e){
-                this.slots_already_chosen = false;
+                this.labs_already_chosen = false;
                 var practicals_date_selector = Polymer.dom(this.root).querySelector("#practicalsDateSelector");
                 if(practicals_date_selector) {
                     practicals_date_selector._handleResetClick();
@@ -260,16 +262,17 @@
              * Function that checks for the practial course date
              */
             _dateExists: function(date){
-                if(date == null || typeof(date)!= undefined){
+                if(date == null){
                     return false;
                 }
                 return true;
             },
             /**
-             * Function that checks for the if there are slots already chosen
+             * Function that checks for the if there are labs already chosen
              */
-            _chosenslotsExist: function(slots){
-                if(slots == null || slots == [] || slots == 0){
+            _chosenlabsExist: function(labs){
+                //console.log(labs);
+                if(labs.starttimes == null || labs.starttimes == [] || labs.starttimes == 0){
                     return  false;
                 }
                 return  true;
@@ -277,44 +280,14 @@
             _getBeforeDeadline: function (deadline){
                 var deadline_date = new Date(deadline);
                 var today = new Date();
-                //console.log(today);
-                //console.log(deadline_date);
                 if(deadline_date > today){
-                    console.log("before deadline");
+                    //console.log("before deadline");
                     return true;
 
                 }
-                console.log("after deadline");
+                //console.log("after deadline");
                 return false;
 
-            },
-            /**
-             * Function that checks for the practial course date
-             */
-            _getChosenslots: function(){
-                //TODO: Get Timeslots from Backend
-                var timeslots =[];
-                timeslots = [[new Date(2017,1,2,1,0),new Date(2017,1,2,2,0)],[new Date(2017,1,2,3,0),new Date(2017,1,2,4,0)],[new Date(2017,1,2,5,0),
-                    new Date(2017,1,10,14,0)],[new Date(2017,1,10,15,0),new Date(2017,1,10,16,0)],[new Date(2017,1,10,17,0),new Date(2017,1,10,18,0)]];
-
-                //return timeslots;
-                return null;
-            },
-
-            /**
-             * Function that checks for the practial course date
-             * @param {String} date - date that will be transformed to String
-             */
-            _getTimeslots: function(){
-                //TODO: Get Timeslots from Backend
-                var timeslots =[];
-                timeslots.starttimes = [new Date(2017,1,2,1,0),new Date(2017,1,2,2,0),new Date(2017,1,2,3,0),new Date(2017,1,2,4,0),new Date(2017,1,2,5,0),
-                    new Date(2017,1,10,14,0),new Date(2017,1,10,15,0),new Date(2017,1,10,16,0),new Date(2017,1,10,17,0),new Date(2017,1,10,18,0),new Date(2017,1,10,19,0),new Date(2017,1,10,20,0),
-                    new Date(2017,1,12,12,0),new Date(2017,1,12,13,0),new Date(2017,1,12,14,0),new Date(2017,1,12,15,0),new Date(2017,1,14,14,0),new Date(2017,1,14,15,0)];
-                timeslots.sizes =[60,60,60,60,60,60,60,60,60,60,60,60,60,60,60,60,60,60];
-
-                return this._transformTimeslots(timeslots);
-                //return null;
             },
             /**
              * Creates string from the given date
@@ -358,46 +331,54 @@
                 return datestring;
             },
             /**
-             * Transform the Format of the given Timeslots from the Api, so it will be easier to handle in the frontend
-             * @param slotsFromApi - Contains the given timeslots
-             * @returns {Array} - timeslots in new format
+             * Transform the Format of the given Timelabs from the Api, so it will be easier to handle in the frontend
+             * @param labsFromApi - Contains the given timelabs
+             * @returns {Array} - timelabs in new format
              * @private
              */
-            _transformTimeslots: function(slotsFromApi){
-                var transformedSlots = []; //Store return-Array here
-                var lastSlot = slotsFromApi.starttimes[0];
+            _transformLabs: function(labsFromApi,divideDates){
+                var transformedLabs = []; //Store return-Array here
+                var lastLab = labsFromApi.starttimes[0];
                 var countDates = 0; //Date counter
-                var countSlots = 0; //Slot counter
+                var countLabs = 0; //lab counter
                 var dates = [];
 
-                for(i=0; i<slotsFromApi.starttimes.length; i++){
-                    // Create a new array-entrie if date from recent slot is different from date of the last slot
-                    if(slotsFromApi.starttimes[i].getFullYear() != lastSlot.getFullYear() ||
-                        slotsFromApi.starttimes[i].getMonth() != lastSlot.getMonth() ||
-                        slotsFromApi.starttimes[i].getDate() != lastSlot.getDate()) {
+                for(i=0; i<labsFromApi.starttimes.length; i++){
+                    // Create a new array-entrie if date from recent lab is different from date of the last lab
+                    if(labsFromApi.starttimes[i].getFullYear() != lastLab.getFullYear() ||
+                        labsFromApi.starttimes[i].getMonth() != lastLab.getMonth() ||
+                        labsFromApi.starttimes[i].getDate() != lastLab.getDate()) {
                         dates = [];
-                        lastSlot = slotsFromApi.starttimes[i];
-                        transformedSlots.push([]);
+                        lastlab = labsFromApi.starttimes[i];
+                        transformedLabs.push([]);
                         countDates++;
-                        countSlots = 0;
+                        countLabs = 0;
                     }
-                    var endtime = new Date(slotsFromApi.starttimes[i].getFullYear(), slotsFromApi.starttimes[i].getMonth(), slotsFromApi.starttimes[i].getDate());
-                    if((slotsFromApi.starttimes[i].getMinutes() + (slotsFromApi.sizes[i] % 60)) > 60){
-                        endtime.setHours(1+Math.floor(slotsFromApi.starttimes[i].getHours()+(slotsFromApi.sizes[i]) / 60));
-                        endtime.setMinutes(slotsFromApi.starttimes[i].getMinutes() + (slotsFromApi.sizes[i] % 60)-60);
+                    var endtime = new Date(labsFromApi.starttimes[i].getFullYear(), labsFromApi.starttimes[i].getMonth(), labsFromApi.starttimes[i].getDate());
+                    if((labsFromApi.starttimes[i].getMinutes() + (labsFromApi.durations[i] % 60)) > 60){
+                        endtime.setHours(1+Math.floor(labsFromApi.starttimes[i].getHours()+(labsFromApi.durations[i]) / 60));
+                        endtime.setMinutes(labsFromApi.starttimes[i].getMinutes() + (labsFromApi.durations[i] % 60)-60);
                     }
                     else{
-                        endtime.setHours(Math.floor(slotsFromApi.starttimes[i].getHours()+(slotsFromApi.sizes[i]) / 60));
-                        endtime.setMinutes(slotsFromApi.starttimes[i].getMinutes() + (slotsFromApi.sizes[i] % 60));
+                        endtime.setHours(Math.floor(labsFromApi.starttimes[i].getHours()+(labsFromApi.durations[i]) / 60));
+                        endtime.setMinutes(labsFromApi.starttimes[i].getMinutes() + (labsFromApi.durations[i] % 60));
                     }
 
-                    var slot = [];
-                    slot = [slotsFromApi.starttimes[i], endtime];
-                    dates[countSlots] = slot;
-                    transformedSlots[countDates] = dates;
-                    countSlots++;
+                    var lab = [];
+                    lab = [labsFromApi.starttimes[i], endtime];
+                    if(divideDates){
+                        dates[countLabs] = lab;
+                        transformedLabs[countDates] = dates;
+                        countLabs++;
+                    }
+                    else{
+                        transformedLabs[i]=lab;
+                    }
+
                 }
-                return transformedSlots;
+                //console.log("transformed labs: ");
+                //console.log(transformedlabs);
+                return transformedLabs;
             },
             /**
              * Gets response from API call to create a new priority

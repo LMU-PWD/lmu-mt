@@ -8,7 +8,6 @@
 <link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="date-creator.html">
-<link rel="import" href="calculate-timeslots.html">
 <link rel="import" href="../shared/shared-styles.html">
 
 <dom-module id="practicals-date-selector">
@@ -70,8 +69,8 @@
                 </paper-button>
             </div>
             <div class="dateselector">
-                <template is="dom-repeat" items="[[timeslots]]" as="slots">
-                    <date-creator id="dateselectors" class="datecreator" timeslots="[[slots]]" priority="[[priority]]"
+                <template is="dom-repeat" items="[[timeslots]]" as="labs">
+                    <date-creator id="dateselectors" class="datecreator" timeslots="[[labs]]" priority="[[priority]]"
                                   on-priority-click="_handlePriorityClick"
                                   on-date-click="_handleDateClick"
                                   on-replace-priority="_handleReplacePriority"></date-creator>
@@ -103,7 +102,7 @@
                     type: Array,
                     value: []
                 },
-                chosenslots:{
+                chosenlabs:{
                     type: Array,
                     value: []
                 },
@@ -205,7 +204,8 @@
              * @private
              */
             _handlePriorityClick: function(e){
-                this.chosenslots[e.target.chosenpriority-1]= e.target.timeslots[e.target.chosenslotindex];
+                //console.log(this.chosenlabs);
+                this.chosenlabs[e.target.chosenpriority-1]= e.target.timeslots[e.target.chosenlabindex];
                 this.priorities[e.target.chosenpriority-1] = 0;
             },
 
@@ -215,7 +215,8 @@
              * @private
              */
             _handleSaveClick: function(e){
-                this.fire("save-click", this.chosenslots);
+                console.log(this.chosenlabs);
+                this.fire("save-click", this.chosenlabs);
             },
 
             /**
@@ -225,8 +226,8 @@
              */
             _handleReplacePriority: function(e){
                 for(i=0; i<this.priorities.length; i++){
-                    if(this.chosenslots[i] == e.target.timeslots[e.target.chosenslotindex]){
-                        this.chosenslots[i]= '';
+                    if(this.chosenlabs[i] == e.target.timeslots[e.target.chosenlabindex]){
+                        this.chosenlabs[i]= '';
                         this.priorities[i] = i+1;
                     }
                 }

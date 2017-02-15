@@ -7,10 +7,8 @@
         </style>
         <div class="saved-dates-shower">Deine Gruppe hat diese Termine ausgewählt:
             <ol type="1">
-                <template id="saved_dates" is="dom-repeat" items="{{chosenslots}}" as="chosen">
-                    <li>[[_getTimeSlotString(chosen)]]</li>
-                    <!--li>{{chosen}}</li-->
-                    <!--{{chosenslots}}--> <!-- this one will be updated correctly, "chosen" not!-->
+                <template id="saved_dates" is="dom-repeat" items="{{chosenlabs}}" as="chosen">
+                    <li>[[_getLabString(chosen)]]</li>
                 </template>
             </ol>
         </div>
@@ -19,19 +17,19 @@
         Polymer({
             is: 'practicals-show-saved-dates',
             properties: {
-                chosenslots:{
+                chosenlabs:{
                     type: Array,
                     value: [],
-                    notify: true
+                    notify: true,
+                    observer: '_labsChanged'
                 }
             },
             ready: function(){
-                console.log(this.chosenslots);
+                //console.log(this.chosenlabs);
             },
-            _slotsChanged: function(slots){
-                this.chosenslots = [];
-                this.chosenslots = slots;
-                console.log(this.chosenslots);
+            _labsChanged: function(labs){
+                this.chosenlabs = labs;
+                //console.log(this.chosenlabs);
                 this.$.saved_dates.render();
             },
             /**
@@ -39,7 +37,7 @@
              * @param {String} date - date that will be transformed to String
              */
             _getDateString: function(date){
-                console.log(date);
+                //console.log(date);
                 var datestring = "";
                 switch(date.getDay()){
                     case 0:
@@ -77,21 +75,22 @@
                 return datestring;
             },
             /**
-             * Creates string from the timeslot-timits to get a nicer visualisation,
+             * Creates string from the timelab-timits to get a nicer visualisation,
              * Adds leading zeros, if necessary
              */
-            _getTimeSlotString: function(slot){
-                if(slot) {
+            _getLabString: function(lab){
+                //console.log(lab);
+                if(lab) {
                     var datestring = "";
-                    var starthours = slot[0].getHours();
-                    var startminutes = slot[0].getMinutes();
-                    var endhours = slot[1].getHours();
-                    var endminutes = slot[1].getMinutes();
+                    var starthours = lab[0].getHours();
+                    var startminutes = lab[0].getMinutes();
+                    var endhours = lab[1].getHours();
+                    var endminutes = lab[1].getMinutes();
 
                     /*
                      * Add zeros, if necessary
                      */
-                    switch(slot[0].getDay()){
+                    switch(lab[0].getDay()){
                         case 0:
                             datestring = "Sonntag, ";
                             break;
@@ -128,7 +127,7 @@
                         endminutes = "0"+endminutes;
                     }
 
-                    return datestring+slot[0].getDate()+"."+slot[0].getMonth()+"."+slot[0].getFullYear()+
+                    return datestring+lab[0].getDate()+"."+lab[0].getMonth()+"."+lab[0].getFullYear()+
                         ", "+starthours +":"+startminutes+" - "+endhours+":"+endminutes+" Uhr";
                 }
             }

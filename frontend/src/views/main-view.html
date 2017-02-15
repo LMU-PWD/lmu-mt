@@ -229,6 +229,7 @@
                     user="[[user]]"
                     lab-type="[[ labtype_foto ]]"
                     lab-data="[[ groupdata_foto ]]"
+                    all-labs="[[ all_labs_foto ]]"
                     on-back-click="_handleBackTap"
                     access-token="{{ accessToken }}"
                     logged-in="{{ session.loggedIn }}"
@@ -242,6 +243,7 @@
                     user="[[user]]"
                     lab-type="[[ labtype_video ]]"
                     lab-data="[[ groupdata_video ]]"
+                    all-labs="[[all_labs_video]]"
                     on-back-click="_handleBackTap"
                     access-token="{{ accessToken }}"
                     logged-in="{{ session.loggedIn }}"
@@ -255,6 +257,7 @@
                     user="[[user]]"
                     lab-type="[[ labtype_audio ]]"
                     lab-data="[[ groupdata_audio ]]"
+                    all-labs="[[all_labs_audio]]"
                     on-back-click="_handleBackTap"
                     access-token="{{ accessToken }}"
                     logged-in="{{ session.loggedIn }}"
@@ -367,11 +370,27 @@
                 this.isReady = true;
 
                 this.groupdata_audio = {};
-                this.groupdata_audio.priorities = [];
+                this.groupdata_audio.priorities = {};
+                this.groupdata_audio.priorities.starttimes = [];
+                this.groupdata_audio.priorities.durations = [];
                 this.groupdata_video = {};
-                this.groupdata_video.priorities = [];
+                this.groupdata_video.priorities = {};
+                this.groupdata_video.priorities.starttimes = [];
+                this.groupdata_video.priorities.durations = [];
                 this.groupdata_foto = {};
-                this.groupdata_foto.priorities = [];
+                this.groupdata_foto.priorities = {};
+                this.groupdata_foto.priorities.starttimes = [];
+                this.groupdata_foto.priorities.durations = [];
+                this.allLabs = [];
+                this.all_labs_foto = {};
+                this.all_labs_foto.starttimes = [];
+                this.all_labs_foto.durations = [];
+                this.all_labs_video = {};
+                this.all_labs_video.starttimes = [];
+                this.all_labs_video.durations = [];
+                this.all_labs_audio = {};
+                this.all_labs_audio.starttimes = [];
+                this.all_labs_audio.durations = [];
             },
 
             observers: [
@@ -537,7 +556,7 @@
             },
 
             /**
-             * Initializes and sets group-priorities-property for each labtype
+             * Initializes and sets group-priorities-property for each lab
              * @param response
              * @private
              */
@@ -545,13 +564,40 @@
 
                 if(!this.isReady || response.type != 'response')
                     return;
+                var lab = "";
+                for(var i = 0; i<this.allLabs.length;i++){
+                    if(response.data.labId == this.allLabs[i].id){
+                        lab = this.allLabs[i];
 
-                if (response.data.labTypeId == this.labtype_audio.id)
-                    this.groupdata_audio.priorities.push(response.data);
-                if (response.data.labTypeId == this.labtype_video.id)
-                    this.groupdata_video.priorities.push(response.data);
-                if (response.data.labTypeId == this.labtype_foto.id)
-                    this.groupdata_foto.priorities.push(response.data)
+                        //console.log("lab:  ");
+                        //console.log(lab);
+
+                        if (lab.labTypeId == this.labtype_audio.id)
+                            this.groupdata_audio.priorities.starttimes[response.data.priority-1] = new Date(lab.date);
+                            this.groupdata_audio.priorities.durations[response.data.priority-1]=lab.duration;
+                        if (lab.labTypeId  == this.labtype_video.id)
+                            this.groupdata_video.priorities.starttimes[response.data.priority-1] = new Date(lab.date);
+                            this.groupdata_video.priorities.durations[response.data.priority-1]=lab.duration;
+                        if (lab.labTypeId  == this.labtype_foto.id)
+                            this.groupdata_foto.priorities.starttimes[response.data.priority-1] = new Date(lab.date);
+                            this.groupdata_foto.priorities.durations[response.data.priority-1] = lab.duration;
+
+                        // TODO: Delete this block when labtype is working
+                        this.groupdata_foto.priorities.starttimes[response.data.priority-1] = new Date(lab.date);
+                        this.groupdata_foto.priorities.durations[response.data.priority-1] = lab.duration;
+                        this.groupdata_foto.priorities.starttimes[response.data.priority] = new Date(lab.date);
+                        this.groupdata_foto.priorities.durations[response.data.priority] = lab.duration;
+                        this.groupdata_foto.priorities.starttimes[response.data.priority+1] = new Date(lab.date);
+                        this.groupdata_foto.priorities.durations[response.data.priority+1] = lab.duration;
+                        this.groupdata_audio.priorities.starttimes[response.data.priority-1] = new Date(lab.date);
+                        this.groupdata_audio.priorities.durations[response.data.priority-1] = lab.duration;
+                        //
+                    }
+                }
+
+
+
+
             },
 
             /**
@@ -591,11 +637,13 @@
                     return;
 
                 if (response.data.labTypeId == this.labtype_audio.id)
-                    this.groupdata_audio.lab = response.data;
+                    this.groupdata_audio.lab = new Date(response.data.date);
                 if (response.data.labTypeId == this.labtype_video.id)
-                    this.groupdata_video.lab = response.data;
+                    this.groupdata_video.lab = new Date(response.data.date);
                 if (response.data.labTypeId == this.labtype_foto.id)
-                    this.groupdata_foto.lab = response.data
+                    this.groupdata_foto.lab = new Date(response.data.date);
+
+                this.groupdata_audio.lab = new Date(response.data.date);
             },
             /**
              * Gets lab data from API and sets them for each labtype
@@ -605,11 +653,47 @@
             _allLabsFromApi: function(response) {
                 if(!this.isReady || response.type != 'response')
                     return;
-
-                console.log("AllLabs: "+ response.data.count);
                 for (var i = 0; i < response.data.length; i++) {
-                    console.log("AllLabs: "+ response.data[i]);
+                    if (response.data.labTypeId == this.labtype_audio.id){
+                        this.all_labs_audio.starttimes.push(new Date(response.data[i].date));
+                        this.all_labs_audio.durations.push(response.data[i].duration);
+                    }
+                    if (response.data.labTypeId == this.labtype_video.id) {
+                        this.all_labs_video.starttimes.push(new Date(response.data[i].date));
+                        this.all_labs_video.durations.push(response.data[i].duration);
+                    }
+                    if (response.data.labTypeId == this.labtype_foto.id){
+                        this.all_labs_foto.starttimes.push(new Date(response.data[i].date));
+                        this.all_labs_foto.durations.push(response.data[i].duration);
+                    }
+
+                    // TODO: Delete this block when labtype is working
+                    this.all_labs_foto.starttimes.push(new Date(response.data[i].date));
+                    this.all_labs_foto.durations.push(response.data[i].duration);
+                    this.all_labs_foto.starttimes.push(new Date(response.data[i].date));
+                    this.all_labs_foto.durations.push(response.data[i].duration);
+                    this.all_labs_foto.starttimes.push(new Date(response.data[i].date));
+                    this.all_labs_foto.durations.push(response.data[i].duration);
+                    this.all_labs_video.starttimes.push(new Date(response.data[i].date));
+                    this.all_labs_video.durations.push(response.data[i].duration);
+                    this.all_labs_video.starttimes.push(new Date(response.data[i].date));
+                    this.all_labs_video.durations.push(response.data[i].duration);
+                    this.all_labs_video.starttimes.push(new Date(response.data[i].date));
+                    this.all_labs_video.durations.push(response.data[i].duration);
+                    this.all_labs_video.starttimes.push(new Date(response.data[i].date));
+                    this.all_labs_video.durations.push(response.data[i].duration);
+                    this.all_labs_video.starttimes.push(new Date(response.data[i].date));
+                    this.all_labs_video.durations.push(response.data[i].duration);
+                    this.all_labs_audio.starttimes.push(new Date(response.data[i].date));
+                    this.all_labs_audio.durations.push(response.data[i].duration);
+                    //
+
+                    this.allLabs.push(response.data[i]);
                 }
+                //console.log("AllLabs: ");
+                //console.log(this.all_labs_foto);
+                //console.log(this.all_labs_video);
+                //console.log(this.all_labs_audio);
             }
 
         });

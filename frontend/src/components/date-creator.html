@@ -10,7 +10,7 @@
                 color: var(--paper-blue-grey-100);
                 font-size: 18px;
             }
-            .slot{
+            .lab{
                 border-style: solid;
                 border-width: 1px;
                 border-color: var(--paper-blue-grey-100);
@@ -38,9 +38,9 @@
             <div class="date">
                 [[date]]
             </div>
-            <template is="dom-repeat" items="[[timeslots]]" as="slot" >
-                <paper-item id="slot" class="slot" on-tap="_handleDateClick">
-                    [[_getTimeSlotString(slot)]]
+            <template is="dom-repeat" items="[[timeslots]]" as="lab" >
+                <paper-item id="lab" class="lab" on-tap="_handleDateClick">
+                    [[_getTimeSlotString(lab)]]
                     <div id="priorityShower"></div>
                 </paper-item>
                 <iron-collapse id="priorityselection">
@@ -85,10 +85,10 @@
                     type: Number,
                     value: 0
                 },
-                chosenslotindex:{
+                chosenlabindex:{
                     type: Number
                 },
-                recentslot: {
+                recentlab: {
                     type: Object
                 },
                 recentpriorityselection:{
@@ -178,7 +178,7 @@
             _handleDateClick: function(e){
                 this.fire("date-click");
 
-                this.chosenslotindex = e.model.index;
+                this.chosenlabindex = e.model.index;
 
 
                 //If there is a visible priorityselection, hide it
@@ -189,7 +189,7 @@
                 // Get clicked priorityselection
                 this.recentpriorityselection = Polymer.dom(this.root).querySelectorAll("#priorityselection")[e.model.index];
                 this.recentpriorityselection.toggle(); //Show Priorityselection
-                this.recentslot = e.target;
+                this.recentlab = e.target;
 
                 //Array-Mutation to force the priorityselection-Dom-Repeat to update
                 var array = this.priorities;
@@ -205,16 +205,16 @@
             _handlePriorityClick: function(e){
                 if(e.model.selector){
                     this.chosenpriority = e.model.selector;
-                    if(this.recentslot.lastChild.textContent.search('Priorität:')>=0){
+                    if(this.recentlab.lastChild.textContent.search('Priorität:')>=0){
                         this.fire("replace-priority");
-                        //TODO: replace slot on practical-date-detail chosenslots-Array and priorities-Array
+                        //TODO: replace lab on practical-date-detail chosenlabs-Array and priorities-Array
                     }
                     this.fire("priority-click"); //Notifies Parent (practical-date-detail.html)
                     this.recentpriorityselection.toggle(); //Hide Priorityselection
-                    this.recentslot.style.color = 'green';
-                    this.recentslot.style.backgroundColor = '#CEF6CE';
-                    this.recentslot.lastChild.textContent = 'Priorität: ' + e.model.selector;
-                    //this.recentslot.innerHTML = this.recentslot.innerHTML +'<div id="priorityShower">'+'Priorität: ' + e.model.selector+'</div>';
+                    this.recentlab.style.color = 'green';
+                    this.recentlab.style.backgroundColor = '#CEF6CE';
+                    this.recentlab.lastChild.textContent = 'Priorität: ' + e.model.selector;
+                    //this.recentlab.innerHTML = this.recentlab.innerHTML +'<div id="priorityShower">'+'Priorität: ' + e.model.selector+'</div>';
                 }
             },
 
@@ -232,15 +232,15 @@
                 return response;
             },
             /**
-             * Reset slotselection on Button click
+             * Reset labselection on Button click
              * @private
              */
             _resetSelection: function(){
-                var slots = Polymer.dom(this.root).querySelectorAll("#slot");
-                for(j=0; j < slots.length; j++){
-                    slots[j].lastChild.textContent = '';
-                    slots[j].style.color = '';
-                    slots[j].style.backgroundColor = '';
+                var labs = Polymer.dom(this.root).querySelectorAll("#lab");
+                for(j=0; j < labs.length; j++){
+                    labs[j].lastChild.textContent = '';
+                    labs[j].style.color = '';
+                    labs[j].style.backgroundColor = '';
                 }
             }
         });
