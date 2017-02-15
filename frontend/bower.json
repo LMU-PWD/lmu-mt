@@ -39,7 +39,8 @@
     "ace-widget": "LostInBrittany/ace-widget#^1.2.5",
     "papa-parser": "milesje/papa-parser#^0.1.4",
     "paper-dialog-scrollable": "PolymerElements/paper-dialog-scrollable#^1.1.5",
-    "iron-data-table": "^1.0.6"
+    "iron-data-table": "^1.0.6",
+    "transburger-icon": "^2.0.0"
   },
   "devDependencies": {
     "web-component-tester": "^4.0.0"

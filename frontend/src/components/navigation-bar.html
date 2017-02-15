@@ -193,14 +193,14 @@
 
             _handleLogoutResponse: function (event) {
 
-                    document.cookie = 'mt-api-accesstoken=; expires=Thu, 01 Jan 1970 00:00:00 UTC';
-                    document.cookie = 'mt-api-userid=; expires=Thu, 01 Jan 1970 00:00:00 UTC';
+                document.cookie = 'mt-api-accesstoken=; expires=Thu, 01 Jan 1970 00:00:00 UTC';
+                document.cookie = 'mt-api-userid=; expires=Thu, 01 Jan 1970 00:00:00 UTC';
 
-                    this.set('accessToken', '');
-                    this.set('userId', '');
-                    this.set('loggedIn', false);
-                    this.set('user', {});
-                    this.set('group', {});
+                this.set('accessToken', '');
+                this.set('userId', '');
+                this.set('loggedIn', false);
+                this.set('user', {});
+                this.set('group', {});
             },
 
             initSwitchLocale: function(e) {
