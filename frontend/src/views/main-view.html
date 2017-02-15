@@ -20,6 +20,7 @@
 <link rel="import" href="../../bower_components/app-layout/app-scroll-effects/app-scroll-effects.html">
 <link rel="import" href="../../bower_components/paper-header-panel/paper-header-panel.html">
 <link rel="import" href="../../bower_components/transburger-icon/transburger-icon.html">
+<link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
 
 <dom-module id="main-view">
 
@@ -591,6 +592,7 @@
             </paper-header-panel>
         </div>
 
+        <iron-signals on-iron-signal-forget="_forget"></iron-signals>
     </template>
 
 
@@ -673,6 +675,9 @@
             observers: [
                 //'_routePageChanged(routeData.page)'
             ],
+            listeners: {
+                'FORGET_IT' : '_handleForget'
+            },
 
         /*_userIdChanged: function () {
 
@@ -812,9 +817,13 @@
 
             _fireLogoutRequest: function () {
                 this.fire('USER_LOGOUT')
+            },
+
+
+            _forget: function (event) {
+                console.log('Heard Forget Event');
+                //TODO reset all data
             }
-
-
         });
     </script>
 </dom-module>

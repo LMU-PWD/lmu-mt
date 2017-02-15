@@ -10,39 +10,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/app-localize-behavior/app-localize-behavior.html">
-
-<link rel="import" href="../bower_components/app-layout/app-drawer/app-drawer.html">
-<link rel="import" href="../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
-<link rel="import" href="../bower_components/app-layout/app-header/app-header.html">
-<link rel="import" href="../bower_components/app-layout/app-header-layout/app-header-layout.html">
-<link rel="import" href="../bower_components/app-layout/app-scroll-effects/app-scroll-effects.html">
-<link rel="import" href="../bower_components/app-layout/app-toolbar/app-toolbar.html">
 <link rel="import" href="../bower_components/app-route/app-location.html">
 <link rel="import" href="../bower_components/app-route/app-route.html">
-<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
-<link rel="import" href="../bower_components/iron-icons/social-icons.html">
-<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../bower_components/iron-selector/iron-selector.html">
-<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../bower_components/iron-signals/iron-signals.html">
 
-<link rel="import" href="components/index-card.html">
-<link rel="import" href="components/group-card.html">
-<link rel="import" href="components/navigation-bar.html">
-<link rel="import" href="components/notifications-card.html">
 <link rel="import" href="services/api-request.html">
-<link rel="import" href="shared/shared-styles.html">
-
 <link rel="import" href="views/login-view.html">
 <link rel="import" href="views/main-view.html">
 <link rel="import" href="views/error-view.html">
 
 <dom-module id="my-app">
     <template>
-        <style include="shared-styles">
-        </style>
-
 
         <!-- Fetches info about currently logged in user -->
         <api-request
@@ -50,7 +30,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 method="[[ ajax.method ]]"
                 endpoint="[[ ajax.endpoint ]]"
                 on-api-response="_handleUserResponse"
-                on-api-error="_handleUserError" loading="{{isLoading}}" ></api-request>
+                on-api-error="_handleUserError"
+                loading="{{isLoading}}" ></api-request>
 
         <!--Logout Request-->
         <api-request
@@ -66,7 +47,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 route="{{route}}"
                 pattern="/:page"
                 data="{{routeData}}"
-                tail="{{subroute}}"></app-route>
+                tail="{{subRoute}}"></app-route>
 
 
         <!-- P A G E S -->
@@ -78,23 +59,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     name="main"
                     access-token="{{ session.accessToken }}"
                     user="{{user}}"
-                    logged-in="{{ session.loggedIn }}"
-                    user-id="{{ session.userId }}"
-                    show-notifications="{{ showDesktopNotifications }}"
-                    route="{{subroute}}"></main-view>
+                    route="{{subRoute}}"></main-view>
             <login-view
                     name="login"
-                    access-token="{{ session.accessToken }}"
-                    logged-in="{{ session.loggedIn }}"
-                    user-id="{{ session.userId }}"
-                    route="{{ subroute }}"></login-view>
+                    route="{{ subRoute }}"></login-view>
             <error-view name="error"></error-view>
 
         </iron-pages>
 
-        <!--/app-header-layout>
-
-      </app-drawer-layout-->
 
     </template>
 
@@ -103,23 +75,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             is: 'my-app',
 
             properties: {
-                /*page: {
-                 type: String,
-                 reflectToAttribute: false,
-                 observer: '_pageChanged'
-                 },*/
                 route: {
                     type: Object,
                     notify: true,
                     observer: '_routeChanged'
                 },
-                subroute: {
+                subRoute: {
                     type: Object,
                     notify: true
                 },
                 routeData: {
                     type: Object,
-                    observer: '_routeDataChanged'
                 },
                 session: {
                     type: Object,
@@ -154,15 +120,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     //Fire User Request to verify Cooke Credentials
                     this.ajax = {
                         headers: {
-                            Authorization: ''//this.session.accessToken
+                            Authorization: this.session.accessToken
                         },
                         method: 'GET',
                         endpoint: '/platformusers/' + this.session.userId
                     };
                 } else {
-
-                    //TODO Route to login without use of _routeChanged
-
                     //Reset Cookies, if parts left
                     document.cookie = 'mt-api-accesstoken=; expires=Thu, 01 Jan 1970 00:00:00 UTC';
                     document.cookie = 'mt-api-userid=; expires=Thu, 01 Jan 1970 00:00:00 UTC';
@@ -191,66 +154,48 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     }
                 }
                 return '';
-
-            },
-
-            /**
-             * Callback fired when the applications route changes
-             * @param {String} page - new value of routeData.page
-             * @private
-             */
-            _routePageChanged: function (page) {
-
-                //this.page = page || 'main';
-
-                // check if mobile or desktop notifications are needed
-                var screenwidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-                if (screenwidth > 1023) {
-                    this.showDesktopNotifications = true;
-                    this.showMobileNotifications = false;
-                }
-                else {
-                    this.showDesktopNotifications = false;
-                }
             },
 
             /**
              * Callback fired on API response to Platform User request
              * @param {Object} response - response to API request
+             * Setting User Property & routing to main page
              * @private
              */
             _handleUserResponse: function (response) {
-                console.log(response);
                 this.set('user', response.detail);
                 this.set('route.path', '/main');
                 this.set('routeData.page', 'main');
                 this.set('session.loggedIn', true);
-                console.log(this.user);
-
             },
 
-            _handleUserError: function (response) {
-                console.log(response);
-                this.set('route.path', '/login');
-                this.set('routeData.page', 'login');
-
+            /**
+             * Callback fired on API Error to Platform User request
+             * Resetting the Cookies & Rerouting to Login Page
+             * @private
+             */
+            _handleUserError: function () {
                 //Reset Cookies, if parts left
                 document.cookie = 'mt-api-accesstoken=; expires=Thu, 01 Jan 1970 00:00:00 UTC';
                 document.cookie = 'mt-api-userid=; expires=Thu, 01 Jan 1970 00:00:00 UTC';
+
+                this.set('route.path', '/login');
+                this.set('routeData.page', 'login');
             },
 
-            _routeChanged: function (detail) {
-                console.log(detail);
-                if (!this.session.loggedIn & !this.isLoading ) {
-                    console.log("Not Logged In!");
+
+            /**
+             * Callback fired when route changed
+             * Routing to Login Page if User is not logged in
+             * @private
+             */
+            _routeChanged: function () {
+                //Checking isLoading to wait for API Request on User Info
+                if (!this.session.loggedIn && !this.isLoading ) {
                     this.set('route.path', '/login');
+                    this.set('routeData.page', 'login');
                 }
             },
-
-            _routeDataChanged: function (detail) {
-                console.log(detail);
-            },
-
 
             /**
              * Callback fired when logout button is pressed. Sets a property
@@ -258,8 +203,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
              * @private
              */
             _fireLogoutRequest: function () {
-                console.log("Heard Log Out Firing");
-
                 if (this.session.loggedIn) {
                     this.ajaxLogout = {
                         headers: {
@@ -271,22 +214,35 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 }
             },
 
-            _handleLogoutResponse: function (event) {
+            /**
+             * Callback fired on logout
+             * Resetting Cookies & User Info, Routing to Login Page
+             * @private
+             */
+            _handleLogoutResponse: function () {
 
-                console.log("LogOut Success");
+                //Reset Cookies
                 document.cookie = 'mt-api-accesstoken=; expires=Thu, 01 Jan 1970 00:00:00 UTC';
                 document.cookie = 'mt-api-userid=; expires=Thu, 01 Jan 1970 00:00:00 UTC';
 
-                this.set('accessToken', '');
-                this.set('userId', '');
-                this.set('loggedIn', false);
-                this.set('user', {});
-                this.set('group', {});
+                //Reset User & Session
+                this.set('session', {});
+                this.set('user',{});
+
+                //Fire Event forcing every component to forget saved data
+                this.fire('iron-signal',{name:'forget'});
+
+                //Route to Login Page
                 this.set('route.path', '/login');
                 this.set('routeData.page', 'login');
             },
 
-
+            /**
+             * Callback fired when User logged in from login-card
+             * @event Containing AccessToken & UserID from Login Request
+             * Fires AJAX request to get User Info
+             * @private
+             */
             _handleLogin: function (event) {
                 this.ajax = {
                     headers: {
