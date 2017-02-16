@@ -85,7 +85,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                     notify: true
                 },
                 routeData: {
-                    type: Object,
+                    type: Object
                 },
                 session: {
                     type: Object,
@@ -244,6 +244,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
              * @private
              */
             _handleLogin: function (event) {
+
+                this.set('session.accessToken', event.detail.id);
+                this.set('session.userId', event.detail.userId);
+
                 this.ajax = {
                     headers: {
                         Authorization: event.detail.id

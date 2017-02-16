@@ -246,9 +246,7 @@
                     type: Object,
                     notify: true,
                     readOnly: false,
-                    value: {
-                        groupId: ''
-                    }
+                    observer: '_selfInfoChanged'
                 },
                 language: {
                     type: String,
@@ -354,6 +352,7 @@
              * @private
              */
             _handleGroupResponse: function (event) {
+                console.log(event);
                 var self = this;
                 var receivedGroup = event.detail;
                 this.set('group', receivedGroup);
@@ -402,6 +401,14 @@
                     method:'POST',
                     endpoint: '/groups/randomJoin/'
                 };
+            },
+
+            _selfInfoChanged: function (detail) {
+                console.log(detail);
+                console.log(this.selfInfo.groupId);
+                this.notifyPath('selfInfo.groupId');
+                this.fire('dom-change');
+
             }
 
         });

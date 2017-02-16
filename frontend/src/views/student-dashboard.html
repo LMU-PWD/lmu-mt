@@ -1,0 +1,144 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../components/group-card.html">
+<link rel="import" href="../components/group-detail.html">
+
+<dom-module id="student-dashboard">
+    <template>
+        <style>
+            :host {
+                width: 100%;
+                height: auto;
+            }
+
+            .group-placeholder {
+                float: left;
+            }
+
+            .group-info {
+                /*width: 100%;*/
+            }
+
+            .practicalsContainer {
+                float: left;
+            }
+
+            iron-collapse {
+                width: 100%;
+            }
+
+            admin-toolbar {
+                margin: 0 10px;
+                width: auto;
+            }
+
+            /*Phone*/
+            @media screen and (max-width: 767px) {
+                .group-placeholder {
+                    width: 100%;
+                    min-width: 320px;
+                }
+
+                .practicalsContainer {
+                    min-width: 320px;
+                    width: 100%;
+                }
+
+                admin-toolbar {
+                    margin: 0;
+                }
+            }
+
+            /*Tablet*/
+            @media screen and (min-width: 768px) and (max-width: 1023px) {
+                .group-placeholder {
+                    margin: 10px;
+                    width: calc(50% - 20px);
+                }
+
+                .practicalsContainer {
+                    margin: 10px;
+                    width: calc(50% - 20px);
+                }
+            }
+
+            /*Desktop*/
+            @media screen and (min-width: 1024px) {
+                .group-placeholder {
+                    margin: 10px;
+                    width: calc(35% - 20px);
+                }
+
+                .practicalsContainer {
+                    margin: 10px;
+                    width: calc(35% - 20px);
+                }
+            }
+
+        </style>
+        <div>
+
+
+            <div class="group-placeholder light-color-text">
+                <group-card group-name=[[group.name]] on-tap="toggleGroup"></group-card>
+                <iron-collapse id="collapse" opened=true>
+                    <group-detail class="group-info"
+                                  access-token="[[ accessToken ]]"
+                                  group="{{ group }}"
+                                  self-info="{{user}}"
+                                  group-name="{{groupName}}"></group-detail>
+                </iron-collapse>
+            </div>
+            <div class="practicalsContainer" on-tap="_handleTap">
+                <div on-tap="_handleFotoTap">
+                    <index-card key="photo" type="Fotopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:"
+                                info2="18.05.16, 14-16"></index-card>
+                </div>
+                <div on-tap="_handleVideoTap">
+                    <index-card key="video" type="Videopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:"
+                                info2="18.05.16, 14-16"></index-card>
+                </div>
+                <div on-tap="_handleAudioTap">
+                    <index-card key="audio" type="Audiopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:"
+                                info2="18.05.16, 14-16"></index-card>
+                </div>
+            </div>
+
+        </div>
+
+    </template>
+    <script>
+        Polymer({
+            is: 'student-dashboard',
+            properties: {
+                user: {
+                    type: Object,
+                    observer: '_userChanged'
+                },
+                accessToken: {
+                    type: String
+                }
+
+            },
+            ready: function () {
+
+            },
+            toggleGroup: function () {
+                var mq = window.matchMedia("(max-width: 767px)");
+                if (mq.matches) {
+                    this.$.collapse.toggle();
+                }
+            },
+            _handleTap: function (event) {
+                console.log(event);
+                //console.log(event.path[0].key);
+                var key = event.target.getAttribute('key');
+                this.fire('CHANGE_ROUTE', {path: '/' + key, page: key});
+                //console.log(event.model);
+            },
+
+            _userChanged: function (detail) {
+                console.log(detail);
+            }
+        });
+    </script>
+</dom-module>

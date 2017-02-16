@@ -1,0 +1,79 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="tutor-dashboard">
+    <template>
+        <style>
+            :host{
+            }
+        </style>
+        <div></div>
+
+        <template is="dom-if" if="[[ user.isAdmin ]]">
+
+        </template>
+
+        <!-- NOTIFICATIONS -->
+        <div class="notificationsContainer">
+            <template is="dom-if" if="{{ showNotifications }}">
+                <notifications-card showlist="{{ showlist }}"></notifications-card>
+            </template>
+        </div>
+
+        <template is="dom-if" if="[[user.isAdmin]]">
+            <div class="group-placeholder">
+                <!-- A D M I N   T O O L B A R -->
+                <admin-toolbar
+                        user="[[ user ]]"
+                        selected-semester="{{ adminSelectedSemesterId }}"
+                        main-view-page="{{ page }}"></admin-toolbar>
+                <group-card group-name="Gruppen" on-tap="toggleGroup"></group-card>
+                <iron-collapse id="collapse" opened=true>
+                    <groups-admin class="group-info"
+                                  access-token="[[ accessToken ]]"
+                                  self-info="{{user}}"
+                                  selected-semester="[[ adminSelectedSemesterId ]]"></groups-admin>
+                </iron-collapse>
+            </div>
+        </template>
+
+        <template is="dom-if" if="[[user.isStudent]]">
+            <div class="group-placeholder light-color-text">
+                <group-card group-name=[[group.name]] on-tap="toggleGroup"></group-card>
+                <iron-collapse id="collapse" opened=true>
+                    <group-detail class="group-info"
+                                  access-token="[[ accessToken ]]"
+                                  group="{{ group }}"
+                                  self-info="{{user}}"
+                                  group-name="{{groupName}}"></group-detail>
+                </iron-collapse>
+            </div>
+        </template>
+
+        <div class="practicalsContainer">
+            <div on-tap="_handleFotoTap">
+                <index-card type="Fotopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:"
+                            info2="18.05.16, 14-16"></index-card>
+            </div>
+            <div on-tap="_handleVideoTap">
+                <index-card type="Videopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:"
+                            info2="18.05.16, 14-16"></index-card>
+            </div>
+            <div on-tap="_handleAudioTap">
+                <index-card type="Audiopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:"
+                            info2="18.05.16, 14-16"></index-card>
+            </div>
+        </div>
+
+    </template>
+    <script>
+        Polymer({
+            is: 'tutor-dashboard',
+            properties: {
+            
+            },
+            ready: function() {
+            
+            }
+        });
+    </script>
+</dom-module>
