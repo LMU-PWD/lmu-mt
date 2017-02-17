@@ -54,6 +54,7 @@
                                                    timeslots="[[timeslots]]"
                                                    priority="[[priority]]"
                                                    api-priorities="{{ labdata.priorities }}"
+                                                   user="[[ user ]]"
                                                    on-save-click="_handleSaveClick"
                                                    on-reset-click="_handleResetClick"></practicals-date-selector>
                     </template>
@@ -142,6 +143,7 @@
                     observer: '_responseFromPrioritySave'
                 },
                 group: Object,
+                user: Object,
                 allLabs: {
                     type: Array,
                     value: []

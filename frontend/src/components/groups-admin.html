@@ -16,19 +16,14 @@
     <template>
 
         <style include="shared-styles">
-            :host{
-
-            }
 
             h1 > span {
                 font-style: italic;
             }
 
-
             h1 {
                 height: auto;
             }
-
 
             .groupsMembers{
                 display: block;
@@ -118,14 +113,15 @@
                 headers="[[ ajax.headers ]]"
                 method="[[ ajax.method ]]"
                 endpoint="[[ ajax.endpoint ]]"
-                response="{{ apiGetGroupsResponse }}"></api-request>
+                semester-filter="[[ selectedSemester ]]"
+                on-api-response="_handleGroupsResponse"></api-request>
 
         <!-- Deletes Specific group -->
         <api-request
                 headers="[[ deleteAjax.headers ]]"
                 method="[[ deleteAjax.method ]]"
                 endpoint="[[ deleteAjax.endpoint ]]"
-                response="{{ apiDeleteGroupResponse }}"></api-request>
+                on-api-response="_handleDeleteGroupResponse"></api-request>
         <!--Lists all Groups-->
         <div class="container">
         <template is="dom-repeat" items="[[groups]]" as="group">
@@ -167,22 +163,15 @@
                         groupId: ''
                     }
                 },
-                apiGetGroupsResponse: {
-                    type: String,
-                    reflectToAttribute: false,
-                    observer: '_apiGetGroupsResponseChanged'
-                },
-                apiDeleteGroupResponse: {
-                    type: String,
-                    reflectToAttribute: false,
-                    observer: '_apiDeleteGroupResponseChanged'
-                },
                 groups: {
                     type: Array
                 },
                 language: {
                     type: String,
                     value: 'de'
+                },
+                selectedSemester: {
+                    type: String
                 }
             },
 
@@ -219,39 +208,29 @@
              * @param response
              * @private
              */
-            _apiGetGroupsResponseChanged: function (response) {
+            _handleGroupsResponse: function (event) {
+                var self = this;
+                var receivedGroup = event.detail;
+                this.set('groups', receivedGroup);
 
-                if (response.type == 'response'){
-                    var self = this;
-                    var receivedGroup = response.data;
-                    this.set('groups', receivedGroup);
-
-                    //Change groupMemberIds to Array Containing Objects with ID, Name and Mail
-                    this.groups.forEach(function (element, index) {
-                        element.groupMemberIds.forEach(function () {
-                            self.push('groups.'+index+'.groupMemberIds',{"id":self.shift('groups.'+index+'.groupMemberIds'),"name":"","mail":""});
-                        });
+                //Change groupMemberIds to Array Containing Objects with ID, Name and Mail
+                this.groups.forEach(function (element, index) {
+                    element.groupMemberIds.forEach(function () {
+                        self.push('groups.'+index+'.groupMemberIds',{"id":self.shift('groups.'+index+'.groupMemberIds'),"name":"","mail":""});
                     });
-                }
-                //console.log(this.groups);
+                });
             },
 
-            _apiDeleteGroupResponseChanged: function (response) {
-                //console.log(response);
-
+            _handleDeleteGroupResponse: function (event) {
                 this._groupsChanged();
             },
 
             _deleteGroup: function(event, groupId){
-                //console.log(event);
-                //console.log(event.model.__data__.group.id);
-
                 var groupID = event.model.__data__.group.id;
                 var groupName = event.model.__data__.group.name;
                 //Pass Group ID Through deleteDialog
                 this.$.deleteDialog.dataset.groupID = groupID;
                 this.$$('#deleteDialog > div > H1 > span').textContent = groupName;
-                //console.log(this.$$('#deleteDialog > div > H1 > span').textContent);
                 this.$.deleteDialog.open();
             },
 
@@ -274,7 +253,6 @@
             },
 
             _toggleCollapse: function (event) {
-                //console.log(event);
                 index = event.model.__key__.slice(1);
                 this.$$('#collapse'+index).toggle();
             }

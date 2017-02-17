@@ -1,0 +1,399 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-icons/hardware-icons.html">
+<link rel="import" href="../../bower_components/ace-widget/ace-widget.html">
+
+<link rel="import" href="../shared/semester-setup-shared.html">
+
+<dom-module id="semester-setup-practicals">
+
+    <template>
+
+        <style include="semester-setup-shared"></style>
+        <style>
+
+            paper-button.practicals-collapse-header {
+                background: var(--semester-setup-primary-light-color);
+                color: var(--semester-setup-secondary-color);
+                margin: 10px 0;
+                width: 100%;
+            }
+
+            paper-dialog {
+                min-width: 380px;
+            }
+
+        </style>
+
+        <template is="dom-if" if="[[ show ]]">
+
+            <paper-card heading="[[ localize('semester_setup_page_title_practicals') ]]" class="flex">
+                <div class="card-content">
+
+                    <p>[[ localize('semester_setup_practicals_intro_p1_1') ]]
+                        <strong>[[ localize('semester_setup_practicals_intro_p1_2') ]]</strong>[[ localize('semester_setup_practicals_intro_p1_3') ]]</p>
+
+                    <p>[[ localize('semester_setup_practicals_intro_p2') ]]</p>
+
+                    <div>
+                        <paper-button
+                                class="practicals-collapse-header"
+                                on-tap="_toggleCollapse"
+                                data-practical-type="photo">
+                            [[ localize('semester_setup_practicals_photo') ]] [[ localize('semester_setup_practicals_lab') ]]
+                            <iron-icon
+                                    icon="hardware:keyboard-arrow-down"
+                                    data-practical-type="photo"></iron-icon>
+
+                        </paper-button>
+                        <iron-collapse id="photoCollapsible">
+                            <paper-input
+                                    label="[[ localize('semester_setup_practicals_title_input') ]]"
+                                    value="{{ photoTitle }}"></paper-input>
+
+                            <paper-input label="[[ localize('semester_setup_practicals_deadline_input') ]]"
+                                         on-tap="_openPhotoPickerDialog"
+                                         allowed-pattern="/[1-9]{1}\d? \/ [1-9]{1}\d? \/ [1-9]{1}\d{3}/"
+                                         value="[[ photoDeadlineFormatted ]]">
+                                <iron-icon icon="icons:date-range" prefix></iron-icon>
+                            </paper-input>
+
+                            <p>[[ localize('semester_setup_practicals_description_label_1') ]]
+                                <strong>[[ localize('semester_setup_practicals_tutors') ]]</strong>[[ localize('semester_setup_practicals_description_label_2') ]]
+                                [[ localize('semester_setup_practicals_photo') ]][[ localize('semester_setup_practicals_description_label_3') ]]
+                                <a target="_blank" href="https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet">
+                                    [[ localize('semester_setup_practicals_markdown') ]]</a>[[ localize('semester_setup_practicals_description_label_4') ]]</p>
+                            <ace-widget
+                                    on-editor-content="_aceValueChanged"
+                                    data-reflecting-property="photoDescriptionTutor"
+                                    theme="[[ editorTheme ]]"></ace-widget>
+
+                            <p>[[ localize('semester_setup_practicals_description_label_1') ]]
+                                <strong>[[ localize('semester_setup_practicals_students') ]]</strong>[[ localize('semester_setup_practicals_description_label_2') ]]
+                                [[ localize('semester_setup_practicals_photo') ]][[ localize('semester_setup_practicals_description_label_3') ]]
+                                <a target="_blank" href="https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet">
+                                    [[ localize('semester_setup_practicals_markdown') ]]</a>[[ localize('semester_setup_practicals_description_label_4') ]]</p>
+                            <ace-widget
+                                    on-editor-content="_aceValueChanged"
+                                    data-reflecting-property="photoDescriptionStudent"
+                                    theme="[[ editorTheme ]]"></ace-widget>
+
+                        </iron-collapse>
+                    </div>
+
+                    <div>
+                        <paper-button
+                                class="practicals-collapse-header"
+                                on-tap="_toggleCollapse"
+                                data-practical-type="video">
+                            [[ localize('semester_setup_practicals_video') ]] [[ localize('semester_setup_practicals_lab') ]]
+                            <iron-icon
+                                    icon="hardware:keyboard-arrow-down"
+                                    data-practical-type="video"></iron-icon>
+                        </paper-button>
+                        <iron-collapse id="videoCollapsible">
+
+                            <paper-input
+                                    label="[[ localize('semester_setup_practicals_title_input') ]]"
+                                    value="{{ videoTitle }}"></paper-input>
+
+                            <paper-input label="[[ localize('semester_setup_practicals_deadline_input') ]]"
+                                         on-tap="_openVideoPickerDialog"
+                                         allowed-pattern="/[1-9]{1}\d? \/ [1-9]{1}\d? \/ [1-9]{1}\d{3}/"
+                                         value="[[ videoDeadlineFormatted ]]">
+                                <iron-icon icon="icons:date-range" prefix></iron-icon>
+                            </paper-input>
+
+                            <p>[[ localize('semester_setup_practicals_description_label_1') ]]
+                                <strong>[[ localize('semester_setup_practicals_tutors') ]]</strong>[[ localize('semester_setup_practicals_description_label_2') ]]
+                                [[ localize('semester_setup_practicals_video') ]][[ localize('semester_setup_practicals_description_label_3') ]]
+                                <a target="_blank" href="https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet">
+                                    [[ localize('semester_setup_practicals_markdown') ]]</a>[[ localize('semester_setup_practicals_description_label_4') ]]</p>
+                            <ace-widget
+                                    on-editor-content="_aceValueChanged"
+                                    data-reflecting-property="videoDescriptionTutor"
+                                    theme="[[ editorTheme ]]"></ace-widget>
+
+                            <p>[[ localize('semester_setup_practicals_description_label_1') ]]
+                                <strong>[[ localize('semester_setup_practicals_students') ]]</strong>[[ localize('semester_setup_practicals_description_label_2') ]]
+                                [[ localize('semester_setup_practicals_video') ]][[ localize('semester_setup_practicals_description_label_3') ]]
+                                <a target="_blank" href="https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet">
+                                    [[ localize('semester_setup_practicals_markdown') ]]</a>[[ localize('semester_setup_practicals_description_label_4') ]]</p>
+                            <ace-widget
+                                    on-editor-content="_aceValueChanged"
+                                    data-reflecting-property="videoDescriptionStudent"
+                                    theme="[[ editorTheme ]]"></ace-widget>
+
+                        </iron-collapse>
+                    </div>
+
+                    <div>
+                        <paper-button
+                                class="practicals-collapse-header"
+                                on-tap="_toggleCollapse"
+                                data-practical-type="audio">
+                            [[ localize('semester_setup_practicals_audio') ]] [[ localize('semester_setup_practicals_lab') ]]
+                            <iron-icon
+                                    icon="hardware:keyboard-arrow-down"
+                                    data-practical-type="audio"></iron-icon>
+                        </paper-button>
+                        <iron-collapse id="audioCollapsible">
+
+                            <paper-input
+                                    label="[[ localize('semester_setup_practicals_title_input') ]]"
+                                    value="{{ audioTitle }}"></paper-input>
+
+                            <paper-input label="[[ localize('semester_setup_practicals_deadline_input') ]]"
+                                         on-tap="_openAudioPickerDialog"
+                                         allowed-pattern="/[1-9]{1}\d? \/ [1-9]{1}\d? \/ [1-9]{1}\d{3}/"
+                                         value="[[ audioDeadlineFormatted ]]">
+                                <iron-icon icon="icons:date-range" prefix></iron-icon>
+                            </paper-input>
+
+                            <p>[[ localize('semester_setup_practicals_description_label_1') ]]
+                                <strong>[[ localize('semester_setup_practicals_tutors') ]]</strong>[[ localize('semester_setup_practicals_description_label_2') ]]
+                                [[ localize('semester_setup_practicals_audio') ]][[ localize('semester_setup_practicals_description_label_3') ]]
+                                <a target="_blank" href="https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet">
+                                    [[ localize('semester_setup_practicals_markdown') ]]</a>[[ localize('semester_setup_practicals_description_label_4') ]]</p>
+                            <ace-widget
+                                    on-editor-content="_aceValueChanged"
+                                    data-reflecting-property="audioDescriptionTutor"
+                                    theme="[[ editorTheme ]]"></ace-widget>
+
+                            <p>[[ localize('semester_setup_practicals_description_label_1') ]]
+                                <strong>[[ localize('semester_setup_practicals_students') ]]</strong>[[ localize('semester_setup_practicals_description_label_2') ]]
+                                [[ localize('semester_setup_practicals_audio') ]][[ localize('semester_setup_practicals_description_label_3') ]]
+                                <a target="_blank" href="https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet">
+                                    [[ localize('semester_setup_practicals_markdown') ]]</a>[[ localize('semester_setup_practicals_description_label_4') ]]</p>
+                            <ace-widget
+                                    on-editor-content="_aceValueChanged"
+                                    data-reflecting-property="audioDescriptionStudent"
+                                    theme="[[ editorTheme ]]"></ace-widget>
+
+                        </iron-collapse>
+                    </div>
+
+                </div>
+            </paper-card>
+
+        </template>
+
+        <paper-dialog id="photoDeadlineDialog" class="paper-date-picker-dialog">
+            <paper-date-picker
+                    id="picker"
+                    date="{{ photoDeadline }}"
+                    responsive-width="630px"></paper-date-picker>
+            <div class="buttons">
+                <paper-button dialog-confirm>[[ localize('c_button_ok') ]]</paper-button>
+            </div>
+        </paper-dialog>
+
+        <paper-dialog id="videoDeadlineDialog" class="paper-date-picker-dialog">
+            <paper-date-picker
+                    id="picker"
+                    date="{{ videoDeadline }}"
+                    responsive-width="630px"></paper-date-picker>
+            <div class="buttons">
+                <paper-button dialog-confirm>[[ localize('c_button_ok') ]]</paper-button>
+            </div>
+        </paper-dialog>
+
+        <paper-dialog id="audioDeadlineDialog" class="paper-date-picker-dialog">
+            <paper-date-picker
+                    id="picker"
+                    date="{{ audioDeadline }}"
+                    responsive-width="630px"></paper-date-picker>
+            <div class="buttons">
+                <paper-button dialog-confirm>[[ localize('c_button_ok') ]]</paper-button>
+            </div>
+        </paper-dialog>
+
+        <iron-signals on-iron-signal-switchlocale="_switchLocale"></iron-signals>
+
+    </template>
+
+    <script>
+
+        Polymer({
+
+            is: 'semester-setup-practicals',
+
+            properties: {
+
+                audioObject: {
+                    type: Object,
+                    notify: true },
+                photoObject: {
+                    type: Object,
+                    notify: true },
+                videoObject: {
+                    type: Object,
+                    notify: true },
+
+                audioDeadline: {
+                    type: Date,
+                    observer: '_audioChanged' },
+                audioDeadlineFormatted: {
+                    type: String,
+                    computed: '_formatDate(audioDeadline)',
+                    reflectToAttribute: false },
+                audioDescriptionTutor: {
+                    type: String,
+                    observer: '_audioChanged',
+                    notify: true },
+                audioDescriptionStudent: {
+                    type: String,
+                    observer: '_audioChanged' },
+                audioTitle: {
+                    type: String,
+                    value: 'Audiopraktikum',
+                    observer: '_audioChanged' },
+
+
+                photoDeadline: {
+                    type: Date,
+                    observer: '_photoChanged' },
+                photoDeadlineFormatted: {
+                    type: String,
+                    computed: '_formatDate(photoDeadline)',
+                    reflectToAttribute: false },
+                photoDescriptionTutor: {
+                    type: String,
+                    observer: '_photoChanged' },
+                photoDescriptionStudent: {
+                    type: String,
+                    observer: '_photoChanged' },
+                photoTitle: {
+                    type: String,
+                    observer: '_photoChanged',
+                    value: 'Fotopraktikum' },
+
+
+                videoDeadline: {
+                    type: Date,
+                    observer: '_videoChanged' },
+                videoDeadlineFormatted: {
+                    type: String,
+                    computed: '_formatDate(videoDeadline)',
+                    reflectToAttribute: false },
+                videoDescriptionTutor: {
+                    type: String,
+                    observer: '_videoChanged' },
+                videoDescriptionStudent: {
+                    type: String,
+                    observer: '_videoChanged'},
+                videoTitle: {
+                    type: String,
+                    observer: '_videoChanged',
+                    value: 'Videopraktikum' },
+
+
+                editorTheme: {
+                    type: String,
+                    reflectToAttribute: false,
+                    value: 'ace/theme/kuroir'
+                },
+                show: {
+                    type: Boolean,
+                    notify: true
+                },
+                language: {
+                    type: String,
+                    value: 'de'
+                }
+            },
+
+            /**
+             * Localization setup
+             */
+            behaviors: [
+                Polymer.AppLocalizeBehavior
+            ],
+            attached: function() {
+                this.loadResources(this.resolveUrl('../shared/locales.json'));
+            },
+            _switchLocale: function() {
+                this.language = (this.language == 'en') ? 'de' : 'en';
+            },
+
+            _toggleCollapse: function (event) {
+                var idPrefix = '#';
+                var idSuffix = 'Collapsible';
+                var practicalType = event.path[0].getAttribute('data-practical-type');
+                var element = this.$$(idPrefix + practicalType + idSuffix);
+                element.toggle();
+            },
+
+            _openPhotoPickerDialog: function () {
+                this.$.photoDeadlineDialog.open();
+            },
+
+            _openVideoPickerDialog: function () {
+                this.$.videoDeadlineDialog.open();
+            },
+
+            _openAudioPickerDialog: function () {
+                this.$.audioDeadlineDialog.open();
+            },
+
+            _formatDate: function (date) {
+                return date.getDate() + ' / ' + (date.getMonth() + 1) + ' / ' + date.getFullYear();
+            },
+
+            _aceValueChanged: function (event) {
+                var propertyName = event.path[0].getAttribute('data-reflecting-property');
+                switch (propertyName) {
+                    case 'audioDescriptionTutor':
+                        this.audioDescriptionTutor = event.detail.value;
+                        break;
+                    case 'audioDescriptionStudent':
+                        this.audioDescriptionStudent = event.detail.value;
+                        break;
+                    case 'photoDescriptionTutor':
+                        this.photoDescriptionTutor = event.detail.value;
+                        break;
+                    case 'photoDescriptionStudent':
+                        this.photoDescriptionStudent = event.detail.value;
+                        break;
+                    case 'videoDescriptionTutor':
+                        this.videoDescriptionTutor = event.detail.value;
+                        break;
+                    case 'videoDescriptionStudent':
+                        this.videoDescriptionStudent = event.detail.value;
+                        break;
+                    default:
+                        console.error('Reflecting Property ' + propertyName + ' not found');
+                }
+            },
+
+            _audioChanged: function () {
+                this.audioObject = {
+                    deadline: this.audioDeadline,
+                    title: this.audioTitle,
+                    descriptionStudent: this.audioDescriptionStudent,
+                    descriptionTutor: this.audioDescriptionTutor
+                };
+            },
+
+            _photoChanged: function () {
+                this.photoObject = {
+                    deadline: this.photoDeadline,
+                    title: this.photoTitle,
+                    descriptionStudent: this.photoDescriptionStudent,
+                    descriptionTutor: this.photoDescriptionTutor
+                };
+            },
+
+            _videoChanged: function () {
+                this.videoObject = {
+                    deadline: this.videoDeadline,
+                    title: this.videoTitle,
+                    descriptionStudent: this.videoDescriptionStudent,
+                    descriptionTutor: this.videoDescriptionTutor
+                };
+            }
+
+        });
+
+    </script>
+
+</dom-module>

@@ -134,7 +134,7 @@
                 method="[[ ajax.method ]]"
                 endpoint="[[ ajax.endpoint ]]"
                 loading="{{ isLoading }}"
-                response="{{ apiResponse }}"></api-request>
+                on-api-response="_handleLoginResponse"></api-request>
 
         <template is="dom-if" if="[[ isLoading ]]">
             <div class="spinner-container">
@@ -188,12 +188,6 @@
                     value: 'de',
                     type: String
                   },
-
-                apiResponse: {
-                    type: String,
-                    reflectToAttribute: false,
-                    observer: '_apiResponseChanged'
-                },
 
                 accessToken: {
                     type: String,
@@ -254,11 +248,10 @@
             _switchLocale: function() {
                 this.language = (this.language == 'en') ? 'de' : 'en';
             },
-            _apiResponseChanged: function (response) {
 
-                if (response.type == 'response') {
+            _handleLoginResponse: function (event) {
 
-                    var jsonResponse = response.data;
+                    var jsonResponse = event.detail;
 
                     // Save session info to cookies
                     var expires = new Date();
@@ -274,7 +267,6 @@
                     this.set('presetName', '');
                     this.customWelcomeText = false;
 
-                }
             },
 
             /**

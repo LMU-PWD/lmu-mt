@@ -12,7 +12,7 @@
                 headers="[[ ajax.headers ]]"
                 method="[[ ajax.method ]]"
                 endpoint="[[ ajax.endpoint ]]"
-                response="{{ apiResponse }}"></api-request>
+                on-api-response="_handleUserResponse"></api-request>
     </template>
     <script>
         Polymer({
@@ -20,11 +20,6 @@
             properties: {
                 accessToken: {
                     type: String
-                },
-                apiResponse: {
-                    type: Object,
-                    reflectToAttribute: false,
-                    observer: '_apiResponseChanged'
                 },
                 userId: {
                     value: String,
@@ -62,12 +57,10 @@
             },
 
             //Function for setting Mail & Name on Ajax response
-            _apiResponseChanged: function(response) {
+            _handleUserResponse: function (event) {
 
-                if (response.type == 'response') {
-                    this._setMail(response.data.email);
-                    this._setName(response.data['first_name'] + " " + response.data.name);
-                }
+                this._setMail(event.detail.email);
+                this._setName(event.detail['first_name'] + " " + event.detail.name);
             }
         });
     </script>

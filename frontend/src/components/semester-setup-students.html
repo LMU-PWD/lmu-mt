@@ -1,0 +1,159 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/papa-parser/papa-parser.html">
+
+<link rel="import" href="../shared/semester-setup-shared.html">
+
+<dom-module id="semester-setup-students">
+
+    <template>
+
+        <style include="semester-setup-shared"></style>
+        <style>
+
+            paper-button {
+                background: var(--semester-setup-primary-light-color);
+                color: var(--semester-setup-secondary-color);
+            }
+
+        </style>
+
+        <paper-card heading="[[ localize('semester_setup_page_title_students') ]]" class="flex">
+            <div class="card-content">
+
+                <p>[[ localize('semester_setup_students_intro') ]]</p>
+
+                <!-- TODO: Modularize this to reuse it in admin menu -->
+                <paper-button><papa-parser label="[[ localize('semester_setup_users_upload_button') ]]" output-data="{{ papaParserJson }}"></papa-parser></paper-button>
+
+                <p><em>[[ localize('semester_setup_table_usage_tip') ]]</em></p>
+
+                <iron-data-table items="[[ studentData ]]" details-enabled>
+                    <template is="row-detail">
+                        <div class="list-detail">
+                            <paper-input label="[[ localize('semester_setup_users_table_firstname') ]]" value="{{ item.first_name }}"></paper-input>
+                            <paper-input label="[[ localize('semester_setup_users_table_lastname') ]]" value="{{ item.name }}"></paper-input>
+                            <paper-input label="[[ localize('semester_setup_users_table_email') ]]" type="email" value="{{ item.email }}"></paper-input>
+                        </div>
+                    </template>
+                    <data-table-column name="[[ localize('semester_setup_users_table_firstname') ]]">
+                        <template>[[ item.first_name ]]</template>
+                    </data-table-column>
+                    <data-table-column name="[[ localize('semester_setup_users_table_lastname') ]]">
+                        <template>[[ item.name ]]</template>
+                    </data-table-column>
+                    <data-table-column name="[[ localize('semester_setup_users_table_email') ]]">
+                        <template>[[ item.email ]]</template>
+                    </data-table-column>
+                    <data-table-column name="[[ localize('semester_setup_users_table_actions') ]]">
+                        <template>
+                            <paper-icon-button
+                                    id="delete-[[ item.id ]]"
+                                    icon="icons:delete"
+                                    on-tap="_removeStudent"></paper-icon-button>
+                            <paper-tooltip
+                                    for="delete-[[ item.id ]]"
+                                    position="right"
+                                    animation-delay="0"
+                                    fit-to-visible-bounds="true">[[ localize('semester_setup_users_table_delete_tooltip') ]]</paper-tooltip>
+                        </template>
+                    </data-table-column>
+                </iron-data-table>
+
+                <paper-button class="save-button" on-tap="_saveTable">
+                    [[ localize('c_button_save_table') ]]&nbsp;<iron-icon icon="icons:save"></iron-icon></paper-button>
+
+                <div style="clear: both;"></div>
+
+            </div>
+        </paper-card>
+
+        <iron-signals on-iron-signal-switchlocale="_switchLocale"></iron-signals>
+
+    </template>
+
+    <script>
+
+        Polymer({
+
+            is: 'semester-setup-students',
+
+            properties: {
+
+                language: {
+                    type: String,
+                    value: 'de'
+                },
+
+                papaParserJson: {
+                    type: Object,
+                    notify: true,
+                    reflectToAttribute: false,
+                    observer: '_processParsedJson'
+                },
+
+                studentData: {
+                    type: Array,
+                    notify: true
+                }
+            },
+
+            /**
+             * Localization setup
+             */
+            behaviors: [
+                Polymer.AppLocalizeBehavior
+            ],
+            attached: function() {
+                this.loadResources(this.resolveUrl('../shared/locales.json'));
+            },
+            _switchLocale: function() {
+                this.language = (this.language == 'en') ? 'de' : 'en';
+            },
+
+            _processParsedJson: function (json) {
+
+                var plainData = json.slice(1);
+                var that = this;
+                this.studentData = plainData.map(function(object, index) {
+                    return {
+                        first_name: object[2],
+                        name: object[3],
+                        email: object[4],
+                        id: that._generateId()
+                    };
+                });
+            },
+
+            _removeStudent: function (event) {
+                // If user hits just the button and not the iron-icon inside of it,
+                // this is the correct id
+                var id = event.path[0].getAttribute('id');
+                if (id == 'icon') {
+                    // User has hit the icon, therefore we need the id of the
+                    // icon's ancestor paper-icon-button
+                    id = event.path[2].getAttribute('id');
+                }
+                id = id.split('delete-')[1];
+                this.studentData = this.studentData.filter(function(item){
+                    return (item.id != id);
+                });
+            },
+
+            // Taken from http://stackoverflow.com/questions/1349404/generate-random-string-characters-in-javascript
+            _generateId: function () {
+                var text = "";
+                var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+                for( var i=0; i < 5; i++ )
+                    text += possible.charAt(Math.floor(Math.random() * possible.length));
+                return text;
+            },
+
+            _saveTable: function () {
+                this.studentData = this.studentData.slice();
+            }
+
+        });
+
+    </script>
+
+</dom-module>

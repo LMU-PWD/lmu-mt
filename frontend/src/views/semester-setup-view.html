@@ -1,0 +1,474 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+
+<link rel="import" href="../components/semester-setup-basics.html">
+<link rel="import" href="../components/semester-setup-practicals.html">
+<link rel="import" href="../components/semester-setup-tutors.html">
+<link rel="import" href="../components/semester-setup-students.html">
+<link rel="import" href="../components/semester-setup-dates.html">
+<link rel="import" href="../services/create-semester-request.html">
+<link rel="import" href="../shared/semester-setup-shared.html">
+
+
+<dom-module is="semester-setup-view">
+
+    <template>
+
+        <style include="iron-flex"></style>
+        <style include="semester-setup-shared"></style>
+        <style>
+
+            :host {
+                text-align: center;
+            }
+
+            .setup-container {
+                margin: auto;
+                max-width: 1000px;
+                text-align: left;
+                width: 100%;
+            }
+
+            .setup-header {
+                margin: 50px auto 0;
+                max-width: 1000px;
+                width: 100%;
+            }
+
+            .setup-header > .setup-header-breadcrumb {
+                float: left;
+                margin: 0 40px 20px;
+            }
+
+            .setup-header-breadcrumb > .mobile {
+                display: none;
+            }
+
+            paper-button.setup-header-breadcrumb-done, paper-button.setup-header-breadcrumb-mobile {
+                background: var(--semester-setup-primary-light-color);
+                color: var(--semester-setup-secondary-color);
+            }
+
+            paper-button.setup-header-breadcrumb-active {
+                background: var(--semester-setup-primary-color);
+                color: var(--semester-setup-secondary-color);
+            }
+
+            paper-button.setup-header-breadcrumb-todo {
+                background: none;
+                color: var(--semester-setup-secondary-dark-color);
+            }
+
+            paper-button.positive {
+                background: var(--paper-light-green-300);
+            }
+
+            .setup-header > .setup-header-actions {
+                float: right;
+                margin: 0 20px;
+            }
+
+            .setup-footer {
+                margin: 0 auto 20px;
+                max-with: 1000px;
+                text-align: center;
+                width: 100%;
+            }
+
+            .setup-footer > .setup-footer-navigation {
+                display: inline-block;
+                margin: auto;
+            }
+
+            .setup-footer > .setup-footer-navigation > paper-button {
+                float: left;
+            }
+
+            .spinner-container {
+                background-color: rgba(255,255,255,0.8);
+                display: block;
+                height: 100%;
+                left: 0;
+                position: absolute;
+                text-align: center;
+                top: 0;
+                width: 100vw;
+                z-index: 100;
+            }
+
+            paper-spinner[active]{
+                height: 50px;
+                margin: auto;
+                top: calc(50% - 25px);
+                width: 50px;
+            }
+
+            /* * * * * * * * * * * * * * * * * * * * * * *
+             *               Media Queries               *
+             * * * * * * * * * * * * * * * * * * * * * * */
+
+            @media screen and (max-width: 767px) {
+
+                .setup-header-breadcrumb > .mobile {
+                    display: block;
+                }
+
+                .setup-header-breadcrumb > .desktop {
+                    display: none;
+                }
+
+            }
+
+        </style>
+
+        <paper-dialog id="closeDialog">
+            <h2>[[ localize('semester_setup_close_dialog_heading') ]]</h2>
+            <p>[[ localize('semester_setup_close_dialog_p1') ]]</p>
+            <p>[[ localize('semester_setup_close_dialog_p2') ]]</p>
+            <div class="buttons">
+                <paper-button dialog-dismiss>[[ localize('semester_setup_close_dialog_cancel_button') ]]</paper-button>
+                <paper-button dialog-confirm autofocus on-tap="_closeDialogCloseButtonTapped">[[ localize('semester_setup_close_dialog_confirm_button') ]]</paper-button>
+            </div>
+        </paper-dialog>
+
+        <div class="setup-container vertical layout">
+
+            <div class="setup-header">
+                <div class="setup-header-actions">
+                    <paper-icon-button
+                            id="closeSetupButton"
+                            icon="icons:close"
+                            on-tap="_closeButtonTapped"></paper-icon-button>
+                    <paper-tooltip
+                            for="closeSetupButton"
+                            position="bottom"
+                            animation-delay="0"
+                            fit-to-visible-bounds="true">[[ localize('semester_setup_close_button_tooltip') ]]</paper-tooltip>
+                </div>
+                <div class="setup-header-breadcrumb">
+                    <div class="desktop">
+                        <template is="dom-repeat" items="[[ breadcrumbStatus ]]" as="breadcrumb">
+                            <template is="dom-if" if="[[ breadcrumb.done ]]">
+                                <paper-button
+                                        class="setup-header-breadcrumb-done"
+                                        data-breadcrumb-index="[[ breadcrumb.index ]]"
+                                        on-tap="_jumpToPage">[[ localize(breadcrumb.label) ]]</paper-button>
+                            </template>
+                            <template is="dom-if" if="[[ breadcrumb.active ]]">
+                                <paper-button
+                                        class="setup-header-breadcrumb-active"
+                                        data-breadcrumb-index="[[ breadcrumb.index ]]"
+                                        on-tap="_jumpToPage">[[ localize(breadcrumb.label) ]]</paper-button>
+                            </template>
+                            <template is="dom-if" if="[[ breadcrumb.todo ]]">
+                                <paper-button
+                                        class="setup-header-breadcrumb-todo"
+                                        data-breadcrumb-index="[[ breadcrumb.index ]]"
+                                        on-tap="_jumpToPage">[[ localize(breadcrumb.label) ]]</paper-button>
+                            </template>
+                        </template>
+                    </div>
+                    <div class="mobile">
+                        <paper-button class="setup-header-breadcrumb-mobile" disabled>[[ activeIndexNatural ]]/5 [[ localize(activeLabel) ]]</paper-button>
+                    </div>
+                </div>
+            </div>
+
+            <iron-pages selected="[[activeIndex]]">
+
+                <!-- BASICS -->
+                <semester-setup-basics
+                    semester-title="{{ semesterTitle }}"
+                    start-date="{{ semesterStartDate }}"
+                    end-date="{{ semesterEndDate }}"
+                    group-size="{{ semesterGroupSize }}"></semester-setup-basics>
+
+                <!-- PRACTICALS -->
+                <!-- This page is hidden by default because of heavyweight code editors that
+                     should not be loaded without reason -->
+                <semester-setup-practicals
+                    show="[[ showPracticalsPage ]]"
+                    audio-object="{{ labTypeAudio }}"
+                    photo-object="{{ labTypePhoto }}"
+                    video-object="{{ labTypeVideo }}"></semester-setup-practicals>
+
+                <!-- TUTORS -->
+                <semester-setup-tutors tutor-data="{{ tutors }}"></semester-setup-tutors>
+
+                <!-- STUDENTS -->
+                <semester-setup-students student-data="{{ students }}"></semester-setup-students>
+
+                <!-- DATES -->
+                <semester-setup-dates dates="{{ dates }}"></semester-setup-dates>
+
+            </iron-pages>
+
+            <div class="setup-footer">
+                <div class="setup-footer-navigation">
+                    <paper-button on-tap="_stepBack" disabled="[[ backDisabled ]]"><iron-icon icon="icons:chevron-left"></iron-icon> [[ localize('c_button_back') ]]</paper-button>
+                    <template is="dom-if" if="[[ !isLastPage ]]">
+                        <paper-button on-tap="_stepForward" disabled="[[ nextDisabled ]]">[[ localize('c_button_next') ]] <iron-icon icon="icons:chevron-right"></iron-icon></paper-button>
+                    </template>
+                    <template is="dom-if" if="[[ isLastPage ]]">
+                        <paper-button on-tap="_postToApi" class="positive"><iron-icon icon="icons:check-circle"></iron-icon>&nbsp;[[ localize('semester_setup_navigation_create_button') ]]</paper-button>
+                    </template>
+
+                </div>
+            </div>
+        </div>
+
+        <template is="dom-if" if="[[ processingCreateRequest ]]">
+            <div class="spinner-container">
+                <paper-spinner active="[[ processingCreateRequest ]]"></paper-spinner>
+            </div>
+        </template>
+
+        <create-semester-request
+            id="createSemesterRequest"
+            access-token="[[ accessToken ]]"
+            semester-term="[[ semesterTitle ]]"
+            semester-start-date="[[ semesterStartDate ]]"
+            semester-end-date="[[ semesterEndDate ]]"
+            semester-group-size="[[ semesterGroupSize ]]"
+            lab-types="[[ labTypes ]]"
+            tutors="[[ tutors ]]"
+            students="[[ students ]]"
+            dates="[[ dates ]]"
+            loading="{{ processingCreateRequest }}"></create-semester-request>
+
+        <iron-signals on-iron-signal-switchlocale="_switchLocale"></iron-signals>
+
+    </template>
+
+    <script>
+
+        // TODO
+        // - Lokalisation
+        // - API requests
+
+        Polymer({
+
+            is: 'semester-setup-view',
+
+            properties: {
+
+                // Page navigation
+                activeIndex: {
+                    type: Number,
+                    value: 0 },
+                activeIndexNatural: {
+                    type: Number,
+                    computed: '_getActiveIndexNatural(activeIndex)' },
+                activeLabel: {
+                    type: String,
+                    computed: '_getActiveLabel(activeIndex)' },
+                backDisabled: {
+                    type: Boolean,
+                    value: true },
+                breadcrumbStatus: {
+                    type: Array,
+                    computed: '_computeBreadcrumbStatus(activeIndex)' },
+                isLastPage: {
+                    type: Boolean,
+                    computed: '_computeIsLastPage(activeIndex)' },
+                nextDisabled: {
+                    type: Boolean,
+                    value: false },
+                page: {
+                    type: String,
+                    notify: true },
+                showPracticalsPage: {
+                    type: Boolean,
+                    notify: true,
+                    computed: '_showPracticalsPage(activeIndex)' },
+
+                // API credentials
+                accessToken: {
+                    type: String },
+
+                // Data for API
+                semesterTitle: {
+                    type: String },
+                semesterStartDate: {
+                    type: Date },
+                semesterEndDate: {
+                    type: Date },
+                semesterGroupSize: {
+                    type: Number },
+                labTypeAudio: {
+                    type: Object,
+                    observer: '_labTypeAudioChanged',
+                    notify: true },
+                labTypeVideo: {
+                    type: Object,
+                    observer: '_labTypeVideoChanged',
+                    notify: true },
+                labTypePhoto: {
+                    type: Object,
+                    observer: '_labTypePhotoChanged',
+                    notify: true },
+                labTypes: {
+                    type: Array,
+                    notify: true,
+                    value: [] },
+                tutors: {
+                    type: Array,
+                    notify: true,
+                    value: [] },
+                students: {
+                    type: Array,
+                    notify: true,
+                    value: [] },
+                dates: {
+                    type: Array,
+                    notify: true,
+                    value: [] },
+                processingCreateRequest: {
+                    type: Boolean,
+                    value: false },
+
+                language: {
+                    type: String,
+                    value: 'de' }
+            },
+
+            /**
+             * Localization setup
+             */
+            behaviors: [
+                Polymer.AppLocalizeBehavior
+            ],
+            attached: function() {
+                this.loadResources(this.resolveUrl('../shared/locales.json'));
+            },
+            _switchLocale: function() {
+                this.language = (this.language == 'en') ? 'de' : 'en';
+            },
+
+            _getActiveLabel: function (index) {
+                var labels = [
+                    'semester_setup_page_title_basics_breadcrumb',
+                    'semester_setup_page_title_practicals_breadcrumb',
+                    'semester_setup_page_title_tutors_breadcrumb',
+                    'semester_setup_page_title_students_breadcrumb',
+                    'semester_setup_page_title_dates_breadcrumb'
+                ];
+                return labels[index];
+            },
+
+            _getActiveIndexNatural: function (index) {
+                return index + 1;
+            },
+
+            _computeBreadcrumbStatus: function (index) {
+                var result = [
+                    {label: 'semester_setup_page_title_basics_breadcrumb_indexed', index: 0, done: false, active: false, todo: false},
+                    {label: 'semester_setup_page_title_practicals_breadcrumb_indexed', index: 1, done: false, active: false, todo: false},
+                    {label: 'semester_setup_page_title_tutors_breadcrumb_indexed', index: 2, done: false, active: false, todo: false},
+                    {label: 'semester_setup_page_title_students_breadcrumb_indexed', index: 3, done: false, active: false, todo: false},
+                    {label: 'semester_setup_page_title_dates_breadcrumb_indexed', index: 4, done: false, active: false, todo: false}
+                ];
+                head = 0;
+                while (head < index) {
+                    result[head].done = true;
+                    head++;
+                }
+                result[head].active = true;
+                head++;
+                while (head < result.length) {
+                    result[head].todo = true;
+                    head++;
+                }
+                return result;
+            },
+
+            _closeButtonTapped: function () {
+                this.$.closeDialog.open();
+            },
+
+            _closeDialogCloseButtonTapped: function () {
+                this.page = 'dashboard';
+            },
+
+            _updateNavButtons: function () {
+                if (this.activeIndex == 0) {
+                    this.backDisabled = true;
+                    this.nextDisabled = false;
+                } else if (this.activeIndex == (this.breadcrumbStatus.length - 1)) {
+                    this.backDisabled = false;
+                    this.nextDisabled = true;
+                } else {
+                    this.backDisabled = false;
+                    this.nextDisabled = false;
+                }
+            },
+
+            _stepBack: function () {
+                if (this.activeIndex > 0) {
+                    this.activeIndex -= 1;
+                    this._scrollToTop();
+                }
+                this._updateNavButtons();
+
+            },
+
+            _stepForward: function () {
+                if (this.activeIndex < 4) {
+                    this.activeIndex += 1;
+                    this._scrollToTop();
+                }
+                this._updateNavButtons();
+            },
+
+            _jumpToPage: function (event) {
+                this.activeIndex = event.path[0].dataBreadcrumbIndex;
+                this._updateNavButtons();
+            },
+
+            _showPracticalsPage: function (activeIndex) {
+                return (activeIndex == 1);
+            },
+
+            _computeIsLastPage: function (index) {
+                return (index == (this.breadcrumbStatus.length - 1));
+            },
+
+            _postToApi: function () {
+                this.$.createSemesterRequest.submitSemester();
+            },
+
+            _labTypeAudioChanged: function () {
+                var newLabTypesObject = this.labTypes.slice();
+                newLabTypesObject[2] = this.labTypeAudio;
+                this.labTypes = newLabTypesObject;
+            },
+
+            _labTypeVideoChanged: function () {
+                var newLabTypesObject = this.labTypes.slice();
+                newLabTypesObject[1] = this.labTypeVideo;
+                this.labTypes = newLabTypesObject;
+            },
+
+            _labTypePhotoChanged: function () {
+                var newLabTypesObject = this.labTypes.slice();
+                newLabTypesObject[0] = this.labTypePhoto;
+                this.labTypes = newLabTypesObject;
+            },
+
+            // Taken from http://stackoverflow.com/questions/27196293/scroll-to-top-with-animation-using-only-polymer-0-5-1
+            _scrollToTop: function() {
+                var scrollDuration = 200;
+                var scrollStep = -window.scrollY / (scrollDuration / 15),
+                        scrollInterval = setInterval(function(){
+                            if ( window.scrollY != 0 ) {
+                                window.scrollBy( 0, scrollStep );
+                            }
+                            else clearInterval(scrollInterval);
+                        },15);
+
+            }
+        });
+
+    </script>
+
+</dom-module>

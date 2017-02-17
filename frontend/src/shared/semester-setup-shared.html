@@ -1,0 +1,93 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<!-- shared styles for all views -->
+<dom-module id="semester-setup-shared">
+    <template>
+        <style>
+            :root {
+                --semester-setup-primary-color: var(--paper-blue-grey-700);
+                --semester-setup-primary-light-color: var(--paper-blue-grey-500);
+                --semester-setup-secondary-color: var(--paper-blue-grey-50);
+                --semester-setup-secondary-dark-color: var(--paper-blue-grey-300);
+                --semester-setup-background-color: var(--paper-blue-grey-100);
+            }
+
+            paper-card {
+                display: block;
+                margin: 0 20px 20px;
+                width: auto;
+
+                --paper-card-background-color: var(--semester-setup-background-color);
+                --paper-card-header-color: var(--semester-setup-secondary-color);
+
+                --paper-card-header: {
+                    background: var(--semester-setup-primary-color);
+                };
+            }
+
+            paper-input {
+                --paper-input-container-color: var(--semester-setup-primary-light-color);
+                --paper-input-container-focus-color: var(--semester-setup-primary-color);
+            }
+
+            paper-slider {
+                --paper-slider-active-color: var(--semester-setup-primary-color);
+                --paper-slider-knob-color: var(--semester-setup-primary-color);
+                --paper-slider-pin-color: var(--semester-setup-primary-color);
+            }
+
+            paper-date-picker {
+                --default-primary-color: var(--semester-setup-primary-color);
+            }
+
+            iron-icon[prefix] {
+                margin-right: 5px;
+            }
+
+            iron-data-table {
+                --iron-data-table-header: {
+                    font-weight: bold;
+                };
+                --iron-data-table-row: {
+                    border-bottom: 1px solid var(--paper-blue-grey-200);
+                };
+                --iron-data-table-row-hover: {
+                    background: var(--paper-blue-grey-200)
+                };
+            }
+
+            .list-detail {
+                background: var(--semester-setup-secondary-color);
+                border: 2px solid var(--semester-setup-primary-light-color);
+                margin: 0 -24px;
+                padding: 10px 24px;
+                width: 100%;
+            }
+
+            .list-detail paper-input {
+                float: left;
+                margin-right: 10px;
+                width: 25%;
+            }
+
+            paper-button.save-button {
+                float:right;
+                margin-top: 10px;
+            }
+
+            /* * * * * * * * * * * * * * * * * * * * * * *
+             *               Media Queries               *
+             * * * * * * * * * * * * * * * * * * * * * * */
+
+            @media screen and (max-width: 767px) {
+
+                .list-detail paper-input {
+                    float: none;
+                    margin: 0;
+                    width: auto;
+                }
+            }
+
+        </style>
+    </template>
+</dom-module>

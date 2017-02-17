@@ -1,0 +1,153 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-slider/paper-slider.html">
+<link rel="import" href="../../bower_components/paper-date-picker/paper-date-picker.html">
+
+<link rel="import" href="../shared/semester-setup-shared.html">
+
+<dom-module id="semester-setup-basics">
+
+    <template>
+
+        <style include="semester-setup-shared"></style>
+        <style>
+
+            .basics-groupsize {
+                color: var(--semester-setup-primary-color);
+                margin: 0 16px;
+            }
+
+            paper-dialog {
+                min-width: 380px;
+            }
+
+        </style>
+
+        <paper-card heading="[[ localize('semester_setup_page_title_basics') ]]" class="flex">
+            <div class="card-content">
+
+                <p>[[ localize('semester_setup_basics_intro') ]]</p>
+
+                <paper-input
+                        label="[[ localize('semester_setup_basics_title_input') ]]"
+                        value="{{ semesterTitle }}"></paper-input>
+
+                <paper-input label="[[ localize('semester_setup_basics_startdate_input') ]]"
+                             on-tap="_openStartPickerDialog"
+                             allowed-pattern="/[1-9]{1}\d? \/ [1-9]{1}\d? \/ [1-9]{1}\d{3}/"
+                             value="[[ startDateFormatted ]]">
+                    <iron-icon icon="icons:date-range" prefix></iron-icon>
+                </paper-input>
+                <paper-dialog id="semesterStart" class="paper-date-picker-dialog">
+                    <paper-date-picker
+                            id="picker"
+                            date="{{ startDate }}"
+                            responsive-width="630px"></paper-date-picker>
+                    <div class="buttons">
+                        <paper-button dialog-confirm>[[ localize('c_button_ok') ]]</paper-button>
+                    </div>
+                </paper-dialog>
+
+                <paper-input label="[[ localize('semester_setup_basics_enddate_input') ]]"
+                             on-tap="_openEndPickerDialog"
+                             allowed-pattern="/[1-9]{1}\d? \/ [1-9]{1}\d? \/ [1-9]{1}\d{3}/"
+                             value="[[ endDateFormatted ]]">
+                    <iron-icon icon="icons:date-range" prefix></iron-icon>
+                </paper-input>
+                <paper-dialog id="semesterEnd" class="paper-date-picker-dialog">
+                    <paper-date-picker
+                            id="picker"
+                            date="{{ endDate }}"
+                            responsive-width="630px"></paper-date-picker>
+                    <div class="buttons">
+                        <paper-button dialog-confirm>[[ localize('c_button_ok') ]]</paper-button>
+                    </div>
+                </paper-dialog>
+
+                <p>[[ localize('semester_setup_basics_groupsize_label') ]]</p>
+                <p class="basics-groupsize">[[ groupSizeSliderImmediateValue ]]</p>
+                <paper-slider min="2" max="10" value="{{ groupSize }}" immediate-value="{{ groupSizeSliderImmediateValue }}" pin></paper-slider>
+
+            </div>
+        </paper-card>
+
+        <iron-signals on-iron-signal-switchlocale="_switchLocale"></iron-signals>
+
+    </template>
+
+    <script>
+
+        Polymer({
+
+            is: 'semester-setup-basics',
+
+            properties: {
+
+                endDate: {
+                    type: Date,
+                    notify: true
+                },
+
+                endDateFormatted: {
+                    type: String,
+                    computed: '_formatDate(endDate)',
+                    reflectToAttribute: false
+                },
+
+                groupSize: {
+                    type: Number,
+                    notify: true,
+                    value: 4
+                },
+
+                language: {
+                    type: String,
+                    value: 'de'
+                },
+
+                semesterTitle: {
+                    type: String,
+                    notify: true
+                },
+
+                startDate: {
+                    type: Date,
+                    notify: true
+                },
+
+                startDateFormatted: {
+                    type: String,
+                    computed: '_formatDate(startDate)',
+                    reflectToAttribute: false
+                }
+            },
+
+            /**
+             * Localization setup
+             */
+            behaviors: [
+                Polymer.AppLocalizeBehavior
+            ],
+            attached: function() {
+                this.loadResources(this.resolveUrl('../shared/locales.json'));
+            },
+            _switchLocale: function() {
+                this.language = (this.language == 'en') ? 'de' : 'en';
+            },
+
+            _openStartPickerDialog: function () {
+                this.$.semesterStart.open();
+            },
+
+            _openEndPickerDialog: function () {
+                this.$.semesterEnd.open();
+            },
+
+            _formatDate: function (date) {
+                return date.getDate() + ' / ' + (date.getMonth() + 1) + ' / ' + date.getFullYear();
+            }
+
+        });
+
+    </script>
+
+</dom-module>

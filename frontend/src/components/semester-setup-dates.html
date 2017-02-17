@@ -1,0 +1,234 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
+<link rel="import" href="../../bower_components/iron-data-table/iron-data-table.html">
+
+
+<link rel="import" href="../components/time-picker.html">
+<link rel="import" href="../shared/semester-setup-shared.html">
+
+<dom-module id="semester-setup-dates">
+
+    <template>
+
+        <style include="semester-setup-shared"></style>
+        <style>
+
+            paper-button {
+                background: var(--semester-setup-primary-light-color);
+                color: var(--semester-setup-secondary-color);
+            }
+
+            iron-icon {
+                margin-right: 5px;
+            }
+
+            paper-dialog {
+                min-width: 380px;
+            }
+
+        </style>
+
+        <paper-card heading="[[ localize('semester_setup_page_title_dates') ]]" class="flex">
+            <div class="card-content">
+
+                <p>[[ localize('semester_setup_dates_intro_p1') ]]</p>
+
+                <p>[[ localize('semester_setup_dates_intro_p2') ]]</p>
+
+                <p><em>[[ localize('semester_setup_table_usage_tip') ]]</em></p>
+
+                <iron-data-table items="[[ dates ]]" details-enabled>
+                    <template is="row-detail">
+                        <div class="list-detail">
+                            <!-- TODO: Make date and time editable -->
+                            <paper-input label="[[ localize('semester_setup_dates_title') ]]" value="{{ item.title }}"></paper-input>
+                            <paper-input label="[[ localize('semester_setup_dates_location') ]]" value="{{ item.location }}"></paper-input>
+                            <paper-input label="[[ localize('semester_setup_dates_duration') ]]" type="number" value="{{ item.duration }}"></paper-input>
+                        </div>
+                    </template>
+                    <data-table-column name="[[ localize('semester_setup_dates_datelabel') ]]">
+                        <template>
+                            <iron-icon icon="icons:date-range"></iron-icon>
+                            [[ _dateAsFormattedString(item.date) ]]
+                        </template>
+                    </data-table-column>
+                    <data-table-column name="[[ localize('semester_setup_dates_title') ]]">
+                        <template>[[ item.title ]]</template>
+                    </data-table-column>
+                    <data-table-column name="[[ localize('semester_setup_table_actions') ]]">
+                        <template>
+                            <paper-icon-button
+                                    id="delete-[[ item.id ]]"
+                                    icon="icons:delete"
+                                    on-tap="_removeDate"></paper-icon-button>
+                            <paper-tooltip
+                                    for="delete-[[ item.id ]]"
+                                    position="right"
+                                    animation-delay="0"
+                                    fit-to-visible-bounds="true">[[ localize('semester_setup_table_delete_tooltip') ]]</paper-tooltip>
+                        </template>
+                    </data-table-column>
+                </iron-data-table>
+
+                <paper-button class="save-button" on-tap="_openDateDialog">
+                    [[ localize('semester_setup_dates_button_add') ]]&nbsp;<iron-icon icon="icons:add-circle-outline"></iron-icon></paper-button>
+
+                <paper-button class="save-button" on-tap="_saveTable">
+                    [[ localize('c_button_save_table') ]]&nbsp;<iron-icon icon="icons:save"></iron-icon></paper-button>
+
+                <div style="clear: both;"></div>
+
+                <paper-dialog id="dateDialog" on-iron-overlay-closed="_discardDateDialog">
+
+                    <h2>[[ localize('semester_setup_dates_dialog_heading') ]]</h2>
+
+                    <paper-dialog-scrollable>
+
+                        <h3>[[ localize('semester_setup_dates_dialog_startingat') ]]</h3>
+                        <paper-date-picker
+                                date="{{ dialogDate }}"
+                                responsive-width="630px"></paper-date-picker>
+                        <time-picker hour="{{ dialogHour }}" min="{{ dialogMin }}"></time-picker>
+
+                        <paper-input type="number" min="0" label="[[ localize('semester_setup_dates_duration') ]]" value="{{ dialogDuration }}">
+                            <div suffix>[[ localize('c_minutes') ]]</div>
+                        </paper-input>
+
+                        <paper-input label="[[ localize('semester_setup_dates_title_long') ]]" value="{{ dialogTitle }}"></paper-input>
+
+                        <paper-input label="[[ localize('semester_setup_dates_location') ]]" value="{{ dialogLocation }}"></paper-input>
+
+                    </paper-dialog-scrollable>
+
+                    <div class="buttons">
+                        <paper-button dialog-dismiss>[[ localize('c_button_discard') ]]</paper-button>
+                        <paper-button dialog-confirm autofocus on-tap="_storeNewDate">[[ localize('c_button_save') ]]</paper-button>
+                    </div>
+                </paper-dialog>
+
+            </div>
+        </paper-card>
+
+        <iron-signals on-iron-signal-switchlocale="_switchLocale"></iron-signals>
+
+    </template>
+
+    <script>
+
+        Polymer({
+
+            is: 'semester-setup-dates',
+
+            properties: {
+
+                dates: {
+                    type: Array,
+                    notify: true,
+                    value: [] },
+
+                dialogDate: {
+                    type: Date,
+                    value: new Date() },
+                dialogHour: {
+                    type: Number,
+                    value: 0 },
+                dialogMin: {
+                    type: Number,
+                    value: 0 },
+                dialogDuration: {
+                    type: Number,
+                    value: 0 },
+                dialogTitle: {
+                    type: String,
+                    value: '' },
+                dialogLocation: {
+                    type: String,
+                    value: '' },
+
+                language: {
+                    type: String,
+                    value: 'de' }
+
+            },
+
+            /**
+             * Localization setup
+             */
+            behaviors: [
+                Polymer.AppLocalizeBehavior
+            ],
+            attached: function() {
+                this.loadResources(this.resolveUrl('../shared/locales.json'));
+            },
+            _switchLocale: function() {
+                this.language = (this.language == 'en') ? 'de' : 'en';
+            },
+
+            _openDateDialog: function () {
+                this.$.dateDialog.open();
+            },
+
+            _storeNewDate: function () {
+                var dateObject = {
+                    id: this._generateId(),
+                    date: this.dialogDate,
+                    duration: this.dialogDuration,
+                    title: this.dialogTitle,
+                    location: this.dialogLocation
+                };
+                dateObject.date.setHours(this.dialogHour);
+                dateObject.date.setMinutes(this.dialogMin);
+                var newDates = this.dates.slice();
+                newDates.push(dateObject);
+                this.dates = newDates;
+            },
+
+            _discardDateDialog: function (event) {
+                if (event.path[0].id != 'dropdown') {
+                    this.dialogDate = new Date();
+                    this.dialogHour = 0;
+                    this.dialogMin = 0;
+                    this.dialogDuration = 0;
+                    this.dialogTitle = '';
+                    this.dialogLocation = '';
+                }
+            },
+
+            _dateAsFormattedString: function (date) {
+                return date.getDate() + "/" + date.getMonth() + "/" + date.getFullYear()
+                        + " - " + date.getHours() + ":" + date.getMinutes();
+            },
+
+            // Taken from http://stackoverflow.com/questions/1349404/generate-random-string-characters-in-javascript
+            _generateId: function () {
+                var text = "";
+                var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+                for( var i=0; i < 5; i++ )
+                    text += possible.charAt(Math.floor(Math.random() * possible.length));
+                return text;
+            },
+
+            _removeDate: function (event) {
+                // If user hits just the button and not the iron-icon inside of it,
+                // this is the correct id
+                var id = event.path[0].getAttribute('id');
+                if (id == 'icon') {
+                    // User has hit the icon, therefore we need the id of the
+                    // icon's ancestor paper-icon-button
+                    id = event.path[2].getAttribute('id');
+                }
+                id = id.split('delete-')[1];
+                this.dates = this.dates.filter(function(item){
+                    return (item.id != id);
+                });
+            },
+
+            _saveTable: function () {
+                this.dates = this.dates.slice();
+            }
+
+        });
+
+    </script>
+
+</dom-module>

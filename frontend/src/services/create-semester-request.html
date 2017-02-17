@@ -1,0 +1,293 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="./api-request.html">
+
+<dom-module id="create-semester-request">
+
+    <template>
+
+        <api-request
+                method="[[ semesterAjax.method ]]"
+                endpoint="[[ semesterAjax.endpoint ]]"
+                headers="[[ semesterAjax.headers ]]"
+                body="[[ semesterAjax.body ]]"
+                on-api-response="_handleSemesterResponse"
+                on-api-error="_handleSemesterError"></api-request>
+
+        <api-request
+                method="[[ labtypeAjax.method ]]"
+                endpoint="[[ labtypeAjax.endpoint ]]"
+                headers="[[ labtypeAjax.headers ]]"
+                body="[[ labtypeAjax.body ]]"
+                on-api-response="_handleLabtypesResponse"
+                on-api-error="_handleLabtypesError"></api-request>
+
+        <api-request
+                method="[[ tutorAjax.method ]]"
+                endpoint="[[ tutorAjax.endpoint ]]"
+                headers="[[ tutorAjax.headers ]]"
+                body="[[ tutorAjax.body ]]"
+                on-api-response="_handleTutorsResponse"
+                on-api-error="_handleTutorsError"></api-request>
+
+        <api-request
+                method="[[ studentAjax.method ]]"
+                endpoint="[[ studentAjax.endpoint ]]"
+                headers="[[ studentAjax.headers ]]"
+                body="[[ studentAjax.body ]]"
+                on-api-response="_handleStudentsResponse"
+                on-api-error="_handleStudentsError"></api-request>
+
+        <api-request
+                method="[[ datesAjax.method ]]"
+                endpoint="[[ datesAjax.endpoint ]]"
+                headers="[[ datesAjax.headers ]]"
+                body="[[ datesAjax.body ]]"
+                on-api-response="_handleDatesResponse"
+                on-api-error="_handleDatesError"></api-request>
+
+    </template>
+
+    <script>
+
+        Polymer({
+
+            is: 'create-semester-request',
+
+            properties: {
+
+                // Attributes downward data flow
+                semesterTerm: {
+                    type: String },
+                semesterStartDate: {
+                    type: Date },
+                semesterEndDate: {
+                    type: Date },
+                semesterGroupSize: {
+                    type: Number },
+                labTypes: {
+                    type: Array },
+                tutors: {
+                    type: Array },
+                students: {
+                    type: Array },
+                dates: {
+                    type: Array },
+
+                // Attributes for upward data flow
+                loading: {
+                    type: Boolean,
+                    notify: true,
+                    value: false },
+
+                // Internals
+                accessToken: {
+                    type: String },
+                semesterId: {
+                    type: String,
+                    reflectToAttribute: false },
+
+                // DEBUG
+                tutorsStringified: {
+                    type: String,
+                    reflectToAttribute: false,
+                    computed: 'stringify(tutors)'
+                },
+                studentsStringified: {
+                    type: String,
+                    reflectToAttribute: false,
+                    computed: 'stringify(students)'
+                },
+                datesStringified: {
+                    type: String,
+                    reflectToAttribute: false,
+                    computed: 'stringify(dates)'
+                }
+            },
+
+            submitSemester: function () {
+                this.loading = true;
+
+                var term = this.semesterTerm.slice();
+                var start_date = new Date(this.semesterStartDate.getTime());
+                var end_date = new Date(this.semesterEndDate.getTime());
+                var group_size = this.semesterGroupSize;
+
+                this.semesterAjax = {
+                    method: 'POST',
+                    endpoint: '/semesters/',
+                    headers: {
+                        Authorization: this.accessToken
+                    },
+                    body: {
+                        term: term,
+                        start_date: start_date,
+                        end_date: end_date,
+                        group_size: group_size
+                    }
+                };
+            },
+
+            _handleSemesterResponse: function (event) {
+
+                this.semesterAjax = null;
+
+                    console.log("semester created:", event.detail.id);
+
+                    this.semesterId = event.detail.id;
+
+                    var photo = this.labTypes[0];
+                    var video = this.labTypes[1];
+                    var audio = this.labTypes[2];
+                    var body =
+                            [{
+                                type: 0,
+                                type_str: photo.title,
+                                registration_deadline: photo.deadline,
+                                registration_open: false,
+                                description_tutor: photo.descriptionTutor,
+                                description_student: photo.descriptionStudent,
+                                semesterId: this.semesterId
+                            },{
+                                type: 1,
+                                type_str: video.title,
+                                registration_deadline: video.deadline,
+                                registration_open: false,
+                                description_tutor: video.descriptionTutor,
+                                description_student: video.descriptionStudent,
+                                semesterId: this.semesterId
+                            },{
+                                type: 2,
+                                type_str: audio.title,
+                                registration_deadline: audio.deadline,
+                                registration_open: false,
+                                description_tutor: audio.descriptionTutor,
+                                description_student: audio.descriptionStudent,
+                                semesterId: this.semesterId
+                            }];
+                    this.labtypeAjax = {
+                        method: 'POST',
+                        endpoint: '/labtypes/',
+                        headers: {
+                            Authorization: this.accessToken
+                        },
+                        body: body
+                    };
+            },
+
+            _handleSemesterError: function (event) {
+                throw event.detail;
+            },
+
+            _handleLabtypesResponse: function (event) {
+
+                this.labtypeAjax = null;
+
+                console.log("labtypes created");
+
+                var body = this.tutors.map(function(item){
+                    return {
+                        name: item.name,
+                        first_name: item.first_name,
+                        email: item.email,
+                        isTutor: true,
+                        isAdmin: false,
+                        semesterId: this.semesterId
+                    };
+                });
+
+                this.tutorAjax = {
+                    method: 'POST',
+                    endpoint: '/pendingplatformusers/',
+                    headers: {
+                        Authorization: this.accessToken
+                    },
+                    body: body
+                }
+            },
+
+            _handleLabtypesError: function (event) {
+                throw event.detail;
+            },
+
+            _handleTutorsResponse: function (event) {
+
+                this.tutorAjax = null;
+
+                console.log("tutors created");
+
+                var that = this;
+
+                var body = this.students.map(function(item){
+                    return {
+                        name: item.name,
+                        first_name: item.first_name,
+                        email: item.email,
+                        isTutor: false,
+                        isAdmin: false,
+                        semesterId: that.semesterId
+                    };
+                });
+
+                this.studentAjax = {
+                    method: 'POST',
+                    endpoint: '/pendingplatformusers/',
+                    headers: {
+                        Authorization: this.accessToken
+                    },
+                    body: body
+                }
+            },
+
+            _handleTutorsError: function (event) {
+                throw event.detail;
+            },
+
+            _handleStudentsResponse: function (event) {
+
+                this.studentAjax = null;
+
+                console.log("students created");
+
+                var dateBody = this.dates.map(function(item){
+                    return {
+                        semesterId: this.semesterId,
+                        name: item.title,
+                        date: item.date,
+                        location: item.location,
+                        duration: item.duration
+                    };
+                });
+
+                this.datesAjax = {
+                    method: 'POST',
+                    endpoint: '/uniquedates/',
+                    headers: {
+                        Authorization: this.accessToken
+                    },
+                    body: dateBody
+                }
+            },
+
+            _handleStudentsError: function (event) {
+                throw event.detail;
+            },
+
+            _handleDatesResponse: function (event) {
+                this.datesAjax = null;
+                console.log("dates created");
+                this.loading = false;
+            },
+
+            _handleDatesError: function (event) {
+                throw event.detail;
+            },
+
+            stringify: function (tutors) {
+                return JSON.stringify(tutors);
+            }
+
+        });
+
+    </script>
+
+</dom-module>

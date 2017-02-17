@@ -132,7 +132,8 @@
                 method="[[ ajax.method ]]"
                 endpoint="[[ ajax.endpoint ]]"
                 loading="{{ isLoading }}"
-                response="{{ apiResponse }}"></api-request>
+                on-api-response="_handleRegistrationResponse"
+                on-api-error="_handleRegistrationError"></api-request>
 
         <template is="dom-if" if="[[ isLoading ]]">
             <div class="spinner-container">
@@ -226,12 +227,6 @@
             is: 'registration-card',
 
             properties: {
-
-                apiResponse: {
-                    type: String,
-                    reflectToAttribute: false,
-                    observer: '_apiResponseChanged'
-                },
 
                 buttonDisabled: {
                     type: Boolean,
@@ -366,32 +361,26 @@
 
             },
 
-            _apiResponseChanged: function (response) {
-                if (response.type == 'error') {
+            _handleRegistrationResponse: function (event) {
 
-                    this.$.apiErrorMessage.setAttribute('class', 'error');
+                var jsonResponse = event.detail;
 
-                } else if (response.type == 'response') {
+                this.$.apiErrorMessage.setAttribute('class', 'error hide');
 
-                    var jsonResponse = response.data;
+                this.presetEmail = jsonResponse.email;
+                this.presetName = jsonResponse.first_name;
 
-                    this.$.apiErrorMessage.setAttribute('class', 'error hide');
+                this.set('userInput', {
+                    email: '',
+                    password: '',
+                    confirmPassword: ''
+                });
 
-                    this.presetEmail = jsonResponse.email;
-                    this.presetName = jsonResponse.first_name;
-                    /*this.set('userInput.email', '');
-                    this.set('userInput.password', '');
-                    this.set('userInput.confirmPassword', '');*/
+                this.set('page', '/');
+            },
 
-                    this.set('userInput', {
-                        email: '',
-                        password: '',
-                        confirmPassword: ''
-                    });
-
-                    this.set('page', '/');
-
-                }
+            _handleRegistrationError: function (event) {
+                this.$.apiErrorMessage.setAttribute('class', 'error');
             },
 
             initSwitchLocale: function(e) {

@@ -5,13 +5,15 @@
 <link rel="import" href="../components/groups-admin.html">
 <link rel="import" href="../components/notifications-card.html">
 <link rel="import" href="../components/navigation-bar.html">
+<link rel="import" href="../components/admin-toolbar.html">
+<link rel="import" href="semester-setup-view.html">
 <link rel="import" href="../shared/shared-styles.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../../bower_components/iron-collapse/iron-collapse.html">
 
-
 <dom-module id="main-view">
 
+<<<<<<< HEAD
     <template>
 
         <style include="shared-styles">
@@ -103,6 +105,71 @@
         <!--app-location route="{{route}}" use-hash-as-path></app-location-->
         <!--zugriff auf url; get ulr mäßig; use-hash-as-path: # vor path-->
         <app-route
+=======
+  <template>
+
+    <style include="shared-styles">
+      .group-placeholder{
+        float: left;
+      }
+      .group-info{
+        width: 100%;
+      }
+      .practicalsContainer {
+        float: left;
+      }
+
+      iron-collapse{
+        width: 100%;
+      }
+
+      admin-toolbar {
+          margin: 0 10px;
+          width: auto;
+      }
+
+      /*Phone*/
+      @media screen and (max-width: 767px) {
+        .group-placeholder{
+          width: 100%;
+          min-width: 320px;
+        }
+
+        .practicalsContainer{
+          min-width: 320px;
+          width: 100%;
+        }
+
+        admin-toolbar {
+            margin: 0;
+        }
+      }
+      /*Tablet*/
+      @media screen and (min-width: 768px) and (max-width: 1023px) {
+        .group-placeholder{
+          margin: 10px;
+          width: calc(50% - 20px);
+        }
+        .practicalsContainer{
+          margin:10px;
+          width: calc(50% - 20px);
+        }
+      }
+      /*Desktop*/
+      @media screen and (min-width: 1024px) {
+        .group-placeholder{
+          margin:10px;
+          width: calc(35% - 20px);
+        }
+        .practicalsContainer{
+          margin:10px;
+          width: calc(35% - 20px);
+        }
+      }
+    </style>
+
+    <app-route
+>>>>>>> origin/master
             route="{{route}}"
             pattern="/:page"
             data="{{routeData}}"
@@ -114,7 +181,7 @@
             headers="[[ ajax.headers ]]"
             method="[[ ajax.method ]]"
             endpoint="[[ ajax.endpoint ]]"
-            response="{{ apiResponse }}"></api-request>
+            on-api-response="_handleLoggedInUserResponse"></api-request>
 
         <api-request
             id="ajax_labTypes"
@@ -180,6 +247,7 @@
                     </template>
                 </div>
 
+<<<<<<< HEAD
                 <template is="dom-if" if="[[user.isAdmin]]">
                     <div class="group-placeholder">
                         <group-card group-name="Gruppen" on-tap="toggleGroup"></group-card>
@@ -265,6 +333,10 @@
 
         </iron-pages>
 
+=======
+    <template is="dom-if" if="{{ showMobileNotifications }}">
+      <notifications-card showlist="{{ showMobileNotifications }}"></notifications-card>
+>>>>>>> origin/master
     </template>
 
     <script>
@@ -358,6 +430,7 @@
                 }
             },
 
+<<<<<<< HEAD
             behaviors: [
                 Polymer.AppLocalizeBehavior
             ],
@@ -473,6 +546,123 @@
                 if (mq.matches) {
                     this.$$('#collapse').toggle();
                 }
+=======
+        <!-- Dashboard Page -->
+        <div class="main-page" name="dashboard">
+
+            <!-- A D M I N   T O O L B A R -->
+            <template is="dom-if" if="[[ user.isAdmin ]]">
+                <admin-toolbar
+                        user="[[ user ]]"
+                        selected-semester="{{ adminSelectedSemesterId }}"
+                        main-view-page="{{ page }}"></admin-toolbar>
+            </template>
+
+            <!-- NOTIFICATIONS -->
+            <div class="notificationsContainer">
+                <template is="dom-if" if="{{ showNotifications }}">
+                    <notifications-card showlist="{{ showlist }}"></notifications-card>
+                </template>
+            </div>
+
+            <template is="dom-if" if="[[user.isAdmin]]">
+                <div class="group-placeholder">
+                    <group-card group-name="Gruppen" on-tap="toggleGroup"></group-card>
+                    <iron-collapse id="collapse" opened=true>
+                        <groups-admin class="group-info"
+                                      access-token="[[ accessToken ]]"
+                                      self-info="{{user}}"
+                                      selected-semester="[[ adminSelectedSemesterId ]]"></groups-admin>
+                    </iron-collapse>
+                </div>
+            </template>
+
+            <template is="dom-if" if="[[user.isStudent]]">
+                <div class="group-placeholder light-color-text">
+                    <group-card group-name=[[group.name]] on-tap="toggleGroup"></group-card>
+                    <iron-collapse id="collapse" opened=true>
+                        <group-detail class="group-info"
+                                      access-token="[[ accessToken ]]"
+                                      group="{{ group }}"
+                                      self-info="{{user}}"
+                                      group-name="{{groupName}}"></group-detail>
+                    </iron-collapse>
+                </div>
+            </template>
+
+            <div class="practicalsContainer">
+                <div on-tap="_handleFotoTap">
+                    <index-card type="Fotopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:" info2="18.05.16, 14-16"></index-card>
+                </div>
+                <div on-tap="_handleVideoTap">
+                    <index-card type="Videopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:" info2="18.05.16, 14-16"></index-card>
+                </div>
+                <div on-tap="_handleAudioTap">
+                    <index-card type="Audiopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:" info2="18.05.16, 14-16"></index-card>
+                </div>
+            </div>
+        </div>
+
+        <!-- Practical Detail Pages -->
+        <practicals-view
+                name="foto-practicals"
+                type= "Foto"
+                icon="[[icon]]"
+                route="{{subroute}}"
+                on-back-click="_handleBackTap"
+                access-token="{{ session.accessToken }}"
+                logged-in="{{ session.loggedIn }}"
+                user-id="{{ session.userId }}"></practicals-view>
+        <practicals-view
+                name="video-practicals"
+                type= "Video"
+                icon="[[icon]]"
+                route="{{subroute}}"
+                on-back-click="_handleBackTap"
+                access-token="{{ session.accessToken }}"
+                logged-in="{{ session.loggedIn }}"
+                user-id="{{ session.userId }}"></practicals-view>
+        <practicals-view
+                name="audio-practicals"
+                type="Audio"
+                icon="[[icon]]"
+                route="{{subroute}}"
+                on-back-click="_handleBackTap"
+                access-token="{{ session.accessToken }}"
+                logged-in="{{ session.loggedIn }}"
+                user-id="{{ session.userId }}"></practicals-view>
+
+        <!-- Semester Setup Pages (Admin only) -->
+        <template is="dom-if" if="[[ user.isAdmin ]]">
+            <semester-setup-view
+                    name="semester-setup"
+                    page="{{ page }}"
+                    access-token="[[ accessToken ]]"></semester-setup-view>
+        </template>
+
+    </iron-pages>
+
+  </template>
+
+  <script>
+    Polymer({
+
+        is: 'main-view',
+
+        properties: {
+
+            accessToken: {
+              type: String,
+              observer: '_accessTokenChanged'
+            },
+            adminSelectedSemesterId: {
+                type: String
+            },
+            apiResponse: {
+              type: Object,
+              reflectToAttribute: false,
+              observer: '_apiResponseChanged'
+>>>>>>> origin/master
             },
 
             isStudent: function () {
@@ -627,6 +817,7 @@
                 }
             },
 
+<<<<<<< HEAD
             /**
              * Gets group-lab data from API and sets them for each labtype
              * @param response
@@ -694,8 +885,121 @@
                 //console.log(this.all_labs_foto);
                 //console.log(this.all_labs_video);
                 //console.log(this.all_labs_audio);
+=======
+                this.ajax = {
+                    headers: {
+                        Authorization: this.accessToken
+                    },
+                    method: 'GET',
+                    endpoint: '/platformusers/' + this.userId
+                };
+>>>>>>> origin/master
             }
 
+<<<<<<< HEAD
         });
     </script>
+=======
+        toggleGroup: function () {
+            var mq = window.matchMedia( "(max-width: 767px)" );
+            if(mq.matches){
+              this.$.collapse.toggle();
+            }
+        },
+        _accessTokenChanged: function () {
+            if (this.userId && this.accessToken) {
+
+                  this.ajax = {
+                      headers: {
+                          Authorization: this.accessToken
+                      },
+                      method: 'GET',
+                      endpoint: '/platformusers/' + this.userId
+                  };
+            }
+        },
+
+        _handleLoggedInUserResponse: function (event) {
+            console.log('_handleLoggedInUserResponse()');
+            var userResponse = event.detail;
+            console.log(userResponse);
+            this.set('user.email', userResponse.email);
+            this.set('user.firstName', userResponse['first_name']);
+            this.set('user.groupId', userResponse.groupId);
+            this.set('user.name', userResponse.name);
+            this.set('user.isAdmin', userResponse.isAdmin);
+            this.set('user.isTutor', userResponse.isTutor);
+            if(!this.user.isAdmin && !this.user.isTutor){
+              this.set('user.isStudent', true);
+            }
+            console.log(this.user);
+        },
+
+      toggleGroup: function () {
+        var mq = window.matchMedia( "(max-width: 767px)" );
+        if(mq.matches){
+          this.$$('#collapse').toggle();
+        }
+      },
+
+      isStudent: function () {
+        if(!this.user.isAdmin && !this.user.isTutor){
+          return true;
+        }
+      },
+
+      _switchLocale: function() {
+        this.language = (this.language == 'en') ? 'de' : 'en';
+      },
+
+        /**
+         * Handle tap on Back-Button
+         */
+        _handleBackTap: function(){
+            this.page = 'dashboard';
+        },
+        /**
+         * Handle tap on Foto-Button
+         */
+        _handleFotoTap: function(){
+            this.page  = "foto-practicals";
+            this.icon = "../../../images/photo.svg";
+        },
+        /**
+         * Handle tap on Video-Button
+         */
+        _handleVideoTap: function(){
+            this.page  = "video-practicals";
+            this.icon = "../../../images/video.svg";
+        },
+        /**
+         * Handle tap on Audio-Button
+         */
+        _handleAudioTap: function(){
+            this.page  = "audio-practicals";
+            this.icon = "../../../images/audio.svg";
+        },
+        /**
+         * Callback fired when the applications route changes
+         * @param {String} page - new value of routeData.page
+         * @private
+         */
+        _routePageChanged: function(page) {
+            this.page  = page || 'dashboard';
+        },
+        /**
+         * Callback fired when the applications page property changes
+         * @param {String} page - new value of page property
+         * @private
+         */
+        _pageChanged: function(page) {
+            // Load page import on demand.
+            if(page.search('practicals')>=0) {
+                var resolvedPageUrl = this.resolveUrl('./practicals-view.html');
+                this.importHref(resolvedPageUrl, null, this._showPage404, true);
+            }
+        }
+    });
+  </script>
+>>>>>>> origin/master
 </dom-module>

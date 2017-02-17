@@ -5,8 +5,7 @@
 
     <template>
 
-        <iron-ajax id="request"
-                  auto
+        <iron-ajax auto
                    body="[[ body ]]"
                    content-type="[[ contentType ]]"
                    handle-as="json"
@@ -28,16 +27,11 @@
 
             properties: {
 
-                accessToken: {
-                    type: String,
-//                    computed: "_getAccessToken"
-                },
-
                 baseUrl: {
                     type: String,
                     reflectToAttribute: false,
                     value: 'http://localhost:3000/api'
-//                    value: 'https://lmu-mt-api.herokuapp.com/api'
+                    //value: 'https://lmu-mt-api.herokuapp.com/api'
                 },
 
                 body: {
@@ -71,10 +65,10 @@
                     value: 'GET'
                 },
 
-                response: {
-                    type: Object,
-                    notify: true,
-                    value: ''
+                semesterFilter: {
+                    type: String,
+                    value: '',
+                    observer: '_computeUrl'
                 },
 
                 url: {
@@ -83,47 +77,26 @@
                 }
             },
 
-            ready: function () {
-                cookieAccessToken = this._getCookie('mt-api-accesstoken');
-                this.headers.Authorization = cookieAccessToken;
-            },
-
             _handleResponse: function (response) {
-                this.response = {
-                    data: response.detail.response,
-                    type: 'response'
-                };
+                this.fire('api-response', response.detail.response);
             },
 
             _handleError: function (response) {
-                this.response = {
-                    data: response.detail.error,
-                    type: 'error'
-                };
-                console.log("# Ajax error #")
-                console.log(response)
+                this.fire('api-error', response.detail.error);
             },
 
             _computeUrl: function () {
-                this.url = this.baseUrl + this.endpoint;
-            },
+                if (this.baseUrl && this.endpoint && this.baseUrl != '' && this.endpoint != '') {
 
-            _getCookie: function (cookieName) {
-
-                var name = cookieName + '=';
-                var allCookies = document.cookie.split(';');
-                var idx;
-                for (idx in allCookies) {
-                    var cookie = allCookies[idx];
-                    while (cookie.charAt(0) == ' ') {
-                        cookie = cookie.substring(1);
-                    }
-                    if (cookie.indexOf(name) == 0) {
-                        return cookie.substring(name.length, cookie.length);
-                    }
+                    this.url =
+                            this.baseUrl +
+                            this.endpoint +
+                            ((this.semesterFilter != '')
+                                    ? '?filter[where][semesterId]=' + this.semesterFilter
+                                    : '');
                 }
-                return '';
-            },
+            }
+
         });
 
     </script>

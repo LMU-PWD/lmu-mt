@@ -8,6 +8,7 @@
 <link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="date-creator.html">
+<link rel="import" href="date-creator-tutor.html">
 <link rel="import" href="../shared/shared-styles.html">
 
 <dom-module id="practicals-date-selector">
@@ -69,12 +70,14 @@
                 </paper-button>
             </div>
             <div class="dateselector">
-                <template is="dom-repeat" items="[[timeslots]]" as="labs">
-                    <date-creator id="dateselectors" class="datecreator" timeslots="[[labs]]" priority="[[priority]]"
-                                  on-priority-click="_handlePriorityClick"
-                                  on-date-click="_handleDateClick"
-                                  on-replace-priority="_handleReplacePriority"></date-creator>
-                </template>
+                <!--template is="dom-if" if="[[user.isStudent]]"-->
+                    <template is="dom-repeat" items="[[timeslots]]" as="labs">
+                        <date-creator id="dateselectors" class="datecreator" timeslots="[[labs]]" priority="[[priority]]"
+                                      on-priority-click="_handlePriorityClick"
+                                      on-date-click="_handleDateClick"
+                                      on-replace-priority="_handleReplacePriority"></date-creator>
+                    </template>
+                <!--/template-->
             </div>
     </template>
     <script>
@@ -102,10 +105,12 @@
                     type: Array,
                     value: []
                 },
+                user: Object,
                 chosenlabs:{
                     type: Array,
                     value: []
                 },
+                labType: Object,
 
                 // Priorities from API
                 apiPriorities: {
