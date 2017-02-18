@@ -35,13 +35,10 @@
         </style>
 
         <api-request
-                id="ajax_savePriorities"
-                body="[[ ajax.body ]]"
                 headers="[[ ajax.headers ]]"
                 method="[[ ajax.method ]]"
                 endpoint="[[ ajax.endpoint ]]"
-                response="{{ response_savePriorities }}"
-                loading="{{ isLoading }}"></api-request>
+                on-api-response="_responseFromPrioritySave"></api-request>
 
         <div class="content">
             <template is="dom-if" if="[[registration_open]]">
@@ -133,10 +130,6 @@
                     type: Boolean,
                     value: false
                 },
-                response_savePriorities: {
-                    type: Object,
-                    observer: '_responseFromPrioritySave'
-                },
                 group: Object,
                 user: Object,
                 allLabs: {
@@ -157,7 +150,7 @@
                     if(this.labs_already_chosen){
                         this.chosenlabs = this.labData.priorities;
                         this.chosenlabs_transformed = this._transformLabs(this.chosenlabs,false);
-                        console.log(this.labData.priorities);
+                        //console.log(this.labData.priorities);
                     }
                 }
                 this.before_deadline = this._getBeforeDeadline(this.labType.registration_deadline);
@@ -188,6 +181,45 @@
                     this.chosenlabs = [];
                     this.chosenlabs = e.target.chosenlabs;
                     this.chosenlabs_transformed = this._transformLabs(this.chosenlabs,false);
+
+                    //console.log(this.labType.id);
+                    //console.log(this.group.id);
+                    // Step 1. Delete existing priority object
+                    this.ajax = {
+                        headers: {
+                            'Authorization' : this.accessToken
+                        },
+                        body: {
+                            id: this.group.id
+                        },
+                        method: 'DELETE',
+                        endpoint: '/groups/' + this.group.id + '/priorities/'
+
+                    };
+                    //console.log(this.ajax);
+
+                    for(i = 0; i<this.chosenlabs; i++) {
+                        console.log(this.chosenlabs[i].id);
+                        // Step 2. Save a new priority object
+                        this.ajax = {
+                            headers: {
+                                'Authorization': this.accessToken
+                            },
+                            body: {
+                                priority: i,
+                                groupId: this.group.id,
+                                labId: this.chosenlabs[i].id,
+                                semesterId: this.group.semesterId,
+                                labTypeId: this.labType.id
+                            },
+                            method: 'POST',
+                            endpoint: '/groups/' + this.group.id + '/priorities/'
+
+                        };
+
+                        //console.log(this.ajax);
+                    }
+
                     this.labs_already_chosen = true;
                     var practicals_show_saved_dates = Polymer.dom(this.root).querySelector("#practicals_show_saved_dates");
                     if(practicals_show_saved_dates) {
@@ -197,45 +229,6 @@
                 else{
                     alert("Error: Not enogh labs chosen. Just "+labcounter+" labs chosen.");
                 }
-
-                // TODO: Deliver chosen labs as lab objects (with Id)
-
-                // IMPORTANT: This is the example process for saving priorities.
-                // The process has to be done for each set priority (every entry in chosenlabs)
-                /*
-                for (var i = 0; i < this.chosenlabs.length; i++) {
-
-                    // TODO: Replace this by chosenlab entry as lab object
-                    var dummyLab = {};
-
-                    // Step 1. check if this priority has been in the DB for this group already
-                    var found = false;
-                    for (var i = 0; i < this.labData.priorities.length; i ++) {
-                        if (this.labData.priorities[i].id == dummyLab.id) {
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (found)
-                    // take next priority / go on in loop over chosenlabs
-                        break;
-
-                    // Step 2. Save a new priority object
-                    this.ajax = {
-                        endpoint: '/groups/' + this.group.id + 'priorities?filter[where][semesterId]=' + this.group.semesterId,
-                        method: 'POST',
-                        headers: {
-                            'Authorization' : this.accessToken
-                        },
-                        body: {
-                            priority: 3,
-                            groupId: this.group.id,
-                            labId: dummyLab.id, // TODO: Set this (= current lab's lab id)
-                            semesterId: this.group.semesterId,
-                            labTypeId: this.labType.id
-                        }
-                    }
-                }*/
             },
             /**
              * Handle reset click
@@ -257,6 +250,7 @@
                     practicals_date_selector._handleResetClick();
                 }
             },
+
             /**
              * Function that checks for the practial course date
              */
@@ -270,7 +264,7 @@
              * Function that checks for the if there are labs already chosen
              */
             _chosenlabsExist: function(labs){
-                console.log(labs);
+                //console.log(labs);
                 if(labs == [] || labs == null || labs.length == 0){
                     return  false;
                 }
@@ -340,7 +334,7 @@
              * @private
              */
             _transformLabs: function(labsFromApi,divideDates){
-                console.log(labsFromApi);
+                //console.log(labsFromApi);
                 var transformedLabs = []; //Store return-Array here
                 var lastLab = new Date(labsFromApi[0].date);
                 var countDates = 0; //Date counter
@@ -381,8 +375,8 @@
                     }
 
                 }
-                console.log("transformed labs: ");
-                console.log(transformedLabs);
+                //console.log("transformed labs: ");
+                //console.log(transformedLabs);
                 return transformedLabs;
             },
             /**
@@ -391,8 +385,6 @@
              * @private
              */
             _responseFromPrioritySave: function(response) {
-                if (!this.isReady)
-                    return;
                 console.log(response);
             }
         });

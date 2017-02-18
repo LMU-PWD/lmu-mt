@@ -186,7 +186,7 @@
              */
             _handleDateClick: function(e){
                 e.target.priorities = this.priorities;
-                console.log(this.priorities);
+                //console.log(this.priorities);
             },
 
             /**
@@ -210,7 +210,7 @@
              * @private
              */
             _handleSaveClick: function(e){
-                console.log(this.chosenlabs);
+                //console.log(this.chosenlabs);
                 this.fire("save-click", this.chosenlabs);
             },
 
@@ -236,7 +236,7 @@
              * @private
              */
             _transformLabs: function(labsFromApi,divideDates){
-                console.log(labsFromApi);
+                //console.log(labsFromApi);
                 var transformedLabs = []; //Store return-Array here
                 var lastLab = new Date(labsFromApi[0].date);
                 var countDates = 0; //Date counter
@@ -275,10 +275,9 @@
                     else{
                         transformedLabs[i]=lab;
                     }
-
                 }
-                console.log("transformed labs: ");
-                console.log(transformedLabs);
+                //console.log("transformed labs: ");
+                //console.log(transformedLabs);
                 return transformedLabs;
             }
         });

@@ -340,26 +340,14 @@
 
                 this.groupdata_audio = {};
                 this.groupdata_audio.priorities = [];
-                //this.groupdata_audio.priorities.starttimes = [];
-                //this.groupdata_audio.priorities.durations = [];
                 this.groupdata_video = {};
                 this.groupdata_video.priorities = [];
-                //this.groupdata_video.priorities.starttimes = [];
-                //this.groupdata_video.priorities.durations = [];
                 this.groupdata_foto = {};
                 this.groupdata_foto.priorities = [];
-                //this.groupdata_foto.priorities.starttimes = [];
-                //this.groupdata_foto.priorities.durations = [];
                 this.allLabs = [];
                 this.all_labs_foto = [];
-                //this.all_labs_foto.starttimes = [];
-                //this.all_labs_foto.durations = [];
                 this.all_labs_video = [];
-                //this.all_labs_video.starttimes = [];
-                //this.all_labs_video.durations = [];
                 this.all_labs_audio = [];
-                //this.all_labs_audio.starttimes = [];
-                //this.all_labs_audio.durations = [];
             },
             _accessTokenChanged: function () {
                 if (this.userId && this.accessToken) {
@@ -380,7 +368,7 @@
              * @private
              */
             _groupChanged: function(response) {
-                if (!this.isReady)
+                if (!this.isReady || !this.group.priorityIds)
                     return;
 
                 this.semesterId = response.semesterId;
@@ -462,6 +450,7 @@
                         method: 'GET',
                         endpoint: '/Labtypes?filter[where][semesterId]=' + this.semesterId
                     };
+                    //console.log(this.ajax_lab_types);
                     //console.log("ajax_lab_types set");
                 }
                 if (this.semesterId && !this.labsRequestSent) {
@@ -549,24 +538,6 @@
                     this.all_labs_video.push(event.detail[i]);
                     this.all_labs_video.push(event.detail[i]);
                     this.all_labs_audio.push(event.detail[i]);
-                    /*this.all_labs_foto.starttimes.push(new Date(event.detail[i].date));
-                    this.all_labs_foto.durations.push(event.detail[i].duration);
-                    this.all_labs_foto.starttimes.push(new Date(event.detail[i].date));
-                    this.all_labs_foto.durations.push(event.detail[i].duration);
-                    this.all_labs_foto.starttimes.push(new Date(event.detail[i].date));
-                    this.all_labs_foto.durations.push(event.detail[i].duration);
-                    this.all_labs_video.starttimes.push(new Date(event.detail[i].date));
-                    this.all_labs_video.durations.push(event.detail[i].duration);
-                    this.all_labs_video.starttimes.push(new Date(event.detail[i].date));
-                    this.all_labs_video.durations.push(event.detail[i].duration);
-                    this.all_labs_video.starttimes.push(new Date(event.detail[i].date));
-                    this.all_labs_video.durations.push(event.detail[i].duration);
-                    this.all_labs_video.starttimes.push(new Date(event.detail[i].date));
-                    this.all_labs_video.durations.push(event.detail[i].duration);
-                    this.all_labs_video.starttimes.push(new Date(event.detail[i].date));
-                    this.all_labs_video.durations.push(event.detail[i].duration);
-                    this.all_labs_audio.starttimes.push(new Date(event.detail[i].date));
-                    this.all_labs_audio.durations.push(event.detail[i].duration);*/
                     //
                 }
 
@@ -615,12 +586,6 @@
                 this.groupdata_foto.priorities[event.detail.priority+1] = lab;
                 //this.groupdata_video.priorities[event.detail.priority-1] = lab;
                 this.groupdata_audio.priorities[event.detail.priority-1] = lab;
-                /*this.groupdata_foto.priorities.starttimes[event.detail.priority] = new Date(lab.date);
-                this.groupdata_foto.priorities.durations[event.detail.priority] = lab.duration;
-                this.groupdata_foto.priorities.starttimes[event.detail.priority+1] = new Date(lab.date);
-                this.groupdata_foto.priorities.durations[event.detail.priority+1] = lab.duration;
-                this.groupdata_audio.priorities.starttimes[event.detail.priority-1] = new Date(lab.date);
-                this.groupdata_audio.priorities.durations[event.detail.priority-1] = lab.duration;*/
                 //
 
                 //console.log("Group Prios:");
