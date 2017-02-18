@@ -50,18 +50,17 @@
                     <template is="dom-if" if="[[!labs_already_chosen]]" >
                         <!-- Deadline is not over, Registration Open and no dates selected; Select your dates!-->
                         <practicals-date-selector  id="practicalsDateSelector"
-                                                   practical_date="[[practical_date]]"
-                                                   timeslots="[[timeslots]]"
                                                    priority="[[priority]]"
                                                    api-priorities="{{ labdata.priorities }}"
                                                    user="[[ user ]]"
+                                                   api-all-labs="[[allLabs]]"
                                                    on-save-click="_handleSaveClick"
                                                    on-reset-click="_handleResetClick"></practicals-date-selector>
                     </template>
                     <template is="dom-if" if="[[labs_already_chosen]]">
                         <!-- Deadline is not over, Registration Open and dates selected; Show saved dates!-->
                         <practicals-show-saved-dates id="practicals_show_saved_dates"
-                                                     chosenlabs="[[chosenlabs]]"></practicals-show-saved-dates>
+                                                     chosenlabs="{{chosenlabs_transformed}}"></practicals-show-saved-dates>
                         <paper-button raised class="changeButton" on-tap="_handleChangeClick">
                             <iron-icon icon="reply"></iron-icon>
                             Auswahl ändern
@@ -72,7 +71,7 @@
                     <!-- Deadline is over but Registration has been started-->
                     <template is="dom-if" if="[[!practical_date_exists]]">
                         <!-- Deadline is over, Registration has been started but Practical Date is not given -->
-                        <practicals-show-saved-dates chosenlabs="[[chosenlabs]]"></practicals-show-saved-dates>
+                        <practicals-show-saved-dates chosenlabs="{{chosenlabs_transformed}}"></practicals-show-saved-dates>
                     </template>
                     <template is="dom-if" if="[[practical_date_exists]]">
                         <!-- Deadline is over, Registration has been started and Practical Date is given-->
@@ -104,7 +103,7 @@
                     type: Boolean,
                     value: true
                 },
-                chosenlabs:{
+                chosenlabs: {
                     type: Array,
                     value: []
                 },
@@ -130,10 +129,6 @@
                 labs_already_chosen:{
                     type: Boolean
                 },
-                timeslots:{
-                    type: Array,
-                    value: []
-                },
                 isReady: {
                     type: Boolean,
                     value: false
@@ -153,7 +148,6 @@
             },
             ready: function () {
                 this.practical_date = this.labData.lab;
-
                 this.practical_date_exists = this._dateExists(this.practical_date);
                 if(this.practical_date_exists){
                     this.practical_date_string = this._getDateString(this.practical_date);
@@ -161,11 +155,14 @@
                 else{
                     this.labs_already_chosen = this._chosenlabsExist(this.labData.priorities);
                     if(this.labs_already_chosen){
-                        this.chosenlabs = this._transformLabs(this.labData.priorities,false);
+                        this.chosenlabs = this.labData.priorities;
+                        this.chosenlabs_transformed = this._transformLabs(this.chosenlabs,false);
+                        console.log(this.labData.priorities);
                     }
                 }
                 this.before_deadline = this._getBeforeDeadline(this.labType.registration_deadline);
-                this.timeslots = this._transformLabs(this.allLabs,true);
+                //this.registration_open = this.labType.registration_open;
+                this.registration_open = true;
             },
             /**
              * Back-button click handler
@@ -190,10 +187,11 @@
                 if(labcounter == e.target.chosenlabs.length){
                     this.chosenlabs = [];
                     this.chosenlabs = e.target.chosenlabs;
+                    this.chosenlabs_transformed = this._transformLabs(this.chosenlabs,false);
                     this.labs_already_chosen = true;
                     var practicals_show_saved_dates = Polymer.dom(this.root).querySelector("#practicals_show_saved_dates");
                     if(practicals_show_saved_dates) {
-                        practicals_show_saved_dates._labsChanged(this.chosenlabs);
+                        practicals_show_saved_dates._labsChanged(this.chosenlabs_transformed);
                     }
                 }
                 else{
@@ -203,10 +201,9 @@
                 // TODO: Deliver chosen labs as lab objects (with Id)
 
                 // IMPORTANT: This is the example process for saving priorities.
-                // The process has to be done for each set priority (every
-                // entry in chosenlabs)
-
-                /*for (var i = 0; i < this.chosenlabs.length; i++) {
+                // The process has to be done for each set priority (every entry in chosenlabs)
+                /*
+                for (var i = 0; i < this.chosenlabs.length; i++) {
 
                     // TODO: Replace this by chosenlab entry as lab object
                     var dummyLab = {};
@@ -273,8 +270,11 @@
              * Function that checks for the if there are labs already chosen
              */
             _chosenlabsExist: function(labs){
-                //console.log(labs);
-                if(labs.starttimes == null || labs.starttimes == [] || labs.starttimes == 0){
+                console.log(labs);
+                if(labs == [] || labs == null || labs.length == 0){
+                    return  false;
+                }
+                if(labs[0].date == null || labs[0].date == 0){
                     return  false;
                 }
                 return  true;
@@ -332,6 +332,7 @@
                     " um "+hours+":"+minutes+" Uhr";
                 return datestring;
             },
+
             /**
              * Transform the Format of the given Timelabs from the Api, so it will be easier to handle in the frontend
              * @param labsFromApi - Contains the given timelabs
@@ -339,35 +340,37 @@
              * @private
              */
             _transformLabs: function(labsFromApi,divideDates){
+                console.log(labsFromApi);
                 var transformedLabs = []; //Store return-Array here
-                var lastLab = labsFromApi.starttimes[0];
+                var lastLab = new Date(labsFromApi[0].date);
                 var countDates = 0; //Date counter
                 var countLabs = 0; //lab counter
                 var dates = [];
 
-                for(i=0; i<labsFromApi.starttimes.length; i++){
+                for(i=0; i<labsFromApi.length; i++){
                     // Create a new array-entrie if date from recent lab is different from date of the last lab
-                    if(labsFromApi.starttimes[i].getFullYear() != lastLab.getFullYear() ||
-                        labsFromApi.starttimes[i].getMonth() != lastLab.getMonth() ||
-                        labsFromApi.starttimes[i].getDate() != lastLab.getDate()) {
+                    var labdate = new Date(labsFromApi[i].date);
+                    if(labdate.getFullYear() != lastLab.getFullYear() ||
+                        labdate.getMonth() != lastLab.getMonth() ||
+                        labdate.getDate() != lastLab.getDate()) {
                         dates = [];
-                        lastlab = labsFromApi.starttimes[i];
+                        lastlab = labdate.date;
                         transformedLabs.push([]);
                         countDates++;
                         countLabs = 0;
                     }
-                    var endtime = new Date(labsFromApi.starttimes[i].getFullYear(), labsFromApi.starttimes[i].getMonth(), labsFromApi.starttimes[i].getDate());
-                    if((labsFromApi.starttimes[i].getMinutes() + (labsFromApi.durations[i] % 60)) > 60){
-                        endtime.setHours(1+Math.floor(labsFromApi.starttimes[i].getHours()+(labsFromApi.durations[i]) / 60));
-                        endtime.setMinutes(labsFromApi.starttimes[i].getMinutes() + (labsFromApi.durations[i] % 60)-60);
+                    var endtime = new Date(labdate.getFullYear(), labdate.getMonth(), labdate.getDate());
+                    if((labdate.getMinutes() + (labsFromApi[i].duration % 60)) > 60){
+                        endtime.setHours(1+Math.floor(labdate.getHours()+(labsFromApi[i].duration) / 60));
+                        endtime.setMinutes(labdate.getMinutes() + (labsFromApi[i].duration % 60)-60);
                     }
                     else{
-                        endtime.setHours(Math.floor(labsFromApi.starttimes[i].getHours()+(labsFromApi.durations[i]) / 60));
-                        endtime.setMinutes(labsFromApi.starttimes[i].getMinutes() + (labsFromApi.durations[i] % 60));
+                        endtime.setHours(Math.floor(labdate.getHours()+(labsFromApi[i].duration) / 60));
+                        endtime.setMinutes(labdate.getMinutes() + (labsFromApi[i].duration % 60));
                     }
 
                     var lab = [];
-                    lab = [labsFromApi.starttimes[i], endtime];
+                    lab = [labdate, endtime];
                     if(divideDates){
                         dates[countLabs] = lab;
                         transformedLabs[countDates] = dates;
@@ -378,8 +381,8 @@
                     }
 
                 }
-                //console.log("transformed labs: ");
-                //console.log(transformedlabs);
+                console.log("transformed labs: ");
+                console.log(transformedLabs);
                 return transformedLabs;
             },
             /**

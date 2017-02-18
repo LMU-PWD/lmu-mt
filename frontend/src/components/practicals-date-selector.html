@@ -8,7 +8,6 @@
 <link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
 <link rel="import" href="date-creator.html">
-<link rel="import" href="date-creator-tutor.html">
 <link rel="import" href="../shared/shared-styles.html">
 
 <dom-module id="practicals-date-selector">
@@ -71,7 +70,7 @@
             </div>
             <div class="dateselector">
                 <!--template is="dom-if" if="[[user.isStudent]]"-->
-                    <template is="dom-repeat" items="[[timeslots]]" as="labs">
+                    <template is="dom-repeat" items="{{timeslots}}" as="labs">
                         <date-creator id="dateselectors" class="datecreator" timeslots="[[labs]]" priority="[[priority]]"
                                       on-priority-click="_handlePriorityClick"
                                       on-date-click="_handleDateClick"
@@ -84,16 +83,6 @@
         Polymer({
             is: 'practicals-date-selector',
             properties: {
-                practical_date: {
-                    type: Date,
-                    notify: true,
-                    observer: '_practicalDateChanged'
-                },
-                practical_date_string: {
-                    type: String,
-                    value: "",
-                    notify: true
-                },
                 timeslots:{
                     type: Array,
                     value: []
@@ -105,38 +94,34 @@
                     type: Array,
                     value: []
                 },
-                user: Object,
-                chosenlabs:{
+                chosenlabs: {
                     type: Array,
                     value: []
                 },
-                labType: Object,
 
-                // Priorities from API
+                // From API
+                labType: Object,
+                user: Object,
                 apiPriorities: {
                     value: Object,
                     notify: true
+                },
+                apiAllLabs: {
+                    type: Array,
+                    value: []
                 }
             },
 
             ready: function() {
-                if(this.practical_date != null){
-                    this.practical_date_string = this._getDateString(this.practical_date);
-                }
                 this._fillPrioritiesArray();
+                //console.log(this.apiAllLabs);
+                this.timeslots = this._transformLabs(this.apiAllLabs,true);
+                //console.log(this.timeslots);
             },
 
             _fillPrioritiesArray: function(){
                 for (i = 0; i < this.priority; i++) {
                     this.priorities[i]=i+1;
-                }
-            },
-            /**
-             *  Handle practicalChanged Event; Variable practical_date changed
-             */
-            _practicalDateChanged: function(){
-                if(this.practical_date != null){
-                    this.practical_date_string = this._getDateString(this.practical_date);
                 }
             },
 
@@ -201,6 +186,7 @@
              */
             _handleDateClick: function(e){
                 e.target.priorities = this.priorities;
+                console.log(this.priorities);
             },
 
             /**
@@ -209,8 +195,12 @@
              * @private
              */
             _handlePriorityClick: function(e){
-                //console.log(this.chosenlabs);
-                this.chosenlabs[e.target.chosenpriority-1]= e.target.timeslots[e.target.chosenlabindex];
+                for(i = 0;i<this.apiAllLabs.length;i++){
+                    labdate = new Date(this.apiAllLabs[i].date);
+                    if(labdate.toString() == e.target.timeslots[e.target.chosenlabindex][0].toString()){
+                        this.chosenlabs[e.target.chosenpriority-1]= this.apiAllLabs[i];
+                    }
+                }
                 this.priorities[e.target.chosenpriority-1] = 0;
             },
 
@@ -231,11 +221,65 @@
              */
             _handleReplacePriority: function(e){
                 for(i=0; i<this.priorities.length; i++){
-                    if(this.chosenlabs[i] == e.target.timeslots[e.target.chosenlabindex]){
+                    labdate = new Date(this.chosenlabs[i]);
+                    if(labdate.toString() == e.target.timeslots[e.target.chosenlabindex][0].toString()){
                         this.chosenlabs[i]= '';
                         this.priorities[i] = i+1;
                     }
                 }
+            },
+
+            /**
+             * Transform the Format of the given Timelabs from the Api, so it will be easier to handle in the frontend
+             * @param labsFromApi - Contains the given timelabs
+             * @returns {Array} - timelabs in new format
+             * @private
+             */
+            _transformLabs: function(labsFromApi,divideDates){
+                console.log(labsFromApi);
+                var transformedLabs = []; //Store return-Array here
+                var lastLab = new Date(labsFromApi[0].date);
+                var countDates = 0; //Date counter
+                var countLabs = 0; //lab counter
+                var dates = [];
+
+                for(i=0; i<labsFromApi.length; i++){
+                    // Create a new array-entrie if date from recent lab is different from date of the last lab
+                    var labdate = new Date(labsFromApi[i].date);
+                    if(labdate.getFullYear() != lastLab.getFullYear() ||
+                        labdate.getMonth() != lastLab.getMonth() ||
+                        labdate.getDate() != lastLab.getDate()) {
+                        dates = [];
+                        lastlab = labdate.date;
+                        transformedLabs.push([]);
+                        countDates++;
+                        countLabs = 0;
+                    }
+                    var endtime = new Date(labdate.getFullYear(), labdate.getMonth(), labdate.getDate());
+                    if((labdate.getMinutes() + (labsFromApi[i].duration % 60)) > 60){
+                        endtime.setHours(1+Math.floor(labdate.getHours()+(labsFromApi[i].duration) / 60));
+                        endtime.setMinutes(labdate.getMinutes() + (labsFromApi[i].duration % 60)-60);
+                    }
+                    else{
+                        endtime.setHours(Math.floor(labdate.getHours()+(labsFromApi[i].duration) / 60));
+                        endtime.setMinutes(labdate.getMinutes() + (labsFromApi[i].duration % 60));
+                    }
+
+                    var lab = [];
+                    lab = [labdate, endtime];
+                    if(divideDates){
+                        dates[countLabs] = lab;
+                        transformedLabs[countDates] = dates;
+                        countLabs++;
+                    }
+                    else{
+                        transformedLabs[i]=lab;
+                    }
+
+                }
+                console.log("transformed labs: ");
+                console.log(transformedLabs);
+                return transformedLabs;
             }
         });
     </script>

@@ -25,7 +25,7 @@
                 }
             },
             ready: function(){
-                //console.log(this.chosenlabs);
+                console.log(this.chosenlabs);
             },
             _labsChanged: function(labs){
                 this.chosenlabs = labs;
@@ -80,7 +80,8 @@
              */
             _getLabString: function(lab){
                 //console.log(lab);
-                if(lab) {
+                if(lab != [0]) {
+                    console.log(lab);
                     var datestring = "";
                     var starthours = lab[0].getHours();
                     var startminutes = lab[0].getMinutes();
