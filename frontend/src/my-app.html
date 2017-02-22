@@ -226,7 +226,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 document.cookie = 'mt-api-userid=; expires=Thu, 01 Jan 1970 00:00:00 UTC';
 
                 //Reset User & Session
+                console.info('Reset Session');
                 this.set('session', {});
+                console.info('Reset User');
                 this.set('user',{});
 
                 //Fire Event forcing every component to forget saved data

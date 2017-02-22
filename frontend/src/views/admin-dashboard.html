@@ -9,7 +9,7 @@
         </style>
         <div></div>
 
-        <div class="group-placeholder" on-tap="_handleTap">
+        <div class="group-container" on-tap="_handleTap">
                 <!-- A D M I N   T O O L B A R -->
                 <admin-toolbar
                         user="[[ user ]]"
@@ -24,7 +24,7 @@
                 </iron-collapse>
             </div>
 
-        <div class="practicalsContainer">
+        <div class="practicals-container">
             <div on-tap="_handleFotoTap">
                 <index-card type="Fotopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:"
                             info2="18.05.16, 14-16"></index-card>
@@ -57,7 +57,6 @@
             },
             _handleTap: function (event) {
                 console.log(event);
-                //console.log(event.path[0].key);
                 var key = event.target.getAttribute('key');
                 this.fire('CHANGE_ROUTE', {path: '/'+key, page: key});
                 //console.log(event.model);

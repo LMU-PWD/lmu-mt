@@ -20,7 +20,7 @@
         </div>
 
         <template is="dom-if" if="[[user.isAdmin]]">
-            <div class="group-placeholder">
+            <div class="group-container">
                 <!-- A D M I N   T O O L B A R -->
                 <admin-toolbar
                         user="[[ user ]]"
@@ -37,7 +37,7 @@
         </template>
 
         <template is="dom-if" if="[[user.isStudent]]">
-            <div class="group-placeholder light-color-text">
+            <div class="group-container light-color-text">
                 <group-card group-name=[[group.name]] on-tap="toggleGroup"></group-card>
                 <iron-collapse id="collapse" opened=true>
                     <group-detail class="group-info"
@@ -49,7 +49,7 @@
             </div>
         </template>
 
-        <div class="practicalsContainer">
+        <div class="practicals-container">
             <div on-tap="_handleFotoTap">
                 <index-card type="Fotopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:"
                             info2="18.05.16, 14-16"></index-card>

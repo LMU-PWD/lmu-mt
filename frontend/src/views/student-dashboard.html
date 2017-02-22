@@ -1,4 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-resizable-behavior/iron-resizable-behavior.html">
+<link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
 <link rel="import" href="../components/group-card.html">
 <link rel="import" href="../components/group-detail.html">
 
@@ -10,7 +12,7 @@
                 height: auto;
             }
 
-            .group-placeholder {
+            .group-container {
                 float: left;
             }
 
@@ -18,7 +20,7 @@
                 /*width: 100%;*/
             }
 
-            .practicalsContainer {
+            .practicals-container {
                 float: left;
             }
 
@@ -33,12 +35,12 @@
 
             /*Phone*/
             @media screen and (max-width: 767px) {
-                .group-placeholder {
+                .group-container {
                     width: 100%;
                     min-width: 320px;
                 }
 
-                .practicalsContainer {
+                .practicals-container {
                     min-width: 320px;
                     width: 100%;
                 }
@@ -50,12 +52,12 @@
 
             /*Tablet*/
             @media screen and (min-width: 768px) and (max-width: 1023px) {
-                .group-placeholder {
+                .group-container {
                     margin: 10px;
                     width: calc(50% - 20px);
                 }
 
-                .practicalsContainer {
+                .practicals-container {
                     margin: 10px;
                     width: calc(50% - 20px);
                 }
@@ -63,12 +65,12 @@
 
             /*Desktop*/
             @media screen and (min-width: 1024px) {
-                .group-placeholder {
+                .group-container {
                     margin: 10px;
                     width: calc(35% - 20px);
                 }
 
-                .practicalsContainer {
+                .practicals-container {
                     margin: 10px;
                     width: calc(35% - 20px);
                 }
@@ -78,17 +80,16 @@
         <div>
 
 
-            <div class="group-placeholder light-color-text">
+            <div class="group-container">
                 <group-card group-name=[[group.name]] on-tap="toggleGroup"></group-card>
                 <iron-collapse id="collapse" opened=true>
                     <group-detail class="group-info"
                                   access-token="[[ accessToken ]]"
                                   group="{{ group }}"
-                                  self-info="{{user}}"
-                                  group-name="{{groupName}}"></group-detail>
+                                  self-info="{{user}}"></group-detail>
                 </iron-collapse>
             </div>
-            <div class="practicalsContainer" on-tap="_handleTap">
+            <div class="practicals-container" on-tap="_handleTap">
                 <div on-tap="_handleFotoTap">
                     <index-card key="photo" type="Fotopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:"
                                 info2="18.05.16, 14-16"></index-card>
@@ -102,8 +103,10 @@
                                 info2="18.05.16, 14-16"></index-card>
                 </div>
             </div>
-
         </div>
+
+        <!--Iron Signal Fired on Logout-->
+        <iron-signals on-iron-signal-forget="_forget"></iron-signals>
 
     </template>
     <script>
@@ -116,9 +119,22 @@
                 },
                 accessToken: {
                     type: String
+                },
+                deviceWidth: {
+                    type: String,
+                    observer: '_deviceChanged'
+                },
+                group:{
+                    type: Object
                 }
 
             },
+            listeners:{
+                'iron-resize': '_handleResize'
+            },
+            behaviors: [
+                    Polymer.IronResizableBehavior
+            ],
             ready: function () {
 
             },
@@ -138,6 +154,39 @@
 
             _userChanged: function (detail) {
                 console.log(detail);
+            },
+            _handleResize: function(event){
+                if(event.target.offsetParent) {
+                    var currentWidth = event.target.offsetParent.clientWidth;
+
+                    if (currentWidth > 1023) {
+                        this.set('deviceWidth', 'Desktop');
+                    } else {
+                        if (currentWidth > 767) {
+                            this.set('deviceWidth', 'Tablet');
+                        } else {
+                            this.set('deviceWidth', 'Mobile');
+                        }
+                    }
+                }
+            },
+            _deviceChanged: function (detail) {
+                var collapse = this.$$('#collapse');
+                switch (detail){
+                    case 'Mobile':
+                        collapse.hide();
+                        break;
+                    case 'Tablet':
+                        collapse.show();
+                        break;
+                    case 'Desktop':
+                        collapse.show();
+                        break;
+                }
+            },
+            _forget: function () {
+                console.info('Reset Group Info');
+                this.set('group',{});
             }
         });
     </script>

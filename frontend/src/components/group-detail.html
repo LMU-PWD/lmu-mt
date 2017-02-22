@@ -226,7 +226,8 @@
                 group: {
                     type: Object,
                     notify: true,
-                    readOnly: false
+                    readOnly: false,
+                    observer: '_groupChanged'
                 },
                 groupSize: {
                     //TODO make input dependent
@@ -409,6 +410,9 @@
                 this.notifyPath('selfInfo.groupId');
                 this.fire('dom-change');
 
+            },
+            _groupChanged: function (detail) {
+                console.log(detail);
             }
 
         });

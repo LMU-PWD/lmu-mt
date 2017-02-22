@@ -35,6 +35,8 @@ The Main View contains:
 <link rel="import" href="../../bower_components/paper-header-panel/paper-header-panel.html">
 <link rel="import" href="../../bower_components/transburger-icon/transburger-icon.html">
 <link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
+<link rel="import" href="../../bower_components/paper-menu-button/paper-menu-button.html">
+<link rel="import" href="../../bower_components/paper-menu/paper-menu.html">
 
 <dom-module id="main-view">
 
@@ -60,12 +62,12 @@ The Main View contains:
 
             /*Tablet*/
             @media screen and (min-width: 768px) and (max-width: 1023px) {
-                .group-placeholder {
+                .group-container {
                     margin: 10px;
                     width: calc(50% - 20px);
                 }
 
-                .practicalsContainer {
+                .practicals-container {
                     margin: 10px;
                     width: calc(50% - 20px);
                 }
@@ -247,7 +249,7 @@ The Main View contains:
             #menu {
                 background-color: var(--paper-blue-grey-800);
                 height: 80px;
-                border-bottom: 10px solid var(--paper-blue-grey-500);
+                /*border-bottom: 10px solid var(--paper-blue-grey-500);*/
                 width: auto;
                 margin: 0 auto;
             }
@@ -284,6 +286,30 @@ The Main View contains:
                 z-index: 10;
                 top: 60px;
             }*/
+            
+            .not-active{
+                display: none !important;
+                opacity: 0;
+                transition: opacity 2s;
+            }
+            .menu-overlay{
+
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0,0,0,0.5);
+                position: fixed;
+                z-index: 10;
+                top: 160px;
+
+                opacity: 1;
+                display: block;
+                transition: opacity 2s;
+            }
+
+            .hidden{
+                visibility: hidden;
+                display: none;
+            }
         </style>
 
         <app-route
@@ -328,8 +354,12 @@ The Main View contains:
 
                     <div class="icon-container">
 
-                        <div class="configuration nav-block no-desktop">
-                            <paper-icon-button id="menu-button" icon="icons:menu" on-tap="_toggleMenu" style=""></paper-icon-button>
+                        <div class="configuration nav-block no-desktop" id="menu-button">
+                            <paper-icon-button icon="icons:menu" on-tap="_toggleMenu" style=""></paper-icon-button>
+                            <paper-tooltip>Menu</paper-tooltip>
+                        </div>
+                        <div class="configuration nav-block no-desktop hidden" id="back-button">
+                            <paper-icon-button icon="icons:back-arrow" on-tap="_goBack" style=""></paper-icon-button>
                             <paper-tooltip>Menu</paper-tooltip>
                         </div>
 
@@ -338,6 +368,17 @@ The Main View contains:
                             <paper-icon-button class="mobile-and-tablet-only" icon="social:notifications"
                                                on-tap="_toggleNotifications"></paper-icon-button>
                         </div>
+
+                        <paper-menu-button>
+                            <paper-icon-button icon="menu" class="dropdown-trigger"></paper-icon-button>
+                            <div class="dropdown-content"> Test Notification Content </div>
+                            </paper-menu-button>
+                            <!--paper-menu class="dropdown-content">
+                                <paper-item>Share</paper-item>
+                                <paper-item>Settings</paper-item>
+                                <paper-item>Help</paper-item>
+                            </paper-menu>
+                        </paper-menu-button-->
 
                         <div class="menu-icon-wrapper desktop-only"> <!--class="configuration nav-block"-->
                             <paper-icon-button class="menu-icon" icon="icons:settings" on-tap="_fireLogoutRequest"></paper-icon-button>
@@ -387,6 +428,7 @@ The Main View contains:
                 </paper-toolbar>
                 <div>
 
+                    <div class="menu-overlay not-active"></div>
                     <!--template is="dom-if" if="{{ showMobileNotifications }}">
                         <notifications-card showlist="{{ showMobileNotifications }}"></notifications-card>
                     </template-->
@@ -402,17 +444,17 @@ The Main View contains:
                             <template is="dom-if" if="{{user.isAdmin}}">
                                 <admin-dashboard
                                         user="{{user}}"
-                                        access-token="{{accessToken}}"></admin-dashboard>
+                                        access-token="[[accessToken]]"></admin-dashboard>
                             </template>
                             <template is="dom-if" if="{{user.isTutor}}">
                                 <tutor-dashboard
                                         user="{{user}}"
-                                        access-token="{{accessToken}}"></tutor-dashboard>
+                                        access-token="[[accessToken]]"></tutor-dashboard>
                             </template>
                             <template is="dom-if" if="{{user.isStudent}}">
                                 <student-dashboard
                                         user="{{user}}"
-                                        access-token="{{accessToken}}"></student-dashboard>
+                                        access-token="[[accessToken]]"></student-dashboard>
                             </template>
                         </div>
 
@@ -543,6 +585,7 @@ The Main View contains:
                 Polymer.AppLocalizeBehavior
             ],
 
+
             attached: function () {
                 <!--TODO import locales globally -->
                 this.loadResources(this.resolveUrl('../shared/locales.json'));
@@ -571,6 +614,13 @@ The Main View contains:
             },
             _toggleMenu: function () {
                 this.$$('#menu').toggle();
+                console.log(this.$$('.menu-overlay'));
+                //this.$$('.menu-overlay').toggleAttribute()
+                //this.toggleClass('is-active',Polymer.dom(this.$$('.menu-overlay')));
+                console.log(this);
+                this.updateStyles();
+                this.$$('.menu-overlay').classList.toggle('not-active');
+                //.toggleAttribute('is-active', true);
             },
             _toggleNotifications: function () {
                 this.$$('#notifications').toggle();
@@ -582,6 +632,9 @@ The Main View contains:
                     this.set('route.path','/dashboard');
                     this.set('routeData.page','dashboard');
                 }
+
+                //Change scroll position -> 0 (on routeChanged)
+                this.$$('paper-header-panel').scroller.scrollTop = 0;
             },
 
             _routeDataChanged: function (detail) {
@@ -597,6 +650,7 @@ The Main View contains:
             },
 
             _fireLogoutRequest: function () {
+                this._toggleMenu();
                 this.fire('USER_LOGOUT');
             },
 
@@ -616,10 +670,12 @@ The Main View contains:
             _handleRouting: function (event) {
                 this.set('route.path',event.detail.path);
                 this.set('routeData.page',event.detail.page);
-                //TODO change scroll position -> 0 (on routeChanged)
-                /*TODO change menu icon to back button
-                this.$$('#menu-button').toggleAttribute('active');
-                this.$$('#back-button').toggleAttribute('active');*/
+                //TODO change menu icon to back button
+
+                //Change scroll position -> 0 (on routeChanged)
+                this.$$('paper-header-panel').scroller.scrollTop = 0;
+                this.$$('#menu-button').toggleClass('hidden');
+                this.$$('#back-button').toggleAttribute('hidden');
             },
 
             _accessTokenChanged: function (detail) {
