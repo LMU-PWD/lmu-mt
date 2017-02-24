@@ -16,12 +16,14 @@ The Main View contains:
 <link rel="import" href="../components/notifications-card.html">
 <link rel="import" href="../components/navigation-bar.html">
 <link rel="import" href="../components/admin-toolbar.html">
+<link rel="import" href="../components/language-switcher.html">
 <link rel="import" href="semester-setup-view.html">
 <link rel="import" href="admin-dashboard.html">
 <link rel="import" href="tutor-dashboard.html">
 <link rel="import" href="student-dashboard.html">
 
 <link rel="import" href="../shared/shared-styles.html">
+
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../../bower_components/iron-collapse/iron-collapse.html">
 <link rel="import" href="../../bower_components/paper-tooltip/paper-tooltip.html">
@@ -34,9 +36,12 @@ The Main View contains:
 <link rel="import" href="../../bower_components/app-layout/app-scroll-effects/app-scroll-effects.html">
 <link rel="import" href="../../bower_components/paper-header-panel/paper-header-panel.html">
 <link rel="import" href="../../bower_components/transburger-icon/transburger-icon.html">
-<link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
 <link rel="import" href="../../bower_components/paper-menu-button/paper-menu-button.html">
 <link rel="import" href="../../bower_components/paper-menu/paper-menu.html">
+
+<!--Localization Imports-->
+<link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
+<link rel="import" href="../services/my-localize-behavior.html">
 
 <dom-module id="main-view">
 
@@ -355,15 +360,17 @@ The Main View contains:
                         <paper-tooltip>Logout</paper-tooltip>
                     </div>
 
+
+
                     <div class="menu-icon-wrapper"> <!--class="configuration nav-block"-->
-                        <paper-icon-button class="menu-icon" icon="icons:settings" on-tap="_fireLogoutRequest"></paper-icon-button>
-                        <paper-tooltip>Logout</paper-tooltip>
+                        <!--paper-icon-button class="menu-icon" icon="icons:language" on-tap="_fireLogoutRequest"></paper-icon-button-->
+                        <language-switcher></language-switcher>
+                        <paper-tooltip>Change Language</paper-tooltip>
+
                     </div>
-
                     <div class="menu-icon-wrapper"> <!--class="configuration nav-block"-->
-                        <paper-icon-button class="menu-icon" icon="icons:language" on-tap="_fireLogoutRequest"></paper-icon-button>
+                        <paper-icon-button class="menu-icon" icon="icons:settings" on-tap=""></paper-icon-button>
                         <paper-tooltip>Logout</paper-tooltip>
-
                     </div>
 
                     <!--div> class="notification  nav-block">
@@ -529,6 +536,7 @@ The Main View contains:
                         </template>
 
                     </iron-pages>
+                    <h1>{{localize('logincard_welcome text-1')}}</h1>
 
 
                     <div>Scroll Content</div>
@@ -560,6 +568,8 @@ The Main View contains:
                     <div>Scroll Content</div>
                     <div>Scroll Content</div>
                     <div>Scroll Content</div>
+
+
 
                 </div>
             </paper-header-panel>
@@ -567,6 +577,10 @@ The Main View contains:
 
         <!--Iron Signal Fired on Logout-->
         <iron-signals on-iron-signal-forget="_forget"></iron-signals>
+
+        <!--Iron Signal for Localization-->
+        <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
+
     </template>
 
 
@@ -577,30 +591,31 @@ The Main View contains:
 
             properties: {
 
+                //Menu/Back Icon Properties
+                activeIcon: String,
                 transburgerChangeTo: {
                     type: String
                 },
 
                 accessToken: {
-                    type: String,
-                    observer: '_accessTokenChanged'
+                    type: String
                 },
                 adminSelectedSemesterId: {
                     //TODO try iron meta
                     type: String
                 },
+
+                //Data Properties
                 group: {
                     type: Object,
                     notify: true,
                     value: {}
                 },
                 user: {
-                    type: Object,
-                    observer: '_userChanged'
-                    /*notify: true,
-                    readOnly: false,
-                    value: {}*/
+                    type: Object
                 },
+
+                //Routing Properties
                 route: {
                     type: Object,
                     notify: true,
@@ -610,30 +625,12 @@ The Main View contains:
                     type: Object,
                     observer: '_routeDataChanged'
                 },
-                language: {
-                    type: String,
-                    value: 'de'
-                },
-                activeIcon: String
             },
 
             behaviors: [
-                Polymer.AppLocalizeBehavior
+                Polymer.MyLocalizeBehavior
             ],
 
-
-            attached: function () {
-                <!--TODO import locales globally -->
-                this.loadResources(this.resolveUrl('../shared/locales.json'));
-            },
-
-            ready: function () {
-
-            },
-
-            observers: [
-                //'_routePageChanged(routeData.page)'
-            ],
             listeners: {
                 'CHANGE_ROUTE' : '_handleRouting',
                 'icon-changed' : '_handleIconChanged'
@@ -653,10 +650,6 @@ The Main View contains:
                 if (!this.user.isAdmin && !this.user.isTutor) {
                     return true;
                 }
-            },
-
-            _switchLocale: function () {
-                this.language = (this.language == 'en') ? 'de' : 'en';
             },
             _toggleMenu: function (detail) {
 
@@ -688,52 +681,47 @@ The Main View contains:
                 this.$$('#notifications').toggle();
             },
 
+            /**
+             * Observing route Changes
+             * @private
+             */
             _routeChanged: function (detail) {
-                console.log(detail);
+
+                //Rerouting from /main to /main/dashboard
                 if(detail.prefix=='/main' && detail.path==''){
                     this.set('route.path','/dashboard');
                     this.set('routeData.page','dashboard');
-
-
                 }
 
                 //Change scroll position -> 0 (on routeChanged)
                 this.$$('paper-header-panel').scroller.scrollTop = 0;
             },
 
+            /**
+             * Observing routeData Changes
+             * @private
+             */
             _routeDataChanged: function (detail) {
-                console.log(detail);
-
+                /* Setting Menu/Back icon back to Menu&Close
+                   Needed for supporting Browsers 'back' functionality */
                 if(detail.page==='dashboard'){
-                    console.log("Dashboard!");
-                    //this.$.transburger.toggleIcon();
-                    //console.log(this.$.transburger);
-
                     this.set('transburgerChangeTo','close');
-                }/*else{
-                    console.log("Not Dashboard!");
-                    this.set('transburgerChangeTo','arrow-left');
-                    this.$.transburger.toggleIcon();
-
-                }*/
-
-            },
-            _userChanged: function (detail) {
-                console.log("User Changed in Main View: ");
-                console.log(detail);
-                if (!this.user.isAdmin && !this.user.isTutor) {
-                    this.set('user.isStudent', true);
                 }
-                console.log(this.user);
             },
 
+            /**
+             * Function handling users tap on logout
+             * Firing USER_LOGOUT to notify my-app
+             * @private
+             */
             _fireLogoutRequest: function () {
+                //Closing the menu to not be opened at next login
                 this._toggleMenu();
                 this.fire('USER_LOGOUT');
             },
 
             /**
-             * Callback fired on logout to reset all data.
+             * Callback fired on logout to reset all data administrated by this module
              * @private
              */
             _forget: function () {
@@ -743,35 +731,21 @@ The Main View contains:
 
             /**
              * Event listener hearing CHANGE_ROUTE to route for child components.
+             * Usage example: on-tap any practical card dashboard fires CHANGE_ROUTE
+             *                with intended page & route as detail
              * @private
              */
             _handleRouting: function (event) {
+                //Route to Page&Path specified in the event
                 this.set('route.path',event.detail.path);
                 this.set('routeData.page',event.detail.page);
-                //TODO change menu icon to back button
 
+                //Change Menu Icon to Back Button
                 this.set('transburgerChangeTo','arrow-left');
                 this.$.transburger.toggleIcon();
 
-
                 //Change scroll position -> 0 (on routeChanged)
                 this.$$('paper-header-panel').scroller.scrollTop = 0;
-                //this.toggleClass('hidden', this.$.menubutton);
-
-                //Working
-                //this.$.menuButton.classList.toggle('hidden');
-                //this.$.backButton.classList.toggle('hidden');
-                //Polymer.dom(this.root).querySelector('#menu-button').toggleClass('hidden');
-                //this.toggleClass('hidden',this.$$('#menu-button'));
-
-                //this.set('transburgerChangeTo','arrow-left');
-                //this.$.transburger.toggleIcon();
-                //this.$$('#back-button').toggleAttribute('hidden');
-                //this.$$('#menu-button').toggleAttribute('hidden');
-            },
-
-            _accessTokenChanged: function (detail) {
-                console.log("Access Token changed to: "+detail);
             }
         });
     </script>

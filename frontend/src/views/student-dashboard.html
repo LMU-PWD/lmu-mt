@@ -4,6 +4,11 @@
 <link rel="import" href="../components/group-card.html">
 <link rel="import" href="../components/group-detail.html">
 
+
+<!--Localization Imports-->
+<link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
+<link rel="import" href="../services/my-localize-behavior.html">
+
 <dom-module id="student-dashboard">
     <template>
         <style>
@@ -108,6 +113,10 @@
         <!--Iron Signal Fired on Logout-->
         <iron-signals on-iron-signal-forget="_forget"></iron-signals>
 
+        <!--Iron Signal for Localization-->
+        <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
+
+
     </template>
     <script>
         Polymer({
@@ -133,7 +142,8 @@
                 'iron-resize': '_handleResize'
             },
             behaviors: [
-                    Polymer.IronResizableBehavior
+                    Polymer.IronResizableBehavior,
+                    Polymer.MyLocalizeBehavior
             ],
             ready: function () {
 

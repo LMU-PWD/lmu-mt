@@ -8,6 +8,11 @@
 <link rel="import" href="../services/get-access-token.html">
 <link rel="import" href="mail-input.html">
 
+<!--Localization Imports-->
+<link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
+<link rel="import" href="../services/my-localize-behavior.html">
+
+
 <dom-module id="group-detail">
 
     <template>
@@ -214,8 +219,10 @@
                     </paper-input-error>
                 </div>
             </div>
-            <iron-signals on-iron-signal-switchlocale="_switchLocale"></iron-signals>
         </template>
+
+        <!--Iron Signal for Localization-->
+        <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
 
     </template>
     <script>
@@ -248,28 +255,14 @@
                     notify: true,
                     readOnly: false,
                     observer: '_selfInfoChanged'
-                },
-                language: {
-                    type: String,
-                    value: 'de'
                 }
             },
             observers: [
                 '_selfInfoGroupIdChanged(selfInfo.groupId)'
             ],
-
-            /**
-             * Localization setup
-             */
             behaviors: [
-                Polymer.AppLocalizeBehavior
+                Polymer.MyLocalizeBehavior
             ],
-            attached: function() {
-                this.loadResources(this.resolveUrl('../shared/locales.json'));
-            },
-            _switchLocale: function() {
-                this.language = (this.language == 'en') ? 'de' : 'en';
-            },
 
             ready: function() {
 

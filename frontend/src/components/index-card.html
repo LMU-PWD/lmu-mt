@@ -1,5 +1,9 @@
 <link rel="import" href="../shared/shared-styles.html">
 
+<!--Localization Imports-->
+<link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
+<link rel="import" href="../services/my-localize-behavior.html">
+
 <dom-module id="index-card">
     <template>
         <style  include="shared-styles">
@@ -90,7 +94,7 @@
                 <div class="form-container">
 
                     <svg class="form-fill" width="40" height="30" version="1.1" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M 0 30  H 40 V 0 Q 30 0 20 15 T 0 30"/>
+                        <path d="M 0 30  H 40 V 0 Q 30 0 20 15 T 0 30"></path>
                     </svg>
                     <div class="back-fill"></div>
                 </div>
@@ -106,6 +110,10 @@
                 </div>
             </div>
         </div>
+
+        <!--Iron Signal for Localization-->
+        <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
+
     </template>
 
     <script>
@@ -133,6 +141,9 @@
                     type: String
                 }
             },
+            behaviors: [
+                Polymer.MyLocalizeBehavior
+            ],
             ready: function () {
                 if(this.type.includes("Photo" || "photo")){
                     this.icon = "../../../images/photo.svg";

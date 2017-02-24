@@ -7,6 +7,11 @@
 <link rel="import" href="../../bower_components/iron-icons/communication-icons.html">
 <link rel="import" href="../shared/shared-styles.html">
 
+<!--Localization Imports-->
+<link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
+<link rel="import" href="../services/my-localize-behavior.html">
+
+
 <dom-module is="registration-card">
 
     <template>
@@ -217,7 +222,11 @@
             </div>
 
         </paper-card>
-        <iron-signals on-iron-signal-switchlocale="_switchLocale"></iron-signals>
+
+        <!--Iron Signal for Localization-->
+        <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
+
+
     </template>
 
     <script>
@@ -276,10 +285,6 @@
                         password: "",
                         confirmPassword: ""
                     }
-                },
-                language: {
-                    type: String,
-                    value: 'de'
                 }
             },
 
@@ -289,19 +294,9 @@
                 '_invalidChanged(invalid.confirmPassword)'
             ],
 
-            /**
-             * Localization setup
-             */
             behaviors: [
-                Polymer.AppLocalizeBehavior
+                Polymer.MyLocalizeBehavior
             ],
-            ready: function() {
-                this.loadResources(this.resolveUrl('../shared/locales.json'));
-            },
-            _switchLocale: function() {
-                this.language = (this.language == 'en') ? 'de' : 'en';
-            },
-
 
             _validateConfirmPasswordInput: function () {
                 if (this.userInput.password === this.userInput.confirmPassword) {

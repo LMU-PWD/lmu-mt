@@ -1,5 +1,10 @@
 <link rel="import" href="../shared/shared-styles.html">
 
+<!--Localization Imports-->
+<link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
+<link rel="import" href="../services/my-localize-behavior.html">
+
+
 <dom-module id="notifications-card">
     <template>
         <style  include="shared-styles">
@@ -79,7 +84,11 @@
             <div class="notification_item">
                 <span class="text">{{localize('notifications-card none')}}</span>
             </div>
-            <iron-signals on-iron-signal-switchlocale="_switchLocale"></iron-signals>
+
+            <!--Iron Signal for Localization-->
+            <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
+
+
         </div>
     </template>
 
@@ -91,30 +100,14 @@
         properties: {
           showlist: {
             type: Boolean
-          },
-          language: {
-            value: 'de',
-            type: String
           }
         },
-
         observers: [
           '_toggleList(showlist)'
         ],
-
-        /**
-         * Localization setup
-         */
-        behaviors: [
-            Polymer.AppLocalizeBehavior
-        ],
-        attached: function() {
-            this.loadResources(this.resolveUrl('../shared/locales.json'));
-        },
-        _switchLocale: function() {
-            this.language = (this.language == 'en') ? 'de' : 'en';
-        }
-
+          behaviors: [
+              Polymer.MyLocalizeBehavior
+          ]
       });
     </script>
 </dom-module>

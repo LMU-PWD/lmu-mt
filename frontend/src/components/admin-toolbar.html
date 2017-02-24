@@ -3,6 +3,10 @@
 <link rel="import" href="../../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../../bower_components/paper-tooltip/paper-tooltip.html">
 
+<!--Localization Imports-->
+<link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
+<link rel="import" href="../services/my-localize-behavior.html">
+
 <dom-module id="admin-toolbar">
 
     <template>
@@ -52,7 +56,7 @@
                 animation-delay="0"
                 fit-to-visible-bounds="true">[[ localize('admin_toolbar_new_semester_tooltip') ]]</paper-tooltip>
 
-        <iron-signals on-iron-signal-switchlocale="_switchLocale"></iron-signals>
+        <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
 
     </template>
 
@@ -75,11 +79,6 @@
                 dropdownSelectedItemLabel: {
                     type: String,
                     notify: true
-                },
-
-                language: {
-                    value: 'de',
-                    type: String
                 },
 
                 mainViewPage: {
@@ -112,26 +111,9 @@
                 }
 
             },
-
-            /**
-             * Localization setup
-             */
             behaviors: [
-                Polymer.AppLocalizeBehavior
+                Polymer.MyLocalizeBehavior
             ],
-
-            attached: function () {
-
-                this.loadResources(this.resolveUrl('../shared/locales.json'));
-
-                this.ajax = {
-                    headers: {
-                        Authorization: this.accessToken
-                    },
-                    method: 'GET',
-                    endpoint: '/semesters'
-                }
-            },
 
             /** Helper function for determining preselected semester by examining
              *  start and end dates. If current time is between start and end date
@@ -181,10 +163,6 @@
                 // semester array
                 return this.semesters.length - 1;
 
-            },
-
-            _switchLocale: function(e) {
-                this.language = (this.language == 'en') ? 'de' : 'en';
             },
 
             _handleSemesterResponse: function (event) {

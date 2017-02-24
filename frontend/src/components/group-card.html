@@ -1,6 +1,11 @@
 <link rel="import" href="../shared/shared-styles.html">
 <link rel="import" href="group-detail.html">
 
+<!--Localization Imports-->
+<link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
+<link rel="import" href="../services/my-localize-behavior.html">
+
+
 <dom-module id="group-card">
     <template>
         <style  include="shared-styles">
@@ -50,7 +55,7 @@
             </div>
             <h1 id="groupname">[[localize('groupcard_tritt bei')]]</h1>
         </div>
-        <iron-signals on-iron-signal-switchlocale="_switchLocale"></iron-signals>
+        <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
     </template>
 
     <script>
@@ -67,15 +72,14 @@
                 expanded: {
                     type: Boolean,
                     value: false
-                },
-                language: {
-                  type: String,
-                  value: 'de'
                 }
             },
 
             observers: [
               "_onGroupNameSet(groupName)"
+            ],
+            behaviors: [
+                Polymer.MyLocalizeBehavior
             ],
 
             ready: function() {
@@ -84,20 +88,6 @@
                     this.updateStyles();
                     console.log("Updated Height");
                 }
-            },
-
-            /**
-            * Localization setup
-            */
-            behaviors: [
-                Polymer.AppLocalizeBehavior
-            ],
-            attached: function() {
-                this.loadResources(this.resolveUrl('../shared/locales.json'));
-            },
-            _switchLocale: function() {
-                this.language = (this.language == 'en') ? 'de' : 'en';
-                this._onGroupNameSet(this.groupName);
             },
 
             /**

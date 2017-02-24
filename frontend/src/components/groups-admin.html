@@ -11,6 +11,11 @@
 <link rel="import" href="../services/get-access-token.html">
 <link rel="import" href="mail-input.html">
 
+<!--Localization Imports-->
+<link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
+<link rel="import" href="../services/my-localize-behavior.html">
+
+
 <dom-module id="groups-admin">
 
     <template>
@@ -148,7 +153,10 @@
 
         </template>
         </div>
-        <iron-signals on-iron-signal-switchlocale="_switchLocale"></iron-signals>
+
+        <!--Iron Signal for Localization-->
+        <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
+
     </template>
     <script>
         Polymer({
@@ -174,22 +182,12 @@
                     type: String
                 }
             },
+            behaviors: [
+                Polymer.MyLocalizeBehavior
+            ],
 
             ready: function () {
                 this._groupsChanged();
-            },
-
-            /**
-             * Localization setup
-             */
-            behaviors: [
-                Polymer.AppLocalizeBehavior
-            ],
-            attached: function() {
-                this.loadResources(this.resolveUrl('../shared/locales.json'));
-            },
-            _switchLocale: function() {
-                this.language = (this.language == 'en') ? 'de' : 'en';
             },
 
             _groupsChanged: function () {

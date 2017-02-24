@@ -9,17 +9,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 
 <link rel="import" href="../bower_components/polymer/polymer.html">
-<link rel="import" href="../bower_components/app-localize-behavior/app-localize-behavior.html">
 <link rel="import" href="../bower_components/app-route/app-location.html">
 <link rel="import" href="../bower_components/app-route/app-route.html">
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../bower_components/iron-selector/iron-selector.html">
-<link rel="import" href="../bower_components/iron-signals/iron-signals.html">
 
 <link rel="import" href="services/api-request.html">
 <link rel="import" href="views/login-view.html">
 <link rel="import" href="views/main-view.html">
 <link rel="import" href="views/error-view.html">
+
+<!--Localization Imports-->
+<link rel="import" href="../bower_components/iron-signals/iron-signals.html">
+<link rel="import" href="services/my-localize-behavior.html">
+
 
 <dom-module id="my-app">
     <template>
@@ -67,6 +70,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         </iron-pages>
 
+        <!--Iron Signal for Localization-->
+        <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
+
 
     </template>
 
@@ -104,6 +110,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 'USER_LOGOUT': '_fireLogoutRequest',
                 'USER_LOGIN': '_handleLogin'
             },
+            behaviors: [
+                    Polymer.MyLocalizeBehavior
+            ],
 
 
             ready: function () {
@@ -164,6 +173,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
              */
             _handleUserResponse: function (response) {
                 this.set('user', response.detail);
+                //Set userRole flag for student if not Admin or Tutor
+                if (!this.user.isAdmin && !this.user.isTutor) {
+                    this.set('user.isStudent', true);
+                }
                 this.set('route.path', '/main');
                 this.set('routeData.page', 'main');
                 this.set('session.loggedIn', true);
