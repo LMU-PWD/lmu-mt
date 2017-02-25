@@ -1,4 +1,4 @@
-<dom-module id="date-creator">
+<dom-module id="tutor-date-creator">
     <template>
         <style include="shared-styles">
             :host{
@@ -10,7 +10,7 @@
                 color: var(--paper-blue-grey-100);
                 font-size: 18px;
             }
-            .slot{
+            .lab{
                 border-style: solid;
                 border-width: 1px;
                 border-color: var(--paper-blue-grey-100);
@@ -38,31 +38,17 @@
             <div class="date">
                 [[date]]
             </div>
-            <template is="dom-repeat" items="[[timeslots]]" as="slot" >
-                <paper-item id="slot" class="slot" on-tap="_handleDateClick">
-                    [[_getTimeSlotString(slot)]]
+            <template is="dom-repeat" items="[[timeslots]]" as="lab" >
+                <paper-item id="lab" class="lab" on-tap="_handleDateClick">
+                    [[_getTimeSlotString(lab)]]
                     <div id="priorityShower"></div>
                 </paper-item>
-                <iron-collapse id="priorityselection">
-                    <div>
-                        <paper-dropdown-menu label="Priorität: ">
-                            <paper-listbox class="dropdown-content">
-                                <template is="dom-repeat" items="[[priorities]]" as="selector">
-                                    <template is="dom-if" if="[[_computeSelector(selector)]]">
-                                          <paper-item on-tap="_handlePriorityClick">[[selector]]</paper-item>
-                                    </template>
-                                </template>
-                            </paper-listbox>
-                        </paper-dropdown-menu>
-                        <div>(1 - gering; [[priority]] - hoch)</div>
-                    </div>
-                </iron-collapse>
             </template>
         </div>
     </template>
     <script>
         Polymer({
-            is: 'date-creator',
+            is: 'tutor-date-creator',
             properties: {
                 timeslots:{
                     type: Array,
@@ -72,23 +58,22 @@
                     type: String,
                     value: ""
                 },
-                priority:{
-                    type: Number,
-                    value: 0
+                chosenlabindex:{
+                    type: Number
                 },
-                priorities:{
+                chosenlabs:{
                     type: Array,
-                    value: [],
-                    notify: true
+                    value: []
                 },
                 chosenpriority:{
                     type: Number,
                     value: 0
                 },
-                chosenslotindex:{
-                    type: Number
+                chosencounter:{
+                    type: Number,
+                    value: 0
                 },
-                recentslot: {
+                recentlab: {
                     type: Object
                 },
                 recentpriorityselection:{
@@ -97,10 +82,7 @@
             },
             ready: function() {
                 this.date = this._getDateString(this.timeslots[0][0]);
-
-                for (i = 0; i < this.priority; i++) {
-                        this.priorities[i]=i+1;
-                }
+                console.log(this.timeslots);
             },
 
             /**
@@ -178,46 +160,25 @@
             _handleDateClick: function(e){
                 this.fire("date-click");
 
-                this.chosenslotindex = e.model.index;
+                this.chosenlabindex = e.model.index;
+                this.recentlab = e.target;
 
-
-                //If there is a visible priorityselection, hide it
-                if(this.recentpriorityselection){
-                    this.recentpriorityselection.hide();
+                if(this.recentlab.style.color == 'green'){
+                    this.recentlab.style.color = '';
+                    this.recentlab.style.backgroundColor = '';
+                    this.chosenlabs = this.chosenlabs.filter(function(item){return item == this.recentlab;});
                 }
-
-                // Get clicked priorityselection
-                this.recentpriorityselection = Polymer.dom(this.root).querySelectorAll("#priorityselection")[e.model.index];
-                this.recentpriorityselection.toggle(); //Show Priorityselection
-                this.recentslot = e.target;
-
-                //Array-Mutation to force the priorityselection-Dom-Repeat to update
-                var array = this.priorities;
-                this.priorities = [];
-                this.priorities = array;
+                else {
+                    this.recentlab.style.color = 'green';
+                    this.recentlab.style.backgroundColor = '#CEF6CE';
+                    this.chosenlabs.push(this.recentlab);
+                }
+                console.log(this.chosenlabs);
             },
 
-            /**
-             * Click-Event handler
-             * Handles the priority selection and fires the priority-click-Event
-             * @param {String} e - handle data
-             */
-            _handlePriorityClick: function(e){
-                if(e.model.selector){
-                    this.chosenpriority = e.model.selector;
-                    if(this.recentslot.lastChild.textContent.search('Priorität:')>=0){
-                        this.fire("replace-priority");
-                        //TODO: replace slot on practical-date-detail chosenslots-Array and priorities-Array
-                    }
-                    this.fire("priority-click"); //Notifies Parent (practical-date-detail.html)
-                    this.recentpriorityselection.toggle(); //Hide Priorityselection
-                    this.recentslot.style.color = 'green';
-                    this.recentslot.style.backgroundColor = '#CEF6CE';
-                    this.recentslot.lastChild.textContent = 'Priorität: ' + e.model.selector;
-                    //this.recentslot.innerHTML = this.recentslot.innerHTML +'<div id="priorityShower">'+'Priorität: ' + e.model.selector+'</div>';
-                }
+            _checkFilled: function(arrayItem){
+                return arrayItem == '';
             },
-
             /**
              * Checks if given Parameter is 0 and returns true of false
              * @param selector - Given parameter
@@ -232,15 +193,16 @@
                 return response;
             },
             /**
-             * Reset slotselection on Button click
+             * Reset labselection on Button click
              * @private
              */
             _resetSelection: function(){
-                var slots = Polymer.dom(this.root).querySelectorAll("#slot");
-                for(j=0; j < slots.length; j++){
-                    slots[j].lastChild.textContent = '';
-                    slots[j].style.color = '';
-                    slots[j].style.backgroundColor = '';
+                this.chosenlabs =[];
+                var labs = Polymer.dom(this.root).querySelectorAll("#lab");
+                for(j=0; j < labs.length; j++){
+                    labs[j].lastChild.textContent = '';
+                    labs[j].style.color = '';
+                    labs[j].style.backgroundColor = '';
                 }
             }
         });
