@@ -393,7 +393,6 @@
                     };
                 }
             },
-
             /**
              * Handle tap on Back-Button
              */
@@ -472,6 +471,7 @@
              */
             _handleLabTypesRequest: function (event) {
                 //console.log('_handleLabTypesRequest()');
+                //console.log(event.detail);
 
                 if(!this.isReady)
                     return;
@@ -493,10 +493,10 @@
                 }
                 this.gotLabTypes = true;
 
-                //console.log("Labtypes: ");
-                //console.log(this.labtype_foto);
-                //console.log(this.labtype_video);
-                //console.log(this.labtype_audio);
+                console.log("Labtypes: ");
+                console.log(this.labtype_foto);
+                console.log(this.labtype_video);
+                console.log(this.labtype_audio);
 
             },
             /**
@@ -506,6 +506,7 @@
              */
             _handleAllLabsRequest: function (event) {
                 //console.log('_handleLabRequest()');
+                //console.log(event.detail);
 
                 if(!this.isReady || this.gotLabTypes == false)
                     return;
@@ -528,24 +529,13 @@
                     }
 
                     this.allLabs.push(event.detail[i]);
-
-                    // TODO: Delete this block when labtype is working
-                    this.all_labs_foto.push(event.detail[i]);
-                    this.all_labs_foto.push(event.detail[i]);
-                    this.all_labs_foto.push(event.detail[i]);
-                    this.all_labs_foto.push(event.detail[i]);
-                    this.all_labs_video.push(event.detail[i]);
-                    this.all_labs_video.push(event.detail[i]);
-                    this.all_labs_video.push(event.detail[i]);
-                    this.all_labs_audio.push(event.detail[i]);
-                    //
                 }
 
-                //console.log("AllLabs: ");
-                //console.log(this.allLabs);
-                //console.log(this.all_labs_foto);
-                //console.log(this.all_labs_video);
-                //console.log(this.all_labs_audio);
+                console.log("AllLabs: ");
+                console.log(this.allLabs);
+                console.log(this.all_labs_foto);
+                console.log(this.all_labs_video);
+                console.log(this.all_labs_audio);
 
                 if (this.semesterId && this.labTypesRequestSent) {
                     this.labsRequestSent = true;
@@ -559,6 +549,7 @@
              */
             _handlePriosRequest: function(event){
                 //console.log('_handlePriosRequest()');
+                //console.log(event.detail);
 
                 if(!this.isReady || this.gotLabTypes == false)
                     return;
@@ -580,18 +571,10 @@
                     }
                 }
 
-                // TODO: Delete this block when labtype is working
-                this.groupdata_foto.priorities[event.detail.priority-1] = lab;
-                this.groupdata_foto.priorities[event.detail.priority] = lab;
-                this.groupdata_foto.priorities[event.detail.priority+1] = lab;
-                //this.groupdata_video.priorities[event.detail.priority-1] = lab;
-                this.groupdata_audio.priorities[event.detail.priority-1] = lab;
-                //
-
-                //console.log("Group Prios:");
-                //console.log(this.groupdata_foto.priorities);
-                //console.log(this.groupdata_video.priorities);
-                //console.log(this.groupdata_audio.priorities);
+                console.log("Group Prios:");
+                console.log(this.groupdata_foto.priorities);
+                console.log(this.groupdata_video.priorities);
+                console.log(this.groupdata_audio.priorities);
 
             },
 
@@ -602,24 +585,22 @@
              */
             _handleGroupLabsRequest: function(event){
                 //console.log('_handleGroupLabsRequest()');
+                //console.log(event.detail);
 
                 if(!this.isReady || this.gotLabTypes == false)
                     return;
 
-
-                if (event.detail.labTypeId == this.labtype_audio.id)
+                if (event.detail.labTypeId == this.labtype_foto.id)
                     this.groupdata_audio.lab = new Date(event.detail.date);
                 if (event.detail.labTypeId == this.labtype_video.id)
                     this.groupdata_video.lab = new Date(event.detail.date);
-                if (event.detail.labTypeId == this.labtype_foto.id)
+                if (event.detail.labTypeId == this.labtype_audio.id)
                     this.groupdata_foto.lab = new Date(event.detail.date);
 
-                this.groupdata_audio.lab = new Date(event.detail.date);
-
-                //console.log("Group Labs:");
-                //console.log(this.groupdata_foto.lab);
-                //console.log(this.groupdata_video.lab);
-                //console.log(this.groupdata_audio.lab);
+                console.log("Group Labs:");
+                console.log(this.groupdata_foto.lab);
+                console.log(this.groupdata_video.lab);
+                console.log(this.groupdata_audio.lab);
             },
 
             isStudent: function () {

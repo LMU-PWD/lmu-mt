@@ -65,7 +65,7 @@
                     </template>
                 </template>
                 <template is="dom-if" if="[[!before_deadline]]">
-                    <!-- Deadline is over but Registration has been started-->
+                    <!-- Deadline is over and Registration has been started-->
                     <template is="dom-if" if="[[!practical_date_exists]]">
                         <!-- Deadline is over, Registration has been started but Practical Date is not given -->
                         <practicals-show-saved-dates chosenlabs="{{chosenlabs_transformed}}"></practicals-show-saved-dates>
@@ -141,7 +141,9 @@
             },
             ready: function () {
                 this.practical_date = this.labData.lab;
+
                 this.practical_date_exists = this._dateExists(this.practical_date);
+                //console.log(this.labData);
                 if(this.practical_date_exists){
                     this.practical_date_string = this._getDateString(this.practical_date);
                 }
@@ -154,8 +156,12 @@
                     }
                 }
                 this.before_deadline = this._getBeforeDeadline(this.labType.registration_deadline);
-                this.registration_open = this.labType.registration_open;
-                //this.registration_open = true;
+                if(!this.practical_date_exists && (this.allLabs == [] || this.allLabs == null)){
+                    this.registration_open = false;
+                }
+                else{
+                    this.registration_open = this.labType.registration_open;
+                }
             },
             /**
              * Back-button click handler
@@ -183,9 +189,10 @@
                     this.chosenlabs_transformed = this._transformLabs(this.chosenlabs,false);
 
                     //console.log(this.labType.id);
-                    //console.log(this.group.id);
+                    console.log(this.group.priorityIds);
+
                     // Step 1. Delete existing priority object
-                    this.ajax = {
+                    /*this.ajax = {
                         headers: {
                             'Authorization' : this.accessToken
                         },
@@ -195,29 +202,78 @@
                         method: 'DELETE',
                         endpoint: '/groups/' + this.group.id + '/priorities/'
 
-                    };
+                    };*/
                     //console.log(this.ajax);
 
-                    for(i = 0; i<this.chosenlabs; i++) {
-                        console.log(this.chosenlabs[i].id);
+
+                    for(i = 0; i<this.chosenlabs.length; i++) {
+                        console.log(this.group.priorityIds[i]);
+                        //console.log(this.chosenlabs[i].id);
                         // Step 2. Save a new priority object
-                        this.ajax = {
-                            headers: {
-                                'Authorization': this.accessToken
-                            },
-                            body: {
-                                priority: i,
-                                groupId: this.group.id,
-                                labId: this.chosenlabs[i].id,
-                                semesterId: this.group.semesterId,
-                                labTypeId: this.labType.id
-                            },
-                            method: 'POST',
-                            endpoint: '/groups/' + this.group.id + '/priorities/'
+                        if(this.group.priorityIds[i]) {
+                            this.ajax = {
+                                headers: {
+                                    'Authorization': this.accessToken
+                                },
+                                body: {
 
-                        };
+                                    priority: i,
+                                    groupId: this.group.id,
+                                    labId: this.chosenlabs[i].id,
+                                    semesterId: this.group.semesterId,
+                                    labTypeId: this.labType.id
 
-                        //console.log(this.ajax);
+                                },
+                                method: 'POST',
+                                endpoint: '/priorities/' + this.group.priorityIds[i]
+
+                            };
+                            console.log(this.ajax);
+                        }
+                        else{
+                            this.ajax = {
+                                headers: {
+                                    'Authorization': this.accessToken
+                                },
+                                body: {
+
+                                    priority: i,
+                                    groupId: this.group.id,
+                                    labId: this.chosenlabs[i].id,
+                                    semesterId: this.group.semesterId,
+                                    labTypeId: this.labType.id
+
+                                },
+                                method: 'POST',
+                                endpoint: '/priorities'
+
+                            };
+                            console.log(this.ajax);
+                        }
+
+
+                        /*//Replace Priorities on API
+                        for(i = 0; i<this.chosenlabs; i++) {
+                            console.log(this.chosenlabs[i].id);
+                            if(this.group.priorityIds.length > 0) {
+
+                                this.ajax = {
+                                    headers: {
+                                        'Authorization': this.accessToken
+                                    },
+                                    body: {
+                                        priority: i,
+                                        groupId: this.group.id,
+                                        labId: this.chosenlabs[i].id,
+                                        semesterId: this.group.semesterId,
+                                        labTypeId: this.labType.id
+                                    },
+                                    method: 'POST',
+                                    endpoint: '/priorities/' + this.group.priorityIds[i]
+
+                                };
+                            }
+                            //console.log(this.ajax);*/
                     }
 
                     this.labs_already_chosen = true;
@@ -268,7 +324,7 @@
                 if(labs == [] || labs == null || labs.length == 0){
                     return  false;
                 }
-                if(labs[0].date == null || labs[0].date == 0){
+                if(labs[0].date == null){
                     return  false;
                 }
                 return  true;

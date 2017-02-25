@@ -236,49 +236,51 @@
              * @private
              */
             _transformLabs: function(labsFromApi,divideDates){
-                //console.log(labsFromApi);
-                var transformedLabs = []; //Store return-Array here
-                var lastLab = new Date(labsFromApi[0].date);
-                var countDates = 0; //Date counter
-                var countLabs = 0; //lab counter
-                var dates = [];
+                if(labsFromApi[0]) {
+                    //console.log(labsFromApi);
+                    var transformedLabs = []; //Store return-Array here
+                    var lastLab = new Date(labsFromApi[0].date);
+                    var countDates = 0; //Date counter
+                    var countLabs = 0; //lab counter
+                    var dates = [];
 
-                for(i=0; i<labsFromApi.length; i++){
-                    // Create a new array-entrie if date from recent lab is different from date of the last lab
-                    var labdate = new Date(labsFromApi[i].date);
-                    if(labdate.getFullYear() != lastLab.getFullYear() ||
-                        labdate.getMonth() != lastLab.getMonth() ||
-                        labdate.getDate() != lastLab.getDate()) {
-                        dates = [];
-                        lastlab = labdate.date;
-                        transformedLabs.push([]);
-                        countDates++;
-                        countLabs = 0;
-                    }
-                    var endtime = new Date(labdate.getFullYear(), labdate.getMonth(), labdate.getDate());
-                    if((labdate.getMinutes() + (labsFromApi[i].duration % 60)) > 60){
-                        endtime.setHours(1+Math.floor(labdate.getHours()+(labsFromApi[i].duration) / 60));
-                        endtime.setMinutes(labdate.getMinutes() + (labsFromApi[i].duration % 60)-60);
-                    }
-                    else{
-                        endtime.setHours(Math.floor(labdate.getHours()+(labsFromApi[i].duration) / 60));
-                        endtime.setMinutes(labdate.getMinutes() + (labsFromApi[i].duration % 60));
-                    }
+                    for (i = 0; i < labsFromApi.length; i++) {
+                        // Create a new array-entrie if date from recent lab is different from date of the last lab
+                        var labdate = new Date(labsFromApi[i].date);
+                        if (labdate.getFullYear() != lastLab.getFullYear() ||
+                            labdate.getMonth() != lastLab.getMonth() ||
+                            labdate.getDate() != lastLab.getDate()) {
+                            dates = [];
+                            lastlab = labdate.date;
+                            transformedLabs.push([]);
+                            countDates++;
+                            countLabs = 0;
+                        }
+                        var endtime = new Date(labdate.getFullYear(), labdate.getMonth(), labdate.getDate());
+                        if ((labdate.getMinutes() + (labsFromApi[i].duration % 60)) > 60) {
+                            endtime.setHours(1 + Math.floor(labdate.getHours() + (labsFromApi[i].duration) / 60));
+                            endtime.setMinutes(labdate.getMinutes() + (labsFromApi[i].duration % 60) - 60);
+                        }
+                        else {
+                            endtime.setHours(Math.floor(labdate.getHours() + (labsFromApi[i].duration) / 60));
+                            endtime.setMinutes(labdate.getMinutes() + (labsFromApi[i].duration % 60));
+                        }
 
-                    var lab = [];
-                    lab = [labdate, endtime];
-                    if(divideDates){
-                        dates[countLabs] = lab;
-                        transformedLabs[countDates] = dates;
-                        countLabs++;
+                        var lab = [];
+                        lab = [labdate, endtime];
+                        if (divideDates) {
+                            dates[countLabs] = lab;
+                            transformedLabs[countDates] = dates;
+                            countLabs++;
+                        }
+                        else {
+                            transformedLabs[i] = lab;
+                        }
                     }
-                    else{
-                        transformedLabs[i]=lab;
-                    }
+                    //console.log("transformed labs: ");
+                    //console.log(transformedLabs);
+                    return transformedLabs;
                 }
-                //console.log("transformed labs: ");
-                //console.log(transformedLabs);
-                return transformedLabs;
             }
         });
     </script>

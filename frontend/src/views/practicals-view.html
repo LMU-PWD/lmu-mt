@@ -64,14 +64,6 @@
             }
         </style>
 
-        <api-request
-            id="ajax_savePriorities"
-            body="[[ ajax.body ]]"
-            headers="[[ ajax.headers ]]"
-            method="[[ ajax.method ]]"
-            endpoint="[[ ajax.endpoint ]]"
-            response="{{ response_savePriorities }}"
-            loading="{{ isLoading }}"></api-request>
 
         <div class="page">
             <img class="icon" src=[[icon]] z-index="1">
@@ -89,7 +81,7 @@
                     </div>
                     <div>
                         <h1>Terminauswahl</h1>
-                        <practicals-students-date-detail group="[[ group ]]"
+                        <practicals-students-date-detail group="{{ group }}"
                                                          user="[[ user ]]"
                                                          lab-type="[[labType]]"
                                                          lab-data="[[labData]]"
@@ -136,10 +128,6 @@
                     type: Boolean,
                     value: false
                 },
-                response_savePriorities: {
-                    type: Object,
-                    observer: '_responseFromPrioritySave'
-                },
                 user: Object,
                 group: Object,
                 labData: Object,
@@ -158,17 +146,6 @@
              */
             _backClicked: function(e) {
               this.fire("back-click");
-            },
-
-            /**
-             * Gets response from API call to create a new priority
-             * @param response
-             * @private
-             */
-            _responseFromPrioritySave: function(response) {
-                if (!this.isReady)
-                    return;
-                console.log(response);
             }
         });
     </script>
