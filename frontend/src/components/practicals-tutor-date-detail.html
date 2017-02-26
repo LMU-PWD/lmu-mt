@@ -1,7 +1,7 @@
-<link rel="import" href="../components/tutor-date-selector.html">
+<link rel="import" href="../components/practicals-tutor-date-selector.html">
 <link rel="import" href="../components/practicals-show-saved-dates.html">
 
-<dom-module id="practicals-date-detail">
+<dom-module id="practicals-tutor-date-detail">
     <template>
         <style include="shared-styles">
             :host {
@@ -46,13 +46,12 @@
                 <template is="dom-if" if="[[before_deadline]]">
                     <template is="dom-if" if="[[!labs_already_chosen]]" >
                         <!-- Deadline is not over, Registration Open and no dates selected; Select your dates!-->
-                        <tutor-date-selector  id="practicalsDateSelector"
+                        <practicals-tutor-date-selector  id="practicalsDateSelector"
                                                    priority="[[priority]]"
-                                                   api-priorities="{{ labdata.priorities }}"
                                                    user="[[ user ]]"
                                                    api-all-labs="[[allLabs]]"
                                                    on-save-click="_handleSaveClick"
-                                                   on-reset-click="_handleResetClick"></tutor-date-selector>
+                                                   on-reset-click="_handleResetClick"></practicals-tutor-date-selector>
                     </template>
                     <template is="dom-if" if="[[labs_already_chosen]]">
                         <!-- Deadline is not over, Registration Open and dates selected; Show saved dates!-->
@@ -66,15 +65,17 @@
                 </template>
                 <template is="dom-if" if="[[!before_deadline]]">
                     <!-- Deadline is over and Registration has been started-->
-                    <template is="dom-if" if="[[!practical_date_exists]]">
+                    <template is="dom-if" if="[[!practical_dates_exists]]">
                         <!-- Deadline is over, Registration has been started but Practical Date is not given -->
-                        <practicals-show-saved-dates chosenlabs="{{chosenlabs_transformed}}"></practicals-show-saved-dates>
+                        <practicals-show-saved-dates
+                                chosenlabs="{{chosenlabs_transformed}}"
+                                title="Du hast diese Termine ausgewählt:"></practicals-show-saved-dates>
                     </template>
-                    <template is="dom-if" if="[[practical_date_exists]]">
+                    <template is="dom-if" if="[[practical_dates_exists]]">
                         <!-- Deadline is over, Registration has been started and Practical Date is given-->
-                        <div>
-                            Dein Praktikumstermin ist am [[practical_date_string]]
-                        </div>
+                        <practicals-show-saved-dates
+                                chosenlabs="{{practical_dates_transformed}}"
+                                title="Das sind deine Praktikumstermine:"></practicals-show-saved-dates>
                     </template>
                 </template>
             </template>
@@ -90,7 +91,7 @@
 
     <script>
         Polymer({
-            is: 'practicals-date-detail',
+            is: 'practicals-tutor-date-detail',
             properties: {
                 accessToken: {
                     type: String,
@@ -104,11 +105,12 @@
                     type: Array,
                     value: []
                 },
-                practical_date:{
-                    type: Date,
+                practical_dates:{
+                    type: Array,
+                    value: [],
                     notify: true
                 },
-                practical_date_exists:{
+                practical_dates_exists:{
                     type: Boolean
                 },
                 priority:{
@@ -132,35 +134,52 @@
                 },
                 group: Object,
                 user: Object,
+                userId: {
+                    type: String
+                },
                 allLabs: {
                     type: Array,
                     value: []
                 },
-                labData: Object,
                 labType: Object
             },
             ready: function () {
-                this.practical_date = this.labData.lab;
-
-                this.practical_date_exists = this._dateExists(this.practical_date);
-                //console.log(this.labData);
-                if(this.practical_date_exists){
-                    this.practical_date_string = this._getDateString(this.practical_date);
+                console.log(this.labType.type_str);
+                //console.log(this.user);
+                //console.log(this.userId);
+                this.practical_dates = this._getPracticalDates(this.allLabs);
+                console.log(this.practical_dates);
+                this.practical_dates_exists = this._practicalDateExists(this.practical_dates);
+                if(this.practical_dates_exists){
+                    this.practical_dates_transformed = this._transformLabs(this.practical_dates,false);
                 }
                 else{
-                    this.labs_already_chosen = this._chosenlabsExist(this.labData.priorities);
+                    console.log(this.user.tutorPossibleLabs);
+
+                    //TODO: Achtung die folgenden Zeilen funktionieren NOCH nicht
+                    this.labs_already_chosen = false;
+
+                    /*this.labs_already_chosen = this._chosenlabsExist(this.user.tutorPossibleLabs);
                     if(this.labs_already_chosen){
-                        this.chosenlabs = this.labData.priorities;
+                        this.chosenlabs = this.user.tutorPossibleLabs;
                         this.chosenlabs_transformed = this._transformLabs(this.chosenlabs,false);
-                        //console.log(this.labData.priorities);
-                    }
+                    }*/
                 }
-                this.before_deadline = this._getBeforeDeadline(this.labType.registration_deadline);
-                if(!this.practical_date_exists && (this.allLabs == [] || this.allLabs == null)){
+                this.before_deadline = this._getBeforeDeadline(this.labType.registration_deadline_tutors);
+                if(!this.practical_dates_exists && (this.allLabs == [] || this.allLabs == null)){
                     this.registration_open = false;
                 }
                 else{
-                    this.registration_open = this.labType.registration_open;
+                    this.registration_open = true;
+                }
+
+                if(this.practical_dates_exists && this.before_deadline){
+                    console.log("ERROR: Die Praktikumsdaten können nicht vor der Deadline zugewiesen sein. Daten sind hier inkorrekt! LabType: "+this.labType.type_str);
+                    console.log("before_deadline wird statisch auf false gesetzt, damit die Anzeige nicht leer ist");
+                    this.before_deadline = false;
+                }
+                if(!this.before_deadline && !this.practical_dates_exists && !this.labs_already_chosen){
+                    console.log("ERROR: Die Deadline ist vorbei und trotzdem existieren weder zugewiesene noch ausgewählte Labs. Daten sind hier inkorrekt! LabType: "+this.labType.type_str);
                 }
             },
             /**
@@ -168,6 +187,21 @@
              */
             _backClicked: function(e) {
                 this.fire("back-click");
+            },
+
+            /**
+             * Check all Labs with this labtype for their tutorIDs
+             */
+            _getPracticalDates: function(labs){
+                //console.log(labs);
+                var labsForThisTutor = [];
+                for(i = 0; i<labs.length; i++){
+                    if(labs[i].tutorId == this.userId){
+                        labsForThisTutor.push(labs[i])
+                    }
+                }
+                //console.log(labsForThisTutor);
+                return labsForThisTutor;
             },
 
             /**
@@ -188,29 +222,11 @@
                     this.chosenlabs = e.target.chosenlabs;
                     this.chosenlabs_transformed = this._transformLabs(this.chosenlabs,false);
 
-                    //console.log(this.labType.id);
-                    console.log(this.group.priorityIds);
-
-                    // Step 1. Delete existing priority object
-                    /*this.ajax = {
-                     headers: {
-                     'Authorization' : this.accessToken
-                     },
-                     body: {
-                     id: this.group.id
-                     },
-                     method: 'DELETE',
-                     endpoint: '/groups/' + this.group.id + '/priorities/'
-
-                     };*/
-                    //console.log(this.ajax);
-
 
                     for(i = 0; i<this.chosenlabs.length; i++) {
-                        console.log(this.group.priorityIds[i]);
-                        //console.log(this.chosenlabs[i].id);
+                        //TODO: Post chosenlabs on API
                         // Step 2. Save a new priority object
-                        if(this.group.priorityIds[i]) {
+                        /*if(this.group.priorityIds[i]) {
                             this.ajax = {
                                 headers: {
                                     'Authorization': this.accessToken
@@ -249,31 +265,7 @@
 
                             };
                             console.log(this.ajax);
-                        }
-
-
-                        /*//Replace Priorities on API
-                         for(i = 0; i<this.chosenlabs; i++) {
-                         console.log(this.chosenlabs[i].id);
-                         if(this.group.priorityIds.length > 0) {
-
-                         this.ajax = {
-                         headers: {
-                         'Authorization': this.accessToken
-                         },
-                         body: {
-                         priority: i,
-                         groupId: this.group.id,
-                         labId: this.chosenlabs[i].id,
-                         semesterId: this.group.semesterId,
-                         labTypeId: this.labType.id
-                         },
-                         method: 'POST',
-                         endpoint: '/priorities/' + this.group.priorityIds[i]
-
-                         };
-                         }
-                         //console.log(this.ajax);*/
+                        }*/
                     }
 
                     this.labs_already_chosen = true;
@@ -281,9 +273,6 @@
                     if(practicals_show_saved_dates) {
                         practicals_show_saved_dates._labsChanged(this.chosenlabs_transformed);
                     }
-                }
-                else{
-                    alert("Error: Not enogh labs chosen. Just "+labcounter+" labs chosen.");
                 }
             },
             /**
@@ -310,8 +299,8 @@
             /**
              * Function that checks for the practial course date
              */
-            _dateExists: function(date){
-                if(date == null){
+            _practicalDateExists: function(dates){
+                if(dates == null || !dates[0]){
                     return false;
                 }
                 return true;

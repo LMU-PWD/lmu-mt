@@ -1,0 +1,249 @@
+<dom-module id="practicals-students-date-creator">
+    <template>
+        <style include="shared-styles">
+            :host{
+
+            }
+            .date{
+                padding: 10px;
+                background-color: var(--paper-blue-grey-500);
+                color: var(--paper-blue-grey-100);
+                font-size: 18px;
+            }
+            .lab{
+                border-style: solid;
+                border-width: 1px;
+                border-color: var(--paper-blue-grey-100);
+            }
+            .date-creator{
+                margin-top: 20px;
+                background-color: var(--paper-blue-grey-50);
+                text-align: center;
+            }
+            #priorityselection{
+                background-color: var(--paper-blue-grey-200);
+                padding-bottom: 20px;
+            }
+            #priorityShower{
+                visibility: hidden;
+                margin-left: 10%;
+                color: green;
+            }
+            .dropdown-content{
+                width: 70px;
+            }
+
+        </style>
+        <div class="date-creator">
+            <div class="date">
+                [[date]]
+            </div>
+            <template is="dom-repeat" items="[[timeslots]]" as="lab" >
+                <paper-item id="lab" class="lab" on-tap="_handleDateClick">
+                    [[_getTimeSlotString(lab)]]
+                    <div id="priorityShower"></div>
+                </paper-item>
+                <iron-collapse id="priorityselection">
+                    <div>
+                        <paper-dropdown-menu label="Priorität: ">
+                            <paper-listbox class="dropdown-content">
+                                <template is="dom-repeat" items="[[priorities]]" as="selector">
+                                    <template is="dom-if" if="[[_computeSelector(selector)]]">
+                                          <paper-item on-tap="_handlePriorityClick">[[selector]]</paper-item>
+                                    </template>
+                                </template>
+                            </paper-listbox>
+                        </paper-dropdown-menu>
+                        <div>(1 - gering; [[priority]] - hoch)</div>
+                    </div>
+                </iron-collapse>
+            </template>
+        </div>
+    </template>
+    <script>
+        Polymer({
+            is: 'practicals-students-date-creator',
+            properties: {
+                timeslots:{
+                    type: Array,
+                    value: []
+                },
+                date:{
+                    type: String,
+                    value: ""
+                },
+                priority:{
+                    type: Number,
+                    value: 0
+                },
+                priorities:{
+                    type: Array,
+                    value: [],
+                    notify: true
+                },
+                chosenpriority:{
+                    type: Number,
+                    value: 0
+                },
+                chosenlabindex:{
+                    type: Number
+                },
+                recentlab: {
+                    type: Object
+                },
+                recentpriorityselection:{
+                    type: Object
+                }
+            },
+            ready: function() {
+                this.date = this._getDateString(this.timeslots[0][0]);
+                console.log(this.timeslots);
+
+                for (i = 0; i < this.priority; i++) {
+                        this.priorities[i]=i+1;
+                }
+            },
+
+            /**
+             * Creates string from the timeslot-timits to get a nicer visualisation,
+             * Adds leading zeros, if necessary
+             */
+            _getTimeSlotString: function(slot){
+                if(slot) {
+                        var starthour = slot[0].getHours();
+                        var startminute = slot[0].getMinutes();
+                        var endhour = slot[1].getHours();
+                        var endminute = slot[1].getMinutes();
+                        /*
+                    * Add zeros, if necessary
+                    */
+
+                    if(starthour<10){
+
+                        starthour = "0"+ starthour;
+                    }
+                    if(startminute<10){
+                        startminute = "0"+startminute;
+                    }
+                    if(endhour<10
+                    ){
+                        endhour = "0"+endhour;
+                    }
+                    if(endminute< 10){
+                        endminute = "0" +endminute;
+                    }
+
+                    return starthour + ":" + startminute + " - " + endhour + ":" + endminute+ " Uhr";
+                }
+            },
+
+            /**
+             * Creates string from the given date
+             * @param {String} date - date that will be transformed to String
+             */
+            _getDateString: function(date){
+                var datestring = "";
+                switch(date.getDay()){
+
+                    case 0:
+                        datestring = "Sonntag, ";
+                        break;
+                    case 1:
+                        datestring = "Montag, ";
+                        break;
+                    case 2:
+                        datestring = "Dienstag, ";
+                        break;
+                    case 3:
+                        datestring = "Mittwoch, ";
+                        break;
+                    case 4:
+                        datestring = "Donnerstag, ";
+                        break;
+                    case 5:
+                        datestring = "Freitag, ";
+                        break;
+                    case 6:
+                        datestring = "Samstag, ";
+                        break;
+                }
+                datestring = datestring+date.getDate()+"."+date.getMonth()+"."+date.getFullYear();
+                return datestring;
+            },
+
+            /**
+             * Click-Event handler
+             * Handles the timeslot selection
+             * @param {String} e - handle data
+             */
+            _handleDateClick: function(e){
+                this.fire("date-click");
+
+                this.chosenlabindex = e.model.index;
+
+
+                //If there is a visible priorityselection, hide it
+                if(this.recentpriorityselection){
+                    this.recentpriorityselection.hide();
+                }
+
+                // Get clicked priorityselection
+                this.recentpriorityselection = Polymer.dom(this.root).querySelectorAll("#priorityselection")[e.model.index];
+                this.recentpriorityselection.toggle(); //Show Priorityselection
+                this.recentlab = e.target;
+
+                //Array-Mutation to force the priorityselection-Dom-Repeat to update
+                var array = this.priorities;
+                this.priorities = [];
+                this.priorities = array;
+            },
+
+            /**
+             * Click-Event handler
+             * Handles the priority selection and fires the priority-click-Event
+             * @param {String} e - handle data
+             */
+            _handlePriorityClick: function(e){
+                if(e.model.selector){
+                    this.chosenpriority = e.model.selector;
+                    if(this.recentlab.lastChild.textContent.search('Priorität:')>=0){
+                        this.fire("replace-priority");
+                        //TODO: replace lab on practical-date-detail chosenlabs-Array and priorities-Array
+                    }
+                    this.fire("priority-click"); //Notifies Parent (practical-date-detail.html)
+                    this.recentpriorityselection.toggle(); //Hide Priorityselection
+                    this.recentlab.style.color = 'green';
+                    this.recentlab.style.backgroundColor = '#CEF6CE';
+                    this.recentlab.lastChild.textContent = 'Priorität: ' + e.model.selector;
+                    //this.recentlab.innerHTML = this.recentlab.innerHTML +'<div id="priorityShower">'+'Priorität: ' + e.model.selector+'</div>';
+                }
+            },
+
+            /**
+             * Checks if given Parameter is 0 and returns true of false
+             * @param selector - Given parameter
+             * @returns {boolean}
+             * @private
+             */
+            _computeSelector: function(selector){
+                var response = true;
+                if(selector == 0){
+                    response = false;
+                }
+                return response;
+            },
+            /**
+             * Reset labselection on Button click
+             * @private
+             */
+            _resetSelection: function(){
+                var labs = Polymer.dom(this.root).querySelectorAll("#lab");
+                for(j=0; j < labs.length; j++){
+                    labs[j].lastChild.textContent = '';
+                    labs[j].style.color = '';
+                    labs[j].style.backgroundColor = '';
+                }
+            }
+        });
+    </script>
+</dom-module>

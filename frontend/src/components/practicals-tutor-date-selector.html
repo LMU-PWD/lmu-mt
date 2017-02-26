@@ -7,10 +7,10 @@
 <link rel="import" href="../../bower_components/iron-collapse/iron-collapse.html">
 <link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
-<link rel="import" href="tutor-date-creator.html">
+<link rel="import" href="practicals-tutor-date-creator.html">
 <link rel="import" href="../shared/shared-styles.html">
 
-<dom-module id="tutor-date-selector">
+<dom-module id="practicals-tutor-date-selector">
     <template>
         <style include="shared-styles">
             :host{
@@ -69,22 +69,20 @@
                 </paper-button>
             </div>
             <div class="dateselector">
-                <!--template is="dom-if" if="[[user.isStudent]]"-->
                     <template is="dom-repeat" items="{{timeslots}}" as="labs">
-                        <tutor-date-creator id="dateselectors" class="tutor-date-creator"
+                        <practicals-tutor-date-creator id="dateselectors" class="datecreator"
                                             timeslots="[[labs]]"
                                             priority="[[priority]]"
                                             api-all-labs="[[apiAllLabs]]"
                                             on-priority-click="_handlePriorityClick"
                                             on-date-click="_handleDateClick"
-                                            on-replace-priority="_handleReplacePriority"></tutor-date-creator>
+                                            on-replace-priority="_handleReplacePriority"></practicals-tutor-date-creator>
                     </template>
-                <!--/template-->
             </div>
     </template>
     <script>
         Polymer({
-            is: 'tutor-date-selector',
+            is: 'practicals-tutor-date-selector',
             properties: {
                 timeslots:{
                     type: Array,

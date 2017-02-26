@@ -202,8 +202,7 @@
                     all-labs="[[ all_labs_foto ]]"
                     on-back-click="_handleBackTap"
                     access-token="{{ accessToken }}"
-                    logged-in="{{ session.loggedIn }}"
-                    user-id="{{ session.userId }}"></practicals-view>
+                    user-id="{{ userId }}"></practicals-view>
             <practicals-view
                     name="video-practicals"
                     type="Video"
@@ -216,8 +215,7 @@
                     all-labs="[[all_labs_video]]"
                     on-back-click="_handleBackTap"
                     access-token="{{ accessToken }}"
-                    logged-in="{{ session.loggedIn }}"
-                    user-id="{{ session.userId }}"></practicals-view>
+                    user-id="{{ userId }}"></practicals-view>
             <practicals-view
                     name="audio-practicals"
                     type="Audio"
@@ -230,8 +228,7 @@
                     all-labs="[[all_labs_audio]]"
                     on-back-click="_handleBackTap"
                     access-token="{{ accessToken }}"
-                    logged-in="{{ session.loggedIn }}"
-                    user-id="{{ session.userId }}"></practicals-view>
+                    user-id="{{ userId }}"></practicals-view>
 
             <!-- Semester Setup Pages (Admin only) -->
             <template is="dom-if" if="[[ user.isAdmin ]]">
@@ -348,6 +345,7 @@
                 this.all_labs_foto = [];
                 this.all_labs_video = [];
                 this.all_labs_audio = [];
+                console.log(this.userId);
             },
             _accessTokenChanged: function () {
                 if (this.userId && this.accessToken) {
@@ -493,10 +491,10 @@
                 }
                 this.gotLabTypes = true;
 
-                console.log("Labtypes: ");
-                console.log(this.labtype_foto);
-                console.log(this.labtype_video);
-                console.log(this.labtype_audio);
+                //console.log("Labtypes: ");
+                //console.log(this.labtype_foto);
+                //console.log(this.labtype_video);
+                //console.log(this.labtype_audio);
 
             },
             /**
@@ -531,11 +529,11 @@
                     this.allLabs.push(event.detail[i]);
                 }
 
-                console.log("AllLabs: ");
-                console.log(this.allLabs);
-                console.log(this.all_labs_foto);
-                console.log(this.all_labs_video);
-                console.log(this.all_labs_audio);
+                //console.log("AllLabs: ");
+                //console.log(this.allLabs);
+                //console.log(this.all_labs_foto);
+                //console.log(this.all_labs_video);
+                //console.log(this.all_labs_audio);
 
                 if (this.semesterId && this.labTypesRequestSent) {
                     this.labsRequestSent = true;
@@ -571,10 +569,10 @@
                     }
                 }
 
-                console.log("Group Prios:");
-                console.log(this.groupdata_foto.priorities);
-                console.log(this.groupdata_video.priorities);
-                console.log(this.groupdata_audio.priorities);
+                //console.log("Group Prios:");
+                //console.log(this.groupdata_foto.priorities);
+                //console.log(this.groupdata_video.priorities);
+                //console.log(this.groupdata_audio.priorities);
 
             },
 
@@ -597,10 +595,10 @@
                 if (event.detail.labTypeId == this.labtype_audio.id)
                     this.groupdata_foto.lab = new Date(event.detail.date);
 
-                console.log("Group Labs:");
-                console.log(this.groupdata_foto.lab);
-                console.log(this.groupdata_video.lab);
-                console.log(this.groupdata_audio.lab);
+                //console.log("Group Labs:");
+                //console.log(this.groupdata_foto.lab);
+                //console.log(this.groupdata_video.lab);
+                //console.log(this.groupdata_audio.lab);
             },
 
             isStudent: function () {
