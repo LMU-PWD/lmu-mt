@@ -164,6 +164,11 @@
                 else{
                     this.registration_open = this.labType.registration_open;
                 }
+                if(this.practical_dates_exists && this.before_deadline){
+                    console.log("ERROR: Die Praktikumsdaten können nicht vor der Deadline zugewiesen sein. Daten sind hier inkorrekt! LabType: "+this.labType.type_str);
+                    console.log("before_dedline wird statisch auf false gesetzt, damit die Anzeige nicht leer ist");
+                    this.before_deadline = false;
+                }
             },
             /**
              * Back-button click handler
