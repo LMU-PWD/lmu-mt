@@ -202,8 +202,7 @@
                     all-labs="[[ all_labs_foto ]]"
                     on-back-click="_handleBackTap"
                     access-token="{{ accessToken }}"
-                    logged-in="{{ session.loggedIn }}"
-                    user-id="{{ session.userId }}"></practicals-view>
+                    user-id="{{ userId }}"></practicals-view>
             <practicals-view
                     name="video-practicals"
                     type="Video"
@@ -216,8 +215,7 @@
                     all-labs="[[all_labs_video]]"
                     on-back-click="_handleBackTap"
                     access-token="{{ accessToken }}"
-                    logged-in="{{ session.loggedIn }}"
-                    user-id="{{ session.userId }}"></practicals-view>
+                    user-id="{{ userId }}"></practicals-view>
             <practicals-view
                     name="audio-practicals"
                     type="Audio"
@@ -230,8 +228,7 @@
                     all-labs="[[all_labs_audio]]"
                     on-back-click="_handleBackTap"
                     access-token="{{ accessToken }}"
-                    logged-in="{{ session.loggedIn }}"
-                    user-id="{{ session.userId }}"></practicals-view>
+                    user-id="{{ userId }}"></practicals-view>
 
             <!-- Semester Setup Pages (Admin only) -->
             <template is="dom-if" if="[[ user.isAdmin ]]">

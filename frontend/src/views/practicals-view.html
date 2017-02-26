@@ -88,8 +88,7 @@
                                                          all-labs="[[allLabs]]"
                                                          on-back-click="_handleBackTap"
                                                          access-token="{{ accessToken }}"
-                                                         logged-in="{{ session.loggedIn }}"
-                                                         user-id="{{ session.userId }}"></practicals-students-date-detail>
+                                                         user-id="{{ userId }}"></practicals-students-date-detail>
                     </div>
                 </iron-pages>
             </div>
@@ -129,6 +128,9 @@
                     value: false
                 },
                 user: Object,
+                userId: {
+                    type: String
+                },
                 group: Object,
                 labData: Object,
                 labType: Object
