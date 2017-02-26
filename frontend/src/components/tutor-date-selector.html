@@ -71,10 +71,13 @@
             <div class="dateselector">
                 <!--template is="dom-if" if="[[user.isStudent]]"-->
                     <template is="dom-repeat" items="{{timeslots}}" as="labs">
-                        <tutor-date-creator id="dateselectors" class="tutor-date-creator" timeslots="[[labs]]" priority="[[priority]]"
-                                      on-priority-click="_handlePriorityClick"
-                                      on-date-click="_handleDateClick"
-                                      on-replace-priority="_handleReplacePriority"></tutor-date-creator>
+                        <tutor-date-creator id="dateselectors" class="tutor-date-creator"
+                                            timeslots="[[labs]]"
+                                            priority="[[priority]]"
+                                            api-all-labs="[[apiAllLabs]]"
+                                            on-priority-click="_handlePriorityClick"
+                                            on-date-click="_handleDateClick"
+                                            on-replace-priority="_handleReplacePriority"></tutor-date-creator>
                     </template>
                 <!--/template-->
             </div>

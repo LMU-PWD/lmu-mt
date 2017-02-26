@@ -41,7 +41,6 @@
             <template is="dom-repeat" items="[[timeslots]]" as="lab" >
                 <paper-item id="lab" class="lab" on-tap="_handleDateClick">
                     [[_getTimeSlotString(lab)]]
-                    <div id="priorityShower"></div>
                 </paper-item>
             </template>
         </div>
@@ -50,6 +49,10 @@
         Polymer({
             is: 'tutor-date-creator',
             properties: {
+                apiAllLabs: {
+                    type: Array,
+                    value: []
+                },
                 timeslots:{
                     type: Array,
                     value: []
@@ -82,7 +85,7 @@
             },
             ready: function() {
                 this.date = this._getDateString(this.timeslots[0][0]);
-                console.log(this.timeslots);
+                //console.log(this.timeslots);
             },
 
             /**
@@ -162,23 +165,27 @@
 
                 this.chosenlabindex = e.model.index;
                 this.recentlab = e.target;
+                //console.log(this.recentlab);
 
                 if(this.recentlab.style.color == 'green'){
                     this.recentlab.style.color = '';
                     this.recentlab.style.backgroundColor = '';
-                    this.chosenlabs = this.chosenlabs.filter(function(item){return item == this.recentlab;});
+                    this.chosenlabs = this.chosenlabs.filter(function(item){return item == this.apiAllLabs[this.chosenlabindex];});
                 }
                 else {
                     this.recentlab.style.color = 'green';
                     this.recentlab.style.backgroundColor = '#CEF6CE';
-                    this.chosenlabs.push(this.recentlab);
+                    this.chosenlabs.push(this.apiAllLabs[this.chosenlabindex]);
                 }
-                console.log(this.chosenlabs);
+                //console.log(this.chosenlabs);
             },
 
             _checkFilled: function(arrayItem){
                 return arrayItem == '';
             },
+            /*_getLabFromPaperItem: funtion(paperItem){
+                paperItem.innerHTML
+            },*/
             /**
              * Checks if given Parameter is 0 and returns true of false
              * @param selector - Given parameter
