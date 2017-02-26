@@ -57,7 +57,8 @@
                     <template is="dom-if" if="[[labs_already_chosen]]">
                         <!-- Deadline is not over, Registration Open and dates selected; Show saved dates!-->
                         <practicals-show-saved-dates id="practicals_show_saved_dates"
-                                                     chosenlabs="{{chosenlabs_transformed}}"></practicals-show-saved-dates>
+                                                     chosenlabs="{{chosenlabs_transformed}}"
+                                                     title="Deine Gruppe hat diese Termine ausgewählt:"></practicals-show-saved-dates>
                         <paper-button raised class="changeButton" on-tap="_handleChangeClick">
                             <iron-icon icon="reply"></iron-icon>
                             Auswahl ändern
@@ -68,7 +69,8 @@
                     <!-- Deadline is over and Registration has been started-->
                     <template is="dom-if" if="[[!practical_date_exists]]">
                         <!-- Deadline is over, Registration has been started but Practical Date is not given -->
-                        <practicals-show-saved-dates chosenlabs="{{chosenlabs_transformed}}"></practicals-show-saved-dates>
+                        <practicals-show-saved-dates chosenlabs="{{chosenlabs_transformed}}"
+                                                     title="Deine Gruppe hat diese Termine ausgewählt:"></practicals-show-saved-dates>
                     </template>
                     <template is="dom-if" if="[[practical_date_exists]]">
                         <!-- Deadline is over, Registration has been started and Practical Date is given-->

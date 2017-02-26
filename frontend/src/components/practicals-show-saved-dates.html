@@ -5,7 +5,7 @@
                 padding-left: 20px;
             }
         </style>
-        <div class="saved-dates-shower">Deine Gruppe hat diese Termine ausgewählt:
+        <div class="saved-dates-shower">[[title]]
             <ol type="1">
                 <template id="saved_dates" is="dom-repeat" items="{{chosenlabs}}" as="chosen">
                     <li>[[_getLabString(chosen)]]</li>
@@ -22,6 +22,9 @@
                     value: [],
                     notify: true,
                     observer: '_labsChanged'
+                },
+                title:{
+                    type: String
                 }
             },
             ready: function(){
