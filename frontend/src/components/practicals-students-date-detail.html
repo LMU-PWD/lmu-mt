@@ -169,6 +169,9 @@
                     console.log("before_dedline wird statisch auf false gesetzt, damit die Anzeige nicht leer ist");
                     this.before_deadline = false;
                 }
+                if(!this.before_deadline && !this.practical_dates_exists && !this.labs_already_chosen){
+                    console.log("ERROR: Die Deadline ist vorbei und trotzdem existieren weder zugewiesene noch ausgewählte Labs. Daten sind hier inkorrekt! LabType: "+this.labType.type_str);
+                }
             },
             /**
              * Back-button click handler
