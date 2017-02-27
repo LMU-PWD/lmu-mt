@@ -195,8 +195,8 @@
                     type="Foto"
                     icon="[[icon]]"
                     route="{{subroute}}"
-                    group="[[ group ]]"
-                    user="[[user]]"
+                    group="{{ group }}"
+                    user="{{user}}"
                     lab-type="[[ labtype_foto ]]"
                     lab-data="[[ groupdata_foto ]]"
                     all-labs="[[ all_labs_foto ]]"
@@ -208,8 +208,8 @@
                     type="Video"
                     icon="[[icon]]"
                     route="{{subroute}}"
-                    group="[[ group ]]"
-                    user="[[user]]"
+                    group="{{ group }}"
+                    user="{{user}}"
                     lab-type="[[ labtype_video ]]"
                     lab-data="[[ groupdata_video ]]"
                     all-labs="[[all_labs_video]]"
@@ -221,8 +221,8 @@
                     type="Audio"
                     icon="[[icon]]"
                     route="{{subroute}}"
-                    group="[[ group ]]"
-                    user="[[user]]"
+                    group="{{ group }}"
+                    user="{{user}}"
                     lab-type="[[ labtype_audio ]]"
                     lab-data="[[ groupdata_audio ]]"
                     all-labs="[[all_labs_audio]]"
@@ -365,6 +365,7 @@
              * @private
              */
             _groupChanged: function(response) {
+                console.log("groupChanged");
                 if (!this.isReady || !this.group.priorityIds)
                     return;
 
@@ -546,7 +547,7 @@
              */
             _handlePriosRequest: function(event){
                 //console.log('_handlePriosRequest()');
-                //console.log(event.detail);
+                console.log(event.detail);
 
                 if(!this.isReady || this.gotLabTypes == false)
                     return;
@@ -569,6 +570,7 @@
                 }
 
                 console.log("Group Prios:");
+                console.log(this.group.id);
                 console.log(this.groupdata_foto.priorities);
                 console.log(this.groupdata_video.priorities);
                 console.log(this.groupdata_audio.priorities);
