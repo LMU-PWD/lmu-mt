@@ -198,7 +198,7 @@
                         labcounter++;
                     }
                 }
-                if(labcounter == e.target.chosenlabs.length){
+                if(labcounter == e.target.chosenlabs.length && labcounter != 0){
                     this.chosenlabs = [];
                     this.chosenlabs = e.target.chosenlabs;
                     this.chosenlabs_transformed = this._transformLabs(this.chosenlabs,false);

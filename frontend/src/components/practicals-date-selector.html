@@ -171,6 +171,7 @@
              */
             _handleResetClick: function(e){
                 this._fillPrioritiesArray();
+                this.chosenlabs = [];
                 var dateselectors = Polymer.dom(this.root).querySelectorAll("#dateselectors");
                 for(i = 0; i < dateselectors.length; i++){
                     dateselectors[i]._resetSelection();
@@ -227,6 +228,7 @@
                         this.priorities[i] = i+1;
                     }
                 }
+                //console.log(this.priorities);
             },
 
             /**
