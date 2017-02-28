@@ -366,6 +366,7 @@
              */
             _groupChanged: function(response) {
                 console.log("groupChanged");
+                console.log(this.group);
                 if (!this.isReady || !this.group.priorityIds)
                     return;
 
@@ -379,6 +380,7 @@
                         method: 'GET',
                         endpoint: '/priorities/' + this.group.priorityIds[i]
                     };
+                    console.log(this.ajax_prios);
                 }
                 for (j = 0; j < this.group.labIds.length; j++) {
                     // Get group-labs

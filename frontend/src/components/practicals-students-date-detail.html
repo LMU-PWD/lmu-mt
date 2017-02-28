@@ -40,6 +40,18 @@
                 method="[[ ajax.method ]]"
                 endpoint="[[ ajax.endpoint ]]"
                 on-api-response="_responseFromPrioritySave"></api-request>
+        <api-request
+                headers="[[ ajax_delete.headers ]]"
+                body="[[ ajax_delete.body ]]"
+                method="[[ ajax_delete.method ]]"
+                endpoint="[[ ajax_delete.endpoint ]]"
+                on-api-response="_responseFromPrioritySaveDelete"></api-request>
+        <api-request
+                headers="[[ ajax_group.headers ]]"
+                body="[[ ajax_group.body ]]"
+                method="[[ ajax_group.method ]]"
+                endpoint="[[ ajax_group.endpoint ]]"
+                on-api-response="_handleGroupResponse"></api-request>
 
         <div class="content">
             <template is="dom-if" if="[[registration_open]]">
@@ -205,60 +217,27 @@
 
                     //console.log(this.labType.id);
                     console.log(this.group.priorityIds);
+                    this.bodyObject = [];
 
                     for(i = 0; i<this.chosenlabs.length; i++) {
-                        //console.log(this.chosenlabs[i]);
-                        /*if(this.group.priorityIds[i]) {
-                            //Replace a priority object
-                            this.ajax = {
-                                headers: {
-                                    'Authorization': this.accessToken
-                                },
-                                body: {
-                                    priority: i,
-                                    groupId: this.group.id,
-                                    labId: this.chosenlabs[i].id,
-                                    semesterId: this.group.semesterId
-                                },
-                                method: 'POST',
-                                endpoint: '/priorities/' + this.group.priorityIds[i] + '/replace'
-                            };
-                            console.log(this.ajax);
-                        }
-                        else{
-                            // Save a new priority object
-                            this.ajax = {
-                                headers: {
-                                    'Authorization': this.accessToken
-                                },
-                                body: {
-
-                                    priority: i,
-                                    groupId: this.group.id,
-                                    labId: this.chosenlabs[i].id,
-                                    semesterId: this.group.semesterId
-                                },
-                                method: 'POST',
-                                endpoint: '/priorities'
-                            };
-                            console.log(this.ajax);
-                        }*/
-                        //Replace a priority object
-                        this.ajax = {
-                            headers: {
-                                'Authorization': this.accessToken
-                            },
-                            method: 'POST',
-                            body: {
-                                 "priority": i,
-                                 "groupId": this.user.groupId,
-                                 "labId": this.chosenlabs[i].id,
-                                 "semesterId": this.group.semesterId
-                            },
-                            endpoint: '/priorities/replaceorcreate/'
-                        };
-                        console.log(this.ajax);
+                         this.bodyObject.push({
+                            priority: i,
+                            groupId: this.user.groupId,
+                            labId: this.chosenlabs[i].id,
+                            semesterId: this.group.semesterId
+                        });
                     }
+
+                    this.ajax_delete = {
+                        headers: {
+                            'Authorization': this.accessToken
+                        },
+                        method: 'DELETE',
+                        endpoint: '/groups/'+this.user.groupId+'/priorities/'
+                    };
+                    console.log(this.ajax_delete);
+
+
 
                     this.labs_already_chosen = true;
                     var practicals_show_saved_dates = Polymer.dom(this.root).querySelector("#practicals_show_saved_dates");
@@ -368,6 +347,24 @@
             },
 
             /**
+             * Gets group dates from api
+             * @param response - Contains the given timelabs
+             * @private
+             */
+            _handleGroupResponse: function(response){
+                console.log(response);
+                var receivedGroup = event.detail ;
+                this.set('group.priorityIds', receivedGroup.priorityIds );
+
+                //Change groupMemberIds to Array Containing Objects with ID, Name and Mail
+                /*this.group.groupMemberIds.forEach(function () {
+                    self.push('group.groupMemberIds',{"id": self.shift('group.groupMemberIds'),"name":"","mail":""});
+                });*/
+
+                console.log(this.group);
+            },
+
+            /**
              * Transform the Format of the given Timelabs from the Api, so it will be easier to handle in the frontend
              * @param labsFromApi - Contains the given timelabs
              * @returns {Array} - timelabs in new format
@@ -426,16 +423,41 @@
              */
             _responseFromPrioritySave: function(response) {
                 console.log(response);
-                if(response.detail.priority) {
+                /*if(response.detail[0].priority != null) {
                     this.ajax = {
-                        contentType: 'application/json',
                         headers: {
-                            Authorization: this.accessToken
+                            'Authorization': this.accessToken
                         },
                         method: 'GET',
                         endpoint: '/groups/' + this.user.groupId
-                    }
-                }
+                    };
+                    console.log(this.ajax);
+                }*/
+                this.ajax_group = {
+                    headers: {
+                        'Authorization': this.accessToken
+                    },
+                    method: 'GET',
+                    endpoint: '/groups/' + this.user.groupId
+                };
+                console.log(this.ajax_group);
+            },
+            /**
+             * Gets response from API call to create a new priority
+             * @param response
+             * @private
+             */
+            _responseFromPrioritySaveDelete: function(response) {
+                console.log(response);
+                this.ajax = {
+                    headers: {
+                        'Authorization': this.accessToken
+                    },
+                    method: 'POST',
+                    body: this.bodyObject,
+                    endpoint: '/priorities/'
+                };
+                console.log(this.ajax);
             }
         });
     </script>
