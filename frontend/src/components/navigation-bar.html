@@ -11,32 +11,85 @@
                 display: block;
                 height:100px;
             }
+
+            .desktop-only{
+                display: none;
+            }
+
+            /*Phone*/
+            @media screen and (max-width: 767px) {
+
+                admin-toolbar {
+                    margin: 0;
+                }
+            }
+
+            /*Tablet*/
+            @media screen and (min-width: 768px) and (max-width: 1023px) {
+                .group-container {
+                    margin: 10px;
+                    width: calc(50% - 20px);
+                }
+
+                .practicals-container {
+                    margin: 10px;
+                    width: calc(50% - 20px);
+                }
+            }
+
+            /*Desktop*/
+            @media screen and (min-width: 1024px) {
+                .no-desktop{
+                    display: none;
+                }
+                .desktop-only{
+                    display: block;
+                }
+
+                .menu-icon:hover {
+                    background-color: var(--paper-blue-grey-500);
+                }
+                .menu-icon {
+                    background-color: transparent !important;
+                }
+            }
+
             .nav-container {
                 border-bottom: var(--paper-blue-grey-700) solid 1px;
                 background: var(--paper-blue-grey-600);
                 height: 70px;
             }
-            .configuration{
+
+            .configuration {
                 float: left;
             }
-            .notification{
-                float:right;
+
+            .notification {
+                float: right;
             }
-            .icon{
+
+            iron-collapse{
+                z-index: 20;
+            }
+
+            .icon {
                 display: block;
                 margin: auto;
                 /*padding-top: 10px;*/
                 width: 100px;
                 z-index: 1;
             }
+
             paper-icon-button {
                 /*position: relative;*/
                 margin: 5%;
                 color: var(--paper-blue-grey-900);
             }
+
             .notification a {
                 text-decoration: none;
             }
+
             .notification paper-button {
                 background: none;
                 min-width: 0;
@@ -44,64 +97,285 @@
                 padding: 0;
                 color: var(--paper-blue-grey-900);
             }
-            .notification paper-button:hover, paper-icon-button:hover {
+
+            /*.notification paper-button:hover, paper-icon-button:hover {
                 color: var(--paper-blue-grey-500);
                 -o-transition: .1s;
                 -moz-transition: .1s;
                 -webkit-transition: .1s;
                 transition: .1s;
-            }
+            }*/
+
             .active-language {
                 text-decoration: underline !important;
             }
+
+            .left-triangle {
+                z-index: 20;
+                fill: #546E7A;
+                height: 30px;
+                width: calc(50% - 20px);
+                position: absolute;
+                top: 70px;
+                left: 0;
+                float: left;
+                stroke: #455A64;
+                stroke-width: 5;
+            }
+
+            .rect {
+                z-index: 20;
+                fill: #546E7A;
+                height: 30px;
+                width: 45px;
+                position: absolute;
+                left: calc(50% - 25px);
+                top: 70px;
+
+            }
+
+            .right-triangle {
+                z-index: 20;
+                fill: #546E7A;
+                height: 30px;
+                width: calc(50% - 15px);
+                position: absolute;
+                top: 70px;
+                right: 0;
+                float: left;
+                stroke: #455A64;
+                stroke-width: 5;
+            }
+
+            .icon-one {
+                left: calc(50% - 52px);
+                /* top: 0; */
+                height: 100%;
+                z-index: 100;
+                text-align: center;
+                width: 100px;
+                position: relative;
+            }
+
+            .icon-one > img {
+                height: 100%;
+            }
+
+            .helper_container {
+                height: auto;
+            }
+
+            paper-toolbar.tall {
+                height: 100px;
+            }
+
+            paper-toolbar {
+                height: 60px;
+                font-size: 16px;
+                line-height: 60px;
+                padding: 0 10px;
+                color: white;
+                transition: height 0.2s;
+                z-index: 20;
+            }
+
+            .icon-container {
+                position: absolute;
+                background-color: var(--paper-blue-grey-600);
+                width: 100%;
+                height: 60px;
+                top: 0;
+                left: 0;
+
+            }
+
+            .larger_geometry_container {
+
+                z-index: 20;
+                height: 0;
+                opacity: 0;
+                transition: height,opacity 0.2s;
+
+            }
+
+            .larger_geometry_container > div {
+                z-index: 20;
+                background-color: var(--paper-blue-grey-600);
+                height: 10px;
+                width: 100%;
+                position: absolute;
+                top: 60px;
+                left: 0;
+            }
+
+            paper-toolbar.tall > .larger_geometry_container {
+                height: 10px;
+                opacity: 1;
+                transition: height,opacity 0.2s;
+
+            }
+
+            #menu {
+                background-color: var(--paper-blue-grey-800);
+                height: 80px;
+                /*border-bottom: 10px solid var(--paper-blue-grey-500);*/
+                width: auto;
+                margin: 0 auto;
+            }
+
+            paper-icon-button {
+                color: var(--paper-blue-grey-50);
+
+            }
+            .menu-icon{
+
+                background-color: var(--paper-blue-grey-500);
+                border-radius: 50%;
+                height: 40px;
+                width: 40px;
+                margin: 12px;
+            }
+
+            .menu-icon-wrapper{
+                float: right;
+            }
+            .menu-icon-container{
+                top: 8px;
+                position: relative;
+                left: calc(50% - 96px);
+                width: 192px;
+                height: 64px;
+                background-color: var(--paper-blue-grey-200);
+                border-radius: 32px;
+            }
+
+
+            /*#notifications{
+                position: fixed;
+                z-index: 10;
+                top: 60px;
+            }*/
+
+            /*.not-active{
+                /*display: none !important;
+                opacity: 0;
+                height: 0px !important;*/
+            /*background-color: red;
+            transition: background-color 2s;*/
+            /*}*/
+            .menu-overlay{
+
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0,0,0,0.5);
+                position: fixed;
+                z-index: 10;
+                top: 80px;
+
+                opacity: 1;
+                display: block;
+                transition: opacity 0.2s;
+            }
+            .menu-overlay.not-active{
+                opacity: 0;
+                height: 0;
+                transition: opacity 0.2s, height 0.2s ease 0.1s;
+
+            }
+
+            button{
+                color: var(--paper-blue-grey-50);
+                background-color: transparent;
+                --transburger-icon-line-radius: 0;
+                border-radius: 50%;
+            }
+            button:focus{
+                outline: none;
+                border: none;
+            }
+            button:hover{
+                color: var(--paper-blue-grey-100);
+            }
+
+            .hidden{
+                visibility: hidden;
+                display: none;
+            }
         </style>
 
-        <api-request
-                headers="[[ ajax.headers ]]"
-                method="[[ ajax.method ]]"
-                endpoint="[[ ajax.endpoint ]]"
-                on-api-response="_handleLogoutResponse"></api-request>
-
-        <!--app-toolbar sticky class="nav-container">
-            <div class="configuration nav-block">
-                <paper-icon-button icon="icons:exit-to-app" on-tap="_fireLogoutRequest"></paper-icon-button>
-                <paper-tooltip>Logout</paper-tooltip>
-            </div>
-            <div class="icon nav-block">
+        <paper-toolbar>
+            <div class="icon-one nav-block">
                 <img src="../../images/mt.svg">
             </div>
-            <div class="notification  nav-block">
-                <paper-button style="float:right" on-click="initSwitchLocale">{{ language }}</paper-button>
-                <paper-tooltip offset="5">{{localize('logincard_locale button tooltip')}}</paper-tooltip>
 
-            </div>
-            <div class="notification  nav-block">
-                <paper-icon-button class="mobile-and-tablet-only" icon="social:notifications" on-tap="toggleNotificationList"></paper-icon-button>
-            </div>
-        </app-toolbar-->
-        <app-header fixed condenses effects="waterfall">
+            <div class="icon-container">
 
-            <app-toolbar>
-                <div style="height:100px; width:100%; background-color:blue;">
-                    Extended Header
+                <div class="configuration nav-block no-desktop" id="menuButton">
+                    <button id="transburger" is="transburger-icon" no-transform transform-to="{{transburgerChangeTo}}" on-tap="_toggleMenu" style=""></button>
+                    <paper-tooltip>Menu</paper-tooltip>
                 </div>
-            </app-toolbar>
-            <app-toolbar sticky>
-                <div style="z-index:100; height:70px; width:100%; background-color:red;">
-                    Shrunk Header
+                <!--div class="configuration nav-block no-desktop" id="menuButton">
+                    <paper-icon-button icon="menu" on-tap="_toggleMenu" style=""></paper-icon-button>
+                    <paper-tooltip>Menu</paper-tooltip>
                 </div>
-            </app-toolbar>
-        </app-header>
+                <div class="configuration nav-block no-desktop hidden" id="backButton">
+                    <paper-icon-button icon="menu" on-tap="_goBack" style=""></paper-icon-button>
+                    <paper-tooltip>Menu</paper-tooltip>
+                </div-->
 
-        <!--app-toolbar class="nav-container">
-            <div class="configuration nav-block">
-            <paper-icon-button icon="icons:menu"></paper-icon-button>
+
+                <div class="notification  nav-block no-desktop">
+                    <paper-icon-button class="mobile-and-tablet-only" src="../../images/notifications.svg" style="color: white;"
+                                       on-tap="_toggleNotifications"></paper-icon-button>
+                </div>
+
+
+                <div class="menu-icon-wrapper desktop-only"> <!--class="configuration nav-block"-->
+                    <paper-icon-button class="menu-icon" icon="icons:settings" on-tap="_fireLogoutRequest"></paper-icon-button>
+                    <paper-tooltip>Logout</paper-tooltip>
+
+                </div>
+                <div class="menu-icon-wrapper desktop-only"> <!--class="configuration nav-block"-->
+                    <paper-icon-button class="menu-icon" icon="icons:language" on-tap="_fireLogoutRequest"></paper-icon-button>
+                    <paper-tooltip>Logout</paper-tooltip>
+
+                </div>
+                <div class="menu-icon-wrapper desktop-only"> <!--class="configuration nav-block"-->
+                    <paper-icon-button class="menu-icon" icon="icons:exit-to-app" on-tap="_fireLogoutRequest"></paper-icon-button>
+                    <paper-tooltip>Logout</paper-tooltip>
+                </div>
+
+
+
+                <!--div> class="notification  nav-block">
+                    <paper-button on-click="initSwitchLocale">{{ language }}</paper-button>
+                    <paper-tooltip offset="5">{{localize('logincard_locale button tooltip')}}</paper-tooltip>
+                </div-->
             </div>
-            <div class="icon nav-block">
-                <img src="../../images/mt.svg">
+            <div>
+                <iron-collapse id="notifications">
+                    <div style="height: 300px; width: 100%; background-color:green;">Test Notification Container</div>
+                </iron-collapse>
             </div>
-        </app-toolbar-->
-        <iron-signals on-iron-signal-switchlocale="_switchLocale"></iron-signals>
+
+            <div class="larger_geometry_container">
+                <div></div>
+                <svg viewBox="0 0 200 200" class="left-triangle" preserveAspectRatio="none">
+                    <polygon points="0,0 200,0 200,200 "></polygon>
+                </svg>
+                <svg viewBox="0 0 200 200" class="right-triangle" preserveAspectRatio="none">
+                    <polygon points="200,0 0,200 0,0 "></polygon>
+                </svg>
+                <svg viewBox="0 0 200 200" class="rect" preserveAspectRatio="none">
+                    <rect width="200" height="200"></rect>
+                </svg>
+            </div>
+
+            <iron-collapse id="notifications_2">
+                <div style="height: 300px; width: 100%; background-color:green;">Test Notification Container</div>
+            </iron-collapse>
+
+        </paper-toolbar>
     </template>
 
     <script>
@@ -111,101 +385,7 @@
 
             properties: {
 
-                accessToken: {
-                    type: String,
-                    notify: true
-                },
-
-                group: {
-                    type: Object,
-                    notify: true,
-                    value: {}
-                },
-
-                loggedIn: {
-                    type: Boolean,
-                    notify: true
-                },
-
-                userId: {
-                    type: String,
-                    notify: true
-                },
-
-                user: {
-                    type: Object,
-                    notify: true,
-                    value: {}
-                },
-
-                show: {
-                    type: Boolean,
-                    value: false,
-                    notify: true
-                },
-
-                language: {
-                    type: String,
-                    value: 'de'
-                }
             },
-
-            /**
-             * Localization setup
-             */
-            behaviors: [
-                Polymer.AppLocalizeBehavior
-            ],
-            attached: function() {
-                this.loadResources(this.resolveUrl('../shared/locales.json'));
-            },
-            _switchLocale: function() {
-                this.language = (this.language == 'en') ? 'de' : 'en';
-            },
-
-
-            /**
-             * Toggle notifications display on button tap
-             */
-            toggleNotificationList: function() {
-                var screenwidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-                if (screenwidth < 1023)
-                    this.show = !this.show;
-            },
-
-            /**
-             * Callback fired when logout button is pressed. Sets a property
-             * `ajax` containing information for logout API call
-             * @private
-             */
-            _fireLogoutRequest: function () {
-
-                if (this.loggedIn) {
-                    this.ajax = {
-                        headers: {
-                            'Authorization': this.accessToken
-                        },
-                        method: 'POST',
-                        endpoint: '/platformusers/logout'
-                    }
-                }
-            },
-
-            _handleLogoutResponse: function (event) {
-
-                document.cookie = 'mt-api-accesstoken=; expires=Thu, 01 Jan 1970 00:00:00 UTC';
-                document.cookie = 'mt-api-userid=; expires=Thu, 01 Jan 1970 00:00:00 UTC';
-
-                this.set('accessToken', '');
-                this.set('userId', '');
-                this.set('loggedIn', false);
-                this.set('user', {});
-                this.set('group', {});
-            },
-
-            initSwitchLocale: function(e) {
-                this.fire("iron-signal", {name: "switchlocale"});
-            }
         });
     </script>
 </dom-module>

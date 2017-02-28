@@ -124,7 +124,11 @@
     "semester_setup_dates_duration": "Duration",
     "semester_setup_dates_button_add": "Add date",
     "semester_setup_dates_dialog_heading": "Add a new date",
-    "semester_setup_dates_dialog_startingat": "Starting at"
+    "semester_setup_dates_dialog_startingat": "Starting at",
+
+    "tooltip_menu logout" : "Log out the current User",
+    "tooltip_menu language" : "Change language to German",
+    "tooltip_menu settings" : "User Settings"
 
   },
 
@@ -253,6 +257,10 @@
     "semester_setup_dates_duration": "Dauer",
     "semester_setup_dates_button_add": "Termin hinzufügen",
     "semester_setup_dates_dialog_heading": "Neuen Termin hinzufügen",
-    "semester_setup_dates_dialog_startingat": "Beginn:"
+    "semester_setup_dates_dialog_startingat": "Beginn:",
+
+    "tooltip_menu logout" : "Den aktuellen Benutzer ausloggen",
+    "tooltip_menu language" : "Plattformsprache zu Englisch ändern",
+    "tooltip_menu settings" : "Benutzereinstellungen"
   }
 }

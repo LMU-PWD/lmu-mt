@@ -3,6 +3,7 @@
 <link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
 <link rel="import" href="../components/group-card.html">
 <link rel="import" href="../components/group-detail.html">
+<link rel="import" href="../shared/shared-styles.html">
 
 
 <!--Localization Imports-->
@@ -11,7 +12,7 @@
 
 <dom-module id="student-dashboard">
     <template>
-        <style>
+        <style include="shared-styles">
             :host {
                 width: 100%;
                 height: auto;
@@ -95,20 +96,15 @@
                 </iron-collapse>
             </div>
             <div class="practicals-container" on-tap="_handleTap">
-                <div on-tap="_handleFotoTap">
-                    <index-card key="photo" type="Fotopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:"
+                <index-card key="photo" type="Fotopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:"
                                 info2="18.05.16, 14-16"></index-card>
-                </div>
-                <div on-tap="_handleVideoTap">
-                    <index-card key="video" type="Videopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:"
+                <index-card key="video" type="Videopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:"
                                 info2="18.05.16, 14-16"></index-card>
-                </div>
-                <div on-tap="_handleAudioTap">
-                    <index-card key="audio" type="Audiopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:"
+                <index-card key="audio" type="Audiopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:"
                                 info2="18.05.16, 14-16"></index-card>
-                </div>
             </div>
         </div>
+
 
         <!--Iron Signal Fired on Logout-->
         <iron-signals on-iron-signal-forget="_forget"></iron-signals>
