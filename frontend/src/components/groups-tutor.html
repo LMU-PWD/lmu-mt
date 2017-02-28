@@ -1,48 +1,141 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../../bower_components/iron-icons/social-icons.html">
+<link rel="import" href="../../bower_components/iron-icons/av-icons.html">
+<link rel="import" href="../../bower_components/iron-icons/image-icons.html">
+<link rel="import" href="../../bower_components/iron-icons/hardware-icons.html">
+<link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="../../bower_components/iron-data-table/iron-data-table.html">
+<link rel="import" href="../../bower_components/iron-collapse/iron-collapse.html">
+
 
 <dom-module is="groups-tutor">
 
     <template>
 
         <style include="shared-styles">
+            :host {
+                min-width: 320px;
+                display: block;
+                /*background-color: var(--paper-blue-grey-100);*/
+            }
             paper-button {
                 width: calc(35% - 20px);
             }
+            paper-item {
+                cursor: pointer
+            }
+            .session_date {
+                width: 30%;
+            }
+            .session_time {
+                width: 15%;
+            }
+            .session_icon {
+                width: 5%;
+            }
+            .session_type {
+                width: 25%;
+            }
+            .sessions_row {
+                border-top: 2px solid var(--paper-grey-200)
+            }
+            .sessions_row:first-of-type {
+                border-top: none
+            }
+            .sessions_row:hover {
+                background-color: var(--paper-grey-100)
+            }
+            .sessions_heading {
+                background-color: var(--paper-blue-grey-800);
+                color: white;
+            }
+            .session_details {
+                font-size: 12px;
+            }
+            paper-listbox {
+                padding: 0
+            }
+            .session-unfolded {
+                border-left: 5px solid var(--paper-blue-grey-400);
+                font-weight: bold;
+            }
+            .icon-session-unfolded {
+                transform: rotate(90deg)
+                transition: transform 2s;
+            }
+
         </style>
 
         <api-request
                 headers="[[ ajax_labs.headers ]]"
                 method="[[ ajax_labs.method ]]"
                 endpoint="[[ ajax_labs.endpoint ]]"
-                response="{{ apiLabsResponse }}"></api-request>
+                on-api-response="_apiLabsResponse"></api-request>
         <api-request
                 headers="[[ ajax_exercises.headers ]]"
                 method="[[ ajax_exercises.method ]]"
                 endpoint="[[ ajax_exercises.endpoint ]]"
-                response="{{ apiExercisesResponse }}"></api-request>
+                on-api-response="_apiExercisesResponse"></api-request>
+        <api-request
+                id="ajax_group"
+                headers="[[ ajax_group.headers ]]"
+                method="[[ ajax_group.method ]]"
+                endpoint="[[ ajax_group.endpoint ]]"
+                on-api-response="_apiGroupResponse"></api-request>
 
-        <div>
-            Lab Termine:
+        <api-request
+                id="ajax_labTypes"
+                headers="[[ ajax_labTypes.headers ]]"
+                method="[[ ajax_labTypes.method ]]"
+                endpoint="[[ ajax_labTypes.endpoint ]]"
+                on-api-response="_apiLabTypesResponse">
+        </api-request>
+
+        <div class="lab-list-container">
+                <template is="dom-if" if="[[ !finishedSessionsLoad ]]">
+                    <paper-spinner active></paper-spinner>
+                </template>
+                <template is="dom-if" if="[[ finishedSessionsLoad ]]">
+                    <paper-listbox>
+                        <paper-item on-click="toggleCollapse" class="sessions_heading">
+                            <span class="session_date">Datum</span>
+                            <span class="session_time">Zeit</span>
+                            <span class="session_icon" style="width:15%">Typ</span>
+                            <span class="session_type"></span>
+                        </paper-item>
+                        <template  is="dom-repeat" items="[[ sessions ]]" filter="prettySessionEntry">
+                            <paper-item on-click="toggle" class="sessions_row" id="src-[[ item.id ]]">
+                                <span class="session_date">[[ item.date_string ]]</span>
+                                    <span class="session_time">[[ item.time_string ]]</span>
+                                    <span class="session_icon"><iron-icon icon="[[ item.icon ]]"></iron-icon></span>
+                                    <span class="session_type">[[ item.labType_string ]]</span>
+                                    <span class="session_toggleDropdown" style="float:right; width: 10px; ">
+                                        <iron-icon icon="hardware:keyboard-arrow-left"></iron-icon>
+                                    </span>
+                            </paper-item>
+                            <iron-collapse id="collapse-[[ item.id ]]">
+                                <paper-item class="session_details" style="border-left: 2px solid var(--paper-blue-grey-500)">
+                                    [[ item.location ]]
+                                </paper-item>
+                            </iron-collapse>
+
+                        </template>
+                    </paper-listbox>
+                </template>
         </div>
-        <template is="dom-repeat" items="[[ futureLabs ]]">
-            [[ item ]]<br>
-        </template>
-        <div>
-            Übungstermine:
-        </div>
-        <template is="dom-repeat" items="[[ futureExercises ]]">
-            [[ item ]]<br>
-        </template>
-        <div>
-            <paper-button on-tap="_onTapChooseDates">
+
+        <div class="lab-detais-container">
+            <paper-button on-tap="_onTapChooseDates" style="display:none">
                 Termine wählen
             </paper-button>
         </div>
-
         <iron-signals on-iron-signal-switchlocale="_switchLocale"></iron-signals>
     </template>
     <script>
+
+
         Polymer({
             is: 'groups-tutor',
             properties: {
@@ -52,14 +145,23 @@
                     value: 'de'
                 },
                 selfInfo: String,
-                apiLabsResponse: {
-                    type: Object,
-                    observer: '_apiLabsResponse'
+                nextSessions: {
+                    type: Array,
+                    value: []
                 },
-                apiExercisesResponse: {
-                    type: Object,
-                    observer: '_apiExercisesResponse'
-                }
+                users_in_exercises: {
+                    type: Array,
+                    value: []
+                },
+                sessions: {
+                    type: Array,
+                    value: []
+                },
+                labTypes: {
+                    type: Array,
+                    value: [],
+                },
+                finishedSessionsLoad: false
             },
 
             ready: function () {
@@ -68,15 +170,23 @@
                         Authorization: this.accessToken
                     },
                     method: 'GET',
-                    endpoint: '/labs/?filter[where][tutorId]' + this.selfInfo.id
-                }
+                    endpoint: '/labs/?filter[where][tutorId]=' + this.selfInfo.id
+                };
                 this.ajax_exercises = {
                     headers: {
                         Authorization: this.accessToken
                     },
                     method: 'GET',
-                    endpoint: '/platformusers/' + this.selfInfo.id + '/exercise'
-                }
+//                    endpoint: '/exercises/?filter[where][tutor]=' + this.selfInfo.id
+                        endpoint: '/platformusers/' + this.selfInfo.id + '/exercise'
+                };
+                this.ajax_labTypes = {
+                    'headers': {
+                        'Authorization': this.accessToken
+                    },
+                    method: 'GET',
+                    endpoint: '/labTypes/'
+                };
             },
 
             /**
@@ -91,16 +201,43 @@
             _switchLocale: function() {
                 this.language = (this.language == 'en') ? 'de' : 'en';
             },
+            toggleCollapse: function(e) {
+                this.$$("#collapse-" + e.model.item.id).toggle();
+                this.$$("#src-" + e.model.item.id).classList.toggle('session-unfolded');
+            },
+            prettySessionEntry: function(item) {
+                console.log("filter:")
+                console.log(item)
+                prettyItem = item
+
+                switch(item.labType_string){
+                    case "":
+                        prettyItem.icon = "social:school";
+                        prettyItem.labType_string = "Übung"
+                        break;
+                    case "Audio":
+                        prettyItem.icon = "av:volume-mute";
+                        break;
+                    case "Video":
+                        prettyItem.icon = "av:videocam";
+                        break;
+                    case "Foto":
+                        prettyItem.icon = "image:photo-camera";
+                        break;
+                }
+
+                return prettyItem;
+            },
 
             _apiLabsResponse: function(response) {
-                if (response.type != 'response')
-                    return;
-                this.futureLabs = this.getOnlyFutureDates(response.data);
+                this._initSessionList(response.detail)
+//                this.futureLabs = this.getOnlyFutureDates(response.detail);
             },
             _apiExercisesResponse: function(response) {
-                if (response.type != 'response')
+//                this.futureExercises = this.getOnlyFutureDates(response.detail);
+                if (response.detail.length == 0)
                     return;
-                this.futureExercises = this.getOnlyFutureDates(response.data);
+                this._initSessionList(response.detail)
             },
 
             _onTapChooseDates: function(e) {
@@ -117,12 +254,133 @@
                 var futureDates = [];
                 var today = Date.now();
                 for (var i = 0; i < array.length; i++) {
-                    currentDate = new Date(array[i].date);
-                    if (currentDate > today)
-                        futureDates.push(currentDate)
+                    var currentSession = array[i];
+                    if (new Date(currentSession.date) > today)
+                        this.push('nextSessions', new Object({ 'info': currentSession }));
                 }
                 return futureDates;
-            }
+            },
+
+            _initSessionList: function(response) {
+
+                if (response.length == 0)
+                    return null;
+
+                var type = ("labTypeId" in response[0]) ? "lab" : "exercise";
+                var sessions_list = [];
+                console.log("received type: " + type);
+                console.log(response);
+
+                for (var i = 0; i < response.length; i++) {
+
+                    var date = new Date(response[i].date);
+                    var date_string = this._getDateString(date);
+                    var time_string = (date.getHours() + 1) + ":" + (date.getMinutes()<10 ? '0' : '') + date.getMinutes();
+                    var labType_string = ""
+
+                    if (this.labTypes.length != 0) {
+                        for (var j = 0; j < this.labTypes; j++) {
+                            if (this.labTypes.id == response[i].labTypeId)
+                                labType_string = this.labTypes[j].name
+                        }
+                    }
+
+                    var session = {
+                        'id': response[i].id,
+                        'type': type,
+                        'date': response[i].date,
+                        'date_string': date_string,
+                        'time_string': time_string,
+                        'location': response[i].location,
+                        'groupId': response[i].groupId,
+                        'labTypeId': response[i].labTypeId,
+                        'labType_string': labType_string,
+                        'exercise_name': response[i].name
+                    };
+
+                    this.push('sessions', session);
+                    this.$.ajax_group.$.request.auto = false;
+
+                    // If a group signed up for the session, get their data
+                    if (typeof response[i].groupId != 'undefined') {
+                        this.ajax_group = {
+                            'headers': {
+                                'Authorization': this.accessToken
+                            },
+                            'method': 'GET',
+                            'endpoint': '/labs/' + response[i].id + '/group'
+                        }
+                        this.$.ajax_group.$.request.generateRequest();
+                    }
+                }
+            },
+
+            _apiGroupResponse: function(response) {
+                console.log(response.detail)
+            },
+            _apiLabTypesResponse: function(response) {
+                console.log(response.detail)
+
+                for (var i = 0; i < response.detail.length; i++) {
+                    this.labTypes[response.detail[i].type_str] =  {
+                        'id':  response.detail[i].id,
+                        'name': response.detail[i].type_str,
+                        'registration_open': response.detail[i].registration_open
+                    }
+
+                    if (this.sessions.length != 0) {
+                        var labType_string;
+                        for (var j = 0; j < this.sessions.length; j++) {
+                            if (response.detail[i].id == this.sessions[j].labTypeId) {
+                                this.sessions[j].labType_string = response.detail[i].type_str
+                            }
+                        }
+//                        this.notifyPath('sessions.name');
+//                        var sessions = this.sessions;
+//                        this.sessions = []
+//                        this.sessions = sessions;
+
+                        var sessions = this.sessions;
+                        this.set('sessions', []);
+                        this.set('sessions', sessions);
+                    }
+                }
+                this.finishedSessionsLoad = true
+            },
+
+            /**
+             * Creates string from the given date
+             * @param {String} date - date that will be transformed to String
+             */
+            _getDateString: function(date){
+                var datestring = "";
+                switch(date.getDay()){
+
+                    case 0:
+                        datestring = "Sonntag, ";
+                        break;
+                    case 1:
+                        datestring = "Montag, ";
+                        break;
+                    case 2:
+                        datestring = "Dienstag, ";
+                        break;
+                    case 3:
+                        datestring = "Mittwoch, ";
+                        break;
+                    case 4:
+                        datestring = "Donnerstag, ";
+                        break;
+                    case 5:
+                        datestring = "Freitag, ";
+                        break;
+                    case 6:
+                        datestring = "Samstag, ";
+                        break;
+                }
+                datestring = datestring+date.getDate()+"."+date.getMonth()+"."+date.getFullYear();
+                return datestring;
+            },
         });
     </script>
 </dom-module>
