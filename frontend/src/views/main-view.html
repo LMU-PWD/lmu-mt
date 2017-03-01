@@ -195,8 +195,8 @@
                     type="Foto"
                     icon="[[icon]]"
                     route="{{subroute}}"
-                    group="[[ group ]]"
-                    user="[[user]]"
+                    group="{{ group }}"
+                    user="{{user}}"
                     lab-type="[[ labtype_foto ]]"
                     lab-data="[[ groupdata_foto ]]"
                     all-labs="[[ all_labs_foto ]]"
@@ -208,8 +208,8 @@
                     type="Video"
                     icon="[[icon]]"
                     route="{{subroute}}"
-                    group="[[ group ]]"
-                    user="[[user]]"
+                    group="{{ group }}"
+                    user="{{user}}"
                     lab-type="[[ labtype_video ]]"
                     lab-data="[[ groupdata_video ]]"
                     all-labs="[[all_labs_video]]"
@@ -221,8 +221,8 @@
                     type="Audio"
                     icon="[[icon]]"
                     route="{{subroute}}"
-                    group="[[ group ]]"
-                    user="[[user]]"
+                    group="{{ group }}"
+                    user="{{user}}"
                     lab-type="[[ labtype_audio ]]"
                     lab-data="[[ groupdata_audio ]]"
                     all-labs="[[all_labs_audio]]"
@@ -345,7 +345,8 @@
                 this.all_labs_foto = [];
                 this.all_labs_video = [];
                 this.all_labs_audio = [];
-                console.log(this.userId);
+                this.allPriorities = [];
+                this.bodyObject = [];
             },
             _accessTokenChanged: function () {
                 if (this.userId && this.accessToken) {
@@ -366,6 +367,7 @@
              * @private
              */
             _groupChanged: function(response) {
+                //console.log(this.group);
                 if (!this.isReady || !this.group.priorityIds)
                     return;
 
@@ -377,8 +379,9 @@
                             Authorization: this.accessToken
                         },
                         method: 'GET',
-                        endpoint: '/priorities/' + this.group.priorityIds[i]
+                        endpoint: '/Priorities?filter[where][groupId]='+this.user.groupId
                     };
+                    //console.log(this.ajax_prios);
                 }
                 for (j = 0; j < this.group.labIds.length; j++) {
                     // Get group-labs
@@ -510,19 +513,13 @@
                     return;
 
                 for (var i = 0; i < event.detail.length; i++) {
-                    if (event.detail[i].labTypeId == this.labtype_audio.id){
-                        //this.all_labs_audio.starttimes.push(new Date(event.detail[i].date));
-                        //this.all_labs_audio.durations.push(event.detail[i].duration);
+                    if (event.detail[i].labTypeId == this.labtype_foto.id){
                         this.all_labs_foto.push(event.detail[i]);
                     }
                     if (event.detail[i].labTypeId == this.labtype_video.id) {
-                        //this.all_labs_video.starttimes.push(new Date(event.detail[i].date));
-                        //this.all_labs_video.durations.push(event.detail[i].duration);
                         this.all_labs_video.push(event.detail[i]);
                     }
-                    if (event.detail[i].labTypeId == this.labtype_foto.id){
-                        //this.all_labs_foto.starttimes.push(new Date(event.detail[i].date));
-                        //this.all_labs_foto.durations.push(event.detail[i].duration);
+                    if (event.detail[i].labTypeId == this.labtype_audio.id){
                         this.all_labs_audio.push(event.detail[i]);
                     }
 
@@ -552,24 +549,27 @@
                 if(!this.isReady || this.gotLabTypes == false)
                     return;
 
+                this.allPriorities = event.detail;
                 var lab = "";
-                for(var i = 0; i<this.allLabs.length;i++){
-                    if(event.detail.labId == this.allLabs[i].id){
-                        lab = this.allLabs[i];
-
-                        if (lab.labTypeId == this.labtype_audio.id){
-                            this.groupdata_audio.priorities[event.detail.priority-1] = lab;
-                        }
-                        if (lab.labTypeId  == this.labtype_video.id) {
-                            this.groupdata_video.priorities[event.detail.priority - 1] = lab;
-                        }
-                        if (lab.labTypeId  == this.labtype_foto.id) {
-                            this.groupdata_foto.priorities[event.detail.priority - 1] = lab;
+                for(i = 0; i<this.allLabs.length;i++){
+                    lab = this.allLabs[i];
+                    for(j = 0; j < event.detail.length;j++) {
+                        if (event.detail[j].labId == this.allLabs[i].id) {
+                            if (lab.labTypeId == this.labtype_audio.id) {
+                                this.groupdata_audio.priorities[event.detail[j].priority - 1] = lab;
+                            }
+                            if (lab.labTypeId == this.labtype_video.id) {
+                                this.groupdata_video.priorities[event.detail[j].priority - 1] = lab;
+                            }
+                            if (lab.labTypeId == this.labtype_foto.id) {
+                                this.groupdata_foto.priorities[event.detail[j].priority - 1] = lab;
+                            }
                         }
                     }
                 }
 
                 //console.log("Group Prios:");
+                //console.log(this.group.id);
                 //console.log(this.groupdata_foto.priorities);
                 //console.log(this.groupdata_video.priorities);
                 //console.log(this.groupdata_audio.priorities);

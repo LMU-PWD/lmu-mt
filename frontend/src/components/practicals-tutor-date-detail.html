@@ -35,10 +35,23 @@
         </style>
 
         <api-request
-                headers="[[ ajax.headers ]]"
-                method="[[ ajax.method ]]"
-                endpoint="[[ ajax.endpoint ]]"
-                on-api-response="_responseFromPrioritySave"></api-request>
+            headers="[[ ajax_save.headers ]]"
+            method="[[ ajax_save.method ]]"
+            body="[[ ajax_save.body ]]"
+            endpoint="[[ ajax_save.endpoint ]]"
+            on-api-response="_responseFromPrioritySave"></api-request>
+        <api-request
+                headers="[[ ajax_delete.headers ]]"
+                method="[[ ajax_delete.method ]]"
+                body="[[ ajax_delete.body ]]"
+                endpoint="[[ ajax_delete.endpoint ]]"
+                on-api-response="_responseFromPriorityDelete"></api-request>
+        <api-request
+            headers="[[ ajax_possible_labs.headers ]]"
+            method="[[ ajax_possible_labs.method ]]"
+            body="[[ ajax_possible_labs.body ]]"
+            endpoint="[[ ajax_possible_labs.endpoint ]]"
+            on-api-response="_responseFromGetPossibleLabs"></api-request>
 
         <div class="content">
             <template is="dom-if" if="[[registration_open]]">
@@ -56,7 +69,8 @@
                     <template is="dom-if" if="[[labs_already_chosen]]">
                         <!-- Deadline is not over, Registration Open and dates selected; Show saved dates!-->
                         <practicals-show-saved-dates id="practicals_show_saved_dates"
-                                                     chosenlabs="{{chosenlabs_transformed}}"></practicals-show-saved-dates>
+                                                     chosenlabs="{{chosenlabs_transformed}}"
+                                                     title="Du hast diese Termine ausgewählt:"></practicals-show-saved-dates>
                         <paper-button raised class="changeButton" on-tap="_handleChangeClick">
                             <iron-icon icon="reply"></iron-icon>
                             Auswahl ändern
@@ -144,26 +158,20 @@
                 labType: Object
             },
             ready: function () {
-                console.log(this.labType.type_str);
+                //console.log(this.labType.type_str);
                 //console.log(this.user);
+                //console.log(this.allLabs);
                 //console.log(this.userId);
+                this.labs_already_chosen = false;
                 this.practical_dates = this._getPracticalDates(this.allLabs);
-                console.log(this.practical_dates);
                 this.practical_dates_exists = this._practicalDateExists(this.practical_dates);
                 if(this.practical_dates_exists){
                     this.practical_dates_transformed = this._transformLabs(this.practical_dates,false);
                 }
                 else{
-                    console.log(this.user.tutorPossibleLabs);
 
                     //TODO: Achtung die folgenden Zeilen funktionieren NOCH nicht
-                    this.labs_already_chosen = false;
-
-                    /*this.labs_already_chosen = this._chosenlabsExist(this.user.tutorPossibleLabs);
-                    if(this.labs_already_chosen){
-                        this.chosenlabs = this.user.tutorPossibleLabs;
-                        this.chosenlabs_transformed = this._transformLabs(this.chosenlabs,false);
-                    }*/
+                    this._getPossibleLabs(this.userId);
                 }
                 this.before_deadline = this._getBeforeDeadline(this.labType.registration_deadline_tutors);
                 if(!this.practical_dates_exists && (this.allLabs == [] || this.allLabs == null)){
@@ -178,9 +186,6 @@
                     console.log("before_deadline wird statisch auf false gesetzt, damit die Anzeige nicht leer ist");
                     this.before_deadline = false;
                 }
-                if(!this.before_deadline && !this.practical_dates_exists && !this.labs_already_chosen){
-                    console.log("ERROR: Die Deadline ist vorbei und trotzdem existieren weder zugewiesene noch ausgewählte Labs. Daten sind hier inkorrekt! LabType: "+this.labType.type_str);
-                }
             },
             /**
              * Back-button click handler
@@ -190,8 +195,21 @@
             },
 
             /**
-             * Check all Labs with this labtype for their tutorIDs
+             * Get tutors possibleLabs from API (labs where chosen by tutor)
+             * @param user - user-Object
              */
+            _getPossibleLabs: function(userId){
+                this.ajax_possible_labs = {
+                    headers: {
+                        'Authorization': this.accessToken
+                    },
+                    method: 'GET',
+                    endpoint: '/platformusers/' +userId+ '/tutorpossiblelabs/'
+                };
+                //console.log(this.ajax_possible_labs);
+            },
+
+
             _getPracticalDates: function(labs){
                 //console.log(labs);
                 var labsForThisTutor = [];
@@ -217,56 +235,26 @@
                         labcounter++;
                     }
                 }
-                if(labcounter == e.target.chosenlabs.length){
+                if(labcounter == e.target.chosenlabs.length && labcounter != 0){
                     this.chosenlabs = [];
                     this.chosenlabs = e.target.chosenlabs;
                     this.chosenlabs_transformed = this._transformLabs(this.chosenlabs,false);
 
-
+                    this.bodyObject =[];
                     for(i = 0; i<this.chosenlabs.length; i++) {
-                        //TODO: Post chosenlabs on API
-                        // Step 2. Save a new priority object
-                        /*if(this.group.priorityIds[i]) {
-                            this.ajax = {
-                                headers: {
-                                    'Authorization': this.accessToken
-                                },
-                                body: {
-
-                                    priority: i,
-                                    groupId: this.group.id,
-                                    labId: this.chosenlabs[i].id,
-                                    semesterId: this.group.semesterId,
-                                    labTypeId: this.labType.id
-
-                                },
-                                method: 'POST',
-                                endpoint: '/priorities/' + this.group.priorityIds[i]
-
-                            };
-                            console.log(this.ajax);
-                        }
-                        else{
-                            this.ajax = {
-                                headers: {
-                                    'Authorization': this.accessToken
-                                },
-                                body: {
-
-                                    priority: i,
-                                    groupId: this.group.id,
-                                    labId: this.chosenlabs[i].id,
-                                    semesterId: this.group.semesterId,
-                                    labTypeId: this.labType.id
-
-                                },
-                                method: 'POST',
-                                endpoint: '/priorities'
-
-                            };
-                            console.log(this.ajax);
-                        }*/
+                        this.bodyObject.push({
+                                "labId": this.chosenlabs[i].id
+                        });
                     }
+
+                    this.ajax_delete = {
+                        headers: {
+                            'Authorization': this.accessToken
+                        },
+                        method: 'DELETE',
+                        endpoint: '/platformusers/' +this.userId+ '/tutorpossiblelabs/'
+                    };
+                    console.log(this.ajax_delete);
 
                     this.labs_already_chosen = true;
                     var practicals_show_saved_dates = Polymer.dom(this.root).querySelector("#practicals_show_saved_dates");
@@ -300,7 +288,9 @@
              * Function that checks for the practial course date
              */
             _practicalDateExists: function(dates){
-                if(dates == null || !dates[0]){
+                //console.log(dates)
+                if(!dates || !dates[0] || dates ==  []){
+                    //console.log("inside")
                     return false;
                 }
                 return true;
@@ -310,10 +300,10 @@
              */
             _chosenlabsExist: function(labs){
                 //console.log(labs);
-                if(labs == [] || labs == null || labs.length == 0){
+                if(labs == [] || !labs || labs.length == 0){
                     return  false;
                 }
-                if(labs[0].date == null){
+                if(!labs[0].date){
                     return  false;
                 }
                 return  true;
@@ -375,6 +365,7 @@
             /**
              * Transform the Format of the given Timelabs from the Api, so it will be easier to handle in the frontend
              * @param labsFromApi - Contains the given timelabs
+             * @param divideDates - Decides if there will be generated a new array for each day inside the return-array or not
              * @returns {Array} - timelabs in new format
              * @private
              */
@@ -389,11 +380,11 @@
                 for(i=0; i<labsFromApi.length; i++){
                     // Create a new array-entrie if date from recent lab is different from date of the last lab
                     var labdate = new Date(labsFromApi[i].date);
-                    if(labdate.getFullYear() != lastLab.getFullYear() ||
+                    if((labdate.getFullYear() != lastLab.getFullYear() ||
                         labdate.getMonth() != lastLab.getMonth() ||
-                        labdate.getDate() != lastLab.getDate()) {
+                        labdate.getDate() != lastLab.getDate()) && divideDates) {
                         dates = [];
-                        lastlab = labdate.date;
+                        lastLab = labdate;
                         transformedLabs.push([]);
                         countDates++;
                         countLabs = 0;
@@ -425,12 +416,58 @@
                 return transformedLabs;
             },
             /**
-             * Gets response from API call to create a new priority
+             * Gets response from API call to save the priorities
+             * @param response
+             * @private
+             */
+            _responseFromPriorityDelete: function(response) {
+                console.log(response);
+                this.ajax_save = {
+                    headers: {
+                        'Authorization': this.accessToken
+                    },
+                    body: this.bodyObject,
+                    method: 'POST',
+                    endpoint: '/platformusers/' +this.userId+ '/tutorpossiblelabs/'
+                };
+                console.log(this.ajax_save);
+            },
+            /**
+             * Gets response from API call to save the priorities
              * @param response
              * @private
              */
             _responseFromPrioritySave: function(response) {
                 console.log(response);
+            },
+
+            /**
+             * Gets response from API request get /plattformusers/{id}/tutorpossiblelabs
+             * @param response
+             * @private
+             */
+            _responseFromGetPossibleLabs: function(response) {
+
+                //console.log(response.detail);
+                var possibleLabsForThisTutor = [];
+                for(i = 0; i<this.allLabs.length; i++){
+                    for(j = 0; j<response.detail.length; j++) {
+                        if (this.allLabs[i].id == response.detail[j]) {
+                            possibleLabsForThisTutor.push(this.allLabs[i]);
+                        }
+                    }
+                }
+                //console.log(possibleLabsForThisTutor);
+
+                if(this._chosenlabsExist(possibleLabsForThisTutor)){
+                    this.chosenlabs = possibleLabsForThisTutor;
+                    this.chosenlabs_transformed = this._transformLabs(this.chosenlabs,false);
+                    this.labs_already_chosen = true;
+                }
+                //console.log(this.labs_already_chosen);
+                if(!this.before_deadline && !this.practical_dates_exists && !this.labs_already_chosen){
+                    console.log("ERROR: Die Deadline ist vorbei und trotzdem existieren weder zugewiesene noch ausgewählte Labs. Daten sind hier inkorrekt! LabType: "+this.labType.type_str);
+                }
             }
         });
     </script>

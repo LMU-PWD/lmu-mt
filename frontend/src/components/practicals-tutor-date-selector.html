@@ -112,7 +112,7 @@
 
             ready: function() {
                 this.timeslots = this._transformLabs(this.apiAllLabs,true);
-                //console.log(this.timeslots);
+                console.log(this.timeslots);
             },
 
 
@@ -220,11 +220,11 @@
                 for(i=0; i<labsFromApi.length; i++){
                     // Create a new array-entrie if date from recent lab is different from date of the last lab
                     var labdate = new Date(labsFromApi[i].date);
-                    if(labdate.getFullYear() != lastLab.getFullYear() ||
+                    if((labdate.getFullYear() != lastLab.getFullYear() ||
                         labdate.getMonth() != lastLab.getMonth() ||
-                        labdate.getDate() != lastLab.getDate()) {
+                        labdate.getDate() != lastLab.getDate()) && divideDates) {
                         dates = [];
-                        lastlab = labdate.date;
+                        lastLab = labdate;
                         transformedLabs.push([]);
                         countDates++;
                         countLabs = 0;

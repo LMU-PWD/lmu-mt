@@ -97,7 +97,6 @@
             },
             ready: function() {
                 this.date = this._getDateString(this.timeslots[0][0]);
-                console.log(this.timeslots);
 
                 for (i = 0; i < this.priority; i++) {
                         this.priorities[i]=i+1;
@@ -178,7 +177,6 @@
              */
             _handleDateClick: function(e){
                 this.fire("date-click");
-
                 this.chosenlabindex = e.model.index;
 
 
@@ -196,6 +194,7 @@
                 var array = this.priorities;
                 this.priorities = [];
                 this.priorities = array;
+                //console.log(this.priorities);
             },
 
             /**
@@ -204,18 +203,21 @@
              * @param {String} e - handle data
              */
             _handlePriorityClick: function(e){
-                if(e.model.selector){
+                if(e.model.selector) {
                     this.chosenpriority = e.model.selector;
-                    if(this.recentlab.lastChild.textContent.search('Priorität:')>=0){
+                    if (this.recentlab.lastChild.textContent.search('Priorität:') >= 0) {
                         this.fire("replace-priority");
                         //TODO: replace lab on practical-date-detail chosenlabs-Array and priorities-Array
                     }
-                    this.fire("priority-click"); //Notifies Parent (practical-date-detail.html)
-                    this.recentpriorityselection.toggle(); //Hide Priorityselection
-                    this.recentlab.style.color = 'green';
-                    this.recentlab.style.backgroundColor = '#CEF6CE';
-                    this.recentlab.lastChild.textContent = 'Priorität: ' + e.model.selector;
-                    //this.recentlab.innerHTML = this.recentlab.innerHTML +'<div id="priorityShower">'+'Priorität: ' + e.model.selector+'</div>';
+                    else {
+                        this.fire("priority-click"); //Notifies Parent (practical-date-detail.html)
+                        this.recentpriorityselection.toggle(); //Hide Priorityselection
+                        this.recentlab.style.color = 'green';
+                        this.recentlab.style.backgroundColor = '#CEF6CE';
+                        this.recentlab.lastChild.textContent = 'Priorität: ' + e.model.selector;
+                        //this.recentlab.innerHTML = this.recentlab.innerHTML +'<div id="priorityShower">'+'Priorität: ' + e.model.selector+'</div>';
+
+                    }
                 }
             },
 
