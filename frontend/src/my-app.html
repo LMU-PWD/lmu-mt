@@ -173,10 +173,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
              */
             _handleUserResponse: function (response) {
                 this.set('user', response.detail);
-                //Set userRole flag for student if not Admin or Tutor
-                if (!this.user.isAdmin && !this.user.isTutor) {
-                    this.set('user.isStudent', true);
-                }
+                console.log(response);
                 this.set('route.path', '/main');
                 this.set('routeData.page', 'main');
                 this.set('session.loggedIn', true);

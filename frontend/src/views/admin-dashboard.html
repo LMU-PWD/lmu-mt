@@ -1,5 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../services/get-user-info.html">
+<link rel="import" href="../components/admin-card.html">
 
 <!--Localization Imports-->
 <link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
@@ -11,37 +12,101 @@
         <style>
             :host{
             }
+
+            .user-container {
+                float: left;
+            }
+
+
+            .practicals-container {
+                float: left;
+            }
+
+            iron-collapse {
+                width: 100%;
+            }
+
+            admin-toolbar {
+                margin: 0 10px;
+                width: auto;
+            }
+
+            /*Phone*/
+            @media screen and (max-width: 767px) {
+                .user-container {
+                    width: 100%;
+                    min-width: 320px;
+                }
+
+                .practicals-container {
+                    min-width: 320px;
+                    width: 100%;
+                }
+
+                admin-toolbar {
+                    margin: 0;
+                }
+            }
+
+            /*Tablet*/
+            @media screen and (min-width: 768px) and (max-width: 1023px) {
+                .user-container {
+                    margin: 10px;
+                    width: calc(50% - 20px);
+                }
+
+                .practicals-container {
+                    margin: 10px;
+                    width: calc(50% - 20px);
+                }
+            }
+
+            /*Desktop*/
+            @media screen and (min-width: 1024px) {
+                .user-container {
+                    margin: 10px;
+                    width: calc(35% - 20px);
+                }
+
+                .practicals-container {
+                    margin: 10px;
+                    width: calc(35% - 20px);
+                }
+            }
         </style>
         <div></div>
 
-        <div class="group-container" on-tap="_handleTap">
+        <div class="user-container">
                 <!-- A D M I N   T O O L B A R -->
                 <admin-toolbar
                         user="[[ user ]]"
                         selected-semester="{{ adminSelectedSemesterId }}"
                         main-view-page="{{ page }}"></admin-toolbar>
-                <group-card key="groups" group-name="Gruppen" on-tap="toggleGroup"></group-card>
+            <admin-card label="{{localize('admin_dashboard tutors')}}"
+                        path-to-icon="../../images/tutor.svg"
+                        role="tutors"></admin-card>
+            <admin-card label="{{localize('admin_dashboard students')}}"
+                        path-to-icon="../../images/student.svg"
+                        role="students"></admin-card>
+            <admin-card label="{{localize('admin_dashboard groups')}}"
+                        path-to-icon="../../images/group.svg"
+                        role="groups"></admin-card>
+                <!--group-card key="groups" group-name="Gruppen" on-tap="toggleGroup"></group-card>
                 <iron-collapse id="collapse" opened=true>
                     <groups-admin class="group-info"
                                   access-token="[[ accessToken ]]"
                                   self-info="{{user}}"
                                   selected-semester="[[ adminSelectedSemesterId ]]"></groups-admin>
-                </iron-collapse>
+                </iron-collapse-->
             </div>
 
         <div class="practicals-container">
-            <div on-tap="_handleFotoTap">
                 <index-card type="Fotopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:"
                             info2="18.05.16, 14-16"></index-card>
-            </div>
-            <div on-tap="_handleVideoTap">
                 <index-card type="Videopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:"
                             info2="18.05.16, 14-16"></index-card>
-            </div>
-            <div on-tap="_handleAudioTap">
                 <index-card type="Audiopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:"
                             info2="18.05.16, 14-16"></index-card>
-            </div>
         </div>
 
         <!--Iron Signal for Localization-->
@@ -69,9 +134,10 @@
             
             },
             _handleTap: function (event) {
+                console.log(event.target);
                 console.log(event);
-                var key = event.target.getAttribute('key');
-                this.fire('CHANGE_ROUTE', {path: '/'+key, page: key});
+                //var key = event.target.getAttribute('key');
+                //this.fire('CHANGE_ROUTE', {path: '/'+key, page: key});
                 //console.log(event.model);
             },
         });

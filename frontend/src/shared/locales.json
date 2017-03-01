@@ -128,7 +128,12 @@
 
     "tooltip_menu logout" : "Log out the current User",
     "tooltip_menu language" : "Change language to German",
-    "tooltip_menu settings" : "User Settings"
+    "tooltip_menu settings" : "User Settings",
+
+    "admin_dashboard students" : "Students",
+    "admin_dashboard groups" : "Groups",
+    "admin_dashboard tutors" : "Tutors",
+    "admin_dashboard semester" : "Terms"
 
   },
 
@@ -261,6 +266,11 @@
 
     "tooltip_menu logout" : "Den aktuellen Benutzer ausloggen",
     "tooltip_menu language" : "Plattformsprache zu Englisch ändern",
-    "tooltip_menu settings" : "Benutzereinstellungen"
+    "tooltip_menu settings" : "Benutzereinstellungen",
+
+    "admin_dashboard students" : "Studenten",
+    "admin_dashboard groups" : "Gruppen",
+    "admin_dashboard tutors" : "Tutoren",
+    "admin_dashboard semester" : "Semester"
   }
 }
