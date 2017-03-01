@@ -79,12 +79,13 @@
                     </div>
                     <div>
                         <h1>Terminauswahl</h1>
-                        <practicals-students-date-detail  group="{{ group }}"
-                                                          user="{{ user }}"
+                        <practicals-students-date-detail id="detailView"
+                                                         group="{{ group }}"
+                                                         user="{{ user }}"
                                                          lab-type="[[labType]]"
                                                          lab-data="[[labData]]"
                                                          all-labs="[[allLabs]]"
-                                                         on-back-click="_handleBackTap"
+                                                         on-save-click="_handleSaveClick"
                                                          access-token="{{ accessToken }}"
                                                          user-id="{{ userId }}"></practicals-students-date-detail>
                     </div>
@@ -146,9 +147,19 @@
                 }
             },
             /**
+             * Handle save click
+             * @param e - Event Variable
+             * @private
+             */
+            _handleSaveClick: function(e){
+                this.fire("save-click",e.detail);
+            },
+            /**
              * Back-button click handler
              */
             _backClicked: function(e) {
+              var datedetail = Polymer.dom(this.root).querySelector("#detailView");
+              datedetail._backClick();
               this.fire("back-click");
             }
         });

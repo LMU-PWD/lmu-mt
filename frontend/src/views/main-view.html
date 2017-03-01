@@ -114,6 +114,19 @@
                 endpoint="[[ ajax_glabs.endpoint ]]"
                 on-api-response="_handleGroupLabsRequest"></api-request>
 
+        <api-request
+                headers="[[ ajax_save.headers ]]"
+                body="[[ ajax_save.body ]]"
+                method="[[ ajax_save.method ]]"
+                endpoint="[[ ajax_save.endpoint ]]"
+                on-api-response="_responseFromPrioritySave"></api-request>
+        <api-request
+                headers="[[ ajax_delete.headers ]]"
+                body="[[ ajax_delete.body ]]"
+                method="[[ ajax_delete.method ]]"
+                endpoint="[[ ajax_delete.endpoint ]]"
+                on-api-response="_responseFromPrioritySaveDelete"></api-request>
+
         <app-header fixed>
             <navigation-bar
                     access-token="{{ accessToken }}"
@@ -201,6 +214,7 @@
                     lab-data="[[ groupdata_foto ]]"
                     all-labs="[[ all_labs_foto ]]"
                     on-back-click="_handleBackTap"
+                    on-save-click="_handleSaveClick"
                     access-token="{{ accessToken }}"
                     user-id="{{ userId }}"></practicals-view>
             <practicals-view
@@ -214,6 +228,7 @@
                     lab-data="[[ groupdata_video ]]"
                     all-labs="[[all_labs_video]]"
                     on-back-click="_handleBackTap"
+                    on-save-click="_handleSaveClick"
                     access-token="{{ accessToken }}"
                     user-id="{{ userId }}"></practicals-view>
             <practicals-view
@@ -227,6 +242,7 @@
                     lab-data="[[ groupdata_audio ]]"
                     all-labs="[[all_labs_audio]]"
                     on-back-click="_handleBackTap"
+                    on-save-click="_handleSaveClick"
                     access-token="{{ accessToken }}"
                     user-id="{{ userId }}"></practicals-view>
 
@@ -345,6 +361,8 @@
                 this.all_labs_foto = [];
                 this.all_labs_video = [];
                 this.all_labs_audio = [];
+                this.allPriorities = [];
+                this.bodyObject = [];
             },
             _accessTokenChanged: function () {
                 if (this.userId && this.accessToken) {
@@ -365,8 +383,7 @@
              * @private
              */
             _groupChanged: function(response) {
-                console.log("groupChanged");
-                console.log(this.group);
+                //console.log(this.group);
                 if (!this.isReady || !this.group.priorityIds)
                     return;
 
@@ -378,9 +395,9 @@
                             Authorization: this.accessToken
                         },
                         method: 'GET',
-                        endpoint: '/priorities/' + this.group.priorityIds[i]
+                        endpoint: '/Priorities?filter[where][groupId]='+this.user.groupId
                     };
-                    console.log(this.ajax_prios);
+                    //console.log(this.ajax_prios);
                 }
                 for (j = 0; j < this.group.labIds.length; j++) {
                     // Get group-labs
@@ -493,10 +510,10 @@
                 }
                 this.gotLabTypes = true;
 
-                console.log("Labtypes: ");
-                console.log(this.labtype_foto);
-                console.log(this.labtype_video);
-                console.log(this.labtype_audio);
+                //console.log("Labtypes: ");
+                //console.log(this.labtype_foto);
+                //console.log(this.labtype_video);
+                //console.log(this.labtype_audio);
 
             },
             /**
@@ -512,30 +529,24 @@
                     return;
 
                 for (var i = 0; i < event.detail.length; i++) {
-                    if (event.detail[i].labTypeId == this.labtype_audio.id){
-                        //this.all_labs_audio.starttimes.push(new Date(event.detail[i].date));
-                        //this.all_labs_audio.durations.push(event.detail[i].duration);
+                    if (event.detail[i].labTypeId == this.labtype_foto.id){
                         this.all_labs_foto.push(event.detail[i]);
                     }
                     if (event.detail[i].labTypeId == this.labtype_video.id) {
-                        //this.all_labs_video.starttimes.push(new Date(event.detail[i].date));
-                        //this.all_labs_video.durations.push(event.detail[i].duration);
                         this.all_labs_video.push(event.detail[i]);
                     }
-                    if (event.detail[i].labTypeId == this.labtype_foto.id){
-                        //this.all_labs_foto.starttimes.push(new Date(event.detail[i].date));
-                        //this.all_labs_foto.durations.push(event.detail[i].duration);
+                    if (event.detail[i].labTypeId == this.labtype_audio.id){
                         this.all_labs_audio.push(event.detail[i]);
                     }
 
                     this.allLabs.push(event.detail[i]);
                 }
 
-                console.log("AllLabs: ");
-                console.log(this.allLabs);
-                console.log(this.all_labs_foto);
-                console.log(this.all_labs_video);
-                console.log(this.all_labs_audio);
+                //console.log("AllLabs: ");
+                //console.log(this.allLabs);
+                //console.log(this.all_labs_foto);
+                //console.log(this.all_labs_video);
+                //console.log(this.all_labs_audio);
 
                 if (this.semesterId && this.labTypesRequestSent) {
                     this.labsRequestSent = true;
@@ -549,33 +560,35 @@
              */
             _handlePriosRequest: function(event){
                 //console.log('_handlePriosRequest()');
-                console.log(event.detail);
+                //console.log(event.detail);
 
                 if(!this.isReady || this.gotLabTypes == false)
                     return;
 
+                this.allPriorities = event.detail;
                 var lab = "";
-                for(var i = 0; i<this.allLabs.length;i++){
-                    if(event.detail.labId == this.allLabs[i].id){
-                        lab = this.allLabs[i];
-
-                        if (lab.labTypeId == this.labtype_audio.id){
-                            this.groupdata_audio.priorities[event.detail.priority-1] = lab;
-                        }
-                        if (lab.labTypeId  == this.labtype_video.id) {
-                            this.groupdata_video.priorities[event.detail.priority - 1] = lab;
-                        }
-                        if (lab.labTypeId  == this.labtype_foto.id) {
-                            this.groupdata_foto.priorities[event.detail.priority - 1] = lab;
+                for(i = 0; i<this.allLabs.length;i++){
+                    lab = this.allLabs[i];
+                    for(j = 0; j < event.detail.length;j++) {
+                        if (event.detail[j].labId == this.allLabs[i].id) {
+                            if (lab.labTypeId == this.labtype_audio.id) {
+                                this.groupdata_audio.priorities[event.detail[j].priority - 1] = lab;
+                            }
+                            if (lab.labTypeId == this.labtype_video.id) {
+                                this.groupdata_video.priorities[event.detail[j].priority - 1] = lab;
+                            }
+                            if (lab.labTypeId == this.labtype_foto.id) {
+                                this.groupdata_foto.priorities[event.detail[j].priority - 1] = lab;
+                            }
                         }
                     }
                 }
 
-                console.log("Group Prios:");
-                console.log(this.group.id);
-                console.log(this.groupdata_foto.priorities);
-                console.log(this.groupdata_video.priorities);
-                console.log(this.groupdata_audio.priorities);
+                //console.log("Group Prios:");
+                //console.log(this.group.id);
+                //console.log(this.groupdata_foto.priorities);
+                //console.log(this.groupdata_video.priorities);
+                //console.log(this.groupdata_audio.priorities);
 
             },
 
@@ -598,10 +611,43 @@
                 if (event.detail.labTypeId == this.labtype_audio.id)
                     this.groupdata_foto.lab = new Date(event.detail.date);
 
-                console.log("Group Labs:");
-                console.log(this.groupdata_foto.lab);
-                console.log(this.groupdata_video.lab);
-                console.log(this.groupdata_audio.lab);
+                //console.log("Group Labs:");
+                //console.log(this.groupdata_foto.lab);
+                //console.log(this.groupdata_video.lab);
+                //console.log(this.groupdata_audio.lab);
+            },
+            /**
+             * Handle save click
+             * @param e - Event Variable
+             * @private
+             */
+            _handleSaveClick: function(e){
+                /*console.log(this.allPriorities);
+                this.bodyObject.push(e.detail);
+                console.log(this.bodyObject);
+                for(i=0; i< this.allPriorities; i++) {
+                    if (this.bodyObject[0].labTypeId && this.bodyObject[0].labTypeId == this.allPriorities[i].labTypeId) {
+                        if(this.allPriorities[i].id) {
+                            this.bodyObject.push(this.allPriorities[i]);
+                            console.log(this.allPriorities[i]);
+                        }
+                    }
+                    else if(!this.bodyObject[0].labTypeId){
+                        if(this.allPriorities[i].id) {
+                            this.bodyObject.push(this.allPriorities[i]);
+                            console.log(this.allPriorities[i]);
+                        }
+                    }
+                }
+                console.log(this.bodyObject);
+                this.ajax_delete = {
+                    headers: {
+                        'Authorization': this.accessToken
+                    },
+                    method: 'DELETE',
+                    endpoint: '/groups/'+this.user.groupId+'/priorities/'
+                };
+                //console.log(this.ajax_delete);*/
             },
 
             isStudent: function () {
@@ -632,6 +678,33 @@
             _routePageChanged: function(page) {
                 this.page  = page || 'dashboard';
             },
+            /**
+             * Gets response from API call to create a new priority
+             * @param response
+             * @private
+             */
+            /*_responseFromPrioritySave: function(response) {
+                console.log(response);
+            },*/
+            /**
+             * Gets response from API call to create a new priority
+             * @param response
+             * @private
+             */
+            /*_responseFromPrioritySaveDelete: function(response) {
+                console.log(response);
+                console.log(this.bodyObject);
+                this.ajax_save = {
+                    headers: {
+                        'Authorization': this.accessToken
+                    },
+                    method: 'POST',
+                    body: this.bodyObject,
+                    endpoint: '/priorities/'
+                };
+                //console.log(this.ajax);
+                this.bodyObject=[];
+            },*/
 
             _switchLocale: function() {
                 this.language = (this.language == 'en') ? 'de' : 'en';
