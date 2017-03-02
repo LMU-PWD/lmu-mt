@@ -1,0 +1,435 @@
+<link rel="import" href="../components/practicals-students-date-selector.html">
+<link rel="import" href="../components/practicals-show-saved-dates.html">
+
+<dom-module id="practicals-students-date-detail">
+    <template>
+        <style include="shared-styles">
+            :host {
+                #display: block;
+            }
+            .page{
+                #border-radius: 25px;
+                margin: 24px;
+                background-color: var(--paper-blue-grey-100);
+                color: var(--paper-blue-grey-900);
+            }
+            .tabheader{
+                background-color: var(--paper-blue-grey-900);
+                font-size: 120%;
+                #border-radius: 25px 25px 0px 0px;
+                overflow: hidden;
+                height: 5vh;
+            }
+            .tabheaderbuttons{
+                color: var(--paper-blue-grey-50);
+                text-align: center;
+            }
+            .backbutton{
+                width: 70px;
+                --paper-icon-button-ink-color:var(--paper-blue-grey-300);
+                padding-right: 30px;
+            }
+            .content{
+                padding: 10px;
+            }
+        </style>
+
+        <api-request
+                headers="[[ ajax.headers ]]"
+                body="[[ ajax.body ]]"
+                method="[[ ajax.method ]]"
+                endpoint="[[ ajax.endpoint ]]"
+                on-api-response="_responseFromPrioritySave"></api-request>
+        <api-request
+                headers="[[ ajax_delete.headers ]]"
+                body="[[ ajax_delete.body ]]"
+                method="[[ ajax_delete.method ]]"
+                endpoint="[[ ajax_delete.endpoint ]]"
+                on-api-response="_responseFromPrioritySaveDelete"></api-request>
+
+        <div class="content">
+            <template is="dom-if" if="[[registration_open]]">
+                <!-- Registration Open Bool from Api is true -->
+                <template is="dom-if" if="[[before_deadline]]">
+                    <template is="dom-if" if="[[!labs_already_chosen]]" >
+                        <!-- Deadline is not over, Registration Open and no dates selected; Select your dates!-->
+                        <practicals-students-date-selector  id="practicalsDateSelector"
+                                                   priority="[[priority]]"
+                                                   api-priorities="{{ labdata.priorities }}"
+                                                   user="[[ user ]]"
+                                                   api-all-labs="[[allLabs]]"
+                                                   on-save-click="_handleSaveClick"
+                                                   on-reset-click="_handleResetClick"></practicals-students-date-selector>
+                    </template>
+                    <template is="dom-if" if="[[labs_already_chosen]]">
+                        <!-- Deadline is not over, Registration Open and dates selected; Show saved dates!-->
+                        <practicals-show-saved-dates id="practicals_show_saved_dates"
+                                                     chosenlabs="{{chosenlabs_transformed}}"
+                                                     title="Deine Gruppe hat diese Termine ausgewählt:"></practicals-show-saved-dates>
+                        <paper-button raised class="changeButton" on-tap="_handleChangeClick">
+                            <iron-icon icon="reply"></iron-icon>
+                            Auswahl ändern
+                        </paper-button>
+                    </template>
+                </template>
+                <template is="dom-if" if="[[!before_deadline]]">
+                    <!-- Deadline is over and Registration has been started-->
+                    <template is="dom-if" if="[[!practical_date_exists]]">
+                        <!-- Deadline is over, Registration has been started but Practical Date is not given -->
+                        <practicals-show-saved-dates chosenlabs="{{chosenlabs_transformed}}"
+                                                     title="Deine Gruppe hat diese Termine ausgewählt:"></practicals-show-saved-dates>
+                    </template>
+                    <template is="dom-if" if="[[practical_date_exists]]">
+                        <!-- Deadline is over, Registration has been started and Practical Date is given-->
+                        <div>
+                            Dein Praktikumstermin ist am [[practical_date_string]]
+                        </div>
+                    </template>
+                </template>
+            </template>
+            <template is="dom-if" if="[[!registration_open]]">
+                <!-- Registration Open Bool from Api is false; Registration not opened yet -->
+                <div>
+                    Die Terminwahl ist noch nicht freigeschalten!
+                </div>
+            </template>
+        </div>
+
+    </template>
+
+    <script>
+        Polymer({
+            is: 'practicals-students-date-detail',
+            properties: {
+                accessToken: {
+                    type: String,
+                    notify: true
+                },
+                before_deadline:{
+                    type: Boolean,
+                    value: true
+                },
+                chosenlabs: {
+                    type: Array,
+                    value: []
+                },
+                practical_date:{
+                    type: Date,
+                    notify: true
+                },
+                practical_date_exists:{
+                    type: Boolean
+                },
+                priority:{
+                    type: Number,
+                    value: 2
+                },
+                registration_open:{
+                    type: Boolean,
+                    value: true
+                },
+                route: {
+                    type: Object,
+                    notify: true
+                },
+                labs_already_chosen:{
+                    type: Boolean
+                },
+                isReady: {
+                    type: Boolean,
+                    value: false
+                },
+                group: {
+                    type: Object,
+                    notify: true,
+                    readOnly: false
+                },
+                user: Object,
+                allLabs: {
+                    type: Array,
+                    value: []
+                },
+                labData: Object,
+                labType: Object
+            },
+            ready: function () {
+                this.practical_date = this.labData.lab;
+
+                this.practical_date_exists = this._dateExists(this.practical_date);
+
+                if(this.practical_date_exists){
+                    this.practical_date_string = this._getDateString(this.practical_date);
+                }
+                else{
+                    this.labs_already_chosen = this._chosenlabsExist(this.labData.priorities);
+                    if(this.labs_already_chosen){
+                        this.chosenlabs = this.labData.priorities;
+                        this.chosenlabs_transformed = this._transformLabs(this.chosenlabs,false);
+                    }
+                }
+                this.before_deadline = this._getBeforeDeadline(this.labType.registration_deadline);
+                if(!this.practical_date_exists && (this.allLabs == [] || this.allLabs == null)){
+                    this.registration_open = false;
+                }
+                else{
+                    this.registration_open = this.labType.registration_open;
+                }
+
+                if(this.practical_date_exists && this.before_deadline){
+                    console.log("ERROR: Die Praktikumsdaten können nicht vor der Deadline zugewiesen sein. Daten sind hier inkorrekt! LabType: "+this.labType.type_str);
+                    console.log("before_dedline wird statisch auf false gesetzt, damit die Anzeige nicht leer ist");
+                    this.before_deadline = false;
+                }
+                else if(!this.before_deadline && !this.practical_dates_exists && !this.labs_already_chosen){
+                    console.log("ERROR: Die Deadline ist vorbei und trotzdem existieren weder zugewiesene noch ausgewählte Labs. Daten sind hier inkorrekt! LabType: "+this.labType.type_str);
+                }
+            },
+            /**
+             * Back-button click handler
+             */
+            _handleBackTap: function(e) {
+                this.chosenlabs = [];
+                var practicals_date_selector = Polymer.dom(this.root).querySelector("#practicalsDateSelector");
+                console.log(practicals_date_selector);
+                if(practicals_date_selector) {
+                    practicals_date_selector._handleResetClick();
+                }
+            },
+
+            /**
+             * Handle save click
+             * @param e - Event Variable
+             * @private
+             */
+            _handleSaveClick: function(e){
+                //console.log(e.target.chosenlabs);
+                var labcounter = 0;
+                for(i=0; i< e.target.chosenlabs.length; i++){
+                    if(e.target.chosenlabs[i] != null){
+                        labcounter++;
+                    }
+                }
+                if(labcounter == e.target.chosenlabs.length && labcounter != 0){
+                    this.chosenlabs = [];
+                    this.chosenlabs = e.target.chosenlabs;
+                    this.chosenlabs_transformed = this._transformLabs(this.chosenlabs,false);
+
+                    this.bodyObject = [];
+
+                    for(i = 0; i<this.chosenlabs.length; i++) {
+                         this.bodyObject.push({
+                            priority: i+1,
+                            groupId: this.user.groupId,
+                            labId: this.chosenlabs[i].id,
+                            semesterId: this.group.semesterId
+                        });
+                    }
+
+                    this.fire("save-click", this.bodyObject);
+
+                    this.ajax_delete = {
+                        headers: {
+                            'Authorization': this.accessToken
+                        },
+                        method: 'DELETE',
+                        endpoint: '/groups/'+this.user.groupId+'/Priorities?filter[where][labTypeId]=' + this.labType
+                    };
+
+                    this.labs_already_chosen = true;
+                    var practicals_show_saved_dates = Polymer.dom(this.root).querySelector("#practicals_show_saved_dates");
+                    if(practicals_show_saved_dates) {
+                        practicals_show_saved_dates._labsChanged(this.chosenlabs_transformed);
+                    }
+                }
+                else{
+                    alert("Error: Not enough labs chosen. Just "+labcounter+" labs chosen.");
+                }
+            },
+            /**
+             * Handle reset click
+             * @param e - Event Variable
+             * @private
+             */
+            _handleResetClick: function(e){
+                this.chosenlabs = [];
+            },
+            /**
+             * Handle change click
+             * @param e - Event Variable
+             * @private
+             */
+            _backClick: function(){
+                this.labs_already_chosen = false;
+                this.chosenlabs = [];
+                var practicals_date_selector = Polymer.dom(this.root).querySelector("#practicalsDateSelector");
+                //console.log(practicals_date_selector);
+                if(practicals_date_selector) {
+                    practicals_date_selector._handleResetClick();
+                }
+            },
+
+            /**
+             * Function that checks for the practial course date
+             */
+            _dateExists: function(date){
+                if(date == null){
+                    return false;
+                }
+                return true;
+            },
+            /**
+             * Function that checks for the if there are labs already chosen
+             */
+            _chosenlabsExist: function(labs){
+                //console.log(labs);
+                if(labs == [] || labs == null || labs.length == 0){
+                    return  false;
+                }
+                if(labs[0].date == null){
+                    return  false;
+                }
+                return  true;
+            },
+            _getBeforeDeadline: function (deadline){
+                var deadline_date = new Date(deadline);
+                var today = new Date();
+                if(deadline_date > today){
+                    //console.log("before deadline");
+                    return true;
+
+                }
+                //console.log("after deadline");
+                return false;
+
+            },
+            /**
+             * Creates string from the given date
+             * @param {String} date - date that will be transformed to String
+             */
+            _getDateString: function(date){
+                var datestring = "";
+                switch(date.getDay()){
+                    case 0:
+                        datestring = "Sonntag, den ";
+                        break;
+                    case 1:
+                        datestring = "Montag, den ";
+                        break;
+                    case 2:
+                        datestring = "Dienstag, den ";
+                        break;
+                    case 3:
+                        datestring = "Mittwoch, den ";
+                        break;
+                    case 4:
+                        datestring = "Donnerstag, den ";
+                        break;
+                    case 5:
+                        datestring = "Freitag, den ";
+                        break;
+                    case 6:
+                        datestring = "Samstag, den ";
+                        break;
+                }
+                var hours = date.getHours();
+                var minutes = date.getMinutes();
+                var day = date.getDate();
+                var month = date.getMonth();
+
+                if(hours<10){
+                    hours = "0"+hours;
+                }
+                if(minutes<10){
+                    minutes = "0"+minutes;
+                }
+                if(month<10){
+                    month = "0"+month;
+                }
+                if(day<10){
+                    day = "0"+day;
+                }
+                datestring = datestring+day+"."+month+"."+date.getFullYear()+
+                    " um "+hours+":"+minutes+" Uhr";
+                return datestring;
+            },
+
+            /**
+             * Transform the Format of the given Timelabs from the Api, so it will be easier to handle in the frontend
+             * @param labsFromApi - Contains the given timelabs
+             * @returns {Array} - timelabs in new format
+             * @private
+             */
+            _transformLabs: function(labsFromApi,divideDates){
+                //console.log(labsFromApi);
+                var transformedLabs = []; //Store return-Array here
+                var lastLab = new Date(labsFromApi[0].date);
+                var countDates = 0; //Date counter
+                var countLabs = 0; //lab counter
+                var dates = [];
+
+                for(i=0; i<labsFromApi.length; i++){
+                    // Create a new array-entrie if date from recent lab is different from date of the last lab
+                    var labdate = new Date(labsFromApi[i].date);
+                    if(labdate.getFullYear() != lastLab.getFullYear() ||
+                        labdate.getMonth() != lastLab.getMonth() ||
+                        labdate.getDate() != lastLab.getDate()) {
+                        dates = [];
+                        lastlab = labdate.date;
+                        transformedLabs.push([]);
+                        countDates++;
+                        countLabs = 0;
+                    }
+                    var endtime = new Date(labdate.getFullYear(), labdate.getMonth(), labdate.getDate());
+                    if((labdate.getMinutes() + (labsFromApi[i].duration % 60)) > 60){
+                        endtime.setHours(1+Math.floor(labdate.getHours()+(labsFromApi[i].duration) / 60));
+                        endtime.setMinutes(labdate.getMinutes() + (labsFromApi[i].duration % 60)-60);
+                    }
+                    else{
+                        endtime.setHours(Math.floor(labdate.getHours()+(labsFromApi[i].duration) / 60));
+                        endtime.setMinutes(labdate.getMinutes() + (labsFromApi[i].duration % 60));
+                    }
+
+                    var lab = [];
+                    lab = [labdate, endtime];
+                    if(divideDates){
+                        dates[countLabs] = lab;
+                        transformedLabs[countDates] = dates;
+                        countLabs++;
+                    }
+                    else{
+                        transformedLabs[i]=lab;
+                    }
+
+                }
+                //console.log("transformed labs: ");
+                //console.log(transformedLabs);
+                return transformedLabs;
+            },
+            /**
+             * Gets response from API call to create a new priority
+             * @param response
+             * @private
+             */
+            _responseFromPrioritySave: function(response) {
+                console.log(response);
+            },
+            /**
+             * Gets response from API call to create a new priority
+             * @param response
+             * @private
+             */
+            _responseFromPrioritySaveDelete: function(response) {
+                console.log(response);
+                this.ajax = {
+                    headers: {
+                        'Authorization': this.accessToken
+                    },
+                    method: 'POST',
+                    body: this.bodyObject,
+                    endpoint: '/priorities/'
+                };
+                //console.log(this.ajax);
+            }
+        });
+    </script>
+</dom-module>
