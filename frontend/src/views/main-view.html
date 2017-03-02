@@ -391,17 +391,19 @@ The Main View contains:
             }
         </style>
 
-        <api-request
+        <!--TODO get semester info-->
+
+        <!--api-request
                 headers="[[ ajax_labTypes.headers ]]"
                 method="[[ ajax_labTypes.method ]]"
                 endpoint="[[ ajax_labTypes.endpoint ]]"
-                on-api-response="_handleLabTypesRequest"></api-request>
+                on-api-response="_handleLabTypesRequest"></api-request-->
 
-        <api-request
+        <!--api-request
                 headers="[[ ajax_labs.headers ]]"
                 method="[[ ajax_labs.method ]]"
                 endpoint="[[ ajax_labs.endpoint ]]"
-                on-api-response="_handleAllLabsRequest"></api-request>
+                on-api-response="_handleAllLabsRequest"></api-request-->
 
         <api-request
                 headers="[[ ajax_prios.headers ]]"
@@ -539,42 +541,27 @@ The Main View contains:
             <practicals-view
                     name="photo"
                     type="Foto"
-                    icon="[[icon]]"
                     route="{{subroute}}"
-                    group="{{ group }}"
+                    group="[[ group ]]"
                     user="{{user}}"
-                    lab-type="[[ labtype_foto ]]"
                     lab-data="[[ groupdata_foto ]]"
-                    all-labs="[[ all_labs_foto ]]"
-                    on-back-click="_handleBackTap"
-                    access-token="{{ accessToken }}"
-                    user-id="{{ userId }}"></practicals-view>
+                    access-token="{{ accessToken }}"></practicals-view>
             <practicals-view
                     name="video"
                     type="Video"
-                    icon="[[icon]]"
                     route="{{subroute}}"
-                    group="{{ group }}"
+                    group="[[ group ]]"
                     user="{{user}}"
-                    lab-type="[[ labtype_video ]]"
                     lab-data="[[ groupdata_video ]]"
-                    all-labs="[[all_labs_video]]"
-                    on-back-click="_handleBackTap"
-                    access-token="{{ accessToken }}"
-                    user-id="{{ userId }}"></practicals-view>
+                    access-token="{{ accessToken }}"></practicals-view>
             <practicals-view
                     name="audio"
                     type="Audio"
-                    icon="[[icon]]"
                     route="{{subroute}}"
-                    group="{{ group }}"
+                    group="[[ group ]]"
                     user="{{user}}"
-                    lab-type="[[ labtype_audio ]]"
                     lab-data="[[ groupdata_audio ]]"
-                    all-labs="[[all_labs_audio]]"
-                    on-back-click="_handleBackTap"
-                    access-token="{{ accessToken }}"
-                    user-id="{{ userId }}"></practicals-view>
+                    access-token="{{ accessToken }}"></practicals-view>
 
                         <!-- Semester Setup Pages (Admin only) -->
                         <template is="dom-if" if="[[ user.isAdmin ]]">
@@ -728,6 +715,30 @@ The Main View contains:
 
             _userChanged: function (detail) {
                 console.log(detail);
+                this.set('semesterId',this.user.semesterId);
+                if (this.semesterId && !this.labTypesRequestSent) {
+                    this.ajax_labTypes = {
+                        headers: {
+                            Authorization: this.accessToken
+                        },
+                        method: 'GET',
+                        endpoint: '/Labtypes?filter[where][semesterId]=' + this.semesterId
+                    };
+                    //console.log(this.ajax_lab_types);
+                    //console.log("ajax_lab_types set");
+                }
+                if (this.semesterId && !this.labsRequestSent) {
+                    this.ajax_labs = {
+                        headers: {
+                            Authorization: this.accessToken
+                        },
+                        method: 'GET',
+                        endpoint: '/Labs?filter[where][semesterId]=' + this.semesterId
+                    };
+                    //console.log("ajax_labs set");
+                }
+
+
             },
 
             _handleIconChanged: function (event) {
@@ -870,6 +881,7 @@ The Main View contains:
                     ready: function () {
                         this.isReady = true;
 
+
                         this.groupdata_audio = {};
                         this.groupdata_audio.priorities = [];
                         this.groupdata_video = {};
@@ -884,27 +896,6 @@ The Main View contains:
                         this.bodyObject = [];
 
 
-                        if (this.semesterId && !this.labTypesRequestSent) {
-                            this.ajax_labTypes = {
-                                headers: {
-                                    Authorization: this.accessToken
-                                },
-                                method: 'GET',
-                                endpoint: '/Labtypes?filter[where][semesterId]=' + this.semesterId
-                            };
-                            //console.log(this.ajax_lab_types);
-                            //console.log("ajax_lab_types set");
-                        }
-                        if (this.semesterId && !this.labsRequestSent) {
-                            this.ajax_labs = {
-                                headers: {
-                                    Authorization: this.accessToken
-                                },
-                                method: 'GET',
-                                endpoint: '/Labs?filter[where][semesterId]=' + this.semesterId
-                            };
-                            //console.log("ajax_labs set");
-                        }
                     },
 
 
@@ -951,7 +942,7 @@ The Main View contains:
          */
         _handleLabTypesRequest: function (event) {
             console.log('_handleLabTypesRequest()');
-            //console.log(event.detail);
+            console.log(event.detail);
 
             if(!this.isReady)
                 return;
@@ -986,7 +977,7 @@ The Main View contains:
          */
         _handleAllLabsRequest: function (event) {
             console.log('_handleLabRequest()');
-            //console.log(event.detail);
+            console.log(event.detail);
 
             if(!this.isReady || this.gotLabTypes == false)
                 return;
@@ -1023,7 +1014,7 @@ The Main View contains:
          */
         _handlePriosRequest: function(event){
             console.log('_handlePriosRequest()');
-            //console.log(event.detail);
+            console.log(event.detail);
 
             if(!this.isReady || this.gotLabTypes == false)
                 return;
