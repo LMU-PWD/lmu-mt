@@ -80,8 +80,7 @@
                 <!-- A D M I N   T O O L B A R -->
                 <admin-toolbar
                         user="[[ user ]]"
-                        selected-semester="{{ adminSelectedSemesterId }}"
-                        main-view-page="{{ page }}"></admin-toolbar>
+                        selected-semester="{{ adminSelectedSemesterId }}"></admin-toolbar>
             <admin-card label="{{localize('admin_dashboard tutors')}}"
                         path-to-icon="../../images/tutor.svg"
                         role="tutors"></admin-card>
@@ -131,7 +130,8 @@
                 Polymer.MyLocalizeBehavior
             ],
             ready: function() {
-            
+                console.log(this.adminSelectedSemesterId);
+
             },
             _handleTap: function (event) {
                 console.log(event.target);

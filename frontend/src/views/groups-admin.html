@@ -6,9 +6,11 @@
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
 <link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../shared/shared-styles.html">
 <link rel="import" href="../services/get-user-info.html">
 <link rel="import" href="../services/get-access-token.html">
+<link rel="import" href="../services/api-request.html">
 <link rel="import" href="../components/mail-input.html">
 
 <!--Localization Imports-->
@@ -20,7 +22,7 @@
 
     <template>
 
-        <style include="shared-styles">
+        <style include="shared-styles iron-flex iron-flex-alignment">
 
             h1 > span {
                 font-style: italic;
@@ -30,7 +32,7 @@
                 height: auto;
             }
 
-            .groupsMembers{
+            .groupsMembers {
                 display: block;
                 padding-bottom: 10px;
             }
@@ -43,7 +45,8 @@
                 height: 20px;
                 overflow: hidden;
             }
-            .groupsMembers > .member > *:last-child{
+
+            .groupsMembers > .member > *:last-child {
                 border-radius: 0 0 5px 5px;
 
             }
@@ -69,43 +72,76 @@
                 color: var(--paper-blue-grey-700);
             }
 
-            .container{
+            .container {
                 padding: 20px;
                 background-color: var(--paper-blue-grey-100);
                 border-top: 1px solid var(--paper-blue-grey-700);
             }
 
-            .group{
-                height: 50px;
+            .group {
+                /*height: 50px;*/
                 background-color: var(--paper-blue-grey-50);
                 border-bottom: 1px solid var(--paper-blue-grey-700);
+                margin: 5px;
 
+                min-width: 250px;
                 border-radius: 5px;
+
+                width: 100%;
             }
 
-
-            .group>h1{
+            .group > h1 {
                 width: calc(100% - 100px);
                 float: left;
                 margin: 10px;
 
                 font-size: 20px;
-                height:30px;
+                height: 30px;
                 padding: 0 10px;
                 white-space: nowrap;
                 overflow: hidden;
                 text-overflow: ellipsis;
             }
-            .group>paper-icon-button{
+
+            .group > paper-icon-button {
                 float: right;
                 margin: 5px;
             }
+
+            .group-selected {
+                /*width: 100%;*/
+            }
+
+            #createDialog{
+                min-width: 300px;
+            }
+
         </style>
 
-        <paper-dialog id="deleteDialog" on-iron-overlay-closed="_reactToDialog">
+        <paper-dialog id="deleteDialog" on-iron-overlay-closed="_reactToDeleteDialog">
             <div>
-                <h1>{{localize('groupsadmin_dialog text-1')}}<span></span> {{localize('groupsadmin_dialog text-2')}} </h1>
+                <h1>{{localize('groupsadmin_dialog text-1')}}<span></span> {{localize('groupsadmin_dialog text-2')}}
+                </h1>
                 <p>{{localize('groupsadmin_dialog text-3')}}</p>
+            </div>
+            <div class="buttons">
+                <paper-button dialog-dismiss autofocus>{{localize('c_button_cancel')}}</paper-button>
+                <paper-button dialog-confirm>OK</paper-button>
+            </div>
+        </paper-dialog>
+
+        <paper-dialog id="createDialog" on-iron-overlay-closed="_reactToCreateDialog">
+            <div>
+                <h1>Please enter the Users E-Mails to create a new group</h1>
+                <template is="dom-repeat" items="{{members}}" as="member">
+                    <paper-input class="create-group-input"
+                                 label="{{localize('groupdetail_member')}} [[calcNaturalIndex(index)]]"
+                                 value="{{member.name}}"
+                                 required>
+                        <iron-icon icon="mail" prefix></iron-icon>
+                        <div suffix>@campus.lmu.de</div>
+                    </paper-input>
+                </template>
             </div>
             <div class="buttons">
                 <paper-button dialog-dismiss autofocus>{{localize('c_button_cancel')}}</paper-button>
@@ -127,35 +163,56 @@
                 method="[[ deleteAjax.method ]]"
                 endpoint="[[ deleteAjax.endpoint ]]"
                 on-api-response="_handleDeleteGroupResponse"></api-request>
-        <!--Lists all Groups-->
-        <div class="container">
-        <template is="dom-repeat" items="[[groups]]" as="group">
-            <div class="group">
-            <h1 on-tap="_toggleCollapse">[[group.name]]</h1>
-            <paper-icon-button icon="icons:delete" on-tap="_deleteGroup"></paper-icon-button>
-            </div>
-            <iron-collapse id="collapse[[index]]">
-            <div class="groupsMembers">
-            <!--TODO Lists Group Memebers -->
-            <template is="dom-repeat" items="[[group.groupMemberIds]]" as="member">
-                <div class="member">
-                    <get-user-info
-                            access-token="[[ accessToken ]]"
-                            user-id="[[member.id]]"
-                            name="{{member.name}}"
-                            mail="{{member.mail}}"></get-user-info>
-                    <a href="mailto:[[member.mail]]" tabindex="-1"><paper-icon-button icon="icons:mail"></paper-icon-button></a>
-                    <h2>[[member.name]]</h2>
-                </div>
-            </template>
-            </div>
-            </iron-collapse>
 
-        </template>
+
+        <!-- Create group by mail request -->
+        <api-request
+                headers="[[ ajaxCreateGroup.headers ]]"
+                body="[[ ajaxCreateGroup.body ]]"
+                method="[[ ajaxCreateGroup.method ]]"
+                endpoint="[[ ajaxCreateGroup.endpoint ]]"
+                on-api-response="_handleCreateGroupResponse"
+                on-api-error="_handleCreateGroupError"
+                loading="{{ isLoading }}"></api-request>
+
+        <!--Lists all Groups-->
+        <div class="container horizontal layout wrap">
+            <paper-button on-tap="expandAll" style="width: 33%;">Expand all</paper-button>
+            <paper-button on-tap="collapseAll" style="width: 33%;">Collapse all</paper-button>
+            <paper-icon-button  style="width: 33%;" icon="add-circle-outline" on-tap="_createGroup"></paper-icon-button>
+
+            <template is="dom-repeat" items="[[groups]]" as="group">
+                <div class="group flex self-center" id="group_[[index]]">
+                    <h1 on-tap="_toggleCollapse">[[group.name]]</h1>
+                    <paper-icon-button icon="icons:delete" on-tap="_deleteGroup"></paper-icon-button>
+                    <iron-collapse id="collapse[[index]]">
+                        <div class="groupsMembers">
+                            <!--TODO Lists Group Memebers -->
+                            <template is="dom-repeat" items="[[group.groupMemberIds]]" as="member">
+                                <div class="member">
+                                    <!--TODO lookup in students for saving requests-->
+                                    <get-user-info
+                                            access-token="[[ accessToken ]]"
+                                            user-id="[[member.id]]"
+                                            name="{{member.name}}"
+                                            mail="{{member.mail}}"></get-user-info>
+                                    <a href="mailto:[[member.mail]]" tabindex="-1"><paper-icon-button icon="icons:mail"></paper-icon-button></a>
+                                    <h2>[[member.name]]</h2>
+                                </div>
+                            </template>
+                        </div>
+
+                </div>
+                </iron-collapse>
+
+            </template>
         </div>
 
         <!--Iron Signal for Localization-->
         <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
+
+        <!--Iron Signal for passing Semester-->
+        <iron-signals on-iron-signal-semester="_semesterChanged"></iron-signals>
 
     </template>
     <script>
@@ -174,31 +231,39 @@
                 groups: {
                     type: Array
                 },
+                students: {
+                    type: Array
+                },
                 language: {
                     type: String,
                     value: 'de'
                 },
                 selectedSemester: {
                     type: String
+                },
+                members: {
+                    type: Array
                 }
             },
             behaviors: [
                 Polymer.MyLocalizeBehavior
             ],
 
-            ready: function () {
-                this._groupsChanged();
-            },
 
-            _groupsChanged: function () {
+            _semesterChanged: function (event) {
+                this.set('semester', event.detail);
+
+
                 this.ajax = {
                     contentType: 'application/json',
                     headers: {
-                        Authorization: this.accessToken
+                        Authorization: this.accessToken,
+                        filter: '{"where":{"semesterId":"'+this.semester+'"}}'
                     },
                     method: 'GET',
-                    endpoint: '/groups/'
-                }
+                    endpoint: '/groups'
+                };
+
             },
 
             /**
@@ -214,16 +279,53 @@
                 //Change groupMemberIds to Array Containing Objects with ID, Name and Mail
                 this.groups.forEach(function (element, index) {
                     element.groupMemberIds.forEach(function () {
-                        self.push('groups.'+index+'.groupMemberIds',{"id":self.shift('groups.'+index+'.groupMemberIds'),"name":"","mail":""});
+                        self.push('groups.' + index + '.groupMemberIds', {
+                            "id": self.shift('groups.' + index + '.groupMemberIds'),
+                            "name": "",
+                            "mail": ""
+                        });
                     });
                 });
+
+                //For testing with more groups
+                var testGroups = [
+                    {name: 'Gruppe 1', groupMemberIds: ['Member 1', 'Member 2', 'Member 3', 'Member 4']},
+                    {name: 'Gruppe 2', groupMemberIds: ['Member 1', 'Member 2', 'Member 3', 'Member 4']},
+                    {name: 'Gruppe 3', groupMemberIds: ['Member 1', 'Member 2', 'Member 3', 'Member 4']},
+                    {name: 'Gruppe 4', groupMemberIds: ['Member 1', 'Member 2', 'Member 3', 'Member 4']},
+                    {name: 'Gruppe 5', groupMemberIds: ['Member 1', 'Member 2', 'Member 3', 'Member 4']},
+                    {name: 'Gruppe 6', groupMemberIds: ['Member 1', 'Member 2', 'Member 3', 'Member 4']},
+                    {name: 'Gruppe 7', groupMemberIds: ['Member 1', 'Member 2', 'Member 3', 'Member 4']},
+                    {name: 'Gruppe 8', groupMemberIds: ['Member 1', 'Member 2', 'Member 3', 'Member 4']},
+                    {name: 'Gruppe 9', groupMemberIds: ['Member 1', 'Member 2', 'Member 3', 'Member 4']},
+                    {name: 'Gruppe 10', groupMemberIds: ['Member 1', 'Member 2', 'Member 3', 'Member 4']},
+                    {name: 'Gruppe 11', groupMemberIds: ['Member 1', 'Member 2', 'Member 3', 'Member 4']},
+                    {name: 'Gruppe 12', groupMemberIds: ['Member 1', 'Member 2', 'Member 3', 'Member 4']},
+                    {name: 'Gruppe 13', groupMemberIds: ['Member 1', 'Member 2', 'Member 3', 'Member 4']},
+                    {name: 'Gruppe 14', groupMemberIds: ['Member 1', 'Member 2', 'Member 3', 'Member 4']},
+                    {name: 'Gruppe 15', groupMemberIds: ['Member 1', 'Member 2', 'Member 3', 'Member 4']},
+                    {name: 'Gruppe 16', groupMemberIds: ['Member 1', 'Member 2', 'Member 3', 'Member 4']},
+                    {name: 'Gruppe 17', groupMemberIds: ['Member 1', 'Member 2', 'Member 3', 'Member 4']},
+                    {name: 'Gruppe 18', groupMemberIds: ['Member 1', 'Member 2', 'Member 3', 'Member 4']},
+                    {name: 'Gruppe 19', groupMemberIds: ['Member 1', 'Member 2', 'Member 3', 'Member 4']},
+                    {name: 'Gruppe 20', groupMemberIds: ['Member 1', 'Member 2', 'Member 3', 'Member 4']},
+                    {name: 'Gruppe 21', groupMemberIds: ['Member 1', 'Member 2', 'Member 3', 'Member 4']},
+                    {name: 'Gruppe 22', groupMemberIds: ['Member 1', 'Member 2', 'Member 3', 'Member 4']},
+                    {name: 'Gruppe 23', groupMemberIds: ['Member 1', 'Member 2', 'Member 3', 'Member 4']},
+                    {name: 'Gruppe 24', groupMemberIds: ['Member 1', 'Member 2', 'Member 3', 'Member 4']},
+                    {name: 'Gruppe 25', groupMemberIds: ['Member 1', 'Member 2', 'Member 3', 'Member 4']},
+                    {name: 'Gruppe 26', groupMemberIds: ['Member 1', 'Member 2', 'Member 3', 'Member 4']},
+                    {name: 'Gruppe 27', groupMemberIds: ['Member 1', 'Member 2', 'Member 3', 'Member 4']},
+                    {name: 'Gruppe 28', groupMemberIds: ['Member 1', 'Member 2', 'Member 3', 'Member 4']},
+                    {name: 'Gruppe 29', groupMemberIds: ['Member 1', 'Member 2', 'Member 3', 'Member 4']}];
+                //this.set('groups', testGroups);
             },
 
             _handleDeleteGroupResponse: function (event) {
                 this._groupsChanged();
             },
 
-            _deleteGroup: function(event, groupId){
+            _deleteGroup: function (event, groupId) {
                 var groupID = event.model.__data__.group.id;
                 var groupName = event.model.__data__.group.name;
                 //Pass Group ID Through deleteDialog
@@ -231,28 +333,89 @@
                 this.$$('#deleteDialog > div > H1 > span').textContent = groupName;
                 this.$.deleteDialog.open();
             },
+            _createGroup: function () {
+                var groupSize = 4; //TODO get from semester info
+                console.log(this.students);
+                this.set('members',[]);
+                for(var i=0; i<groupSize; i++)
+                    this.push('members',{name:''});
+                this.$.createDialog.open();
+            },
 
-            _reactToDialog: function (event) {
-                if(event.detail.confirmed){
+            _reactToDeleteDialog: function (event) {
+                if (event.detail.confirmed) {
                     //Get bakc groupID
                     var groupID = event.path[0].dataset.groupID;
                     this.deleteAjax = {
-                     contentType: 'application/json',
-                     headers: {
-                     Authorization: this.accessToken
-                     },
-                     method: 'DELETE',
-                     endpoint: '/groups/' + groupID
-                     };
+                        contentType: 'application/json',
+                        headers: {
+                            Authorization: this.accessToken
+                        },
+                        method: 'DELETE',
+                        endpoint: '/groups/' + groupID
+                    };
 
                 }
                 //Reset groupID Attribute
                 this.$.deleteDialog.dataset.groupID = '';
             },
+            _reactToCreateDialog: function (event) {
+
+                if (event.detail.confirmed) {
+
+                    console.log(event);
+                    console.log(this.members);
+
+                    var mails = [];
+                    var checked = true;
+                    //Add suffix back to Mails and Push to Array
+                    this.members.forEach(function (element) {
+                        if(element.name!=""){
+                            mails.push(element.name.concat("@campus.lmu.de"));
+                        }else{
+                            checked = false
+                        }
+                    });
+                    console.log(mails);
+                    console.log(this.accessToken);
+                    if(checked){
+                        this.ajaxCreateGroup = {
+                            headers: {
+                                Authorization: this.accessToken
+                            },
+                            method: 'POST',
+                            body: {
+                                "emails": mails
+                            },
+                            endpoint: '/groups/createbymail/'
+                        };
+                    }else{
+                        console.log("Nicht alle felder ausgefüllt");
+                    }
+
+                }
+            },
 
             _toggleCollapse: function (event) {
                 index = event.model.__key__.slice(1);
-                this.$$('#collapse'+index).toggle();
+                this.$$('#collapse' + index).toggle();
+                //Uncomment for 100% width of expanded Tiles
+                //this.$$('#group_' + index).classList.toggle('flex-none');
+            },
+
+            expandAll: function () {
+                var self = this;
+                this.groups.forEach(function (item, index) {
+                    self.$$('#collapse' + index).show();
+                });
+            },
+            collapseAll: function () {
+                var self = this;
+                this.groups.forEach(function (item, index) {
+                    self.$$('#collapse' + index).hide();
+                });
+            },
+            createGroup: function () {
             }
         });
     </script>

@@ -58,6 +58,8 @@
 
         <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
 
+        <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
+
     </template>
 
     <script>
@@ -81,11 +83,6 @@
                     notify: true
                 },
 
-                mainViewPage: {
-                    type: String,
-                    notify: true
-                },
-
                 selectedSemester: {
                     type: String,
                     notify: true,
@@ -93,7 +90,8 @@
                 },
 
                 selectedSemesterIndex: {
-                    type: Number
+                    type: Number,
+                    observer: '_semesterSelectionChanged'
                 },
 
                 semesters: {
@@ -114,6 +112,16 @@
             behaviors: [
                 Polymer.MyLocalizeBehavior
             ],
+
+            attached: function () {
+                this.ajax = {
+                    headers: {
+                        Authorization: this.accessToken
+                    },
+                    method: 'GET',
+                    endpoint: '/semesters'
+                }
+            },
 
             /** Helper function for determining preselected semester by examining
              *  start and end dates. If current time is between start and end date
@@ -175,7 +183,13 @@
             },
 
             _buttonTapped: function () {
-                this.mainViewPage = 'semester-setup';
+                //this.mainViewPage = 'semester-setup';
+                this.fire('CHANGE_ROUTE', {path: '/semester-setup', page: 'semester-setup'});
+            },
+
+            _semesterSelectionChanged: function (detail) {
+                var semesterID = this.semesters[detail].id;
+                this.fire('iron-signal', {name: 'semester', data: semesterID});
             }
 
         });

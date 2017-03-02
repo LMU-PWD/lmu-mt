@@ -1,4 +1,5 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
 
 <dom-module id="tutors-admin">
     <template>
@@ -7,15 +8,53 @@
             }
         </style>
         <div></div>
+        <!-- Fetches all current Groups -->
+        <api-request
+                headers="[[ ajax.headers ]]"
+                method="[[ ajax.method ]]"
+                endpoint="[[ ajax.endpoint ]]"
+                semester-filter="[[ selectedSemester ]]"
+                on-api-response="_handleTutorsResponse"></api-request>
+        <template is="dom-repeat" items="[[tutors]]" as="member">
+            <div class="member">
+                <a href="mailto:[[member.mail]]" tabindex="-1"><paper-icon-button icon="icons:mail"></paper-icon-button></a>
+                <h2>[[member.first_name]] [[member.name]]</h2>
+            </div>
+        </template>
+
+        <!--Iron Signal for Passing Semester ID-->
+        <iron-signals on-iron-signal-semester="_semesterChanged"></iron-signals>
     </template>
     <script>
         Polymer({
             is: 'tutors-admin',
             properties: {
+                tutors: {
+                    type: Array
+                },
+                semester: {
+                    type: String
+                }
             
             },
             ready: function() {
-            
+            },
+            _handleTutorsResponse: function (event) {
+                this.set('tutors',event.detail);
+            },
+            _semesterChanged: function (event) {
+                this.set('semester', event.detail);
+
+                this.ajax = {
+                    contentType: 'application/json',
+                    headers: {
+                        Authorization: this.accessToken,
+                        filter: '{"where":{"isTutor":"true","semesterId":"'+this.semester+'"}}'
+                    },
+                    method: 'GET',
+                    endpoint: '/platformUsers'
+                }
+
             }
         });
     </script>

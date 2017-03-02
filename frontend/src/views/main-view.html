@@ -549,15 +549,19 @@ The Main View contains:
                                     name="students"
                                     access-token="[[ accessToken ]]"
                                     self-info="{{user}}"
+                                    students="{{students}}"
                                     selected-semester="[[ adminSelectedSemesterId ]]"></students-admin>
                             <groups-admin
                                     name="groups"
                                     access-token="[[ accessToken ]]"
                                     self-info="{{user}}"
+                                    students="[[students]]"
                                     selected-semester="[[ adminSelectedSemesterId ]]"></groups-admin>
                         </template>
                         <settings-view
-                                name="settings"></settings-view>
+                                name="settings"
+                                access-token="[[ accessToken ]]"
+                                user="{{user}}"></settings-view>
 
                     </iron-pages>
                     <h1>{{localize('logincard_welcome text-1')}}</h1>
@@ -759,7 +763,7 @@ The Main View contains:
              * @private
              */
             _handleRouting: function (event) {
-                console.log(event);
+                //console.log(event);
                 //Route to Page&Path specified in the event
                 this.set('route.path',event.detail.path);
                 this.set('routeData.page',event.detail.page);
