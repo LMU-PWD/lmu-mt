@@ -61,9 +61,13 @@
                 border-left: 5px solid var(--paper-blue-grey-400);
                 font-weight: bold;
             }
-            .icon-session-unfolded {
-                transform: rotate(90deg)
-                transition: transform 2s;
+            .session_toggleDropdown {
+                width: 4%;
+                color: var(--paper-blue-grey-200);
+            }
+            .session-unfolded .session_toggleDropdown {
+                transform: rotate(90deg);
+                transition: transform .3s;
             }
 
         </style>
@@ -106,14 +110,14 @@
                             <span class="session_type"></span>
                         </paper-item>
                         <template  is="dom-repeat" items="[[ sessions ]]" filter="prettySessionEntry">
-                            <paper-item on-click="toggle" class="sessions_row" id="src-[[ item.id ]]">
+                            <paper-item on-click="toggleCollapse" class="sessions_row" id="src-[[ item.id ]]">
+                                <span class="session_toggleDropdown">
+                                        <iron-icon icon="hardware:keyboard-arrow-right"></iron-icon>
+                                </span>
                                 <span class="session_date">[[ item.date_string ]]</span>
-                                    <span class="session_time">[[ item.time_string ]]</span>
-                                    <span class="session_icon"><iron-icon icon="[[ item.icon ]]"></iron-icon></span>
-                                    <span class="session_type">[[ item.labType_string ]]</span>
-                                    <span class="session_toggleDropdown" style="float:right; width: 10px; ">
-                                        <iron-icon icon="hardware:keyboard-arrow-left"></iron-icon>
-                                    </span>
+                                <span class="session_time">[[ item.time_string ]]</span>
+                                <span class="session_icon"><iron-icon icon="[[ item.icon ]]"></iron-icon></span>
+                                <span class="session_type">[[ item.labType_string ]]</span>
                             </paper-item>
                             <iron-collapse id="collapse-[[ item.id ]]">
                                 <paper-item class="session_details" style="border-left: 2px solid var(--paper-blue-grey-500)">
@@ -201,13 +205,13 @@
             _switchLocale: function() {
                 this.language = (this.language == 'en') ? 'de' : 'en';
             },
+
             toggleCollapse: function(e) {
                 this.$$("#collapse-" + e.model.item.id).toggle();
                 this.$$("#src-" + e.model.item.id).classList.toggle('session-unfolded');
             },
+
             prettySessionEntry: function(item) {
-                console.log("filter:")
-                console.log(item)
                 prettyItem = item
 
                 switch(item.labType_string){
