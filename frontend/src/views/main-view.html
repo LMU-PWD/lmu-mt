@@ -114,19 +114,6 @@
                 endpoint="[[ ajax_glabs.endpoint ]]"
                 on-api-response="_handleGroupLabsRequest"></api-request>
 
-        <api-request
-                headers="[[ ajax_save.headers ]]"
-                body="[[ ajax_save.body ]]"
-                method="[[ ajax_save.method ]]"
-                endpoint="[[ ajax_save.endpoint ]]"
-                on-api-response="_responseFromPrioritySave"></api-request>
-        <api-request
-                headers="[[ ajax_delete.headers ]]"
-                body="[[ ajax_delete.body ]]"
-                method="[[ ajax_delete.method ]]"
-                endpoint="[[ ajax_delete.endpoint ]]"
-                on-api-response="_responseFromPrioritySaveDelete"></api-request>
-
         <app-header fixed>
             <navigation-bar
                     access-token="{{ accessToken }}"
@@ -214,7 +201,6 @@
                     lab-data="[[ groupdata_foto ]]"
                     all-labs="[[ all_labs_foto ]]"
                     on-back-click="_handleBackTap"
-                    on-save-click="_handleSaveClick"
                     access-token="{{ accessToken }}"
                     user-id="{{ userId }}"></practicals-view>
             <practicals-view
@@ -228,7 +214,6 @@
                     lab-data="[[ groupdata_video ]]"
                     all-labs="[[all_labs_video]]"
                     on-back-click="_handleBackTap"
-                    on-save-click="_handleSaveClick"
                     access-token="{{ accessToken }}"
                     user-id="{{ userId }}"></practicals-view>
             <practicals-view
@@ -242,7 +227,6 @@
                     lab-data="[[ groupdata_audio ]]"
                     all-labs="[[all_labs_audio]]"
                     on-back-click="_handleBackTap"
-                    on-save-click="_handleSaveClick"
                     access-token="{{ accessToken }}"
                     user-id="{{ userId }}"></practicals-view>
 
@@ -616,39 +600,6 @@
                 //console.log(this.groupdata_video.lab);
                 //console.log(this.groupdata_audio.lab);
             },
-            /**
-             * Handle save click
-             * @param e - Event Variable
-             * @private
-             */
-            _handleSaveClick: function(e){
-                /*console.log(this.allPriorities);
-                this.bodyObject.push(e.detail);
-                console.log(this.bodyObject);
-                for(i=0; i< this.allPriorities; i++) {
-                    if (this.bodyObject[0].labTypeId && this.bodyObject[0].labTypeId == this.allPriorities[i].labTypeId) {
-                        if(this.allPriorities[i].id) {
-                            this.bodyObject.push(this.allPriorities[i]);
-                            console.log(this.allPriorities[i]);
-                        }
-                    }
-                    else if(!this.bodyObject[0].labTypeId){
-                        if(this.allPriorities[i].id) {
-                            this.bodyObject.push(this.allPriorities[i]);
-                            console.log(this.allPriorities[i]);
-                        }
-                    }
-                }
-                console.log(this.bodyObject);
-                this.ajax_delete = {
-                    headers: {
-                        'Authorization': this.accessToken
-                    },
-                    method: 'DELETE',
-                    endpoint: '/groups/'+this.user.groupId+'/priorities/'
-                };
-                //console.log(this.ajax_delete);*/
-            },
 
             isStudent: function () {
                 if(!this.user.isAdmin && !this.user.isTutor){
@@ -678,33 +629,6 @@
             _routePageChanged: function(page) {
                 this.page  = page || 'dashboard';
             },
-            /**
-             * Gets response from API call to create a new priority
-             * @param response
-             * @private
-             */
-            /*_responseFromPrioritySave: function(response) {
-                console.log(response);
-            },*/
-            /**
-             * Gets response from API call to create a new priority
-             * @param response
-             * @private
-             */
-            /*_responseFromPrioritySaveDelete: function(response) {
-                console.log(response);
-                console.log(this.bodyObject);
-                this.ajax_save = {
-                    headers: {
-                        'Authorization': this.accessToken
-                    },
-                    method: 'POST',
-                    body: this.bodyObject,
-                    endpoint: '/priorities/'
-                };
-                //console.log(this.ajax);
-                this.bodyObject=[];
-            },*/
 
             _switchLocale: function() {
                 this.language = (this.language == 'en') ? 'de' : 'en';

@@ -85,7 +85,6 @@
                                                          lab-type="[[labType]]"
                                                          lab-data="[[labData]]"
                                                          all-labs="[[allLabs]]"
-                                                         on-save-click="_handleSaveClick"
                                                          access-token="{{ accessToken }}"
                                                          user-id="{{ userId }}"></practicals-students-date-detail>
                     </div>
@@ -146,14 +145,7 @@
                     this.informationText = this.labType.description_tutor;
                 }
             },
-            /**
-             * Handle save click
-             * @param e - Event Variable
-             * @private
-             */
-            _handleSaveClick: function(e){
-                this.fire("save-click",e.detail);
-            },
+
             /**
              * Back-button click handler
              */

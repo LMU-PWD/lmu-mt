@@ -7,10 +7,10 @@
 <link rel="import" href="../../bower_components/iron-collapse/iron-collapse.html">
 <link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
-<link rel="import" href="date-creator.html">
+<link rel="import" href="practicals-students-date-creator.html">
 <link rel="import" href="../shared/shared-styles.html">
 
-<dom-module id="practicals-date-selector">
+<dom-module id="practicals-students-date-selector">
     <template>
         <style include="shared-styles">
             :host{
@@ -71,17 +71,17 @@
             <div class="dateselector">
                 <!--template is="dom-if" if="[[user.isStudent]]"-->
                     <template is="dom-repeat" items="{{timeslots}}" as="labs">
-                        <date-creator id="dateselectors" class="datecreator" timeslots="[[labs]]" priority="[[priority]]"
+                        <practicals-students-date-creator id="dateselectors" class="datecreator" timeslots="[[labs]]" priority="[[priority]]"
                                       on-priority-click="_handlePriorityClick"
                                       on-date-click="_handleDateClick"
-                                      on-replace-priority="_handleReplacePriority"></date-creator>
+                                      on-replace-priority="_handleReplacePriority"></practicals-students-date-creator>
                     </template>
                 <!--/template-->
             </div>
     </template>
     <script>
         Polymer({
-            is: 'practicals-date-selector',
+            is: 'practicals-students-date-selector',
             properties: {
                 timeslots:{
                     type: Array,

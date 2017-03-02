@@ -1,4 +1,4 @@
-<link rel="import" href="../components/practicals-date-selector.html">
+<link rel="import" href="../components/practicals-students-date-selector.html">
 <link rel="import" href="../components/practicals-show-saved-dates.html">
 
 <dom-module id="practicals-students-date-detail">
@@ -53,13 +53,13 @@
                 <template is="dom-if" if="[[before_deadline]]">
                     <template is="dom-if" if="[[!labs_already_chosen]]" >
                         <!-- Deadline is not over, Registration Open and no dates selected; Select your dates!-->
-                        <practicals-date-selector  id="practicalsDateSelector"
+                        <practicals-students-date-selector  id="practicalsDateSelector"
                                                    priority="[[priority]]"
                                                    api-priorities="{{ labdata.priorities }}"
                                                    user="[[ user ]]"
                                                    api-all-labs="[[allLabs]]"
                                                    on-save-click="_handleSaveClick"
-                                                   on-reset-click="_handleResetClick"></practicals-date-selector>
+                                                   on-reset-click="_handleResetClick"></practicals-students-date-selector>
                     </template>
                     <template is="dom-if" if="[[labs_already_chosen]]">
                         <!-- Deadline is not over, Registration Open and dates selected; Show saved dates!-->
@@ -234,16 +234,6 @@
                         method: 'DELETE',
                         endpoint: '/groups/'+this.user.groupId+'/Priorities?filter[where][labTypeId]=' + this.labType
                     };
-                    /*for(i=0; i< this.group.priorityIds; i++) {
-                        this.ajax_delete = {
-                            headers: {
-                                'Authorization': this.accessToken
-                            },
-                            method: 'DELETE',
-                            endpoint: '/groups/' + this.user.groupId + '/priorities/' + this.group.priorityIds[i]
-                        };
-                    }*/
-                    //console.log(this.ajax_delete);
 
                     this.labs_already_chosen = true;
                     var practicals_show_saved_dates = Polymer.dom(this.root).querySelector("#practicals_show_saved_dates");
