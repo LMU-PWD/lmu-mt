@@ -1,0 +1,259 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../../bower_components/iron-collapse/iron-collapse.html">
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="practicals-tutor-date-creator.html">
+<link rel="import" href="../shared/shared-styles.html">
+
+<dom-module id="practicals-tutor-date-selector">
+    <template>
+        <style include="shared-styles">
+            :host{
+
+            }
+            .dateselector{
+                text-align: center;
+                width: 100%;
+            }
+            .datecreator{
+                display:inline-block;
+                margin:0;
+                height: auto;
+                vertical-align:top;
+            }
+            .resetButton{
+                margin-bottom: 10px;
+                width: 49.8%;
+                float: left;
+            }
+            .saveButton{
+                margin-bottom: 10px;
+                width: 49.8%;
+                float: right;
+            }
+            /*Phone*/
+            @media screen and (max-width: 767px) {
+                .datecreator{
+                    width: 100%;
+                }
+            }
+            /*Tablet*/
+            @media screen and (min-width: 768px) and (max-width: 1023px) {
+                .datecreator{
+                    min-width: 400px;
+                    width: 49%;
+
+                }
+            }
+            /*Desktop*/
+            @media screen and (min-width: 1024px) {
+                .datecreator{
+                    min-width: 400px;
+                    width: 24%;
+                }
+            }
+        </style>
+            <div>
+                <paper-button raised class="resetButton" on-tap="_handleResetClick">
+                    <iron-icon icon="reply"></iron-icon>
+                        Zurücksetzen
+                </paper-button>
+                <paper-button raised class="saveButton" on-tap="_handleSaveClick">
+                    <iron-icon icon="save"></iron-icon>
+                    Speichern
+                </paper-button>
+            </div>
+            <div class="dateselector">
+                    <template is="dom-repeat" items="{{timeslots}}" as="labs">
+                        <practicals-tutor-date-creator id="dateselectors" class="datecreator"
+                                            timeslots="[[labs]]"
+                                            priority="[[priority]]"
+                                            api-all-labs="[[apiAllLabs]]"
+                                            on-priority-click="_handlePriorityClick"
+                                            on-date-click="_handleDateClick"
+                                            on-replace-priority="_handleReplacePriority"></practicals-tutor-date-creator>
+                    </template>
+            </div>
+    </template>
+    <script>
+        Polymer({
+            is: 'practicals-tutor-date-selector',
+            properties: {
+                timeslots:{
+                    type: Array,
+                    value: []
+                },
+                priority:{
+                    type: Number
+                },
+
+                chosenlabs: {
+                    type: Array,
+                    value: []
+                },
+
+                // From API
+                labType: Object,
+                user: Object,
+                apiPriorities: {
+                    value: Object,
+                    notify: true
+                },
+                apiAllLabs: {
+                    type: Array,
+                    value: []
+                }
+            },
+
+            ready: function() {
+                this.timeslots = this._transformLabs(this.apiAllLabs,true);
+                console.log(this.timeslots);
+            },
+
+
+            /**
+             * Creates string from the given date
+             * @param {String} date - date that will be transformed to String
+             */
+            _getDateString: function(date){
+                var datestring = "";
+                switch(date.getDay()){
+                    case 0:
+                        datestring = "Sonntag, den ";
+                        break;
+                    case 1:
+                        datestring = "Montag, den ";
+                        break;
+                    case 2:
+                        datestring = "Dienstag, den ";
+                        break;
+                    case 3:
+                        datestring = "Mittwoch, den ";
+                        break;
+                    case 4:
+                        datestring = "Donnerstag, den ";
+                        break;
+                    case 5:
+                        datestring = "Freitag, den ";
+                        break;
+                    case 6:
+                        datestring = "Samstag, den ";
+                        break;
+                }
+                var hours = date.getHours();
+                var minutes = date.getMinutes();
+                if(hours<10){
+                   hours = "0"+hours;
+                }
+                if(minutes<10){
+                   minutes = "0"+minutes;
+                }
+                datestring = datestring+date.getDate()+"."+date.getMonth()+"."+date.getFullYear()+
+                        " um "+hours+":"+minutes+" Uhr";
+                return datestring;
+            },
+            /**
+             * Handles Reset-Button Click; Resets the priorities-Array and calls childs resetSelection functions
+             */
+            _handleResetClick: function(e){
+                var dateselectors = Polymer.dom(this.root).querySelectorAll("#dateselectors");
+                for(i = 0; i < dateselectors.length; i++){
+                    dateselectors[i]._resetSelection();
+                }
+                this.fire("reset-click");
+            },
+
+            /**
+             * Handle date click from Child (date-creator)
+             * Update child priorities-Array
+             * @param e - Event Variable
+             * @private
+             */
+            _handleDateClick: function(e){
+                this.chosenlabs = e.target.chosenlabs;
+                //console.log(this.chosenlabs);
+            },
+
+            /**
+             * Handle save click
+             * @param e - Event Variable
+             * @private
+             */
+            _handleSaveClick: function(e){
+                //console.log(this.chosenlabs);
+                this.fire("save-click", this.chosenlabs);
+            },
+
+            /**
+             * Replace a already chosen priority with e newly selected one
+             * @param e - Event Variable
+             * @private
+             */
+            _handleReplacePriority: function(e){
+                for(i=0; i<this.chosenlabs.length; i++){
+                    labdate = new Date(this.chosenlabs[i]);
+                    if(labdate.toString() == e.target.timeslots[e.target.chosenlabindex][0].toString()){
+                        this.chosenlabs[i]= '';
+                    }
+                }
+            },
+
+            /**
+             * Transform the Format of the given Timelabs from the Api, so it will be easier to handle in the frontend
+             * @param labsFromApi - Contains the given timelabs
+             * @returns {Array} - timelabs in new format
+             * @private
+             */
+            _transformLabs: function(labsFromApi,divideDates){
+                //console.log(labsFromApi);
+                var transformedLabs = []; //Store return-Array here
+                var lastLab = new Date(labsFromApi[0].date);
+                var countDates = 0; //Date counter
+                var countLabs = 0; //lab counter
+                var dates = [];
+
+                for(i=0; i<labsFromApi.length; i++){
+                    // Create a new array-entrie if date from recent lab is different from date of the last lab
+                    var labdate = new Date(labsFromApi[i].date);
+                    if((labdate.getFullYear() != lastLab.getFullYear() ||
+                        labdate.getMonth() != lastLab.getMonth() ||
+                        labdate.getDate() != lastLab.getDate()) && divideDates) {
+                        dates = [];
+                        lastLab = labdate;
+                        transformedLabs.push([]);
+                        countDates++;
+                        countLabs = 0;
+                    }
+                    var endtime = new Date(labdate.getFullYear(), labdate.getMonth(), labdate.getDate());
+                    if((labdate.getMinutes() + (labsFromApi[i].duration % 60)) > 60){
+                        endtime.setHours(1+Math.floor(labdate.getHours()+(labsFromApi[i].duration) / 60));
+                        endtime.setMinutes(labdate.getMinutes() + (labsFromApi[i].duration % 60)-60);
+                    }
+                    else{
+                        endtime.setHours(Math.floor(labdate.getHours()+(labsFromApi[i].duration) / 60));
+                        endtime.setMinutes(labdate.getMinutes() + (labsFromApi[i].duration % 60));
+                    }
+
+                    var lab = [];
+                    lab = [labdate, endtime];
+                    if(divideDates){
+                        dates[countLabs] = lab;
+                        transformedLabs[countDates] = dates;
+                        countLabs++;
+                    }
+                    else{
+                        transformedLabs[i]=lab;
+                    }
+                }
+                //console.log("transformed labs: ");
+                //console.log(transformedLabs);
+                return transformedLabs;
+            }
+        });
+    </script>
+</dom-module>

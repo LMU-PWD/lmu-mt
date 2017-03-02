@@ -2,227 +2,164 @@
 <link rel="import" href="../shared/shared-styles.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../../bower_components/paper-tabs/paper-tabs.html">
-<link rel="import" href="../components/practical-date-detail.html">
+<link rel="import" href="../components/practicals-tutor-date-detail.html">
+<link rel="import" href="../components/practicals-students-date-detail.html">
 
 
 <dom-module id="practicals-view">
-  <template>
-    <style include="shared-styles">
-      :host {
-        #display: block;
-      }
-      .page{
-        #border-radius: 25px;
-        margin: 24px;
-        background-color: var(--paper-blue-grey-100);
-        color: var(--paper-blue-grey-900);
-      }
-      .tabheader{
-        background-color: var(--paper-blue-grey-900);
-        font-size: 120%;
-        #border-radius: 25px 25px 0px 0px;
-        overflow: hidden;
-        height: 5vh;
-      }
-      .tabheaderbuttons{
-        color: var(--paper-blue-grey-50);
-        text-align: center;
-      }
-      .backbutton{
-        width: 70px;
-        --paper-icon-button-ink-color:var(--paper-blue-grey-300);
-        padding-right: 30px;
-      }
-      .firsttab{
-        padding-left: 25px;
-      }
-      paper-tab{
-        --paper-tab-ink:var(--paper-blue-grey-100);
-        font-weight: 300;
-      }
-      paper-tab.iron-selected {
-        color: var(--paper-blue-grey-900);
-        background-color: var(--paper-blue-grey-100);
-      }
-      .icon{
-        position: absolute;
-        margin-left: 40px;
-        margin-top: -5px;
-        width: 64px;
-        height: 64px;
-        width: 6vh;
-        height: 6vh;
-        border-radius: 50%;
-        background-color: var(--paper-blue-grey-100);
-        border:  3px solid var(--paper-blue-grey-900);
-        z-index: 1;
-      }
-      .content{
-        padding: 10px;
-      }
-    </style>
-
-    <div class="page">
-      <img class="icon" src=[[icon]] z-index="1">
-      <paper-tabs selected="{{selectedTab}}" class="tabheader" no-slide>
-        <paper-icon-button  class="tabheaderbuttons backbutton" icon="icons:arrow-back" on-tap="_backClicked"></paper-icon-button>
-        <paper-tab class="tabheaderbuttons firsttab">Allgemein</paper-tab>
-        <paper-tab class="tabheaderbuttons">Termine</paper-tab>
-      </paper-tabs>
-      <div class="content">
-        <h2>[[type]] Praktikum</h2>
-        <iron-pages selected="[[selectedTab]]">
-          <div>Page 1 Text</div>
-          <div>
-            <practical-date-detail id="practicalDateDetail" type="[[type]]" practical_date="[[practical_date]]"
-                                   timeslots="[[timeslots]]"
-                                   on-save-click="_handleSaveClick"
-                                   on-reset-click="_handleResetClick"></practical-date-detail>
-          </div>
-        </iron-pages>
-      </div>
-    </div>
-  </template>
-
-  <script>
-    Polymer({
-
-        is: 'practicals-view',
-        properties: {
-            accessToken: {
-                type: String,
-                notify: true
-            },
-            chosenslots:{
-                type: Array,
-                value: []
-            },
-            icon:{
-                type: String
-            },
-            practical_date:{
-                type: Date,
-                notify: true
-            },
-            route: {
-                type: Object,
-                notify: true
-            },
-            selectedTab:{
-                type: String,
-                value: "0"
-            },
-            timeslots:{
-                type: Array,
-                value: []
-            },
-            type:{
-                type: String,
-                notify: true,
-                value: ""
+    <template>
+        <style include="shared-styles">
+            :host {
+              #display: block;
             }
-        },
-        ready: function () {
-            this.practical_date = this._getDate();
-            if(this.practical_date == null){
-                this.timeslots = this._getTimeslots();
+            .page{
+              #border-radius: 25px;
+              margin: 24px;
+              background-color: var(--paper-blue-grey-100);
+              color: var(--paper-blue-grey-900);
             }
-            //console.log(this.accessToken);
-            //console.log(this.route);
-        },
-
-        /**
-         * Back-button click handler
-         */
-        _backClicked: function() {
-          this.type = "";
-          this.fire("back-click");
-          this.$.practicalDateDetail._handleResetClick();
-        },
-
-        /**
-         * Handle save click
-         * @param e - Event Variable
-         * @private
-         */
-        _handleSaveClick: function(e){
-            this.chosenslots = this.$.practicalDateDetail.chosenslots;
-            console.log(this.chosenslots);
-        },
-
-        _handleResetClick: function(e){
-            this.chosenslots = [];
-        },
-
-        /**
-         * Function that checks for the practial course date
-         * @param {String} date - date that will be transformed to String
-         */
-        _getDate: function(){
-            //TODO: Check for Practicalsdates in Backend
-            return null;
-            //return new Date(2017,2,25,14,0);
-
-        },
-
-        /**
-         * Function that checks for the practial course date
-         * @param {String} date - date that will be transformed to String
-         */
-        _getTimeslots: function(){
-            //TODO: Get Timeslots from Backend
-            var timeslots =[];
-            timeslots.starttimes = [new Date(2017,1,2,1,0),new Date(2017,1,2,2,0),new Date(2017,1,2,3,0),new Date(2017,1,2,4,0),new Date(2017,1,2,5,0),
-                new Date(2017,1,10,14,0),new Date(2017,1,10,15,0),new Date(2017,1,10,16,0),new Date(2017,1,10,17,0),new Date(2017,1,10,18,0),new Date(2017,1,10,19,0),new Date(2017,1,10,20,0),
-                new Date(2017,1,12,12,0),new Date(2017,1,12,13,0),new Date(2017,1,12,14,0),new Date(2017,1,12,15,0),new Date(2017,1,14,14,0),new Date(2017,1,14,15,0)];
-            timeslots.sizes =[60,60,60,60,60,60,60,60,60,60,60,60,60,60,60,60,60,60];
-
-            return this._transformTimeslots(timeslots);
-            //return null;
-        },
-
-        /**
-         * Transform the Format of the given Timeslots from the Api, so it will be easier to handle in the frontend
-         * @param slotsFromApi - Contains the given timeslots
-         * @returns {Array} - timeslots in new format
-         * @private
-         */
-        _transformTimeslots: function(slotsFromApi){
-            var transformedSlots = []; //Store return-Array here
-            var lastSlot = slotsFromApi.starttimes[0];
-            var countDates = 0; //Date counter
-            var countSlots = 0; //Slot counter
-            var dates = [];
-
-            for(i=0; i<slotsFromApi.starttimes.length; i++){
-                // Create a new array-entrie if date from recent slot is different from date of the last slot
-                if(slotsFromApi.starttimes[i].getFullYear() != lastSlot.getFullYear() ||
-                    slotsFromApi.starttimes[i].getMonth() != lastSlot.getMonth() ||
-                    slotsFromApi.starttimes[i].getDate() != lastSlot.getDate()) {
-                    dates = [];
-                    lastSlot = slotsFromApi.starttimes[i];
-                    transformedSlots.push([]);
-                    countDates++;
-                    countSlots = 0;
-                }
-                var endtime = new Date(slotsFromApi.starttimes[i].getFullYear(), slotsFromApi.starttimes[i].getMonth(), slotsFromApi.starttimes[i].getDate());
-                if((slotsFromApi.starttimes[i].getMinutes() + (slotsFromApi.sizes[i] % 60)) > 60){
-                    endtime.setHours(1+Math.floor(slotsFromApi.starttimes[i].getHours()+(slotsFromApi.sizes[i]) / 60));
-                    endtime.setMinutes(slotsFromApi.starttimes[i].getMinutes() + (slotsFromApi.sizes[i] % 60)-60);
-                }
-                else{
-                    endtime.setHours(Math.floor(slotsFromApi.starttimes[i].getHours()+(slotsFromApi.sizes[i]) / 60));
-                    endtime.setMinutes(slotsFromApi.starttimes[i].getMinutes() + (slotsFromApi.sizes[i] % 60));
-                }
-
-                var slot = [];
-                slot = [slotsFromApi.starttimes[i], endtime];
-                dates[countSlots] = slot;
-                transformedSlots[countDates] = dates;
-                countSlots++;
+            .tabheader{
+              background-color: var(--paper-blue-grey-900);
+              font-size: 120%;
+              #border-radius: 25px 25px 0px 0px;
+              overflow: hidden;
+              height: 5vh;
             }
-            return transformedSlots;
-        }
-    });
-  </script>
+            .tabheaderbuttons{
+              color: var(--paper-blue-grey-50);
+              text-align: center;
+            }
+            .backbutton{
+              width: 70px;
+              --paper-icon-button-ink-color:var(--paper-blue-grey-300);
+              padding-right: 30px;
+            }
+            .firsttab{
+              padding-left: 25px;
+            }
+            paper-tab{
+              --paper-tab-ink:var(--paper-blue-grey-100);
+              font-weight: 300;
+            }
+            paper-tab.iron-selected {
+              color: var(--paper-blue-grey-900);
+              background-color: var(--paper-blue-grey-100);
+            }
+            .icon{
+              position: absolute;
+              margin-left: 40px;
+              margin-top: -5px;
+              width: 64px;
+              height: 64px;
+              width: 6vh;
+              height: 6vh;
+              border-radius: 50%;
+              background-color: var(--paper-blue-grey-100);
+              border:  3px solid var(--paper-blue-grey-900);
+              z-index: 1;
+            }
+            .content{
+              padding: 10px;
+            }
+        </style>
+
+
+        <div class="page">
+            <img class="icon" src=[[icon]] z-index="1">
+            <paper-tabs selected="{{selectedTab}}" class="tabheader" no-slide>
+                <paper-icon-button  class="tabheaderbuttons backbutton" icon="icons:arrow-back" on-tap="_backClicked"></paper-icon-button>
+                <paper-tab class="tabheaderbuttons firsttab">Allgemein</paper-tab>
+                <paper-tab class="tabheaderbuttons">Termine</paper-tab>
+            </paper-tabs>
+            <div class="content">
+                <h1>[[type]] Praktikum</h1>
+                <iron-pages selected="[[selectedTab]]">
+                    <div>
+                        <h1>Informationen</h1>
+                        [[informationText]]
+                    </div>
+                    <div>
+                        <h1>Terminauswahl</h1>
+                        <template is="dom-if" if="[[user.isStudent]]">
+                            <practicals-students-date-detail group="{{ group }}"
+                                                             user="[[ user ]]"
+                                                             lab-type="[[labType]]"
+                                                             lab-data="[[labData]]"
+                                                             all-labs="[[allLabs]]"
+                                                             on-back-click="_handleBackTap"
+                                                             access-token="{{ accessToken }}"
+                                                             user-id="{{ userId }}"></practicals-students-date-detail>
+                        </template>
+                        <template is="dom-if" if="[[user.isTutor]]">
+                            <practicals-tutor-date-detail group="{{ group }}"
+                                               user="[[ user ]]"
+                                               lab-type="[[labType]]"
+                                               lab-data="[[labData]]"
+                                               all-labs="[[allLabs]]"
+                                               on-back-click="_handleBackTap"
+                                               access-token="{{ accessToken }}"
+                                               user-id="{{ userId }}"></practicals-tutor-date-detail>
+                        </template>
+                    </div>
+                </iron-pages>
+            </div>
+        </div>
+    </template>
+
+    <script>
+        Polymer({
+            is: 'practicals-view',
+            properties: {
+                accessToken: {
+                    type: String,
+                    notify: true
+                },
+                icon:{
+                    type: String
+                },
+                practical_date:{
+                    type: Date,
+                    notify: true
+                },
+                route: {
+                    type: Object,
+                    notify: true
+                },
+                selectedTab:{
+                    type: String,
+                    value: "0"
+                },
+                type:{
+                    type: String,
+                    notify: true,
+                    value: ""
+                },
+                isReady: {
+                    type: Boolean,
+                    value: false
+                },
+                user: Object,
+                userId: {
+                    type: String
+                },
+                group: Object,
+                labData: Object,
+                labType: Object
+            },
+            ready: function () {
+                if(this.user.isStudent){
+                    this.informationText = this.labType.description_student;
+                }
+                if(this.user.isTutor){
+                    this.informationText = this.labType.description_tutor;
+                }
+            },
+            /**
+             * Back-button click handler
+             */
+            _backClicked: function(e) {
+              this.fire("back-click");
+            }
+        });
+    </script>
 </dom-module>

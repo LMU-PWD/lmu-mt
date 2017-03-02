@@ -10,7 +10,7 @@
 <link rel="import" href="../../bower_components/iron-collapse/iron-collapse.html">
 
 
-<dom-module is="groups-tutor">
+<dom-module id="tutor-sessionlist">
 
     <template>
 
@@ -98,36 +98,36 @@
         </api-request>
 
         <div class="lab-list-container">
-                <template is="dom-if" if="[[ !finishedSessionsLoad ]]">
-                    <paper-spinner active></paper-spinner>
-                </template>
-                <template is="dom-if" if="[[ finishedSessionsLoad ]]">
-                    <paper-listbox>
-                        <paper-item on-click="toggleCollapse" class="sessions_heading">
-                            <span class="session_date">Datum</span>
-                            <span class="session_time">Zeit</span>
-                            <span class="session_icon" style="width:15%">Typ</span>
-                            <span class="session_type"></span>
-                        </paper-item>
-                        <template  is="dom-repeat" items="[[ sessions ]]" filter="prettySessionEntry">
-                            <paper-item on-click="toggleCollapse" class="sessions_row" id="src-[[ item.id ]]">
+            <template is="dom-if" if="[[ !finishedSessionsLoad ]]">
+                <paper-spinner active></paper-spinner>
+            </template>
+            <template is="dom-if" if="[[ finishedSessionsLoad ]]">
+                <paper-listbox>
+                    <paper-item on-click="toggleCollapse" class="sessions_heading">
+                        <span class="session_date">Datum</span>
+                        <span class="session_time">Zeit</span>
+                        <span class="session_icon" style="width:15%">Typ</span>
+                        <span class="session_type"></span>
+                    </paper-item>
+                    <template  is="dom-repeat" items="[[ sessions ]]" filter="prettySessionEntry">
+                        <paper-item on-click="toggleCollapse" class="sessions_row" id="src-[[ item.id ]]">
                                 <span class="session_toggleDropdown">
                                         <iron-icon icon="hardware:keyboard-arrow-right"></iron-icon>
                                 </span>
-                                <span class="session_date">[[ item.date_string ]]</span>
-                                <span class="session_time">[[ item.time_string ]]</span>
-                                <span class="session_icon"><iron-icon icon="[[ item.icon ]]"></iron-icon></span>
-                                <span class="session_type">[[ item.labType_string ]]</span>
+                            <span class="session_date">[[ item.date_string ]]</span>
+                            <span class="session_time">[[ item.time_string ]]</span>
+                            <span class="session_icon"><iron-icon icon="[[ item.icon ]]"></iron-icon></span>
+                            <span class="session_type">[[ item.labType_string ]]</span>
+                        </paper-item>
+                        <iron-collapse id="collapse-[[ item.id ]]">
+                            <paper-item class="session_details" style="border-left: 2px solid var(--paper-blue-grey-500)">
+                                [[ item.location ]]
                             </paper-item>
-                            <iron-collapse id="collapse-[[ item.id ]]">
-                                <paper-item class="session_details" style="border-left: 2px solid var(--paper-blue-grey-500)">
-                                    [[ item.location ]]
-                                </paper-item>
-                            </iron-collapse>
+                        </iron-collapse>
 
-                        </template>
-                    </paper-listbox>
-                </template>
+                    </template>
+                </paper-listbox>
+            </template>
         </div>
 
         <div class="lab-detais-container">
@@ -141,7 +141,7 @@
 
 
         Polymer({
-            is: 'groups-tutor',
+            is: 'tutor-sessionlist',
             properties: {
                 accessToken: String,
                 language: {
@@ -169,28 +169,28 @@
             },
 
             ready: function () {
-                this.ajax_labs = {
-                    headers: {
-                        Authorization: this.accessToken
-                    },
-                    method: 'GET',
-                    endpoint: '/labs/?filter[where][tutorId]=' + this.selfInfo.id
-                };
-                this.ajax_exercises = {
-                    headers: {
-                        Authorization: this.accessToken
-                    },
-                    method: 'GET',
-//                    endpoint: '/exercises/?filter[where][tutor]=' + this.selfInfo.id
-                        endpoint: '/platformusers/' + this.selfInfo.id + '/exercise'
-                };
-                this.ajax_labTypes = {
-                    'headers': {
-                        'Authorization': this.accessToken
-                    },
-                    method: 'GET',
-                    endpoint: '/labTypes/'
-                };
+//                this.ajax_labs = {
+//                    headers: {
+//                        Authorization: this.accessToken
+//                    },
+//                    method: 'GET',
+//                    endpoint: '/labs/?filter[where][tutorId]=' + this.selfInfo.id
+//                };
+//                this.ajax_exercises = {
+//                    headers: {
+//                        Authorization: this.accessToken
+//                    },
+//                    method: 'GET',
+////                    endpoint: '/exercises/?filter[where][tutor]=' + this.selfInfo.id
+//                        endpoint: '/platformusers/' + this.selfInfo.id + '/exercise'
+//                };
+//                this.ajax_labTypes = {
+//                    'headers': {
+//                        'Authorization': this.accessToken
+//                    },
+//                    method: 'GET',
+//                    endpoint: '/labTypes/'
+//                };
             },
 
             /**

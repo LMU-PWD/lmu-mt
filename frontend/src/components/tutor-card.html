@@ -1,0 +1,84 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../components/tutor-sessionlist.html">
+<link rel="import" href="../components/practicals-tutor-date-detail.html">
+
+<dom-module id="tutor-card">
+
+    <template>
+
+        <style include="shared-styles">
+            :host {
+            }
+            .overall-container {
+                width: calc(70% - 25px);
+                padding: 15px 0 15px 15px;
+            }
+        </style>
+
+        <div class="overall-container">
+            <paper-listbox>
+                <paper-item  class="">
+                    <template is="dom-if" if="[[ labtypeAudio.registration_open ]]">
+                        <practicals-tutor-date-detail
+                                group="{{ group }}"
+                                user="[[ user ]]"
+                                lab-type="[[ labtypeAudio ]]"
+                                lab-data="[[labData]]"
+                                all-labs="[[allLabsAudio]]"
+                                on-back-click="_handleBackTap"
+                                access-token="{{ accessToken }}"
+                                user-id="{{ user.id }}"></practicals-tutor-date-detail>
+                    </template>
+                </paper-item>
+            </paper-listbox>
+        </div>
+
+
+
+        <tutor-sessionlist
+        >
+        </tutor-sessionlist>
+
+        <iron-signals on-iron-signal-switchlocale="_switchLocale"></iron-signals>
+    </template>
+
+
+    <script>
+
+        Polymer({
+            is: 'tutor-card',
+            properties: {
+                accessToken: String,
+                language: {
+                    type: String,
+                    value: 'de'
+                },
+                labtypeAudio: Object,
+                labtypeVideo: Object,
+                labtypeFoto: Object,
+                allLabsAudio: Object,
+                allLabsVideo: Object,
+                allLabsFoto: Object,
+                user: Object
+            },
+
+            ready: function () {
+                console.log(this.labtypeAudio);
+            },
+
+            /**
+             * Localization setup
+             */
+            behaviors: [
+                Polymer.AppLocalizeBehavior
+            ],
+            attached: function() {
+                this.loadResources(this.resolveUrl('../shared/locales.json'));
+            },
+            _switchLocale: function() {
+                this.language = (this.language == 'en') ? 'de' : 'en';
+            },
+
+        });
+    </script>
+</dom-module>
