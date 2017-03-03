@@ -1,89 +1,186 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-resizable-behavior/iron-resizable-behavior.html">
+<link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
+<link rel="import" href="../components/group-card.html">
+<link rel="import" href="../components/group-detail.html">
+<link rel="import" href="../shared/shared-styles.html">
+
 
 <!--Localization Imports-->
 <link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
 <link rel="import" href="../services/my-localize-behavior.html">
 
-
 <dom-module id="tutor-dashboard">
     <template>
-        <style>
-            :host{
+        <style include="shared-styles">
+            :host {
+                width: 100%;
+                height: auto;
             }
+
+            .dates-container {
+                float: left;
+                background-color: var(--paper-blue-grey-200);
+                height:300px;
+
+            }
+
+            .group-info {
+                /*width: 100%;*/
+            }
+
+            .practicals-container {
+                float: left;
+            }
+
+            iron-collapse {
+                width: 100%;
+            }
+
+            admin-toolbar {
+                margin: 0 10px;
+                width: auto;
+            }
+
+            /*Phone*/
+            @media screen and (max-width: 767px) {
+                .dates-container {
+                    width: 100%;
+                    min-width: 320px;
+                }
+
+                .practicals-container {
+                    min-width: 320px;
+                    width: 100%;
+                }
+
+                admin-toolbar {
+                    margin: 0;
+                }
+            }
+
+            /*Tablet*/
+            @media screen and (min-width: 768px) and (max-width: 1023px) {
+                .dates-container {
+                    margin: 10px;
+                    width: calc(50% - 20px);
+                }
+
+                .practicals-container {
+                    margin: 10px;
+                    width: calc(50% - 20px);
+                }
+            }
+
+            /*Desktop*/
+            @media screen and (min-width: 1024px) {
+                .dates-container {
+                    margin: 10px;
+                    width: calc(35% - 20px);
+                }
+
+                .practicals-container {
+                    margin: 10px;
+                    width: calc(35% - 20px);
+                }
+            }
+
         </style>
-        <div></div>
+        <div>
 
-        <template is="dom-if" if="[[ user.isAdmin ]]">
 
-        </template>
-
-        <!-- NOTIFICATIONS -->
-        <div class="notificationsContainer">
-            <template is="dom-if" if="{{ showNotifications }}">
-                <notifications-card showlist="{{ showlist }}"></notifications-card>
-            </template>
-        </div>
-
-        <template is="dom-if" if="[[user.isAdmin]]">
-            <div class="group-container">
-                <!-- A D M I N   T O O L B A R -->
-                <admin-toolbar
-                        user="[[ user ]]"
-                        selected-semester="{{ adminSelectedSemesterId }}"
-                        main-view-page="{{ page }}"></admin-toolbar>
-                <group-card group-name="Gruppen" on-tap="toggleGroup"></group-card>
-                <iron-collapse id="collapse" opened=true>
-                    <groups-admin class="group-info"
-                                  access-token="[[ accessToken ]]"
-                                  self-info="{{user}}"
-                                  selected-semester="[[ adminSelectedSemesterId ]]"></groups-admin>
-                </iron-collapse>
+            <div class="dates-container">
+                Tutors Up Next Dates
             </div>
-        </template>
-
-        <template is="dom-if" if="[[user.isStudent]]">
-            <div class="group-container light-color-text">
-                <group-card group-name=[[group.name]] on-tap="toggleGroup"></group-card>
-                <iron-collapse id="collapse" opened=true>
-                    <group-detail class="group-info"
-                                  access-token="[[ accessToken ]]"
-                                  group="{{ group }}"
-                                  self-info="{{user}}"
-                                  group-name="{{groupName}}"></group-detail>
-                </iron-collapse>
-            </div>
-        </template>
-
-        <div class="practicals-container">
-            <div on-tap="_handleFotoTap">
-                <index-card type="Fotopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:"
+            <div class="practicals-container" on-tap="_handleTap">
+                <index-card key="photo" type="Fotopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:"
                             info2="18.05.16, 14-16"></index-card>
-            </div>
-            <div on-tap="_handleVideoTap">
-                <index-card type="Videopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:"
+                <index-card key="video" type="Videopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:"
                             info2="18.05.16, 14-16"></index-card>
-            </div>
-            <div on-tap="_handleAudioTap">
-                <index-card type="Audiopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:"
+                <index-card key="audio" type="Audiopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:"
                             info2="18.05.16, 14-16"></index-card>
             </div>
         </div>
+
+
+        <!--Iron Signal Fired on Logout-->
+        <iron-signals on-iron-signal-forget="_forget"></iron-signals>
 
         <!--Iron Signal for Localization-->
         <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
+
 
     </template>
     <script>
         Polymer({
             is: 'tutor-dashboard',
             properties: {
-            
+                user: {
+                    type: Object,
+                    observer: '_userChanged'
+                },
+                accessToken: {
+                    type: String
+                },
+                deviceWidth: {
+                    type: String,
+                    observer: '_deviceChanged'
+                }
+
+            },
+            listeners:{
+                'iron-resize': '_handleResize'
             },
             behaviors: [
+                Polymer.IronResizableBehavior,
                 Polymer.MyLocalizeBehavior
             ],
-            ready: function() {
-            
+            ready: function () {
+
+            },
+            _handleTap: function (event) {
+                console.log(event);
+                //console.log(event.path[0].key);
+                var key = event.target.getAttribute('key');
+                this.fire('CHANGE_ROUTE', {path: '/' + key, page: key});
+                //console.log(event.model);
+            },
+
+            _userChanged: function (detail) {
+                console.log(detail);
+            },
+            _handleResize: function(event){
+                if(event.target.offsetParent) {
+                    var currentWidth = event.target.offsetParent.clientWidth;
+
+                    if (currentWidth > 1023) {
+                        this.set('deviceWidth', 'Desktop');
+                    } else {
+                        if (currentWidth > 767) {
+                            this.set('deviceWidth', 'Tablet');
+                        } else {
+                            this.set('deviceWidth', 'Mobile');
+                        }
+                    }
+                }
+            },
+            _deviceChanged: function (detail) {
+                var collapse = this.$$('#collapse');
+                switch (detail){
+                    case 'Mobile':
+                        collapse.hide();
+                        break;
+                    case 'Tablet':
+                        collapse.show();
+                        break;
+                    case 'Desktop':
+                        collapse.show();
+                        break;
+                }
+            },
+            _forget: function () {
+                console.info('Reset Group Info');
+                this.set('group',{});
             }
         });
     </script>

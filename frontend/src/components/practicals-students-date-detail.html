@@ -34,6 +34,7 @@
             }
         </style>
 
+
         <api-request
                 headers="[[ ajax.headers ]]"
                 body="[[ ajax.body ]]"
@@ -74,12 +75,12 @@
                 </template>
                 <template is="dom-if" if="[[!before_deadline]]">
                     <!-- Deadline is over and Registration has been started-->
-                    <template is="dom-if" if="[[!practical_date_exists]]">
+                    <template is="dom-if" if="[[!practical_date_string]]">
                         <!-- Deadline is over, Registration has been started but Practical Date is not given -->
                         <practicals-show-saved-dates chosenlabs="{{chosenlabs_transformed}}"
                                                      title="Deine Gruppe hat diese Termine ausgewählt:"></practicals-show-saved-dates>
                     </template>
-                    <template is="dom-if" if="[[practical_date_exists]]">
+                    <template is="dom-if" if="[[practical_date_string]]">
                         <!-- Deadline is over, Registration has been started and Practical Date is given-->
                         <div>
                             Dein Praktikumstermin ist am [[practical_date_string]]
@@ -139,51 +140,78 @@
                     type: Boolean,
                     value: false
                 },
-                group: {
-                    type: Object,
-                    notify: true,
-                    readOnly: false
-                },
+                group:  Object,
                 user: Object,
                 allLabs: {
                     type: Array,
-                    value: []
+                    value: [],
+                    observer: '_allLabsChanged'
                 },
-                labData: Object,
+                labData: {
+                    type: Object,
+                    observer: '_labDataChanged'
+                },
                 labType: Object
             },
-            ready: function () {
-                this.practical_date = this.labData.lab;
+            _labDataChanged: function (detail) {
 
-                this.practical_date_exists = this._dateExists(this.practical_date);
+                //TODO set registration_open, before_deadline, labs_already_chosen
 
-                if(this.practical_date_exists){
-                    this.practical_date_string = this._getDateString(this.practical_date);
-                }
-                else{
-                    this.labs_already_chosen = this._chosenlabsExist(this.labData.priorities);
-                    if(this.labs_already_chosen){
-                        this.chosenlabs = this.labData.priorities;
-                        this.chosenlabs_transformed = this._transformLabs(this.chosenlabs,false);
+                //Set Before Deadline Flag
+                this.set('before_deadline',this._getBeforeDeadline(this.labType.registration_deadline));
+
+                //Set Registration_Open
+                this.set('registration_open',this.labType.registration_open);
+                console.log(this.allLabs);
+                console.log(this.labType.registration_open);
+
+
+
+
+                console.log(Object.keys(this.labData.lab).length);
+                    if(detail.lab.id){
+                        //If Specific Lab exists -> lab has been set
+                        console.log(this.labType.type_str+": Received labData, lab Set:");
+                        console.log(detail.lab);
+                        //this.set('before_deadline',false);
+                        //this.set('practical_date_exists',true);
+                        var d = new Date(detail.lab.date);
+                        this.set('practical_date_string', d.toLocaleString().slice(0,-3));
+
+                        if(this.before_deadline){
+                            console.log("ERROR: Die Praktikumsdaten können nicht vor der Deadline zugewiesen sein. Daten sind hier inkorrekt! LabType: "+this.labType.type_str);
+                            console.log("before_dedline wird statisch auf false gesetzt, damit die Anzeige nicht leer ist");
+                            this.before_deadline = false;
+                        }
+                        //this.practical_date_string = this._getDateString(detail.lab.date);
+                    }else{
+                        //No specific Lab Set
+                        if(this.allLabs == [] || this.allLabs == null){
+                            this.set('registration_open',false);
+                        }
+
+                        if(detail.priorities.length){
+                            //Priorities exist -> show Priorities
+                            this.set('labs_already_chosen',true);
+                            console.log(this.labType.type_str+": Received labData, priorities Set:");
+                            console.log(detail.priorities);
+
+                            this.chosenlabs = this.labData.priorities;
+                            this.chosenlabs_transformed = this._transformLabs(this.chosenlabs,false);
+                        }else{
+                            //Neither Lab nor Priorities set -> show date Picker
+                            this.set('labs_already_chosen',false);
+                            console.log(this.labType.type_str+": Received labData, nothing Set:");
+                            console.log(detail);
+
+                            if(!this.before_deadline){
+                                console.log("ERROR: Die Deadline ist vorbei und trotzdem existieren weder zugewiesene noch ausgewählte Labs. Daten sind hier inkorrekt! LabType: "+this.labType.type_str);
+                            }
+                        }
                     }
-                }
-                this.before_deadline = this._getBeforeDeadline(this.labType.registration_deadline);
-                if(!this.practical_date_exists && (this.allLabs == [] || this.allLabs == null)){
-                    this.registration_open = false;
-                }
-                else{
-                    this.registration_open = this.labType.registration_open;
-                }
-
-                if(this.practical_date_exists && this.before_deadline){
-                    console.log("ERROR: Die Praktikumsdaten können nicht vor der Deadline zugewiesen sein. Daten sind hier inkorrekt! LabType: "+this.labType.type_str);
-                    console.log("before_dedline wird statisch auf false gesetzt, damit die Anzeige nicht leer ist");
-                    this.before_deadline = false;
-                }
-                else if(!this.before_deadline && !this.practical_dates_exists && !this.labs_already_chosen){
-                    console.log("ERROR: Die Deadline ist vorbei und trotzdem existieren weder zugewiesene noch ausgewählte Labs. Daten sind hier inkorrekt! LabType: "+this.labType.type_str);
-                }
+                console.log(this.labType);
             },
+
             /**
              * Back-button click handler
              */
@@ -194,6 +222,10 @@
                 if(practicals_date_selector) {
                     practicals_date_selector._handleResetClick();
                 }
+            },
+            _allLabsChanged: function (detail) {
+                //console.log(this.labType.type_str+": Received allLabs:");
+                console.log(detail);
             },
 
             /**
@@ -308,6 +340,7 @@
              */
             _getDateString: function(date){
                 var datestring = "";
+                console.log(date);
                 switch(date.getDay()){
                     case 0:
                         datestring = "Sonntag, den ";

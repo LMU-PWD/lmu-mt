@@ -16,29 +16,21 @@
               #display: block;
             }
             .page{
-              #border-radius: 25px;
+              /*border-radius: 25px;*/
               margin: 24px;
               background-color: var(--paper-blue-grey-100);
               color: var(--paper-blue-grey-900);
             }
             .tabheader{
-              background-color: var(--paper-blue-grey-900);
-              font-size: 120%;
-              #border-radius: 25px 25px 0px 0px;
+              background-color: var(--color);
+              font-size: 18px;
+              /*border-radius: 25px 25px 0px 0px;*/
               overflow: hidden;
-              height: 5vh;
+              height: 40px;
             }
             .tabheaderbuttons{
               color: var(--paper-blue-grey-50);
               text-align: center;
-            }
-            .backbutton{
-              width: 70px;
-              --paper-icon-button-ink-color:var(--paper-blue-grey-300);
-              padding-right: 30px;
-            }
-            .firsttab{
-              padding-left: 25px;
             }
             paper-tab{
               --paper-tab-ink:var(--paper-blue-grey-100);
@@ -50,15 +42,12 @@
             }
             .icon{
               position: absolute;
-              margin-left: 40px;
-              margin-top: -5px;
-              width: 64px;
-              height: 64px;
-              width: 6vh;
-              height: 6vh;
+                left: calc(50% - 24px);
+                height: 40px;
+                width: 40px;
               border-radius: 50%;
               background-color: var(--paper-blue-grey-100);
-              border:  3px solid var(--paper-blue-grey-900);
+              border:  2px solid var(--paper-blue-grey-900);
               z-index: 1;
             }
             .content{
@@ -67,25 +56,10 @@
         </style>
 
         <api-request
-                headers="[[ ajax_labTypes.headers ]]"
-                method="[[ ajax_labTypes.method ]]"
-                endpoint="[[ ajax_labTypes.endpoint ]]"
-                on-api-response="_handleLabTypesRequest"></api-request>
-
-        <api-request
                 headers="[[ ajax_labs.headers ]]"
                 method="[[ ajax_labs.method ]]"
                 endpoint="[[ ajax_labs.endpoint ]]"
                 on-api-response="_handleAllLabsRequest"></api-request>
-
-
-        <!--on user set (changed)-->
-        <!--API request labtype filter: type & semesterid-->
-            <!--API request all labs filter labtypeid -->
-
-        <!--on group set (changed)-->
-            <!--API request groups priorities-->
-            <!--API request groups labs-->
 
 
         <div class="page">
@@ -95,7 +69,7 @@
                 <paper-tab class="tabheaderbuttons">Termine</paper-tab>
             </paper-tabs>
             <div class="content">
-                <h1>[[type]] Praktikum</h1>
+                <h1>[[labType.type_str]] Praktikum</h1>
                 <iron-pages selected="[[selectedTab]]">
                     <div>
                         <h1>Informationen</h1>
@@ -108,13 +82,13 @@
                     </div>
                     <div>
                         <h1>Terminauswahl</h1>
-                        <!--practicals-students-date-detail id="detailView"
+                        <practicals-students-date-detail id="detailView"
                                                          group="{{ group }}"
                                                          user="{{ user }}"
                                                          lab-type="[[labType]]"
                                                          lab-data="[[labData]]"
                                                          all-labs="[[allLabs]]"
-                                                         access-token="{{ accessToken }}"></practicals-students-date-detail-->
+                                                         access-token="{{ accessToken }}"></practicals-students-date-detail>
                     </div>
                 </iron-pages>
             </div>
@@ -161,30 +135,41 @@
                 },
                 /*Paths:• Lab (final lab from group object)
                 *       • Priorities (groups )    */
-                labData: Object,
+                labData: {
+                    type: Object
+                },
 
                 /*Holding information about the labType (infotext, deadlines, ect.. )*/
-                labType: Object
+                labType: {
+                    type: Object,
+                    observer: '_labTypeChanged'
+                }
             },
 
             _groupChanged: function (detail) {
-                console.log(detail);
+                var newLabData = {lab: {}, priorities: []};
+
+                for (var i = 0; i < this.group.labIds.length; i++) {
+                    //Matching groups labs id with lab id (map photo->photo ect.)
+                    if (this.group.labIds[i].labTypeId == this.labType.id) {
+                        newLabData.lab = this.group.labIds[i];
+                    }
+                }
+                for (var i = 0; i < this.group.priorityIds.length; i++) {
+                    //Matching groups labs id with lab id (map photo->photo ect.)
+                    if (this.group.priorityIds[i].labTypeId == this.labType.id) {
+                        newLabData.priorities.push(this.group.priorityIds[i]);
+                    }
+                }
+                this.set('labData', newLabData);
+
+                //Just for Testing
+                //console.log(this.labType.type_str + ": Updated labData");
+                //console.log(this.labData);
+
             },
             _userChanged: function (detail) {
                 console.log(detail);
-
-                this.ajax_labTypes = {
-                    headers: {
-                        Authorization: this.accessToken,
-                        filter: '{"where":{"semesterId":"'+this.user.semesterId+'","type_str":"'+this.type+'"}}'
-                    },
-                    method: 'GET',
-                    endpoint: '/Labtypes'
-                };
-            },
-            _handleLabTypesRequest: function (response) {
-                this.set('labType',response.detail[0]);
-                console.log(this.labType);
 
                 this.ajax_labs = {
                     headers: {
@@ -194,10 +179,16 @@
                     method: 'GET',
                     endpoint: '/Labs'
                 };
+
+            },
+            _labTypeChanged: function (response) {
+                //console.log(detail);
+                this.customStyle['--color'] = this.labType.color;
+                this.updateStyles();
             },
             _handleAllLabsRequest: function (response) {
                 this.set('allLabs',response.detail);
-                console.log(this.allLabs);
+                //console.log(this.allLabs);
             }
         });
     </script>

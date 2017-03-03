@@ -72,7 +72,7 @@ The Main View contains:
 
             /*Tablet*/
             @media screen and (min-width: 768px) and (max-width: 1023px) {
-                .group-container {
+                .dates-container {
                     margin: 10px;
                     width: calc(50% - 20px);
                 }
@@ -418,6 +418,14 @@ The Main View contains:
                 on-api-response="_handleGroupLabsRequest"></api-request>
 
 
+        <!--Fetch Lab Types from API-->
+        <api-request
+                headers="[[ ajax_labTypes.headers ]]"
+                method="[[ ajax_labTypes.method ]]"
+                endpoint="[[ ajax_labTypes.endpoint ]]"
+                on-api-response="_handleLabTypesRequest"></api-request>
+
+
         <app-route
                 route="{{route}}"
                 pattern="/:page"
@@ -513,18 +521,25 @@ The Main View contains:
                         <div class="main-page" name="dashboard">
                             <template is="dom-if" if="{{user.isAdmin}}">
                                 <admin-dashboard
+                                        lab-types="{{labTypes}}"
                                         user="{{user}}"
-                                        access-token="[[accessToken]]"></admin-dashboard>
+                                        access-token="[[accessToken]]"
+                                        lab-types="[[labTypes]]"></admin-dashboard>
                             </template>
                             <template is="dom-if" if="{{user.isTutor}}">
                                 <tutor-dashboard
+                                        lab-types="{{labTypes}}"
                                         user="{{user}}"
-                                        access-token="[[accessToken]]"></tutor-dashboard>
+                                        access-token="[[accessToken]]"
+                                        lab-types="[[labTypes]]"></tutor-dashboard>
                             </template>
                             <template is="dom-if" if="{{user.isStudent}}">
                                 <student-dashboard
+                                        group="[[group]]"
+                                        lab-types="{{labTypes}}"
                                         user="{{user}}"
-                                        access-token="[[accessToken]]"></student-dashboard>
+                                        access-token="[[accessToken]]"
+                                        lab-types="[[labTypes]]"></student-dashboard>
                             </template>
 
                             <div class="notifications-container">
@@ -537,8 +552,16 @@ The Main View contains:
                         </div>
 
                         <!-- Practical Detail Pages -->
-
-            <practicals-view
+                        <template is="dom-repeat" items="{{labTypes}}" as="labType">
+                            <h1>[[labType.name]]</h1>
+                            <practicals-view
+                                    name= "[[labType.name]]"
+                                    group= "[[group]]"
+                                    user= "[[user]]"
+                                    access-token= "[[accessToken]]"
+                                    lab-type= "[[labType]]"></practicals-view>
+                        </template>
+            <!--practicals-view
                     name="photo"
                     type="Foto"
                     route="{{subroute}}"
@@ -561,7 +584,7 @@ The Main View contains:
                     group="[[ group ]]"
                     user="{{user}}"
                     lab-data="[[ groupdata_audio ]]"
-                    access-token="{{ accessToken }}"></practicals-view>
+                    access-token="{{ accessToken }}"></practicals-view-->
 
                         <!-- Semester Setup Pages (Admin only) -->
                         <template is="dom-if" if="[[ user.isAdmin ]]">
@@ -666,7 +689,7 @@ The Main View contains:
                 group: {
                     type: Object,
                     notify: true,
-                    value: {}
+                    readonly: false
                 },
                 user: {
                     type: Object,
@@ -690,17 +713,8 @@ The Main View contains:
                     //value: [{'text': 'Die gruppeneinteilung ist jetzt freigeschalten', date: 'vor 6 Tagen'}]
                 },
 
-                labTypesRequestSent: {
-                    type: Boolean,
-                    value: false
-                },
-                labsRequestSent: {
-                    type: Boolean,
-                    value: false
-                },
-                gotLabTypes: {
-                    type: Boolean,
-                    value: false
+                labTypes: {
+                    type: Array
                 }
             },
 
@@ -710,33 +724,26 @@ The Main View contains:
 
             listeners: {
                 'CHANGE_ROUTE' : '_handleRouting',
-                'icon-changed' : '_handleIconChanged'
+                'icon-changed' : '_handleIconChanged',
+                'GROUP_CHANGED': '_updateGroup'
+            },
+
+            _updateGroup: function (event) {
+                this.set('group',event.detail);
             },
 
             _userChanged: function (detail) {
                 console.log(detail);
-                this.set('semesterId',this.user.semesterId);
-                if (this.semesterId && !this.labTypesRequestSent) {
-                    this.ajax_labTypes = {
-                        headers: {
-                            Authorization: this.accessToken
-                        },
-                        method: 'GET',
-                        endpoint: '/Labtypes?filter[where][semesterId]=' + this.semesterId
-                    };
-                    //console.log(this.ajax_lab_types);
-                    //console.log("ajax_lab_types set");
-                }
-                if (this.semesterId && !this.labsRequestSent) {
-                    this.ajax_labs = {
-                        headers: {
-                            Authorization: this.accessToken
-                        },
-                        method: 'GET',
-                        endpoint: '/Labs?filter[where][semesterId]=' + this.semesterId
-                    };
-                    //console.log("ajax_labs set");
-                }
+
+
+                this.ajax_labTypes = {
+                    headers: {
+                        Authorization: this.accessToken,
+                        filter: '{"where":{"semesterId":"'+this.user.semesterId+'"}}'
+                    },
+                    method: 'GET',
+                    endpoint: '/Labtypes'
+                };
 
 
             },
@@ -824,7 +831,8 @@ The Main View contains:
              * @private
              */
             _forget: function () {
-                //Reset
+                this.set('group',{});
+                this.set('labTypes',[]);
             },
 
             /**
@@ -878,25 +886,6 @@ The Main View contains:
 
             //NEW
 
-                    ready: function () {
-                        this.isReady = true;
-
-
-                        this.groupdata_audio = {};
-                        this.groupdata_audio.priorities = [];
-                        this.groupdata_video = {};
-                        this.groupdata_video.priorities = [];
-                        this.groupdata_foto = {};
-                        this.groupdata_foto.priorities = [];
-                        this.allLabs = [];
-                        this.all_labs_foto = [];
-                        this.all_labs_video = [];
-                        this.all_labs_audio = [];
-                        this.allPriorities = [];
-                        this.bodyObject = [];
-
-
-                    },
 
 
                     /**
@@ -940,7 +929,7 @@ The Main View contains:
          * @param event.detail
          * @private
          */
-        _handleLabTypesRequest: function (event) {
+       /* _handleLabTypesRequest: function (event) {
             console.log('_handleLabTypesRequest()');
             console.log(event.detail);
 
@@ -1045,6 +1034,32 @@ The Main View contains:
             //console.log(this.groupdata_audio.priorities);
 
         },
+            addNameLabel: function (labObject) {
+                var name;
+                var customColor;
+                if(labObject.type_str.includes("Photo" || "photo")){
+                    name = 'photo';
+                    customColor = '#78909c';
+                } else if(labObject.type_str.includes("Foto" || "foto")){
+                    name = 'photo';
+                    customColor = '#78909c';
+                } else if(labObject.type_str.includes("Video" || "video")){
+                    name = 'video';
+                    customColor = '#546e7a';
+                } else if(labObject.type_str.includes("Audio" || "audio")){
+                    name = 'audio';
+                    customColor = '#455a64';
+                }
+                return Object.assign({}, labObject, {name: name, color: customColor});
+            },
+
+            _handleLabTypesRequest: function (response) {
+                var labResponse = response.detail;
+                for(var i=0; i<labResponse.length; i++){
+                    labResponse[i] = this.addNameLabel(labResponse[i]);
+                }
+                this.set('labTypes',labResponse);
+            },
 
         /**
          * Gets group-lab data from API and sets them for each labtype

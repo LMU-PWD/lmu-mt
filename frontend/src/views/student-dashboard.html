@@ -18,7 +18,7 @@
                 height: auto;
             }
 
-            .group-container {
+            .dates-container {
                 float: left;
             }
 
@@ -41,7 +41,7 @@
 
             /*Phone*/
             @media screen and (max-width: 767px) {
-                .group-container {
+                .dates-container {
                     width: 100%;
                     min-width: 320px;
                 }
@@ -58,7 +58,7 @@
 
             /*Tablet*/
             @media screen and (min-width: 768px) and (max-width: 1023px) {
-                .group-container {
+                .dates-container {
                     margin: 10px;
                     width: calc(50% - 20px);
                 }
@@ -71,7 +71,7 @@
 
             /*Desktop*/
             @media screen and (min-width: 1024px) {
-                .group-container {
+                .dates-container {
                     margin: 10px;
                     width: calc(35% - 20px);
                 }
@@ -86,22 +86,30 @@
         <div>
 
 
-            <div class="group-container">
+            <div class="dates-container">
                 <group-card group-name=[[group.name]] on-tap="toggleGroup"></group-card>
                 <iron-collapse id="collapse" opened=true>
                     <group-detail class="group-info"
                                   access-token="[[ accessToken ]]"
-                                  group="{{ group }}"
+                                  group="[[ group ]]"
                                   self-info="{{user}}"></group-detail>
                 </iron-collapse>
             </div>
             <div class="practicals-container" on-tap="_handleTap">
-                <index-card key="photo" type="Fotopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:"
-                                info2="18.05.16, 14-16"></index-card>
-                <index-card key="video" type="Videopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:"
-                                info2="18.05.16, 14-16"></index-card>
-                <index-card key="audio" type="Audiopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:"
-                                info2="18.05.16, 14-16"></index-card>
+                <template is="dom-repeat" items="[[labTypes]]" as="labType">
+                    <index-card lab-type="[[labType]]" group="[[group]]"></index-card>
+                    <!--h1 key=[[labType.name]]>[[labType.name]]</h1-->
+
+                    <!--index-card key="[[labType.name]]" type="Fotopraktikum" label1="Lab:" info1="in 6 Tagen"
+                                label2="Abgabe:"
+                                info2="18.05.16, 14-16"></index-card-->
+                </template>
+                    <!--index-card key="photo" type="Fotopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:"
+                                    info2="18.05.16, 14-16"></index-card>
+                    <index-card key="video" type="Videopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:"
+                                    info2="18.05.16, 14-16"></index-card>
+                    <index-card key="audio" type="Audiopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:"
+                                    info2="18.05.16, 14-16"></index-card-->
             </div>
         </div>
 
@@ -130,7 +138,12 @@
                     observer: '_deviceChanged'
                 },
                 group:{
-                    type: Object
+                    type: Object,
+                    observer: '_groupChanged'
+                },
+                labTypes: {
+                    type: Array,
+                    observer: '_labTypesChanged'
                 }
 
             },
@@ -144,19 +157,17 @@
             ready: function () {
 
             },
+
+            _labTypesChanged: function (detail) {
+                console.log(detail);
+            },
             toggleGroup: function () {
                 var mq = window.matchMedia("(max-width: 767px)");
                 if (mq.matches) {
                     this.$.collapse.toggle();
                 }
             },
-            _handleTap: function (event) {
-                console.log(event);
-                //console.log(event.path[0].key);
-                var key = event.target.getAttribute('key');
-                this.fire('CHANGE_ROUTE', {path: '/' + key, page: key});
-                //console.log(event.model);
-            },
+
 
             _userChanged: function (detail) {
                 console.log(detail);
@@ -193,6 +204,9 @@
             _forget: function () {
                 console.info('Reset Group Info');
                 this.set('group',{});
+            },
+            _groupChanged:function (detail) {
+                console.log(detail);
             }
         });
     </script>

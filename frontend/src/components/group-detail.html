@@ -162,6 +162,20 @@
                         on-api-response="_handleGroupResponse"
                         loading="{{ isLoading }}"></api-request>
 
+                <!--Fetching info about the groups labs-->
+                <api-request
+                        headers="[[ ajax_glabs.headers ]]"
+                        method="[[ ajax_glabs.method ]]"
+                        endpoint="[[ ajax_glabs.endpoint ]]"
+                        on-api-response="_handleGroupLabsRequest"></api-request>
+
+                <!--Fetching info about the groups priorities-->
+                <api-request
+                        headers="[[ ajax_prios.headers ]]"
+                        method="[[ ajax_prios.method ]]"
+                        endpoint="[[ ajax_prios.endpoint ]]"
+                        on-api-response="_handlePriosRequest"></api-request>
+
                 <template is="dom-repeat" items="[[group.groupMemberIds]]" as="member">
                     <div class="member">
                         <get-user-info
@@ -309,7 +323,7 @@
                 //Check for empty inputs
                 this.members.forEach(function(element) {
                     if(element.name==""){
-                        console.log('element was empty');
+                        //console.log('element was empty');
                         checked = false;
                     }
                 });
@@ -346,7 +360,7 @@
              * @private
              */
             _handleGroupResponse: function (event) {
-                console.log(event);
+                //console.log(event);
                 var self = this;
                 var receivedGroup = event.detail;
                 this.set('group', receivedGroup);
@@ -355,6 +369,59 @@
                 this.group.groupMemberIds.forEach(function () {
                     self.push('group.groupMemberIds',{"id":self.shift('group.groupMemberIds'),"name":"","mail":""});
                 });
+
+                if(this.group.labIds){
+                    // Get the first group-lab
+                    this.ajax_glabs = {
+                        headers: {
+                            Authorization: this.accessToken
+                        },
+                        method: 'GET',
+                        endpoint: '/labs/' + this.pop('group.labIds')
+                    };
+                }
+            },
+
+            _handleGroupLabsRequest: function (response) {
+                var labInfo = response.detail;
+                //console.log(labInfo);
+                ////console.log(this.pop('group.labIds'));
+                this.push('group.labIds',labInfo);
+
+                //console.log(this.group);
+
+                if((typeof this.group.labIds[0])=='string'){
+                    var labId = this.splice('group.labIds',0,1);
+                    // Get further group-labs until all strings replaced
+                    this.ajax_glabs = {
+                        headers: {
+                            Authorization: this.accessToken
+                        },
+                        method: 'GET',
+                        endpoint: '/labs/' + labId[0]
+                    };
+                }else {
+                    //Notify labIds Changed
+                    //this.splice('group.labIds')
+
+                    //Get the Groups Priorities
+                    this.ajax_prios = {
+                        headers: {
+                            Authorization: this.accessToken,
+                            filter: '{"where":{"semesterId":"' + this.selfInfo.semesterId + '","groupId":"' + this.selfInfo.groupId + '"}}'
+                        },
+                        method: 'GET',
+                        endpoint: '/Priorities'
+                    };
+                }
+            },
+
+
+            _handlePriosRequest: function (response) {
+                this.set('group.priorityIds',response.detail);
+
+                //Notify Main to Update Group Property
+                this.fire('GROUP_CHANGED',this.group);
             },
 
             /**
@@ -370,7 +437,7 @@
             },
 
             _handleCreateGroupError: function (event) {
-                console.log('there has been an error');
+                //console.log('there has been an error');
                 this.$$('#requestError').toggleAttribute("invalid",true);
             },
 
@@ -398,14 +465,14 @@
             },
 
             _selfInfoChanged: function (detail) {
-                console.log(detail);
-                console.log(this.selfInfo.groupId);
+                //console.log(detail);
+                //console.log(this.selfInfo.groupId);
                 this.notifyPath('selfInfo.groupId');
                 this.fire('dom-change');
 
             },
             _groupChanged: function (detail) {
-                console.log(detail);
+                //console.log(detail);
             }
 
         });
