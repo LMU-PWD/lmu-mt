@@ -761,18 +761,18 @@ The Main View contains:
                 if(this.routeData.page!='dashboard'){
                     window.history.back();
                     this.set('transburgerChangeTo','close');
-                    this.$.transburger.toggleIcon();
+                    this.$$('#transburger').toggleIcon();
 
                 }else{
                     console.log(detail);
 
-                    this.$.transburger.toggleIcon();
+                    this.$$('#transburger').toggleIcon();
                     this.$$('#menu').toggle();
                     this.$$('.menu-overlay').classList.toggle('not-active');
                     console.log(this.$.menu.opened);
-                    console.log(this.$.transburger.icon);
+                    console.log(this.$$('#transburger').icon);
                     if(this.$.menu.opened && this.activeIcon=='menu'){
-                        this.$.transburger.toggleIcon();
+                        this.$$('#transburger').toggleIcon();
 
                     }
                 }
@@ -849,7 +849,7 @@ The Main View contains:
 
                 //Change Menu Icon to Back Button
                 this.set('transburgerChangeTo','arrow-left');
-                this.$.transburger.toggleIcon();
+                this.$$('#transburger').toggleIcon();
 
                 //Change scroll position -> 0 (on routeChanged)
                 this.$$('paper-header-panel').scroller.scrollTop = 0;
