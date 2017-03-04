@@ -1,5 +1,8 @@
 <link rel="import" href="../components/practicals-students-date-selector.html">
 <link rel="import" href="../components/practicals-show-saved-dates.html">
+<!--Localization Imports-->
+<link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
+<link rel="import" href="../services/my-localize-behavior.html">
 
 <dom-module id="practicals-students-date-detail">
     <template>
@@ -75,15 +78,18 @@
                 </template>
                 <template is="dom-if" if="[[!before_deadline]]">
                     <!-- Deadline is over and Registration has been started-->
-                    <template is="dom-if" if="[[!practical_date_string]]">
+                    <template is="dom-if" if="[[!practical_date.exists]]">
                         <!-- Deadline is over, Registration has been started but Practical Date is not given -->
                         <practicals-show-saved-dates chosenlabs="{{chosenlabs_transformed}}"
                                                      title="Deine Gruppe hat diese Termine ausgewählt:"></practicals-show-saved-dates>
                     </template>
-                    <template is="dom-if" if="[[practical_date_string]]">
+                    <template is="dom-if" if="[[practical_date.exists]]">
                         <!-- Deadline is over, Registration has been started and Practical Date is given-->
                         <div>
-                            Dein Praktikumstermin ist am [[practical_date_string]]
+                            {{localize('practicals-student-date labDate_1')}}
+                            [[practical_date.weekday]]{{localize('practicals-student-date labDate_2')}}
+                            [[practical_date.date]]{{localize('practicals-student-date labDate_3')}}
+                            [[practical_date.time]]
                         </div>
                     </template>
                 </template>
@@ -95,6 +101,9 @@
                 </div>
             </template>
         </div>
+
+        <!--Iron Signal for Localization-->
+        <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
 
     </template>
 
@@ -115,7 +124,7 @@
                     value: []
                 },
                 practical_date:{
-                    type: Date,
+                    type: Object,
                     notify: true
                 },
                 practical_date_exists:{
@@ -153,6 +162,10 @@
                 },
                 labType: Object
             },
+                behaviors: [
+                    Polymer.MyLocalizeBehavior
+                ],
+
             _labDataChanged: function (detail) {
 
                 //TODO set registration_open, before_deadline, labs_already_chosen
@@ -175,9 +188,9 @@
                         console.log(detail.lab);
                         //this.set('before_deadline',false);
                         //this.set('practical_date_exists',true);
-                        var d = new Date(detail.lab.date);
-                        this.set('practical_date_string', d.toLocaleString().slice(0,-3));
-
+                        //var d = new Date(detail.lab.date);
+                        //this.set('practical_date_string', d.toLocaleString().slice(0,-3));
+                        this.setDate(detail.lab.date,'practical_date');
                         if(this.before_deadline){
                             console.log("ERROR: Die Praktikumsdaten können nicht vor der Deadline zugewiesen sein. Daten sind hier inkorrekt! LabType: "+this.labType.type_str);
                             console.log("before_dedline wird statisch auf false gesetzt, damit die Anzeige nicht leer ist");
@@ -210,6 +223,25 @@
                         }
                     }
                 console.log(this.labType);
+            },
+
+
+            /**
+             * Converts a date sting into an object, localize-able
+             * containing weekday, date, time and a flag if set
+             * @param{string} date - Date String to be converted
+             * @param{string} propertyName - name of Object, Date should be saved to
+             * @private
+             */
+            setDate: function (date, propertyName) {
+                var d = new Date(date);
+                var newDate = {
+                    weekday: this.localize('general_weekdays '+d.getDay()),
+                    date: d.toLocaleDateString(),
+                    time: d.toLocaleTimeString().slice(0,-3),
+                    exists: true
+                };
+                this.set(propertyName,newDate);
             },
 
             /**

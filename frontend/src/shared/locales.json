@@ -133,7 +133,19 @@
     "admin_dashboard students" : "Students",
     "admin_dashboard groups" : "Groups",
     "admin_dashboard tutors" : "Tutors",
-    "admin_dashboard semester" : "Terms"
+    "admin_dashboard semester" : "Terms",
+
+    "practicals-student-date labDate_1" : "Your practical takes place on ",
+    "practicals-student-date labDate_2" : ", the  ",
+    "practicals-student-date labDate_3" : ", starting at ",
+
+    "general_weekdays 0": "Sunday",
+    "general_weekdays 1": "Monday",
+    "general_weekdays 2": "Tuesday",
+    "general_weekdays 3": "Wednesday",
+    "general_weekdays 4": "Thursday",
+    "general_weekdays 5": "Friday",
+    "general_weekdays 6": "Saturday"
 
   },
 
@@ -271,6 +283,19 @@
     "admin_dashboard students" : "Studenten",
     "admin_dashboard groups" : "Gruppen",
     "admin_dashboard tutors" : "Tutoren",
-    "admin_dashboard semester" : "Semester"
+    "admin_dashboard semester" : "Semester",
+
+    "practicals-student-date labDate_1" : "Dein Praktikumstermin ist am ",
+    "practicals-student-date labDate_2" : ", den ",
+    "practicals-student-date labDate_3" : ", ab ",
+
+    "general_weekdays 0": "Sonntag",
+    "general_weekdays 1": "Montag",
+    "general_weekdays 2": "Dienstag",
+    "general_weekdays 3": "Mittwoch",
+    "general_weekdays 4": "Donnerstag",
+    "general_weekdays 5": "Freitag",
+    "general_weekdays 6": "Samstag"
+
   }
 }
