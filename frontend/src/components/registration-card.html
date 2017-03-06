@@ -109,25 +109,13 @@
                 color: #eceff1;
             }
 
-            .localepicker {
+            language-switcher{
+                --primary-switcher-color: var(--paper-blue-grey-50);
+                --secondary-switcher-color: var(--paper-blue-grey-900);
+                --backlay-color: var(--paper-blue-grey-100);
                 float: right;
-            }
-
-            .localepicker paper-button {
-                padding: 0;
-                /*width: 50px;*/
-                color: var(--paper-blue-grey-300);
-                min-width: 0px;
-                font-size: 20px;
-                font-weight: 300;
-            }
-
-            .localepicker paper-button:hover {
-                color: #FFF;
-                -o-transition: .1s;
-                -moz-transition: .1s;
-                -webkit-transition: .1s;
-                transition: .1s;
+                position: relative;
+                top: -16px;
             }
 
         </style>
@@ -150,10 +138,7 @@
 
             <div class="card-header">
                 <span>{{localize('registrationcard_header')}}</span>
-                <span class="localepicker">
-                    <paper-button style="float:right" on-tap="initSwitchLocale">{{ language }}</paper-button>
-                    <paper-tooltip offset="5">{{localize('logincard_locale button tooltip')}}</paper-tooltip>
-                </span>
+                <language-switcher></language-switcher>
             </div>
 
             <div class="card-content">
