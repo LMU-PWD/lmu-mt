@@ -1,0 +1,189 @@
+<dom-module id="practicals-admin-date-creator">
+    <template>
+        <style include="shared-styles">
+            :host{
+
+            }
+            .date{
+                padding: 10px;
+                background-color: var(--paper-blue-grey-500);
+                color: var(--paper-blue-grey-100);
+                font-size: 18px;
+            }
+            #lab{
+                border-style: solid;
+                border-width: 1px;
+                border-color: var(--paper-blue-grey-100);
+            }
+            .labStrings{
+                margin-right: 5px;
+                margin-left: 5px;
+            }
+            .date-creator{
+                margin-top: 20px;
+                background-color: var(--paper-blue-grey-50);
+                text-align: center;
+            }
+            #priorityselection{
+                background-color: var(--paper-blue-grey-200);
+                padding-bottom: 20px;
+            }
+            #priorityShower{
+                visibility: hidden;
+                margin-left: 10%;
+                color: green;
+            }
+            .dropdown-content{
+                width: 70px;
+            }
+
+        </style>
+        <div class="date-creator">
+            <div class="date">
+                [[date]]
+            </div>
+            <template is="dom-repeat" items="[[labs]]" as="lab" >
+                <paper-item id="lab" class="lab" on-tap="_handleDateClick">
+                    <p class="labStrings">[[_getTimeSlotString(lab)]]</p>
+                    <p class="labStrings">[[_getLabTutorString(lab)]]</p>
+                    <p class="labStrings">[[_getLabGroupString(lab)]]</p>
+                </paper-item>
+            </template>
+        </div>
+    </template>
+    <script>
+        Polymer({
+            is: 'practicals-admin-date-creator',
+            properties: {
+                labs:{
+                    type: Array,
+                    value: []
+                },
+                date:{
+                    type: String,
+                    value: ""
+                },
+                chosenlabindex:{
+                    type: Number
+                },
+                recentlab: {
+                    type: Object
+                }
+            },
+            ready: function() {
+                this.date = this._getDateString(this.labs[0].dates[0]);
+            },
+
+            /**
+             * Creates string from the timeslot-timits to get a nicer visualisation,
+             * Adds leading zeros, if necessary
+             */
+            _getLabGroupString: function(slot){
+                var returnstring = "";
+                if(slot) {
+                    //console.log(slot.tutorName +slot.groupName );
+                    if(slot.tutorName &&  slot.tutorName != ""){
+                        returnstring = "Tutor: "+slot.tutorName;
+                    }
+                    else if(slot.tutor &&  slot.tutor != "" && (!slot.tutorName || slot.tutorName != "")){
+                        returnstring = "Tutor: "+slot.tutor;
+                    }
+                }
+                return returnstring;
+            },
+            /**
+             * Creates string from the timeslot-timits to get a nicer visualisation,
+             * Adds leading zeros, if necessary
+             */
+            _getLabTutorString: function(slot){
+                var returnstring = "";
+                if(slot) {
+                    if(slot.groupName && slot.groupName != ""){
+                        returnstring = "Gruppe: "+slot.groupName;
+                    }
+                    else if(slot.group &&  slot.group != "" && (!slot.groupName || slot.groupName != "")){
+                        returnstring = "Gruppe: "+slot.group;
+                    }
+                }
+                return returnstring;
+            },
+
+            /**
+             * Creates string from the timeslot-timits to get a nicer visualisation,
+             * Adds leading zeros, if necessary
+             */
+            _getTimeSlotString: function(slot){
+                if(slot) {
+                        var starthour = slot.dates[0].getHours();
+                        var startminute = slot.dates[0].getMinutes();
+                        var endhour = slot.dates[1].getHours();
+                        var endminute = slot.dates[1].getMinutes();
+                        /*
+                    * Add zeros, if necessary
+                    */
+
+                    if(starthour<10){
+
+                        starthour = "0"+ starthour;
+                    }
+                    if(startminute<10){
+                        startminute = "0"+startminute;
+                    }
+                    if(endhour<10
+                    ){
+                        endhour = "0"+endhour;
+                    }
+                    if(endminute< 10){
+                        endminute = "0" +endminute;
+                    }
+
+                    return starthour + ":" + startminute + " - " + endhour + ":" + endminute+ " Uhr  ";
+                }
+            },
+
+            /**
+             * Creates string from the given date
+             * @param {String} date - date that will be transformed to String
+             */
+            _getDateString: function(date){
+                var datestring = "";
+                switch(date.getDay()){
+
+                    case 0:
+                        datestring = "Sonntag, ";
+                        break;
+                    case 1:
+                        datestring = "Montag, ";
+                        break;
+                    case 2:
+                        datestring = "Dienstag, ";
+                        break;
+                    case 3:
+                        datestring = "Mittwoch, ";
+                        break;
+                    case 4:
+                        datestring = "Donnerstag, ";
+                        break;
+                    case 5:
+                        datestring = "Freitag, ";
+                        break;
+                    case 6:
+                        datestring = "Samstag, ";
+                        break;
+                }
+                datestring = datestring+date.getDate()+"."+date.getMonth()+"."+date.getFullYear();
+                return datestring;
+            },
+
+            /**
+             * Click-Event handler
+             * Handles the timeslot selection
+             * @param {String} e - handle data
+             */
+            _handleDateClick: function(e){
+                //console.log(e.model.index);
+                this.fire("date-click",this.labs[e.model.index]);
+            }
+        });
+    </script>
+</dom-module>

@@ -1,0 +1,466 @@
+<link rel="import" href="practicals-admin-date-creator.html">
+<link rel="import" href="lab-detail-view.html">
+
+<dom-module id="practicals-admin-detail">
+    <template>
+        <style include="shared-styles">
+            :host {
+                display: block;
+                text-align: center;
+            }
+            .title{
+                font-size: larger;
+            }
+            .datecreator{
+                display:inline-block;
+                margin:0;
+                height: auto;
+                vertical-align:top;
+                padding-bottom: 10px;
+            }
+            .studentsRegistrationButton{
+                margin-top: 10px;
+                margin-bottom: 10px;
+            }
+            #detailView{
+                background-color: var(--paper-blue-grey-50);
+            }
+            .dialogButton{
+                width: 49.8%;
+                height: 40px;
+            }
+            /*Phone*/
+            @media screen and (max-width: 767px) {
+                .datecreator{
+                    width: 100%;
+                }
+            }
+            /*Tablet*/
+            @media screen and (min-width: 768px) and (max-width: 1023px) {
+                .datecreator{
+                    min-width: 400px;
+                    width: 49%;
+
+                }
+            }
+            /*Desktop*/
+            @media screen and (min-width: 1024px) {
+                .datecreator{
+                    min-width: 400px;
+                    width: 24%;
+                }
+            }
+        </style>
+
+        <api-request
+                headers="[[ ajax_groups.headers ]]"
+                method="[[ ajax_groups.method ]]"
+                body="[[ ajax_groups.body ]]"
+                endpoint="[[ ajax_groups.endpoint ]]"
+                on-api-response="_responseFromGettingGroups"></api-request>
+        <api-request
+                headers="[[ ajax_tutors.headers ]]"
+                method="[[ ajax_tutors.method ]]"
+                body="[[ ajax_tutors.body ]]"
+                endpoint="[[ ajax_tutors.endpoint ]]"
+                on-api-response="_responseFromGettingTutors"></api-request>
+        <api-request
+                headers="[[ ajax_save_registration_open.headers ]]"
+                method="[[ ajax_save_registration_open.method ]]"
+                body="[[ ajax_save_registration_open.body ]]"
+                endpoint="[[ ajax_save_registration_open.endpoint ]]"
+                on-api-response="_responseFromPostingRegistrationOpen"></api-request>
+        <api-request
+                headers="[[ ajax_save_lab.headers ]]"
+                method="[[ ajax_save_lab.method ]]"
+                body="[[ ajax_save_lab.body ]]"
+                endpoint="[[ ajax_save_lab.endpoint ]]"
+                on-api-response="_responseFromPostingLab"></api-request>
+        <api-request
+                headers="[[ ajax_get_labs.headers ]]"
+                method="[[ ajax_get_labs.method ]]"
+                body="[[ ajax_get_labs.body ]]"
+                endpoint="[[ ajax_get_labs.endpoint ]]"
+                on-api-response="_responseFromGettingLabs"></api-request>
+
+        <iron-signals on-iron-signal-switchlocale="_switchLocale"></iron-signals>
+
+        <paper-dialog id="detailView" on-iron-overlay-closed="_reactToDialog">
+            <lab-detail-view lab-from-api="[[ chosenlab ]]"
+                             access-token ="[[accessToken]]"
+                             tutors = "[[tutors]]"
+                             groups = "[[groups]]"></lab-detail-view>
+
+            <div class="buttons">
+                <paper-button class="dialogButton" dialog-dismiss raised><iron-icon icon="close" ></iron-icon> Cancel {{localize('c_button_cancel')}}</paper-button>
+                <paper-button class="dialogButton" dialog-confirm raised><iron-icon icon="save" ></iron-icon> Save </paper-button>
+            </div>
+        </paper-dialog>
+
+            <div class="page">
+                <div>
+                    <paper-button raised class="studentsRegistrationButton" on-tap="_handleStudentButtonClick">
+                        <template is="dom-if" if="[[labType.registration_open]]">
+                            Registrierung schliessen
+                        </template>
+                        <template is="dom-if" if="[[!labType.registration_open]]">
+                            Registrierung freischalten
+                        </template>
+                    </paper-button>
+                </div>
+                <div class="dateselector">
+                    <template is="dom-repeat" id="dates" items="[[transformedLabs]]" as="labs">
+                        <practicals-admin-date-creator id="dateselectors" class="datecreator"
+                                                       labs="[[labs]]"
+                                                       priority="[[priority]]"
+                                                       on-date-click="_handleDateClick"></practicals-admin-date-creator>
+                    </template>
+                </div>
+            </div>
+
+    </template>
+
+    <script>
+        Polymer({
+            is: 'practicals-admin-detail',
+            properties: {
+                accessToken: {
+                    type: String,
+                    notify: true
+                },
+                allLabs: {
+                    type: Array,
+                    value: [],
+                    observer: "_labsChanged"
+                },
+                isReady:{
+                    type: Boolean,
+                    value: false
+                },
+                groups: Array,
+                labType: Object,
+                labToSet: Object,
+                priority:{
+                    type: Number,
+                    value: 2
+                },
+                route: {
+                    type: Object,
+                    notify: true
+                },
+                selectedView:{
+                    type: String,
+                    value: "0"
+                },
+                semesterId:{
+                    type: String
+                },
+                transformedLabs: Array,
+                tutors: Array,
+                user: Object,
+                userId: {
+                    type: String
+                }
+            },
+            ready: function () {
+                //console.log(this.allLabs);
+                this.ajax_groups ={
+                    headers: {
+                        Authorization: this.accessToken
+                    },
+                    method: 'GET',
+                    endpoint: '/groups?filter[where][semesterId]=' + this.semesterId
+                };
+                //console.log(this.user);
+                console.log(this.labType);
+                //console.log(this.accessToken);
+                //this.transformedLabs = this._transformLabs(this.allLabs,true);
+                //this.$.dates.render();
+            },
+
+            /**
+             * Localization setup
+             */
+            behaviors: [
+                Polymer.AppLocalizeBehavior
+            ],
+            attached: function() {
+                this.loadResources(this.resolveUrl('../shared/locales.json'));
+            },
+            _switchLocale: function() {
+                this.language = (this.language == 'en') ? 'de' : 'en';
+            },
+
+            /**
+             * Creates string from the timeslot-timits to get a nicer visualisation,
+             * Adds leading zeros, if necessary
+             */
+            _getLabGroupName: function(group){
+                    //console.log(group);
+                    if(group  && this.groups && group != ""){
+                        for(i=0; i<this.groups.length; i++){
+                            if(group == this.groups[i].id){
+                                var returnstring = this.groups[i].name;
+                                break;
+                            }
+                        }
+                    }
+                    return returnstring;
+            },
+            /**
+             * Creates string from the timeslot-timits to get a nicer visualisation,
+             * Adds leading zeros, if necessary
+             */
+            _getLabTutorName: function(tutor){
+                //console.log(tutor);
+                //console.log(this.tutor);
+                if(tutor && this.tutors && tutor != ""){
+                    for(i=0; i<this.tutors.length; i++){
+                        if(tutor == this.tutors[i].id){
+                            var returnstring = this.tutors[i].name + ", " + this.tutors[i].first_name;
+                            break;
+                        }
+                    }
+                }
+                return returnstring;
+            },
+
+            /**
+             * Handle date click from Child (date-creator)
+             * Update child priorities-Array
+             * @param e - Event Variable
+             * @private
+             */
+            _handleDateClick: function(e){
+                var labFromChild = new Date(e.detail.dates[0]);
+                //console.log(labFromChild.toString());
+                var lab = new Date();
+                for(i=0; i<this.allLabs.length; i++){
+                    lab = new Date(this.allLabs[i].date);
+                    if(lab.toString() == labFromChild.toString()){
+                        this.chosenlab = this.allLabs[i];
+                        break;
+                    }
+                }
+                if(this.chosenlab) {
+                    this.$.detailView.open();
+                }
+                else{
+                    console.log("chosenlab is not correctly defined: ");
+                    console.log(this.chosenlab);
+                }
+            },
+
+            /**
+             * Handle click on Student Button to Post registration_open on API
+             * @param e - Event Variable
+             * @private
+             */
+            _handleStudentButtonClick: function(){
+                if(this.labType.registration_open) {
+                    this.set('labType.registration_open', false);
+                    this.ajax_save_registration_open = {
+                        headers: {
+                            Authorization: this.accessToken
+                        },
+                        body: this.labType,
+                        method: 'POST',
+                        endpoint: '/labtypes/' + this.labType.id  +'/replace'
+                    };
+                }
+                else {
+                    this.set('labType.registration_open', true);
+                    this.ajax_save_registration_open = {
+                        headers: {
+                            Authorization: this.accessToken
+                        },
+                        body: this.labType,
+                        method: 'POST',
+                        endpoint: '/labtypes/' + this.labType.id +'/replace'
+                    };
+                }
+                console.log(this.ajax_save_registration_open);
+            },
+            /**
+             * Handle allLabs array changes
+             * @param e - Event Variable
+             * @private
+             */
+            _labsChanged: function(e){
+                //console.log(e);
+                if(this.isReady) {
+                    this.transformedLabs = this._transformLabs(this.allLabs, true);
+                    //this.$.dates.render();
+                }
+            },
+            /**
+             * Handle Dialog button pressed
+             * @param event
+             */
+            _reactToDialog: function (event) {
+                console.log(event.detail);
+                if(event.detail.confirmed){
+                    //Post Lab-Changes in API
+                    //console.log(event.target.firstChild.nextSibling.lab);
+                    //this.chosenlab = {};
+                    this.labToSet = event.target.firstChild.nextSibling.lab;
+                    console.log(this.labToSet);
+                    if(this.labToSet.id) {
+                        this.ajax_save_lab = {
+                            headers: {
+                                Authorization: this.accessToken
+                            },
+                            body: this.labToSet,
+                            method: 'PUT',
+                            endpoint: '/labs/' + this.labToSet.id
+                        };
+                    }
+                    else{
+                        console.log("Error: LabId is wrong: ");
+                        console.log(this.labToSet.id);
+                    }
+                }
+            },
+
+            /**
+             * Handle response from api-request whith ajax_groups
+             * @param e - Event Variable
+             * @private
+             */
+            _responseFromPostingRegistrationOpen: function(e){
+                console.log(e.detail);
+            },
+
+            /**
+             * Handle response from api-request whith ajax_groups
+             * @param e - Event Variable
+             * @private
+             */
+            _responseFromGettingGroups: function(e){
+                //console.log(e.detail);
+                this.groups = e.detail;
+                console.log(e.detail);
+
+                this.ajax_tutors ={
+                    headers: {
+                        Authorization: this.accessToken
+                    },
+                    method: 'GET',
+                    endpoint: '/platformusers?filter[where][semesterId]=' +  this.semesterId
+                };
+            },
+            /**
+             * Handle response from api-request whith ajax_groups
+             * @param e - Event Variable
+             * @private
+             */
+            _responseFromGettingTutors: function(e){
+                var temporalArray = e.detail;
+                this.tutors = temporalArray.filter(function(item){return item.isTutor;});
+                this.isReady = true;
+                //console.log(this.tutors);
+                //TODO: when i execute the next line everything goes wrong
+                this.transformedLabs = this._transformLabs(this.allLabs,true);
+                //this.$.dates.render();
+
+            },
+            /**
+             * Handle response from api-request whith ajax_get_labs
+             * @param e - Event Variable
+             * @private
+             */
+            _responseFromGettingLabs: function(e){
+                var temporalArray = e.detail;
+                var labTypeId = this.labType.id;
+                this.allLabs = temporalArray.filter(function(item){return item.labTypeId == labTypeId;});
+                //console.log(this.allLabs);
+                this.transformedLabs = this._transformLabs(this.allLabs,true);
+            },
+
+            /**
+             * Handle response from api-request to save changed lab data
+             * @param e - Event Variable
+             * @private
+             */
+            _responseFromPostingLab: function(e){
+                //console.log(e);
+                this.ajax_get_labs = {
+                    headers: {
+                        Authorization: this.accessToken
+                    },
+                    body: this.labToSet,
+                    method: 'Get',
+                    endpoint: '/labs?filter[where][semesterId]=' +  this.semesterId
+                };
+            },
+
+            /**
+             * Transform the Format of the given Timelabs from the Api, so it will be easier to handle in the frontend
+             * @param labsFromApi - Contains the given timelabs
+             * @returns {Array} - timelabs in new format
+             * @private
+             */
+            _transformLabs: function(labsFromApi,divideDates){
+                //console.log(labsFromApi);
+                var transformedLabs = []; //Store return-Array here
+                var lastLab = new Date(labsFromApi[0].date);
+                var countDates = 0; //Date counter
+                var countLabs = 0; //lab counter
+                var dates = [];
+
+                for(i=0; i<labsFromApi.length; i++){
+                    // Create a new array-entrie if date from recent lab is different from date of the last lab
+                    var labdate = new Date(labsFromApi[i].date);
+                    if((labdate.getFullYear() != lastLab.getFullYear() ||
+                        labdate.getMonth() != lastLab.getMonth() ||
+                        labdate.getDate() != lastLab.getDate()) && divideDates) {
+                        dates = [];
+                        lastLab = labdate;
+                        transformedLabs.push([]);
+                        countDates++;
+                        countLabs = 0;
+                    }
+                    var endtime = new Date(labdate.getFullYear(), labdate.getMonth(), labdate.getDate());
+                    if((labdate.getMinutes() + (labsFromApi[i].duration % 60)) > 60){
+                        endtime.setHours(1+Math.floor(labdate.getHours()+(labsFromApi[i].duration) / 60));
+                        endtime.setMinutes(labdate.getMinutes() + (labsFromApi[i].duration % 60)-60);
+                    }
+                    else{
+                        endtime.setHours(Math.floor(labdate.getHours()+(labsFromApi[i].duration) / 60));
+                        endtime.setMinutes(labdate.getMinutes() + (labsFromApi[i].duration % 60));
+                    }
+
+                    var lab = {};
+                    lab.dates = [];
+                    lab.tutor = "";
+                    lab.group = "";
+                    lab.dates = [labdate, endtime];
+                    lab.tutor = labsFromApi[i].tutorId;
+                    lab.group = labsFromApi[i].groupId;
+                    if(lab.tutor){
+                        console.log(lab.tutor);
+                        lab.tutorName = this._getLabTutorName(labsFromApi[i].tutorId);
+                        console.log(lab.tutorName);
+                    }
+                    if(lab.group) {
+                        console.log(lab.group);
+                        lab.groupName = this._getLabGroupName(labsFromApi[i].groupId);
+                        console.log(lab.groupName);
+                    }
+
+                    if(divideDates){
+                        dates[countLabs] = lab;
+                        transformedLabs[countDates] = dates;
+                        countLabs++;
+                    }
+                    else{
+                        transformedLabs[i]=lab;
+                    }
+                }
+                //console.log("transformed labs: ");
+                //console.log(transformedLabs);
+                return transformedLabs;
+            }
+        });
+    </script>
+</dom-module>

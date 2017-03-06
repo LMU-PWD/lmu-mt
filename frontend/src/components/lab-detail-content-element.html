@@ -1,0 +1,212 @@
+<dom-module id="lab-detail-content-element">
+    <template>
+        <style include="shared-styles">
+            :host {
+                display: block;
+                text-align: center;
+            }
+            .textInputElements{
+                display: inline-block;
+            }
+            #changeContentElement{
+                width: 100%;
+            }
+
+            /*Phone*/
+            @media screen and (max-width: 767px) {
+                .datecreator{
+                    width: 100%;
+                }
+            }
+            /*Tablet*/
+            @media screen and (min-width: 768px) and (max-width: 1023px) {
+                .datecreator{
+                    min-width: 400px;
+                    width: 49%;
+
+                }
+            }
+            /*Desktop*/
+            @media screen and (min-width: 1024px) {
+                .datecreator{
+                    min-width: 400px;
+                    width: 24%;
+                }
+            }
+        </style>
+
+        <paper-item>
+            <div id="text">[[text]]: [[data]]</div>
+            <iron-collapse id="editorElement">
+                <iron-icon icon="editor:mode-edit" on-tap="_handleContentClick"></iron-icon>
+            </iron-collapse>
+            <iron-collapse id="changeContentElement">
+                <template is="dom-if" if="[[isString]]">
+                    <paper-input class="textInputElements" label="[[data]]" value="{{userInput}}"></paper-input>
+                </template>
+                <template is="dom-if" if="[[isDate]]">
+                    <paper-date-picker id="picker" date="{{date}}"></paper-date-picker>
+                    <time-picker hour="{{ time.hour }}" min="{{ time.min }}"></time-picker>
+                </template>
+                <template is="dom-if" if="[[isId]]">
+                    <paper-dropdown-menu label="Name">
+                        <paper-listbox class="dropdown-content">
+                            <template is="dom-repeat" items="[[array]]">
+                                <paper-item on-tap="_handleItemClick">[[item]]</paper-item>
+                            </template>
+                        </paper-listbox>
+                    </paper-dropdown-menu>
+                </template>
+                <iron-icon class="textInputElements" icon="check" on-tap="_handleSetClick"></iron-icon>
+            </iron-collapse>
+        </paper-item>
+    </template>
+
+    <script>
+        Polymer({
+            is: 'lab-detail-content-element',
+            properties: {
+                array: {
+                    type: Array,
+                    notify: true
+                },
+                data: {
+                    type: String,
+                    notify: true
+                },
+                date: {
+                    type: Date,
+                    notify: true
+                },
+                input: {
+                    type: String,
+                    notify: true
+                },
+                isDateFromParent: {
+                    type: String,
+                    notify: true
+                },
+                isIdFromParent: {
+                    type: String,
+                    notify: true
+                },
+                isDate: {
+                    type: Boolean,
+                    notify: true
+                },
+                isId: {
+                    type: Boolean,
+                    notify: true
+                },
+                isNumber:{
+                    type: Boolean,
+                    notify: true
+                },
+                isString: {
+                    type: Boolean,
+                    notify: true
+                },
+                text: {
+                    type: String,
+                    notify: true
+                },
+                selectedItem: {
+                    type: String,
+                    notify: true
+                }
+            },
+            ready: function () {
+                //console.log(this.text);
+                //console.log(this.data);
+                this.time = {};
+                this.time.min = "0";
+                this.time.hour = "0";
+                this.$.editorElement.toggle(); //Show Data Element
+                this.userInput = this.data;
+            },
+
+            /**
+             * Handle Click on this paper-item
+             * @param e - Event Variable
+             * @private
+             */
+            _handleContentClick: function(e){
+                 if (this.isDateFromParent && this.isDateFromParent == "true") {
+                    if(this.data != "") {
+                    this.date = new Date(this.data);
+                    this.time.hour = this.date.getHours();
+                    this.time.minutes = this.date.getMinutes();
+                    }
+                    else{
+                        this.date = new Date();
+                    }
+                    this.set('isDate', true);
+                    this.set('isId', false);
+                    this.set('isString', false);
+                }
+                else if (this.isIdFromParent && this.isIdFromParent == "true") {
+                    console.log(this.array);
+                    this.set('isDate', false);
+                    this.set('isId', true);
+                    this.set('isString', false);
+                    console.log("It's an ID!");
+                }
+                else {
+                    this.set('isDate', false);
+                    this.set('isId', false);
+                    this.set('isString', true);
+                    if(!isNaN(parseInt(this.data))){
+                        this.set('isNumber', true);
+                    }
+                }
+                this.$.editorElement.toggle();
+                this.$.changeContentElement.toggle();
+                this.userInput = this.data;
+                this.data = "";
+            },
+            /**
+             * Handle click on dropdown menu item
+             * @param e - Event Variable
+             * @private
+             */
+            _handleItemClick: function(e){
+                //console.log(e.model.index);
+                this.selectedItem = this.array[e.model.index];
+            },
+            /**
+             * Handle click on save icon
+             * @param e - Event Variable
+             * @private
+             */
+            _handleSetClick: function(e){
+                this.$.text.style.color ="";
+                if(this.isString){
+                    if(this.isNumber){
+                        if(!isNaN(parseInt(this.userInput))){
+                            this.input = parseInt(this.userInput);
+                        }
+                        else{
+                            this.$.text.style.color ="red";
+                            console.log("Falsche Eingabe!");
+                        }
+                    }
+                    else{
+                        this.input = this.userInput;
+                    }
+                }
+                if(this.isDate){
+                    this.date.setHours(this.time.hour);
+                    this.date.setMinutes(this.time.min);
+                    this.input = this.date;
+                }
+                if(this.isId){
+                    this.input = this.selectedItem;
+                }
+                //console.log(this.input);
+                this.data = this.input;
+                this.$.editorElement.toggle();
+                this.$.changeContentElement.toggle();
+            }
+        });
+    </script>
+</dom-module>
