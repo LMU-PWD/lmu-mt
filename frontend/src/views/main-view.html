@@ -828,8 +828,10 @@ The Main View contains:
              * @private
              */
             _goToSetting: function (event) {
-                this._toggleMenu();
-                this.fire('CHANGE_ROUTE', {path: '/settings', page: 'settings'});
+                if (this.route.path !== '/settings' && this.routeData.page !== 'settings') {
+                    this._toggleMenu();
+                    this.fire('CHANGE_ROUTE', {path: '/settings', page: 'settings'});
+                }
             },
 
             /**
