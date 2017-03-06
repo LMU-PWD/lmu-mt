@@ -58,33 +58,35 @@
                 }
             }
         </style>
-            <div>
-                <paper-button raised class="resetButton" on-tap="_handleResetClick">
-                    <iron-icon icon="reply"></iron-icon>
-                        Zurücksetzen
-                </paper-button>
-                <paper-button raised class="saveButton" on-tap="_handleSaveClick">
-                    <iron-icon icon="save"></iron-icon>
-                    Speichern
-                </paper-button>
-            </div>
-            <div class="dateselector">
-                    <template is="dom-repeat" items="{{timeslots}}" as="labs">
-                        <practicals-tutor-date-creator id="dateselectors" class="datecreator"
-                                            timeslots="[[labs]]"
-                                            priority="[[priority]]"
-                                            api-all-labs="[[apiAllLabs]]"
-                                            on-priority-click="_handlePriorityClick"
-                                            on-date-click="_handleDateClick"
-                                            on-replace-priority="_handleReplacePriority"></practicals-tutor-date-creator>
-                    </template>
-            </div>
+        <div>
+            <paper-button raised class="resetButton" on-tap="_handleResetClick">
+                <iron-icon icon="reply"></iron-icon>
+                    Zurücksetzen
+            </paper-button>
+            <paper-button raised class="saveButton" on-tap="_handleSaveClick">
+                <iron-icon icon="save"></iron-icon>
+                Speichern
+            </paper-button>
+        </div>
+        <div class="dateselector">
+            <template is="dom-repeat" items="{{timeslots}}" as="labs">
+                <practicals-tutor-date-creator id="dateselectors" class="datecreator"
+                                    timeslots="[[labs]]"
+                                    priority="[[priority]]"
+                                    api-all-labs="[[apiAllLabs]]"
+                                    on-priority-click="_handlePriorityClick"
+                                    on-date-click="_handleDateClick"
+                                    on-replace-priority="_handleReplacePriority"></practicals-tutor-date-creator>
+            </template>
+        </div>
     </template>
+
     <script>
         Polymer({
             is: 'practicals-tutor-date-selector',
             properties: {
                 timeslots:{
+//                    computed: '_computeTimeslots(apiAllLabs)',
                     type: Array,
                     value: []
                 },
@@ -106,15 +108,18 @@
                 },
                 apiAllLabs: {
                     type: Array,
-                    value: []
+                    observer: '_computeTimeslots'
                 }
             },
 
             ready: function() {
-                this.timeslots = this._transformLabs(this.apiAllLabs,true);
+//                this.timeslots = this._transformLabs(this.apiAllLabs,true);
                 console.log(this.timeslots);
             },
 
+            _computeTimeslots: function() {
+                this.timeslots = this._transformLabs(this.apiAllLabs, true);
+            },
 
             /**
              * Creates string from the given date
@@ -210,6 +215,9 @@
              * @private
              */
             _transformLabs: function(labsFromApi,divideDates){
+
+                if (typeof labsFromApi == 'undefined' || labsFromApi.length == 0)
+                    return [];
                 //console.log(labsFromApi);
                 var transformedLabs = []; //Store return-Array here
                 var lastLab = new Date(labsFromApi[0].date);

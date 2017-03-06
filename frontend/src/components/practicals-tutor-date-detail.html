@@ -32,6 +32,14 @@
             .content{
                 padding: 10px;
             }
+            paper-button {
+                display: inline-block;
+            }
+            .info {
+                padding: 0 20px 20px 20px;
+                font-weight: 100;
+                font-size: 14px
+            }
         </style>
 
         <api-request
@@ -46,12 +54,6 @@
                 body="[[ ajax_delete.body ]]"
                 endpoint="[[ ajax_delete.endpoint ]]"
                 on-api-response="_responseFromPriorityDelete"></api-request>
-        <api-request
-            headers="[[ ajax_possible_labs.headers ]]"
-            method="[[ ajax_possible_labs.method ]]"
-            body="[[ ajax_possible_labs.body ]]"
-            endpoint="[[ ajax_possible_labs.endpoint ]]"
-            on-api-response="_responseFromGetPossibleLabs"></api-request>
 
         <div class="content">
             <template is="dom-if" if="[[registration_open]]">
@@ -65,14 +67,16 @@
                                                    api-all-labs="[[allLabs]]"
                                                    on-save-click="_handleSaveClick"
                                                    on-reset-click="_handleResetClick"></practicals-tutor-date-selector>
+                        <paper-button on-tap="_handleBackToDateOveriew"  style="width: 50%"><iron-icon icon="reply"></iron-icon>Zurück zur Übersicht</paper-button>
                     </template>
                     <template is="dom-if" if="[[labs_already_chosen]]">
                         <!-- Deadline is not over, Registration Open and dates selected; Show saved dates!-->
                         <practicals-show-saved-dates id="practicals_show_saved_dates"
                                                      chosenlabs="{{chosenlabs_transformed}}"
                                                      title="Du hast diese Termine ausgewählt:"></practicals-show-saved-dates>
-                        <paper-button raised class="changeButton" on-tap="_handleChangeClick">
-                            <iron-icon icon="reply"></iron-icon>
+                        <paper-button on-tap="_handleBackToDateOveriew"  style="width: 50%"><iron-icon icon="reply"></iron-icon>Zurück zur Übersicht</paper-button>
+                        <paper-button raised class="changeButton" on-tap="_handleChangeClick" style="width: 49%">
+                            <iron-icon icon="image:edit"></iron-icon>
                             Auswahl ändern
                         </paper-button>
                     </template>
@@ -91,6 +95,9 @@
                                 chosenlabs="{{practical_dates_transformed}}"
                                 title="Das sind deine Praktikumstermine:"></practicals-show-saved-dates>
                     </template>
+                    <div class="info">Die Deadline zur Terminwahl wurde bereits erreicht. In Kürze werden dir feste Termine zugeteilt werden.</div>
+                    <paper-button on-tap="_handleBackToDateOveriew"  style="width: 50%"><iron-icon icon="reply"></iron-icon>Zurück zur Übersicht</paper-button>
+
                 </template>
             </template>
             <template is="dom-if" if="[[!registration_open]]">
@@ -113,7 +120,8 @@
                 },
                 before_deadline:{
                     type: Boolean,
-                    value: true
+                    value: true,
+                    computed: '_computeBeforeDeadline(labType)'
                 },
                 chosenlabs: {
                     type: Array,
@@ -153,9 +161,17 @@
                 },
                 allLabs: {
                     type: Array,
-                    value: []
+                    observer: '_allLabsListener'
                 },
-                labType: Object
+                possibleLabs: {
+                    type: Array,
+                    observer: '_setPossibleLabs'
+                },
+                labType: Object,
+                page: {
+                    type: String,
+                    notify: true
+                },
             },
             ready: function () {
                 //console.log(this.labType.type_str);
@@ -163,17 +179,17 @@
                 //console.log(this.allLabs);
                 //console.log(this.userId);
                 this.labs_already_chosen = false;
+
+            },
+
+            _allLabsListener: function(allLabs) {
+//                console.log("change")
                 this.practical_dates = this._getPracticalDates(this.allLabs);
                 this.practical_dates_exists = this._practicalDateExists(this.practical_dates);
                 if(this.practical_dates_exists){
                     this.practical_dates_transformed = this._transformLabs(this.practical_dates,false);
                 }
-                else{
 
-                    //TODO: Achtung die folgenden Zeilen funktionieren NOCH nicht
-                    this._getPossibleLabs(this.userId);
-                }
-                this.before_deadline = this._getBeforeDeadline(this.labType.registration_deadline_tutors);
                 if(!this.practical_dates_exists && (this.allLabs == [] || this.allLabs == null)){
                     this.registration_open = false;
                 }
@@ -187,6 +203,11 @@
                     this.before_deadline = false;
                 }
             },
+
+            _computeBeforeDeadline: function(labType) {
+                return this._getBeforeDeadline(this.labType.registration_deadline_tutors);
+            },
+
             /**
              * Back-button click handler
              */
@@ -415,6 +436,7 @@
                 //console.log(transformedLabs);
                 return transformedLabs;
             },
+
             /**
              * Gets response from API call to save the priorities
              * @param response
@@ -432,35 +454,26 @@
                 };
                 console.log(this.ajax_save);
             },
-            /**
-             * Gets response from API call to save the priorities
-             * @param response
-             * @private
-             */
-            _responseFromPrioritySave: function(response) {
-                console.log(response);
-            },
 
             /**
-             * Gets response from API request get /plattformusers/{id}/tutorpossiblelabs
-             * @param response
+             * Sets up the list of chosen labs for this labtype
              * @private
              */
-            _responseFromGetPossibleLabs: function(response) {
+            _setPossibleLabs: function() {
+                if(this.practical_dates_exists)
+                    return
 
-                //console.log(response.detail);
-                var possibleLabsForThisTutor = [];
+                var possibleLabsForThisLabtype = [];
                 for(i = 0; i<this.allLabs.length; i++){
-                    for(j = 0; j<response.detail.length; j++) {
-                        if (this.allLabs[i].id == response.detail[j]) {
-                            possibleLabsForThisTutor.push(this.allLabs[i]);
+                    for(j = 0; j< this.possibleLabs.length; j++) {
+                        if (this.allLabs[i].id == this.possibleLabs[j].id) {
+                            possibleLabsForThisLabtype.push(this.allLabs[i]);
                         }
                     }
                 }
-                //console.log(possibleLabsForThisTutor);
 
-                if(this._chosenlabsExist(possibleLabsForThisTutor)){
-                    this.chosenlabs = possibleLabsForThisTutor;
+                if(this._chosenlabsExist(possibleLabsForThisLabtype)){
+                    this.chosenlabs = possibleLabsForThisLabtype;
                     this.chosenlabs_transformed = this._transformLabs(this.chosenlabs,false);
                     this.labs_already_chosen = true;
                 }
@@ -468,6 +481,10 @@
                 if(!this.before_deadline && !this.practical_dates_exists && !this.labs_already_chosen){
                     console.log("ERROR: Die Deadline ist vorbei und trotzdem existieren weder zugewiesene noch ausgewählte Labs. Daten sind hier inkorrekt! LabType: "+this.labType.type_str);
                 }
+            },
+
+            _handleBackToDateOveriew: function() {
+                this.page = 'datepicker_overview'
             }
         });
     </script>

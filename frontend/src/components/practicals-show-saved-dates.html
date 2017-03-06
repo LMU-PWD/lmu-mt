@@ -1,16 +1,28 @@
+<link rel="import" href="../../bower_components/iron-list/iron-list.html">
+
 <dom-module id="practicals-show-saved-dates">
     <template>
         <style include="shared-styles">
             .saved-dates-shower{
-                padding-left: 20px;
+                padding: 10px 20px 20px 20px;
+            }
+            .listrow {
+                padding: 5px;
+                border-bottom: 1px solid var(--paper-grey-300)
+            }
+            .listrow:last-child {
+                border: none
             }
         </style>
-        <div class="saved-dates-shower">[[title]]
-            <ol type="1">
-                <template id="saved_dates" is="dom-repeat" items="{{chosenlabs}}" as="chosen">
-                    <li>[[_getLabString(chosen)]]</li>
+        <div class="saved-dates-shower">
+            <!--[[title]]-->
+            <iron-list items="{{chosenlabs}}" as="chosen" style=" flex: 1 1 auto;">
+                <template>
+                    <div class="listrow">
+                        [[_getLabString(chosen)]]
+                    </div>
                 </template>
-            </ol>
+            </iron-list>
         </div>
     </template>
     <script>
@@ -33,7 +45,7 @@
             _labsChanged: function(labs){
                 this.chosenlabs = labs;
                 //console.log(this.chosenlabs);
-                this.$.saved_dates.render();
+//                this.$.saved_dates.render();
             },
             /**
              * Creates string from the given date

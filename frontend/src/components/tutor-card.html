@@ -1,4 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../components/tutor-sessionlist.html">
 <link rel="import" href="../components/practicals-tutor-date-detail.html">
 
@@ -9,35 +11,184 @@
         <style include="shared-styles">
             :host {
             }
-            .overall-container {
-                width: calc(70% - 25px);
-                padding: 15px 0 15px 15px;
+            .content > * {
+                background-color: #FFF;
             }
+            h1 {
+                margin: 0;
+                height: inherit;
+            }
+            .heading {
+                background-color: var(--paper-blue-grey-800);
+                color: white;
+                padding: 25px;
+            }
+            .datepicker-overview img {
+                border-radius: 50%;
+                /*border: 2px solid var(--paper-blue-grey-900);*/
+                width: 38px;
+                height: 38px;
+                margin-right: 15px
+            }
+            .labtype_deadline {
+                color: var(--paper-grey-500);
+                font-weight: 100;
+                font-size: 12px
+            }
+            paper-item {
+                border-top: 2px solid var(--paper-grey-200);
+                padding-top: 14px;
+                padding-bottom: 14px;
+            }
+            .datepicker-overview paper-item:hover {
+                background: var(--paper-orange-50);
+                cursor: pointer;
+            }
+            .labtype_deadline {
+                float: right;
+            }
+            .iron-selected {
+                font-weight: normal;
+            }
+
+
+            /*Phone*/
+            @media screen and (max-width: 767px) {
+                .content {
+                    width: calc(100% - 25px);
+                    padding: 15px 0 15px 15px;
+                }
+            }
+            /*Tablet*/
+            @media screen and (min-width: 768px) and (max-width: 1023px) {
+                .content {
+                    width: calc(100% - 25px);
+                    padding: 15px 0 15px 15px;
+                }
+            }
+            /*Desktop*/
+            @media screen and (min-width: 1024px) {
+                .content {
+                    width: calc(70% - 25px);
+                    padding: 15px 0 15px 15px;
+                }
+            }
+
         </style>
 
-        <div class="overall-container">
-            <paper-listbox>
-                <paper-item  class="">
-                    <template is="dom-if" if="[[ labtypeAudio.registration_open ]]">
-                        <practicals-tutor-date-detail
-                                group="{{ group }}"
-                                user="[[ user ]]"
-                                lab-type="[[ labtypeAudio ]]"
-                                lab-data="[[labData]]"
-                                all-labs="[[allLabsAudio]]"
-                                on-back-click="_handleBackTap"
-                                access-token="{{ accessToken }}"
-                                user-id="{{ user.id }}"></practicals-tutor-date-detail>
-                    </template>
-                </paper-item>
-            </paper-listbox>
+        <!-- API REQUESTS ------->
+        <!-- ALL LABS -->
+        <api-request
+                headers="[[ ajax_allLabs.headers ]]"
+                method="[[ ajax_allLabs.method ]]"
+                endpoint="[[ ajax_allLabs.endpoint ]]"
+                on-api-response="_handleAllLabsResponse"></api-request>
+
+        <!-- LABS CHOSEN -->
+        <api-request
+                headers="[[ ajax_possibleLabs.headers ]]"
+                method="[[ ajax_possibleLabs.method ]]"
+                body="[[ ajax_possibleLabs.body ]]"
+                endpoint="[[ ajax_possibleLabs.endpoint ]]"
+                on-api-response="_handlePossibleLabsResponse"></api-request>
+
+        <!-- FIXED / ASSIGNED LABS TO THIS TUTOR -->
+        <api-request
+                headers="[[ ajax_assignedLabs.headers ]]"
+                method="[[ ajax_assignedLabs.method ]]"
+                endpoint="[[ ajax_assignedLabs.endpoint ]]"
+                on-api-response="_handleAssignedLabsResponse"></api-request>
+
+        <!-- ALL LABS -->
+        <div class="content">
+            <template is="dom-if" if="[[ !hasAssignedLabs ]]">
+                <iron-pages
+                        selected="[[ page ]]"
+                        attr-for-selected="name"
+                        fallback-selection="error">
+                    <div class="datepicker-overview" name="datepicker_overview">
+                        <paper-listbox style="padding: 0">
+                            <h1 class="heading">  Wähle deine freien Termine</h1>
+                            <paper-item on-tap="_handleAudioTap" >
+                                <img src="../../../images/audio.svg" alt="Audio Icon">
+                                <span style="margin-right: 25px">Audiopraktikum</span>
+                                <span class="labtype_deadline">noch offen bis [[ prettyAudioDeadline.date ]] um [[ prettyAudioDeadline.time ]]</span>
+                            </paper-item>
+                            <paper-item on-tap="_handleVideoTap" >
+                                <img src="../../../images/video.svg" alt="Video Icon">
+                                <span style="margin-right: 25px">Videopraktikum</span>
+                                <span class="labtype_deadline">noch offen bis [[ prettyVideoDeadline.date ]] um [[ prettyVideoDeadline.time ]]</span>
+                            </paper-item>
+                            <paper-item on-tap="_handleFotoTap">
+                                <img src="../../../images/photo.svg" alt="Foto Icon">
+                                <span style="margin-right: 25px">Fotopraktikum</span>
+                                <span class="labtype_deadline">noch offen bis [[ prettyFotoDeadline.date ]] um [[ prettyFotoDeadline.time ]]</span>
+                            </paper-item>
+                        </paper-listbox>
+                    </div>
+                    <div name="datepicker_audio">
+                        <h1 class="heading"> Deine Termine für das Audiopraktikum</h1>
+                        <template is="dom-if" if="[[ labtypeAudio.registration_open ]]">
+                            <practicals-tutor-date-detail
+                                    group="{{ group }}"
+                                    user="[[ user ]]"
+                                    lab-type="[[ labtypeAudio ]]"
+                                    lab-data="[[labData]]"
+                                    all-labs="[[allLabsAudio]]"
+                                    possible-labs="[[possibleLabs]]"
+                                    on-back-click="_handleBackTap"
+                                    access-token="{{ accessToken }}"
+                                    user-id="{{ user.id }}"
+                                    page="{{ page }}"></practicals-tutor-date-detail>
+                        </template>
+                    </div>
+                    <div name="datepicker_video">
+                        <h1 class="heading"> Deine Termine für das Videopraktikum</h1>
+                        <template is="dom-if" if="[[ labtypeFoto.registration_open ]]">
+                            <practicals-tutor-date-detail
+                                    group="{{ group }}"
+                                    user="[[ user ]]"
+                                    lab-type="[[ labtypeVideo ]]"
+                                    lab-data="[[labData]]"
+                                    all-labs="[[allLabsVideo]]"
+                                    possible-labs="[[possibleLabs]]"
+                                    on-back-click="_handleBackTap"
+                                    access-token="{{ accessToken }}"
+                                    user-id="{{ user.id }}"
+                                    page="{{ page }}"></practicals-tutor-date-detail>
+                        </template>
+                    </div>
+                    <div name="datepicker_foto">
+                        <h1 class="heading"> Deine Termine für das Fotopraktikum</h1>
+                        <template is="dom-if" if="[[ labtypeFoto.registration_open ]]">
+                            <practicals-tutor-date-detail
+                                    group="{{ group }}"
+                                    user="[[ user ]]"
+                                    lab-type="[[ labtypeFoto ]]"
+                                    lab-data="[[labData]]"
+                                    all-labs="[[allLabsFoto]]"
+                                    possible-labs="[[possibleLabs]]"
+                                    on-back-click="_handleBackTap"
+                                    access-token="{{ accessToken }}"
+                                    user-id="{{ user.id }}"
+                                    page="{{ page }}"></practicals-tutor-date-detail>
+                        </template>
+                    </div>
+                </iron-pages>
+            </template>
+
+            <template is="dom-if" if="[[ hasAssignedLabs ]]">
+                <tutor-sessionlist
+                        access-token="{{ accessToken }}"
+                        lab-type-audio="[[ labtypeAudio ]]"
+                        lab-type-video="[[ labtypeVideo ]]"
+                        lab-type-foto="[[ labtypeFoto ]]"
+                        assigned-labs="[[ tutorSessions ]]"
+                >
+                </tutor-sessionlist>
+            </template>
         </div>
 
-
-
-        <tutor-sessionlist
-        >
-        </tutor-sessionlist>
 
         <iron-signals on-iron-signal-switchlocale="_switchLocale"></iron-signals>
     </template>
@@ -53,17 +204,61 @@
                     type: String,
                     value: 'de'
                 },
+                deadline_reached_audio: Boolean,
+                deadline_reached_video: Boolean,
+                deadline_reached_fotoo: Boolean,
+                hasAssignedLabs: Boolean,
                 labtypeAudio: Object,
                 labtypeVideo: Object,
                 labtypeFoto: Object,
-                allLabsAudio: Object,
-                allLabsVideo: Object,
-                allLabsFoto: Object,
-                user: Object
+                allLabsAudio: {
+                    type: Array,
+                    value: []
+                },
+                allLabsVideo: {
+                    type: Array,
+                    value: []
+                },
+                allLabsFoto: {
+                    type: Array,
+                    value: []
+                },
+                allLabs: {
+                    type: Array,
+                    value: []
+                },
+                page: {
+                    type: String,
+                    reflectToAttribute: false
+                },
+                prettyAudioDeadline: {
+                    type: String,
+                    computed: 'prettyDate(labtypeAudio.registration_deadline_tutors)'
+                },
+                prettyVideoDeadline: {
+                    type: String,
+                    computed: 'prettyDate(labtypeVideo.registration_deadline_tutors)'
+                },
+                prettyFotoDeadline: {
+                    type: String,
+                    computed: 'prettyDate(labtypeFoto.registration_deadline_tutors)'
+                },
             },
 
+            observers: [
+                '_setupLabs(labtypeAudio, labtypeVideo, labtypeFoto, hasAssignedLabs)'
+            ],
+
             ready: function () {
-                console.log(this.labtypeAudio);
+                this.page = 'datepicker_overview'
+
+                this.ajax_assignedLabs = {
+                    headers: {
+                        Authorization: this.accessToken
+                    },
+                    method: 'GET',
+                    endpoint: '/labs/?filter[where][tutorId]=' + this.user.id
+                };
             },
 
             /**
@@ -78,6 +273,133 @@
             _switchLocale: function() {
                 this.language = (this.language == 'en') ? 'de' : 'en';
             },
+
+            /**
+             *  Observer methods
+             */
+            _setupLabs: function(labtypeAudio, labtypeVideo, labtypeFoto, hasAssignedLabs) {
+
+                this.deadline_reached_audio = this._isAfterDeadline(labtypeAudio.registration_deadline_tutors);
+                this.deadline_reached_video = this._isAfterDeadline(labtypeVideo.registration_deadline_tutors);
+                this.deadline_reached_foto = this._isAfterDeadline(labtypeFoto.registration_deadline_tutors);
+
+                if ((!this.labtypeAudio.deadline_reached_audio || !this.labtypeVideo.deadline_reached_video
+                    || !this.labtypeFoto.deadline_reached_foto) && !hasAssignedLabs)
+                {
+                    this.ajax_allLabs = {
+                        headers: {
+                            Authorization: this.accessToken
+                        },
+                        method: 'GET',
+                        endpoint: '/Labs?filter[where][semesterId]=' + this.labtypeAudio.semesterId
+                    };
+
+                    this.ajax_possibleLabs = {
+                        headers: {
+                            'Authorization': this.accessToken
+                        },
+                        method: 'GET',
+                        endpoint: '/platformusers/' + this.user.id + '/tutorpossiblelabs/'
+                    };
+                }
+                else {
+                    // "Pending" state: deadlines reached but no labs are assigned yet
+//                    this.
+                }
+
+            },
+
+            prettyDate: function(uglyDate) {
+                prettyDate = new Date(uglyDate)
+                prettyDateString = prettyDate.getDate()+"."+ (prettyDate.getMonth()+1) + "."+prettyDate.getFullYear();
+                prettyTimeString = (prettyDate.getHours() + 1) + ":" + (prettyDate.getMinutes()<10 ? '0' : '') + prettyDate.getMinutes();
+                prettyDateObject = { time: prettyTimeString, date: prettyDateString };
+                return prettyDateObject;
+            },
+
+            _isAfterDeadline: function (deadline){
+                var deadline_date = new Date(deadline);
+                var today = new Date();
+                return deadline_date < today;
+            },
+
+            _handleAssignedLabsResponse: function(response) {
+
+                if (typeof response.detail == 'undefined' || response.detail == [] || response.detail.length == 0) {
+                    this.hasAssignedLabs = false;
+                }
+                else {
+                    this.hasAssignedLabs = true;
+                    this.tutorSessions = response.detail;
+                }
+            },
+
+            /**
+             * Gets lab data from API and sets them for each labtype
+             * @param event
+             * @private
+             */
+            _handleAllLabsResponse: function (event) {
+                //console.log('_handleLabRequest()');
+                //console.log(event.detail);
+                var audiolabs = [];
+                var videolabs = [];
+                var fotolabs = [];
+                var alllabs = [];
+
+                for (var i = 0; i < event.detail.length; i++) {
+                    if (event.detail[i].labTypeId == this.labtypeAudio.id){
+                        audiolabs.push(event.detail[i]);
+                    }
+                    if (event.detail[i].labTypeId == this.labtypeVideo.id) {
+                        videolabs.push(event.detail[i]);
+                    }
+                    if (event.detail[i].labTypeId == this.labtypeFoto.id){
+                        fotolabs.push(event.detail[i]);
+                    }
+
+                    alllabs.push(event.detail[i]);
+                }
+
+                this.allLabsAudio = audiolabs;
+                this.allLabsVideo = videolabs;
+                this.allLabsFoto = fotolabs;
+                this.allLabs = alllabs;
+//                console.log("AllLabs: ");
+//                console.log(this.allLabs);
+//                console.log(this.allLabsAudio);
+//                console.log(this.allLabsVideo);
+//                console.log(this.allLabsFoto);
+            },
+
+            _handlePossibleLabsResponse: function(response) {
+                var possibleLabsForThisTutor = [];
+                for(i = 0; i<this.allLabs.length; i++){
+                    for(j = 0; j<response.detail.length; j++) {
+                        if (this.allLabs[i].id == response.detail[j]) {
+                            possibleLabsForThisTutor.push(this.allLabs[i]);
+                        }
+                    }
+                }
+                console.log(possibleLabsForThisTutor)
+                this.possibleLabs = possibleLabsForThisTutor;
+            },
+
+            /*
+             *  CLICK HANDLERS
+             */
+            _handleAudioTap: function() {
+                this.page = 'datepicker_audio'
+            },
+            _handleVideoTap: function() {
+                this.page = 'datepicker_video'
+            },
+            _handleFotoTap: function() {
+                this.page = 'datepicker_foto'
+            },
+            _handleBackToDateOveriew: function() {
+                this.page = 'datepicker_overview'
+            }
 
         });
     </script>

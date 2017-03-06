@@ -27,16 +27,18 @@
                 cursor: pointer
             }
             .session_date {
-                width: 30%;
+                width: 35%;
+                min-width: 150px;
             }
             .session_time {
-                width: 15%;
+                width: 20%;
             }
             .session_icon {
                 width: 5%;
+                min-width: 24px;
             }
             .session_type {
-                width: 25%;
+                width: 30%;
             }
             .sessions_row {
                 border-top: 2px solid var(--paper-grey-200)
@@ -50,6 +52,7 @@
             .sessions_heading {
                 background-color: var(--paper-blue-grey-800);
                 color: white;
+                /*box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);*/
             }
             .session_details {
                 font-size: 12px;
@@ -89,14 +92,6 @@
                 endpoint="[[ ajax_group.endpoint ]]"
                 on-api-response="_apiGroupResponse"></api-request>
 
-        <api-request
-                id="ajax_labTypes"
-                headers="[[ ajax_labTypes.headers ]]"
-                method="[[ ajax_labTypes.method ]]"
-                endpoint="[[ ajax_labTypes.endpoint ]]"
-                on-api-response="_apiLabTypesResponse">
-        </api-request>
-
         <div class="lab-list-container">
             <template is="dom-if" if="[[ !finishedSessionsLoad ]]">
                 <paper-spinner active></paper-spinner>
@@ -104,6 +99,8 @@
             <template is="dom-if" if="[[ finishedSessionsLoad ]]">
                 <paper-listbox>
                     <paper-item on-click="toggleCollapse" class="sessions_heading">
+                        <span class="session_toggleDropdown mobile-hidden" style="width: 4%">
+                        </span>
                         <span class="session_date">Datum</span>
                         <span class="session_time">Zeit</span>
                         <span class="session_icon" style="width:15%">Typ</span>
@@ -111,8 +108,8 @@
                     </paper-item>
                     <template  is="dom-repeat" items="[[ sessions ]]" filter="prettySessionEntry">
                         <paper-item on-click="toggleCollapse" class="sessions_row" id="src-[[ item.id ]]">
-                                <span class="session_toggleDropdown">
-                                        <iron-icon icon="hardware:keyboard-arrow-right"></iron-icon>
+                                <span class="session_toggleDropdown mobile-hidden">
+                                    <iron-icon icon="hardware:keyboard-arrow-right"></iron-icon>
                                 </span>
                             <span class="session_date">[[ item.date_string ]]</span>
                             <span class="session_time">[[ item.time_string ]]</span>
@@ -130,11 +127,6 @@
             </template>
         </div>
 
-        <div class="lab-detais-container">
-            <paper-button on-tap="_onTapChooseDates" style="display:none">
-                Termine wählen
-            </paper-button>
-        </div>
         <iron-signals on-iron-signal-switchlocale="_switchLocale"></iron-signals>
     </template>
     <script>
@@ -161,12 +153,23 @@
                     type: Array,
                     value: []
                 },
-                labTypes: {
+                assignedLabs: {
+                    type: Array
+                },
+                labTypeAudio: Object,
+                labTypeVideo: Object,
+                labTypeFoto: Object,
+                labTypesArray: {
                     type: Array,
-                    value: [],
+                    value: []
                 },
                 finishedSessionsLoad: false
             },
+
+            observers: [
+                '_initSessionList(labTypeAudio, labTypeVideo, labTypeFoto, assignedLabs)',
+//                '_initSessionList(labTypesArray, assignedLabs)'
+            ],
 
             ready: function () {
 //                this.ajax_labs = {
@@ -244,11 +247,6 @@
                 this._initSessionList(response.detail)
             },
 
-            _onTapChooseDates: function(e) {
-                console.log(e)
-                this.page = ""
-            },
-
             /**
              * Function to remove objects that have a property 'date' that lies in the past from an array
              * @param array
@@ -265,78 +263,86 @@
                 return futureDates;
             },
 
-            _initSessionList: function(response) {
+            _initSessionList: function(labTypeAudio, labTypeVideo, labTypeFoto, assignedLabs) {
 
-                if (response.length == 0)
+                if (assignedLabs.length == 0)
                     return null;
 
-                var type = ("labTypeId" in response[0]) ? "lab" : "exercise";
+                this._makeLabTypesArray(labTypeAudio, labTypeVideo, labTypeFoto);
+
+                var labTypesArray = [labTypeAudio, labTypeVideo, labTypeFoto];
+
+                var type = ("labTypeId" in assignedLabs[0]) ? "lab" : "exercise";
                 var sessions_list = [];
                 console.log("received type: " + type);
-                console.log(response);
+                console.log(assignedLabs);
 
-                for (var i = 0; i < response.length; i++) {
+                for (var i = 0; i < assignedLabs.length; i++) {
 
-                    var date = new Date(response[i].date);
+                    var date = new Date(assignedLabs[i].date);
                     var date_string = this._getDateString(date);
                     var time_string = (date.getHours() + 1) + ":" + (date.getMinutes()<10 ? '0' : '') + date.getMinutes();
                     var labType_string = ""
 
-                    if (this.labTypes.length != 0) {
-                        for (var j = 0; j < this.labTypes; j++) {
-                            if (this.labTypes.id == response[i].labTypeId)
-                                labType_string = this.labTypes[j].name
+                    if (labTypesArray.length != 0) {
+                        for (var j = 0; j < labTypesArray.length; j++) {
+                            if (labTypesArray[j].id == assignedLabs[i].labTypeId)
+                                labType_string = labTypesArray[j].type_str
                         }
+//                        if (assignedLabs[i].labTypeId in labTypesArray)
+//                            labType_string = labTypesArray[assignedLabs[i].labTypeId]
                     }
 
                     var session = {
-                        'id': response[i].id,
+                        'id': assignedLabs[i].id,
                         'type': type,
-                        'date': response[i].date,
+                        'date': assignedLabs[i].date,
                         'date_string': date_string,
                         'time_string': time_string,
-                        'location': response[i].location,
-                        'groupId': response[i].groupId,
-                        'labTypeId': response[i].labTypeId,
+                        'location': assignedLabs[i].location,
+                        'groupId': assignedLabs[i].groupId,
+                        'labTypeId': assignedLabs[i].labTypeId,
                         'labType_string': labType_string,
-                        'exercise_name': response[i].name
+                        'exercise_name': assignedLabs[i].name
                     };
 
                     this.push('sessions', session);
                     this.$.ajax_group.$.request.auto = false;
 
                     // If a group signed up for the session, get their data
-                    if (typeof response[i].groupId != 'undefined') {
-                        this.ajax_group = {
-                            'headers': {
-                                'Authorization': this.accessToken
-                            },
-                            'method': 'GET',
-                            'endpoint': '/labs/' + response[i].id + '/group'
-                        }
-                        this.$.ajax_group.$.request.generateRequest();
-                    }
+//                    if (typeof assignedLabs[i].groupId != 'undefined') {
+//                        this.ajax_group = {
+//                            'headers': {
+//                                'Authorization': this.accessToken
+//                            },
+//                            'method': 'GET',
+//                            'endpoint': '/labs/' + assignedLabs[i].id + '/group'
+//                        }
+//                        this.$.ajax_group.$.request.generateRequest();
+//                    }
                 }
             },
 
             _apiGroupResponse: function(response) {
                 console.log(response.detail)
             },
-            _apiLabTypesResponse: function(response) {
-                console.log(response.detail)
 
-                for (var i = 0; i < response.detail.length; i++) {
-                    this.labTypes[response.detail[i].type_str] =  {
-                        'id':  response.detail[i].id,
-                        'name': response.detail[i].type_str,
-                        'registration_open': response.detail[i].registration_open
+            _makeLabTypesArray: function(labtypeAudio, labtypeVideo, labtypeFoto) {
+//                console.log(response.detail)
+                var labtypes = [ labtypeAudio, labtypeVideo, labtypeFoto ];
+
+                for (var i = 0; i < labtypes.length; i++) {
+                    this.labTypesArray[labtypes[i].type_str] =  {
+                        'id':  labtypes[i].id,
+                        'name': labtypes[i].type_str,
+                        'registration_open': labtypes[i].registration_open
                     }
 
                     if (this.sessions.length != 0) {
                         var labType_string;
                         for (var j = 0; j < this.sessions.length; j++) {
-                            if (response.detail[i].id == this.sessions[j].labTypeId) {
-                                this.sessions[j].labType_string = response.detail[i].type_str
+                            if (labtypes[i].id == this.sessions[j].labTypeId) {
+                                this.sessions[j].labType_string = labtypes[i].type_str
                             }
                         }
 //                        this.notifyPath('sessions.name');
@@ -349,7 +355,9 @@
                         this.set('sessions', sessions);
                     }
                 }
+
                 this.finishedSessionsLoad = true
+                return this.labTypesArray;
             },
 
             /**
@@ -382,7 +390,7 @@
                         datestring = "Samstag, ";
                         break;
                 }
-                datestring = datestring+date.getDate()+"."+date.getMonth()+"."+date.getFullYear();
+                datestring = datestring+date.getDate()+"."+ (date.getMonth()+1) + "."+date.getFullYear();
                 return datestring;
             },
         });
