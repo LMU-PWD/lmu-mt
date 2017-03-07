@@ -1,5 +1,9 @@
 <link rel="import" href="../shared/shared-styles.html">
 
+<!--Localization Imports-->
+<link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
+<link rel="import" href="../services/my-localize-behavior.html">
+
 <dom-module id="index-card">
     <template>
         <style  include="shared-styles">
@@ -16,6 +20,7 @@
                 float: left;
                 width: calc(60% - 20px);
                 margin: 0;
+                line-height:20px;
             }
 
             .form-container{
@@ -82,15 +87,15 @@
                 border: 2px solid var(--paper-blue-grey-900);
             }
         </style>
-        <div>
+        <div on-tap="_handleTap">
 
             <div>
-                <h2 class="light light-color-text">[[type]]</h2>
+                <h2 class="light light-color-text">[[labType.type_str]]</h2>
 
                 <div class="form-container">
 
                     <svg class="form-fill" width="40" height="30" version="1.1" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M 0 30  H 40 V 0 Q 30 0 20 15 T 0 30"/>
+                        <path d="M 0 30  H 40 V 0 Q 30 0 20 15 T 0 30"></path>
                     </svg>
                     <div class="back-fill"></div>
                 </div>
@@ -98,14 +103,18 @@
 
             <div class="content">
                 <div class="icon">
-                    <img src=[[icon]] width="64px" height="64px" alt="camera-icon" fill="">
+                    <img src="../../images/[[labType.name]].svg" width="64px" height="64px" alt="camera-icon" fill="">
                 </div>
                 <div class="info">
-                    <p class="plabel">[[label1]]<br/>[[label2]]</p>
-                    <p class="pinfo">[[info1]]<br/>[[info2]]</p>
+                    <p class="plabel">Lab:<br/>[[label2]]</p>
+                    <p class="pinfo">[[labDate]]<br/>[[info2]]</p>
                 </div>
             </div>
         </div>
+
+        <!--Iron Signal for Localization-->
+        <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
+
     </template>
 
     <script>
@@ -131,9 +140,24 @@
                 },
                 icon: {
                     type: String
+                },
+                labType: {
+                    type: Object,
+                    observer: '_labTypeChanged'
+                },
+                labDate: {
+                    type: String,
+                    observer: '_labDateChanged'
+                },
+                group: {
+                    type: Object,
+                    observer: '_groupChanged'
                 }
             },
-            ready: function () {
+            behaviors: [
+                Polymer.MyLocalizeBehavior
+            ],
+            /*ready: function () {
                 if(this.type.includes("Photo" || "photo")){
                     this.icon = "../../../images/photo.svg";
                     this.customStyle['--color'] = '#78909c';
@@ -151,6 +175,36 @@
                     this.customStyle['--color'] = '#455a64';
                     this.updateStyles();
                 }
+            },*/
+            _handleTap: function (event) {
+                //console.log(event);
+                //console.log(event.path[0].key);
+                if(this.labType) {
+                    var key = this.labType.name;
+                    this.fire('CHANGE_ROUTE', {path: '/' + key, page: key});
+                    //console.log(event.model);
+                }
+            },
+
+            _labTypeChanged: function (detail) {
+                //console.log(detail);
+                this.customStyle['--color'] = this.labType.color;
+                this.updateStyles();
+            },
+
+            _groupChanged: function (detail) {
+                //console.log(detail);
+                for (var i=0; i<this.group.labIds.length; i++){
+                    //console.log(this.labType.id);
+                    if(this.group.labIds[i].labTypeId === this.labType.id){
+                        var d = new Date(this.group.labIds[i].date);
+                        this.set('labDate', d.toLocaleString().slice(0,-3));
+
+                    }
+                }
+            },
+            _labDateChanged: function (detail) {
+                //console.log(detail);
             }
 
         });

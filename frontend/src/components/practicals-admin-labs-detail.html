@@ -1,7 +1,7 @@
 <link rel="import" href="practicals-admin-date-creator.html">
 <link rel="import" href="lab-detail-view.html">
 
-<dom-module id="practicals-admin-detail">
+<dom-module id="practicals-admin-labs-detail">
     <template>
         <style include="shared-styles">
             :host {
@@ -122,7 +122,7 @@
 
     <script>
         Polymer({
-            is: 'practicals-admin-detail',
+            is: 'practicals-admin-labs-detail',
             properties: {
                 accessToken: {
                     type: String,
@@ -310,9 +310,15 @@
                             headers: {
                                 Authorization: this.accessToken
                             },
-                            body: this.labToSet,
-                            method: 'PUT',
-                            endpoint: '/labs/' + this.labToSet.id
+                            body: {
+                                date: this.labToSet.date,
+                                duration: this.labToSet.duration,
+                                location: this.labToSet.location,
+                                tutorId: this.labToSet.tutorId,
+                                groupId: this.labToSet.groupId
+                            },
+                            method: 'POST',
+                            endpoint: '/labs/' + this.labToSet.id + '/replace'
                         };
                     }
                     else{

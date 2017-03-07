@@ -14,8 +14,7 @@
                    method="[[ method ]]"
                    on-error="_handleError"
                    on-response="_handleResponse"
-                   url="[[ url ]]"
-                   verbose></iron-ajax>
+                   url="[[ url ]]"></iron-ajax>
 
     </template>
 
@@ -79,6 +78,8 @@
 
             _handleResponse: function (response) {
                 this.fire('api-response', response.detail.response);
+                //Console Info to check if all received data is reset on logout
+                console.info("Received "+ this.endpoint)
             },
 
             _handleError: function (response) {

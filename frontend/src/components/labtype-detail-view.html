@@ -1,0 +1,142 @@
+<link rel="import" href="lab-detail-content-element.html">
+<dom-module id="labtype-detail-view">
+    <template>
+        <style include="shared-styles">
+            :host {
+                display: block;
+                margin-top: 20px;
+                background-color: var(--paper-blue-grey-50);
+            }
+            .title{
+                padding: 10px;
+                text-align: center;
+                font-size: 20px;
+            }
+            iron-icon{
+                display: inline-block;
+                float: right;
+            }
+            /*Phone*/
+            @media screen and (max-width: 767px) {
+            }
+            /*Tablet*/
+            @media screen and (min-width: 768px) and (max-width: 1023px) {
+
+            }
+            /*Desktop*/
+            @media screen and (min-width: 1024px) {
+
+            }
+        </style>
+
+        <paper-item class="title">Detailansicht:</paper-item>
+        <lab-detail-content-element
+                text="Registration Deadline Studenten:" data="[[labType.registration_deadline]]" input="{{ dateInput }}"
+                is-date-from-parent="true" is-id-from-parent="false"></lab-detail-content-element>
+        <lab-detail-content-element
+                text="Registration Deadline Tutoren:" data="[[labType.registration_deadline_tutors]]" input="{{ dateTutorInput }}"
+                is-date-from-parent="true" is-id-from-parent="false"></lab-detail-content-element>
+        <lab-detail-content-element
+                text="Beschreibung Studenten:" data="[[labType.description_student]]"  input="{{ descriptionStudentInput }}"
+                is-date-from-parent="false" is-id-from-parent="false"></lab-detail-content-element>
+        <lab-detail-content-element
+                text="Beschreibung Tutoren:" data="[[labType.description_tutor]]"  input="{{ descriptionTutorInput }}"
+                is-date-from-parent="false" is-id-from-parent="false"></lab-detail-content-element>
+    </template>
+
+    <script>
+        Polymer({
+            is: 'labtype-detail-view',
+            properties: {
+                accessToken: {
+                    type: String,
+                    notify: true
+                },
+                dateInput: {
+                    type: String,
+                    observer: "_dateChanged"
+                },
+                dateTutorInput: {
+                    type: String,
+                    observer: "_dateChanged"
+                },
+                descriptionStudentInput: {
+                    type: String,
+                    observer: "_durationChanged"
+                },
+                descriptionTutorInput: {
+                    type: String,
+                    observer: "_durationChanged"
+                }
+            },
+            ready: function () {
+                //console.log(this.accessToken);
+                //console.log(this.lab);
+            },
+            /**
+             * Handle changes of
+             * @param e - Event Variable
+             * @private
+             */
+            _dateChanged: function(e){
+                console.log(e);
+                console.log(this.dateInput);
+                //this.set('lab.date', this.dateInput.toString());
+            },
+
+            /**
+             * Handle changes of groups and tutors arrays from api
+             * @param e - Event Variable
+             * @private
+             */
+            _dataFromApiChanged: function(e){
+                //console.log(e);
+                //console.log(this.groups);
+                //console.log(this.tutors);
+                if(this.tutors && this.groups) {
+                    this.tutorNames = [];
+                    this.groupNames = [];
+                    //console.log(this.lab);
+                    for (i = 0; i < this.tutors.length; i++) {
+                        this.tutorNames.push(this.tutors[i].name + ", " + this.tutors[i].first_name);
+                        if(this.lab && this.lab.tutorId == this.tutors[i].id){
+                            this.set('labTutor', (this.tutors[i].name + ", " + this.tutors[i].first_name));
+                            //console.log(this.labTutor);
+                        }
+                    }
+                    for (i = 0; i < this.groups.length; i++) {
+                        this.groupNames.push(this.groups[i].name);
+                        if(this.lab && this.lab.groupId == this.groups[i].id){
+                            this.set('labGroup', this.groups[i].name);
+                            //console.log(this.labGroup);
+                        }
+                    }
+                    //console.log(this.groupNames);
+                    //console.log(this.tutorNames);
+                }
+            },
+            /** Handle changes of
+            * @param e - Event Variable
+            * @private
+            */
+            _durationChanged: function(e){
+                console.log(e);
+                console.log(this.durationInput);
+                this.set('lab.duration', this.durationInput);
+            },
+            /**
+             * Handle chages of lab-Object
+             * @param e - Event Variable
+             * @private
+             */
+            _labChanged: function(e){
+                console.log(this.labFromApi);
+                //console.log(this.lab.groupId);
+                //console.log(this.lab.tutorId);
+                this.set('lab', this.labFromApi);
+                this.set('lab.date', new Date(this.labFromApi.date));
+                this._dataFromApiChanged(e);
+            }
+        });
+    </script>
+</dom-module>

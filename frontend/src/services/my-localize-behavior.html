@@ -1,0 +1,42 @@
+<link rel="import" href="../../bower_components/app-localize-behavior/app-localize-behavior.html">
+
+<script>
+    Polymer.MyLocalizeBehaviorExtension = {
+
+        attached: function() {
+            //Load Locales File
+            this.loadResources(this.resolveUrl("/src/shared/locales.json"));
+
+            //Get language from local storage or body attribute if empty
+            var localLang = localStorage.getItem('language');
+            var bodyLang = document.querySelector('html').getAttribute("lang");
+            this.language = (localLang)?(localLang):(bodyLang);
+
+            //Write Language to local storage & body attribute
+            localStorage.setItem('language',this.language);
+            document.querySelector('html').setAttribute("lang",this.language);
+        },
+
+        changeLanguage: function(event){
+            this.language = event.detail;
+        }
+
+    };
+    Polymer.MyLocalizeBehavior = [ Polymer.AppLocalizeBehavior, Polymer.MyLocalizeBehaviorExtension ];
+
+    /*<!--
+     Changes:-->
+
+     <!--Localization Imports-->
+     <link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
+     <link rel="import" href="../services/my-localize-behavior.html">
+
+     <!--Iron Signal for Localization-->
+     <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
+
+
+     behaviors: [
+     Polymer.MyLocalizeBehavior
+     ],*/
+</script>
+

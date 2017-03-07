@@ -7,6 +7,11 @@
 <link rel="import" href="../../bower_components/iron-icons/communication-icons.html">
 <link rel="import" href="../shared/shared-styles.html">
 
+<!--Localization Imports-->
+<link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
+<link rel="import" href="../services/my-localize-behavior.html">
+
+
 <dom-module is="registration-card">
 
     <template>
@@ -104,25 +109,13 @@
                 color: #eceff1;
             }
 
-            .localepicker {
+            language-switcher{
+                --primary-switcher-color: var(--paper-blue-grey-50);
+                --secondary-switcher-color: var(--paper-blue-grey-900);
+                --backlay-color: var(--paper-blue-grey-100);
                 float: right;
-            }
-
-            .localepicker paper-button {
-                padding: 0;
-                /*width: 50px;*/
-                color: var(--paper-blue-grey-300);
-                min-width: 0px;
-                font-size: 20px;
-                font-weight: 300;
-            }
-
-            .localepicker paper-button:hover {
-                color: #FFF;
-                -o-transition: .1s;
-                -moz-transition: .1s;
-                -webkit-transition: .1s;
-                transition: .1s;
+                position: relative;
+                top: -16px;
             }
 
         </style>
@@ -145,10 +138,7 @@
 
             <div class="card-header">
                 <span>{{localize('registrationcard_header')}}</span>
-                <span class="localepicker">
-                    <paper-button style="float:right" on-tap="initSwitchLocale">{{ language }}</paper-button>
-                    <paper-tooltip offset="5">{{localize('logincard_locale button tooltip')}}</paper-tooltip>
-                </span>
+                <language-switcher></language-switcher>
             </div>
 
             <div class="card-content">
@@ -217,7 +207,11 @@
             </div>
 
         </paper-card>
-        <iron-signals on-iron-signal-switchlocale="_switchLocale"></iron-signals>
+
+        <!--Iron Signal for Localization-->
+        <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
+
+
     </template>
 
     <script>
@@ -276,10 +270,6 @@
                         password: "",
                         confirmPassword: ""
                     }
-                },
-                language: {
-                    type: String,
-                    value: 'de'
                 }
             },
 
@@ -289,19 +279,9 @@
                 '_invalidChanged(invalid.confirmPassword)'
             ],
 
-            /**
-             * Localization setup
-             */
             behaviors: [
-                Polymer.AppLocalizeBehavior
+                Polymer.MyLocalizeBehavior
             ],
-            ready: function() {
-                this.loadResources(this.resolveUrl('../shared/locales.json'));
-            },
-            _switchLocale: function() {
-                this.language = (this.language == 'en') ? 'de' : 'en';
-            },
-
 
             _validateConfirmPasswordInput: function () {
                 if (this.userInput.password === this.userInput.confirmPassword) {

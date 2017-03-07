@@ -2,6 +2,11 @@
 <link rel="import" href="../../bower_components/paper-dialog-scrollable/paper-dialog-scrollable.html">
 <link rel="import" href="../../bower_components/iron-data-table/iron-data-table.html">
 
+<!--Localization Imports-->
+<link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
+<link rel="import" href="../services/my-localize-behavior.html">
+
+
 
 <link rel="import" href="../components/time-picker.html">
 <link rel="import" href="../shared/semester-setup-shared.html">
@@ -109,7 +114,9 @@
             </div>
         </paper-card>
 
-        <iron-signals on-iron-signal-switchlocale="_switchLocale"></iron-signals>
+        <!--Iron Signal for Localization-->
+        <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
+
 
     </template>
 
@@ -145,25 +152,11 @@
                     type: String,
                     value: '' },
 
-                language: {
-                    type: String,
-                    value: 'de' }
-
             },
 
-            /**
-             * Localization setup
-             */
             behaviors: [
-                Polymer.AppLocalizeBehavior
+                Polymer.MyLocalizeBehavior
             ],
-            attached: function() {
-                this.loadResources(this.resolveUrl('../shared/locales.json'));
-            },
-            _switchLocale: function() {
-                this.language = (this.language == 'en') ? 'de' : 'en';
-            },
-
             _openDateDialog: function () {
                 this.$.dateDialog.open();
             },
