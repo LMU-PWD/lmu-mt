@@ -1,28 +1,175 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 
 <dom-module id="students-admin">
     <template>
-        <style>
+        <style include="shared-styles iron-flex iron-flex-alignment">
             :host{
             }
+
+
+            h1 > span {
+                font-style: italic;
+            }
+
+            h1 {
+                height: auto;
+            }
+
+            .userInfo {
+                display: block;
+                padding-bottom: 10px;
+            }
+
+            .userInfo > .member {
+                margin: 0 10px;
+                padding: 10px;
+                border-bottom: 1px solid var(--paper-blue-grey-700);
+                background-color: var(--paper-blue-grey-50);
+                height: 20px;
+                overflow: hidden;
+            }
+
+            .userInfo > .member > *:last-child {
+                border-radius: 0 0 5px 5px;
+
+            }
+
+            .userInfo > .member > h2 {
+
+                position: relative;
+                margin: 0 0 0 40px;
+                width: calc(100% - 40px);
+                top: -5px;
+                color: var(--paper-blue-grey-700);
+                font-size: 13px;
+            }
+
+            .userInfo > .member > a {
+                float: left;
+                width: 40px;
+                position: relative;
+                top: -10px;
+            }
+
+            .userInfo > .member > a > paper-icon-button {
+                color: var(--paper-blue-grey-700);
+            }
+
+            .container {
+                padding: 20px;
+                background-color: var(--paper-blue-grey-100);
+                border-top: 1px solid var(--paper-blue-grey-700);
+            }
+
+            .student {
+                /*height: 50px;*/
+                background-color: var(--paper-blue-grey-50);
+                border-bottom: 1px solid var(--paper-blue-grey-700);
+                margin: 5px;
+
+                min-width: 250px;
+                border-radius: 5px;
+
+                width: 100%;
+            }
+
+            .student > h1 {
+                width: calc(100% - 100px);
+                float: left;
+                margin: 10px;
+
+                font-size: 20px;
+                height: 30px;
+                padding: 0 10px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .student > paper-icon-button {
+                float: right;
+                margin: 5px;
+            }
+
+            .group-selected {
+                /*width: 100%;*/
+            }
+
+            #createDialog{
+                min-width: 300px;
+            }
+
+           #verified{
+               color: var(--paper-blue-grey-300);
+           }
+
         </style>
         <div></div>
-        <!-- Fetches all current Groups -->
+        <!-- Fetches all registered Students -->
         <api-request
                 headers="[[ ajax.headers ]]"
                 method="[[ ajax.method ]]"
                 endpoint="[[ ajax.endpoint ]]"
                 semester-filter="[[ selectedSemester ]]"
                 on-api-response="_handleStudentsResponse"></api-request>
-        <template is="dom-repeat" items="[[students]]" as="member">
-            <div class="member">
-                <a href="mailto:[[member.mail]]" tabindex="-1"><paper-icon-button icon="icons:mail"></paper-icon-button></a>
-                <h2>[[member.first_name]] [[member.name]]</h2>
-            </div>
-        </template>
 
-        <!--Iron Signal for Passing Semester ID-->
+        <!-- Fetches all pending Students -->
+        <api-request
+                headers="[[ ajax_pending.headers ]]"
+                method="[[ ajax_pending.method ]]"
+                endpoint="[[ ajax_pending.endpoint ]]"
+                semester-filter="[[ selectedSemester ]]"
+                on-api-response="_handlePendingStudentsResponse"></api-request>
+
+        <!--Lists all Students-->
+        <div class="container horizontal layout wrap">
+            <paper-button on-tap="expandAll" style="width: 33%;">Expand all</paper-button>
+            <paper-button on-tap="collapseAll" style="width: 33%;">Collapse all</paper-button>
+            <paper-icon-button  style="width: 33%;" icon="add-circle-outline" on-tap="_createGroup"></paper-icon-button>
+
+            <template is="dom-repeat" items="[[students]]" as="student">
+                <div class="student flex self-center" id="group_[[index]]">
+                    <h1 on-tap="_toggleCollapse">[[student.first_name]] [[student.name]]</h1>
+                    <a href="mailto:[[student.email]]" tabindex="-1"><paper-icon-button icon="icons:mail"></paper-icon-button></a>
+                    <template is="dom-if" if="[[student.emailVerified]]">
+                        <iron-icon id="verified" icon="icons:verified-user"></iron-icon>
+                        <paper-tooltip>User verified his email</paper-tooltip>
+                    </template>
+                    <paper-icon-button icon="icons:delete" on-tap="_deleteGroup"></paper-icon-button>
+                    <iron-collapse id="collapse[[index]]">
+                        <div class="userInfo">
+                            <!--TODO Lists Group Memebers -->
+                                <div class="member">
+                                    <h2>[[student.status]]</h2>
+                                    <!--h2>evtl Gruppennname</h2-->
+                                    <!--h2>evtl Gruppennname</h2-->
+                                </div>
+                                <div class="member">
+                                    <h2>[[student.email]]</h2>
+                                    <!--h2>evtl Gruppennname</h2-->
+                                    <!--h2>evtl Gruppennname</h2-->
+                                </div>
+                                <div class="member">
+                                    <h2>[[student.groupId]]</h2>
+                                    <!--h2>evtl Gruppennname</h2-->
+                                    <!--h2>evtl Gruppennname</h2-->
+                                </div>
+                                <div class="member">
+                                    <h2>[[student.semesterId]]</h2>
+                                    <!--h2>evtl Gruppennname</h2-->
+                                    <!--h2>evtl Gruppennname</h2-->
+                                </div>
+                        </div>
+
+                    </iron-collapse>
+
+                </div>
+            </template>
+
+
+                <!--Iron Signal for Passing Semester ID-->
         <iron-signals on-iron-signal-semester="_semesterChanged"></iron-signals>
     </template>
     <script>
@@ -30,7 +177,8 @@
             is: 'students-admin',
             properties: {
                 students: {
-                    type: Array
+                    type: Array,
+                    value: []
                 },
                 semester: {
                     type: String
@@ -40,7 +188,17 @@
             ready: function() {
             },
             _handleStudentsResponse: function (event) {
-                this.set('students',event.detail);
+                api_response = event.detail;
+                for(var i=0; i < api_response.length; i++){
+                    this.push('students',api_response[i]);
+                }
+                console.log(this.students);
+            },
+            _handlePendingStudentsResponse: function (event) {
+                api_response = event.detail;
+                for(var i=0; i<api_response.length; i++){
+                    this.push('students',api_response[i]);
+                }
                 console.log(this.students);
             },
             _semesterChanged: function (event) {
@@ -54,9 +212,25 @@
                     },
                     method: 'GET',
                     endpoint: '/platformUsers'
-                }
+                };
+                this.ajax_pending = {
+                    contentType: 'application/json',
+                    headers: {
+                        Authorization: this.accessToken,
+                        filter: '{"where":{"isTutor":"false","isAdmin":"false","semesterId":"'+this.semester+'"}}'
+                    },
+                    method: 'GET',
+                    endpoint: '/PendingPlatformUsers'
+                };
 
-            }
+            },
+            _toggleCollapse: function (event) {
+                index = event.model.__key__.slice(1);
+                this.$$('#collapse' + index).toggle();
+                //Uncomment for 100% width of expanded Tiles
+                //this.$$('#group_' + index).classList.toggle('flex-none');
+            },
+
         });
     </script>
 </dom-module>

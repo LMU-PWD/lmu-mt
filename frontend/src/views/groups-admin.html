@@ -32,12 +32,12 @@
                 height: auto;
             }
 
-            .groupsMembers {
+            .userInfo {
                 display: block;
                 padding-bottom: 10px;
             }
 
-            .groupsMembers > .member {
+            .userInfo > .member {
                 margin: 0 10px;
                 padding: 10px;
                 border-bottom: 1px solid var(--paper-blue-grey-700);
@@ -46,12 +46,12 @@
                 overflow: hidden;
             }
 
-            .groupsMembers > .member > *:last-child {
+            .userInfo > .member > *:last-child {
                 border-radius: 0 0 5px 5px;
 
             }
 
-            .groupsMembers > .member > h2 {
+            .userInfo > .member > h2 {
 
                 position: relative;
                 margin: 0 0 0 40px;
@@ -61,14 +61,14 @@
                 font-size: 13px;
             }
 
-            .groupsMembers > .member > a {
+            .userInfo > .member > a {
                 float: left;
                 width: 40px;
                 position: relative;
                 top: -10px;
             }
 
-            .groupsMembers > .member > a > paper-icon-button {
+            .userInfo > .member > a > paper-icon-button {
                 color: var(--paper-blue-grey-700);
             }
 
@@ -78,7 +78,7 @@
                 border-top: 1px solid var(--paper-blue-grey-700);
             }
 
-            .group {
+            .student {
                 /*height: 50px;*/
                 background-color: var(--paper-blue-grey-50);
                 border-bottom: 1px solid var(--paper-blue-grey-700);
@@ -90,7 +90,7 @@
                 width: 100%;
             }
 
-            .group > h1 {
+            .student > h1 {
                 width: calc(100% - 100px);
                 float: left;
                 margin: 10px;
@@ -103,7 +103,7 @@
                 text-overflow: ellipsis;
             }
 
-            .group > paper-icon-button {
+            .student > paper-icon-button {
                 float: right;
                 margin: 5px;
             }
@@ -182,11 +182,11 @@
             <paper-icon-button  style="width: 33%;" icon="add-circle-outline" on-tap="_createGroup"></paper-icon-button>
 
             <template is="dom-repeat" items="[[groups]]" as="group">
-                <div class="group flex self-center" id="group_[[index]]">
+                <div class="student flex self-center" id="group_[[index]]">
                     <h1 on-tap="_toggleCollapse">[[group.name]]</h1>
                     <paper-icon-button icon="icons:delete" on-tap="_deleteGroup"></paper-icon-button>
                     <iron-collapse id="collapse[[index]]">
-                        <div class="groupsMembers">
+                        <div class="userInfo">
                             <!--TODO Lists Group Memebers -->
                             <template is="dom-repeat" items="[[group.groupMemberIds]]" as="member">
                                 <div class="member">
