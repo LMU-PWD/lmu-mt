@@ -186,10 +186,6 @@
                         //If Specific Lab exists -> lab has been set
                         console.log(this.labType.type_str+": Received labData, lab Set:");
                         console.log(detail.lab);
-                        //this.set('before_deadline',false);
-                        //this.set('practical_date_exists',true);
-                        //var d = new Date(detail.lab.date);
-                        //this.set('practical_date_string', d.toLocaleString().slice(0,-3));
                         this.setDate(detail.lab.date,'practical_date');
                         if(this.before_deadline){
                             console.log("ERROR: Die Praktikumsdaten können nicht vor der Deadline zugewiesen sein. Daten sind hier inkorrekt! LabType: "+this.labType.type_str);
@@ -295,8 +291,12 @@
                         headers: {
                             'Authorization': this.accessToken
                         },
+                        body:{
+                            groupId:this.user.groupId,
+                            labTypeId: this.labType.id
+                        },
                         method: 'DELETE',
-                        endpoint: '/groups/'+this.user.groupId+'/Priorities?filter[where][labTypeId]=' + this.labType
+                        endpoint: '/Priorities/deleteByGroupAndLabType/'
                     };
 
                     this.labs_already_chosen = true;

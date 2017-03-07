@@ -4,18 +4,14 @@
         <style include="shared-styles">
             :host {
                 display: block;
-                margin-top: 20px;
-                background-color: var(--paper-blue-grey-50);
+                #margin-top: 20px;
+                padding: 3%;
+                text-align: left;
             }
-            .title{
-                padding: 10px;
-                text-align: center;
-                font-size: 20px;
+            paper-button{
+                margin: 2%;
             }
-            iron-icon{
-                display: inline-block;
-                float: right;
-            }
+
             /*Phone*/
             @media screen and (max-width: 767px) {
             }
@@ -29,19 +25,45 @@
             }
         </style>
 
-        <paper-item class="title">Detailansicht:</paper-item>
+        <api-request
+                headers="[[ ajax_save_registration_open.headers ]]"
+                method="[[ ajax_save_registration_open.method ]]"
+                body="[[ ajax_save_registration_open.body ]]"
+                endpoint="[[ ajax_save_registration_open.endpoint ]]"
+                on-api-response="_responseFromPostingRegistrationOpen"></api-request>
+        <api-request
+                headers="[[ ajax_save_labtype.headers ]]"
+                method="[[  ajax_save_labtype.method ]]"
+                body="[[  ajax_save_labtype.body ]]"
+                endpoint="[[  ajax_save_labtype.endpoint ]]"
+                on-api-response="_responseFromPostingRegistrationOpen"></api-request>
+
+        <paper-button raised class="studentsRegistrationButton" on-tap="_handleStudentButtonClick">
+            <template is="dom-if" if="[[labType.registration_open]]">
+                Registrierung schliessen
+            </template>
+            <template is="dom-if" if="[[!labType.registration_open]]">
+                Registrierung freischalten
+            </template>
+        </paper-button>
         <lab-detail-content-element
-                text="Registration Deadline Studenten:" data="[[labType.registration_deadline]]" input="{{ dateInput }}"
-                is-date-from-parent="true" is-id-from-parent="false"></lab-detail-content-element>
+                text="Registration Deadline Studenten" data="[[labType.registration_deadline]]" input="{{ dateInput }}"
+                is-date-from-parent="true" is-id-from-parent="false" is-editor-from-parent="false"></lab-detail-content-element>
         <lab-detail-content-element
-                text="Registration Deadline Tutoren:" data="[[labType.registration_deadline_tutors]]" input="{{ dateTutorInput }}"
-                is-date-from-parent="true" is-id-from-parent="false"></lab-detail-content-element>
+                text="Registration Deadline Tutoren" data="[[labType.registration_deadline_tutors]]" input="{{ dateTutorInput }}"
+                is-date-from-parent="true" is-id-from-parent="false" is-editor-from-parent="false"></lab-detail-content-element>
         <lab-detail-content-element
-                text="Beschreibung Studenten:" data="[[labType.description_student]]"  input="{{ descriptionStudentInput }}"
-                is-date-from-parent="false" is-id-from-parent="false"></lab-detail-content-element>
+                text="Beschreibung Studenten" data="[[labType.description_student]]"  input="{{ descriptionStudentInput }}"
+                is-date-from-parent="false" is-id-from-parent="false" is-editor-from-parent="true"></lab-detail-content-element>
         <lab-detail-content-element
-                text="Beschreibung Tutoren:" data="[[labType.description_tutor]]"  input="{{ descriptionTutorInput }}"
-                is-date-from-parent="false" is-id-from-parent="false"></lab-detail-content-element>
+                text="Beschreibung Tutoren" data="[[labType.description_tutor]]"  input="{{ descriptionTutorInput }}"
+                is-date-from-parent="false" is-id-from-parent="false" is-editor-from-parent="true"></lab-detail-content-element>
+
+        <template is="dom-if" if="[[showSaveButton]]">
+            <paper-button raised class="button" on-tap="_handleSaveButtonClick">
+                <iron-icon icon="save" ></iron-icon>Änderungen Speichern
+            </paper-button>
+        </template>
     </template>
 
     <script>
@@ -58,20 +80,29 @@
                 },
                 dateTutorInput: {
                     type: String,
-                    observer: "_dateChanged"
+                    observer: "_dateTutorChanged"
                 },
                 descriptionStudentInput: {
                     type: String,
-                    observer: "_durationChanged"
+                    observer: "_descriptionStudentChanged"
                 },
                 descriptionTutorInput: {
                     type: String,
-                    observer: "_durationChanged"
+                    observer: "_descriptionTutorChanged"
+                },
+                labType: Object,
+                labTypeFromApi: {
+                    type: Object,
+                    observer: "_labTypeChanged"
+                },
+                showSaveButton:{
+                    type: Boolean,
+                    value: false
                 }
             },
             ready: function () {
                 //console.log(this.accessToken);
-                //console.log(this.lab);
+                //console.log(this.labTypeFromApi);
             },
             /**
              * Handle changes of
@@ -79,63 +110,135 @@
              * @private
              */
             _dateChanged: function(e){
-                console.log(e);
-                console.log(this.dateInput);
-                //this.set('lab.date', this.dateInput.toString());
+                //console.log(this.dateInput);
+                this.set('labType.descriptionStudentInput', this.dateInput);
+                this.set('showSaveButton', true);
             },
-
             /**
-             * Handle changes of groups and tutors arrays from api
+             * Handle changes of
              * @param e - Event Variable
              * @private
              */
-            _dataFromApiChanged: function(e){
-                //console.log(e);
-                //console.log(this.groups);
-                //console.log(this.tutors);
-                if(this.tutors && this.groups) {
-                    this.tutorNames = [];
-                    this.groupNames = [];
-                    //console.log(this.lab);
-                    for (i = 0; i < this.tutors.length; i++) {
-                        this.tutorNames.push(this.tutors[i].name + ", " + this.tutors[i].first_name);
-                        if(this.lab && this.lab.tutorId == this.tutors[i].id){
-                            this.set('labTutor', (this.tutors[i].name + ", " + this.tutors[i].first_name));
-                            //console.log(this.labTutor);
-                        }
-                    }
-                    for (i = 0; i < this.groups.length; i++) {
-                        this.groupNames.push(this.groups[i].name);
-                        if(this.lab && this.lab.groupId == this.groups[i].id){
-                            this.set('labGroup', this.groups[i].name);
-                            //console.log(this.labGroup);
-                        }
-                    }
-                    //console.log(this.groupNames);
-                    //console.log(this.tutorNames);
-                }
+            _dateTutorChanged: function(e){
+                //console.log(this.dateTutorInput);
+                this.set('labType.descriptionTutorInput', this.dateTutorInput);
+                this.set('showSaveButton', true);
             },
+
             /** Handle changes of
             * @param e - Event Variable
             * @private
             */
-            _durationChanged: function(e){
-                console.log(e);
-                console.log(this.durationInput);
-                this.set('lab.duration', this.durationInput);
+            _descriptionTutorChanged: function(e){
+                //console.log(this.descriptionTutorInput);
+                this.set('labType.description_tutor', this.descriptionTutorInput);
+                this.set('showSaveButton', true);
             },
+            /** Handle changes of
+             * @param e - Event Variable
+             * @private
+             */
+            _descriptionStudentChanged: function(e){
+                //console.log(this.descriptionStudentInput);
+                this.set('labType.description_student', this.descriptionStudentInput);
+                this.set('showSaveButton', true);
+            },
+            /**
+             * Handle click on Student Button to Post registration_open on API
+             * @param e - Event Variable
+             * @private
+             */
+            _handleSaveButtonClick: function(){
+                //console.log(event.detail);
+                //Post LabType-Changes in API
+                console.log(this.labType);
+                if (this.labType.id) {
+                    this.ajax_save_labtype = {
+                        headers: {
+                            Authorization: this.accessToken
+                        },
+                        body: {
+                            description_student: this.labType.description_student,
+                            description_tutor: this.labType.description_tutor,
+                            registration_deadline: this.labType.registration_deadline,
+                            registration_deadline_tutors: this.labType.registration_deadline_tutors
+                        },
+                        method: 'PUT',
+                        endpoint: '/labtypes/' + this.labType.id
+                    };
+                    //console.log(this.ajax_save_labtype);
+                }
+                else {
+                    console.log("Error: LabId is wrong: ");
+                    console.log(this.labToSet.id);
+                }
+
+                this.set('showSaveButton', false);
+            },
+
+            /**
+             * Handle click on Student Button to Post registration_open on API
+             * @param e - Event Variable
+             * @private
+             */
+            _handleStudentButtonClick: function(){
+                if(this.labType.registration_open) {
+                    this.set('labType.registration_open', false);
+                    this.ajax_save_registration_open = {
+                        headers: {
+                            Authorization: this.accessToken
+                        },
+                        body: {
+                            registration_open: this.labType.registration_open
+                        },
+                        method: 'PUT',
+                        endpoint: '/labtypes/' + this.labType.id
+                    };
+                }
+                else {
+                    this.set('labType.registration_open', true);
+                    this.ajax_save_registration_open = {
+                        headers: {
+                            Authorization: this.accessToken
+                        },
+                        body: {
+                            registration_open: this.labType.registration_open
+                        },
+                        method: 'PUT',
+                        endpoint: '/labtypes/' + this.labType.id
+                    };
+                }
+                //console.log(this.ajax_save_registration_open);
+            },
+
             /**
              * Handle chages of lab-Object
              * @param e - Event Variable
              * @private
              */
-            _labChanged: function(e){
-                console.log(this.labFromApi);
-                //console.log(this.lab.groupId);
-                //console.log(this.lab.tutorId);
-                this.set('lab', this.labFromApi);
-                this.set('lab.date', new Date(this.labFromApi.date));
-                this._dataFromApiChanged(e);
+            _labTypeChanged: function(e){
+                //console.log(this.labTypeFromApi);
+                this.set('labType', this.labTypeFromApi);
+                this.set('labType.registration_deadline', new Date(this.labTypeFromApi.registration_deadline));
+                this.set('labType.registration_deadline_tutors', new Date(this.labTypeFromApi.registration_deadline_tutors));
+            },
+
+            /**
+             * Handle response from api-request whith ajax_groups
+             * @param e - Event Variable
+             * @private
+             */
+            _responseFromPostingRegistrationOpen: function(e){
+                console.log(e.detail);
+            },
+
+            /**
+             * Handle response from api-request to save changed lab data
+             * @param e - Event Variable
+             * @private
+             */
+            _responseFromPostingLabtype: function(e){
+                console.log(e);
             }
         });
     </script>

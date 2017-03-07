@@ -2,9 +2,10 @@
 <link rel="import" href="../shared/shared-styles.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../../bower_components/iron-icons/editor-icons.html">
 <link rel="import" href="../components/practicals-students-date-detail.html">
 <link rel="import" href="../components/practicals-admin-labs-detail.html">
-<link rel="import" href="../components/labtype-detail-view.html>
+<link rel="import" href="../components/labtype-detail-view.html">
 
 <!--Localization Imports-->
 <link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
@@ -45,8 +46,8 @@
             .icon{
               position: absolute;
                 left: calc(50% - 24px);
-                height: 40px;
-                width: 40px;
+                height: 48px;
+                width: 48px;
               border-radius: 50%;
               background-color: var(--paper-blue-grey-100);
               border:  2px solid var(--paper-blue-grey-900);
@@ -84,9 +85,8 @@
                             </template>
                         </template>
                         <template is="dom-if" if="[[user.isAdmin]]">
-                            Admin-Labtypes-Configurations
                             <labtype-detail-view access-token ="[[accessToken]]"
-                                             lab-type = "[[labType]]"></labtype-detail-view>
+                                             lab-type-from-api = "[[labType]]"></labtype-detail-view>
                         </template>
                     </div>
                     <div>
@@ -166,7 +166,7 @@
                 }
             },
             ready: function () {
-               console.log(this.user);
+               //console.log(this.user);
             },
 
             _groupChanged: function (detail) {
@@ -192,7 +192,7 @@
 
             },
             _userChanged: function (detail) {
-                console.log(detail);
+                //console.log(detail);
 
                 this.ajax_labs = {
                     headers: {
@@ -205,6 +205,7 @@
 
             },
             _labTypeChanged: function (response) {
+                //console.log("Labtype changed!");
                 //console.log(detail);
                 this.customStyle['--color'] = this.labType.color;
                 this.updateStyles();

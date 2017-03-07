@@ -65,16 +65,16 @@
                 endpoint="[[ ajax_tutors.endpoint ]]"
                 on-api-response="_responseFromGettingTutors"></api-request>
         <api-request
-                headers="[[ ajax_save_registration_open.headers ]]"
-                method="[[ ajax_save_registration_open.method ]]"
-                body="[[ ajax_save_registration_open.body ]]"
-                endpoint="[[ ajax_save_registration_open.endpoint ]]"
-                on-api-response="_responseFromPostingRegistrationOpen"></api-request>
-        <api-request
                 headers="[[ ajax_save_lab.headers ]]"
                 method="[[ ajax_save_lab.method ]]"
                 body="[[ ajax_save_lab.body ]]"
                 endpoint="[[ ajax_save_lab.endpoint ]]"
+                on-api-response="_responseFromPostingLab"></api-request>
+        <api-request
+                headers="[[ ajax_save_new_lab.headers ]]"
+                method="[[ ajax_save_new_lab.method ]]"
+                body="[[ ajax_save_new_lab.body ]]"
+                endpoint="[[ ajax_save_new_lab.endpoint ]]"
                 on-api-response="_responseFromPostingLab"></api-request>
         <api-request
                 headers="[[ ajax_get_labs.headers ]]"
@@ -85,7 +85,7 @@
 
         <iron-signals on-iron-signal-switchlocale="_switchLocale"></iron-signals>
 
-        <paper-dialog id="detailView" on-iron-overlay-closed="_reactToDialog">
+        <paper-dialog id="detailView" on-iron-overlay-closed="_reactToDetailDialog">
             <lab-detail-view lab-from-api="[[ chosenlab ]]"
                              access-token ="[[accessToken]]"
                              tutors = "[[tutors]]"
@@ -97,15 +97,19 @@
             </div>
         </paper-dialog>
 
+        <paper-dialog id="newLabView" on-iron-overlay-closed="_reactToNewLabDialog">
+            <!-- TODO: here comes a view to add a new lab-->
+
+            <div class="buttons">
+                <paper-button class="dialogButton" dialog-dismiss raised><iron-icon icon="close" ></iron-icon> Cancel {{localize('c_button_cancel')}}</paper-button>
+                <paper-button class="dialogButton" dialog-confirm raised><iron-icon icon="save" ></iron-icon> Save </paper-button>
+            </div>
+        </paper-dialog>
+
             <div class="page">
                 <div>
-                    <paper-button raised class="studentsRegistrationButton" on-tap="_handleStudentButtonClick">
-                        <template is="dom-if" if="[[labType.registration_open]]">
-                            Registrierung schliessen
-                        </template>
-                        <template is="dom-if" if="[[!labType.registration_open]]">
-                            Registrierung freischalten
-                        </template>
+                    <paper-button raised class="addNewLabButton" on-tap="_handleAddNewLab">
+                        <iron-icon icon="add" ></iron-icon> Neuen Termin erstellen
                     </paper-button>
                 </div>
                 <div class="dateselector">
@@ -117,7 +121,6 @@
                     </template>
                 </div>
             </div>
-
     </template>
 
     <script>
@@ -155,7 +158,10 @@
                 semesterId:{
                     type: String
                 },
-                transformedLabs: Array,
+                transformedLabs: {
+                    type: Array,
+                    notify: true
+                },
                 tutors: Array,
                 user: Object,
                 userId: {
@@ -163,7 +169,7 @@
                 }
             },
             ready: function () {
-                //console.log(this.allLabs);
+                console.log(this.semesterId);
                 this.ajax_groups ={
                     headers: {
                         Authorization: this.accessToken
@@ -173,9 +179,6 @@
                 };
                 //console.log(this.user);
                 console.log(this.labType);
-                //console.log(this.accessToken);
-                //this.transformedLabs = this._transformLabs(this.allLabs,true);
-                //this.$.dates.render();
             },
 
             /**
@@ -205,6 +208,7 @@
                             }
                         }
                     }
+                    console.log(returnstring);
                     return returnstring;
             },
             /**
@@ -222,12 +226,12 @@
                         }
                     }
                 }
+                console.log(returnstring);
                 return returnstring;
             },
 
             /**
-             * Handle date click from Child (date-creator)
-             * Update child priorities-Array
+             * Handle date click, Get chosenlab and open LAb-Detail-Dialog
              * @param e - Event Variable
              * @private
              */
@@ -250,36 +254,13 @@
                     console.log(this.chosenlab);
                 }
             },
-
             /**
-             * Handle click on Student Button to Post registration_open on API
+             * Handle date click, Open New-Lab-Dialog
              * @param e - Event Variable
              * @private
              */
-            _handleStudentButtonClick: function(){
-                if(this.labType.registration_open) {
-                    this.set('labType.registration_open', false);
-                    this.ajax_save_registration_open = {
-                        headers: {
-                            Authorization: this.accessToken
-                        },
-                        body: this.labType,
-                        method: 'POST',
-                        endpoint: '/labtypes/' + this.labType.id  +'/replace'
-                    };
-                }
-                else {
-                    this.set('labType.registration_open', true);
-                    this.ajax_save_registration_open = {
-                        headers: {
-                            Authorization: this.accessToken
-                        },
-                        body: this.labType,
-                        method: 'POST',
-                        endpoint: '/labtypes/' + this.labType.id +'/replace'
-                    };
-                }
-                console.log(this.ajax_save_registration_open);
+            _handleAddNewLab: function(e){
+                this.$.newLabView.open();
             },
             /**
              * Handle allLabs array changes
@@ -289,20 +270,17 @@
             _labsChanged: function(e){
                 //console.log(e);
                 if(this.isReady) {
-                    this.transformedLabs = this._transformLabs(this.allLabs, true);
-                    //this.$.dates.render();
+                    this.set('transformedLabs', this._transformLabs(this.allLabs,true));
                 }
             },
             /**
-             * Handle Dialog button pressed
+             * Handle Dialog button pressed, If confirmed replace the chosen Lab in API
              * @param event
              */
-            _reactToDialog: function (event) {
+            _reactToDetailDialog: function (event) {
                 console.log(event.detail);
                 if(event.detail.confirmed){
                     //Post Lab-Changes in API
-                    //console.log(event.target.firstChild.nextSibling.lab);
-                    //this.chosenlab = {};
                     this.labToSet = event.target.firstChild.nextSibling.lab;
                     console.log(this.labToSet);
                     if(this.labToSet.id) {
@@ -317,9 +295,11 @@
                                 tutorId: this.labToSet.tutorId,
                                 groupId: this.labToSet.groupId
                             },
-                            method: 'POST',
-                            endpoint: '/labs/' + this.labToSet.id + '/replace'
+                            method: 'PUT',
+                            endpoint: '/labs/' + this.labToSet.id
                         };
+                        console.log(this.ajax_save_lab);
+                        this.labToSet = {};
                     }
                     else{
                         console.log("Error: LabId is wrong: ");
@@ -329,12 +309,36 @@
             },
 
             /**
-             * Handle response from api-request whith ajax_groups
-             * @param e - Event Variable
-             * @private
+             * Handle Dialog button pressed, If confirmed POST a new lab to API
+             * @param event
              */
-            _responseFromPostingRegistrationOpen: function(e){
-                console.log(e.detail);
+            _reactToNewLabDialog: function (event) {
+                console.log(event.detail);
+                if(event.detail.confirmed){
+                    //PODT new lab in API
+                    this.labToSet = event.target.firstChild.nextSibling.lab;
+                    console.log(this.labToSet);
+                    if(this.labToSet.id) {
+                        this.ajax_save_new_lab = {
+                            headers: {
+                                Authorization: this.accessToken
+                            },
+                            body: {
+                                date: this.labToSet.date,
+                                duration: this.labToSet.duration,
+                                location: this.labToSet.location,
+                                tutorId: this.labToSet.tutorId,
+                                groupId: this.labToSet.groupId
+                            },
+                            method: 'POST',
+                            endpoint: '/labs/'
+                        };
+                    }
+                    else{
+                        console.log("Error: LabId is wrong: ");
+                        console.log(this.labToSet.id);
+                    }
+                }
             },
 
             /**
@@ -366,7 +370,7 @@
                 this.isReady = true;
                 //console.log(this.tutors);
                 //TODO: when i execute the next line everything goes wrong
-                this.transformedLabs = this._transformLabs(this.allLabs,true);
+                this.set('transformedLabs', this._transformLabs(this.allLabs,true));
                 //this.$.dates.render();
 
             },
@@ -379,8 +383,8 @@
                 var temporalArray = e.detail;
                 var labTypeId = this.labType.id;
                 this.allLabs = temporalArray.filter(function(item){return item.labTypeId == labTypeId;});
-                //console.log(this.allLabs);
-                this.transformedLabs = this._transformLabs(this.allLabs,true);
+                //this.set('transformedLabs', this._transformLabs(this.allLabs,true));
+                //console.log(this.transformedLabs);
             },
 
             /**
@@ -394,8 +398,7 @@
                     headers: {
                         Authorization: this.accessToken
                     },
-                    body: this.labToSet,
-                    method: 'Get',
+                    method: 'GET',
                     endpoint: '/labs?filter[where][semesterId]=' +  this.semesterId
                 };
             },
@@ -414,7 +417,7 @@
                 var countLabs = 0; //lab counter
                 var dates = [];
 
-                for(i=0; i<labsFromApi.length; i++){
+                for( i=0 ; i<labsFromApi.length; i++){
                     // Create a new array-entrie if date from recent lab is different from date of the last lab
                     var labdate = new Date(labsFromApi[i].date);
                     if((labdate.getFullYear() != lastLab.getFullYear() ||
@@ -440,16 +443,18 @@
                     lab.dates = [];
                     lab.tutor = "";
                     lab.group = "";
+                    lab.tutorName = "";
+                    lab.groupName = "";
                     lab.dates = [labdate, endtime];
                     lab.tutor = labsFromApi[i].tutorId;
                     lab.group = labsFromApi[i].groupId;
                     if(lab.tutor){
-                        console.log(lab.tutor);
+                        //console.log(lab.tutor);
                         lab.tutorName = this._getLabTutorName(labsFromApi[i].tutorId);
                         console.log(lab.tutorName);
                     }
                     if(lab.group) {
-                        console.log(lab.group);
+                        //console.log(lab.group);
                         lab.groupName = this._getLabGroupName(labsFromApi[i].groupId);
                         console.log(lab.groupName);
                     }

@@ -78,10 +78,9 @@
              * Creates string from the timeslot-timits to get a nicer visualisation,
              * Adds leading zeros, if necessary
              */
-            _getLabGroupString: function(slot){
+            _getLabTutorString: function(slot){
                 var returnstring = "";
                 if(slot) {
-                    //console.log(slot.tutorName +slot.groupName );
                     if(slot.tutorName &&  slot.tutorName != ""){
                         returnstring = "Tutor: "+slot.tutorName;
                     }
@@ -95,7 +94,7 @@
              * Creates string from the timeslot-timits to get a nicer visualisation,
              * Adds leading zeros, if necessary
              */
-            _getLabTutorString: function(slot){
+            _getLabGroupString: function(slot){
                 var returnstring = "";
                 if(slot) {
                     if(slot.groupName && slot.groupName != ""){

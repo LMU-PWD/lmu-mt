@@ -3,40 +3,34 @@
         <style include="shared-styles">
             :host {
                 display: block;
-                text-align: center;
             }
             .textInputElements{
                 display: inline-block;
+                float: none;
             }
-            #changeContentElement{
-                width: 100%;
+            #text{
+                margin-right: 2%;
             }
-
-            /*Phone*/
-            @media screen and (max-width: 767px) {
-                .datecreator{
-                    width: 100%;
-                }
+            paper-date-picker{
+                color: var(--paper-blue-grey-500) !important;
+                background-color: var(--paper-blue-grey-50) !important;
             }
-            /*Tablet*/
-            @media screen and (min-width: 768px) and (max-width: 1023px) {
-                .datecreator{
-                    min-width: 400px;
-                    width: 49%;
-
-                }
+            iron-icon{
+                display: inline-block;
+                float: right;
             }
-            /*Desktop*/
-            @media screen and (min-width: 1024px) {
-                .datecreator{
-                    min-width: 400px;
-                    width: 24%;
-                }
+            paper-item{
+                margin-bottom: 1%;
+                margin-top: 1%;
+                text-align: left;
+            }
+            ace-widget{
+                width: 2000%;
             }
         </style>
 
         <paper-item>
-            <div id="text">[[text]]: [[data]]</div>
+            <div id="text">[[text]]:  [[data]]</div>
             <iron-collapse id="editorElement">
                 <iron-icon icon="editor:mode-edit" on-tap="_handleContentClick"></iron-icon>
             </iron-collapse>
@@ -45,7 +39,7 @@
                     <paper-input class="textInputElements" label="[[data]]" value="{{userInput}}"></paper-input>
                 </template>
                 <template is="dom-if" if="[[isDate]]">
-                    <paper-date-picker id="picker" date="{{date}}"></paper-date-picker>
+                    <paper-date-picker date="{{date}}" responsive-width="630px" ></paper-date-picker><br>
                     <time-picker hour="{{ time.hour }}" min="{{ time.min }}"></time-picker>
                 </template>
                 <template is="dom-if" if="[[isId]]">
@@ -56,6 +50,11 @@
                             </template>
                         </paper-listbox>
                     </paper-dropdown-menu>
+                </template>
+                <template is="dom-if" if="[[isEditor]]">
+                    <ace-widget
+                            on-editor-content="_aceValueChanged"
+                            theme="[[ editorTheme ]]"></ace-widget>
                 </template>
                 <iron-icon class="textInputElements" icon="check" on-tap="_handleSetClick"></iron-icon>
             </iron-collapse>
@@ -78,6 +77,11 @@
                     type: Date,
                     notify: true
                 },
+                editorTheme: {
+                    type: String,
+                    reflectToAttribute: false,
+                    value: 'ace/theme/kuroir'
+                },
                 input: {
                     type: String,
                     notify: true
@@ -86,11 +90,19 @@
                     type: String,
                     notify: true
                 },
+                isEditorFromParent: {
+                    type: String,
+                    notify: true
+                },
                 isIdFromParent: {
                     type: String,
                     notify: true
                 },
                 isDate: {
+                    type: Boolean,
+                    notify: true
+                },
+                isEditor: {
                     type: Boolean,
                     notify: true
                 },
@@ -124,6 +136,10 @@
                 this.$.editorElement.toggle(); //Show Data Element
                 this.userInput = this.data;
             },
+            _aceValueChanged: function(e){
+                //console.log(e.detail.value);
+                this.userInput = e.detail.value;
+            },
 
             /**
              * Handle Click on this paper-item
@@ -135,25 +151,32 @@
                     if(this.data != "") {
                     this.date = new Date(this.data);
                     this.time.hour = this.date.getHours();
-                    this.time.minutes = this.date.getMinutes();
+                    this.time.min = this.date.getMinutes();
                     }
                     else{
                         this.date = new Date();
                     }
                     this.set('isDate', true);
+                    this.set('isEditor', false);
                     this.set('isId', false);
                     this.set('isString', false);
                 }
                 else if (this.isIdFromParent && this.isIdFromParent == "true") {
-                    console.log(this.array);
                     this.set('isDate', false);
+                    this.set('isEditor', false);
                     this.set('isId', true);
                     this.set('isString', false);
-                    console.log("It's an ID!");
+                }
+                else if (this.isEditorFromParent && this.isEditorFromParent == "true") {
+                     this.set('isDate', false);
+                     this.set('isEditor', true);
+                     this.set('isId', false);
+                     this.set('isString', false);
                 }
                 else {
                     this.set('isDate', false);
                     this.set('isId', false);
+                    this.set('isEditor', false);
                     this.set('isString', true);
                     if(!isNaN(parseInt(this.data))){
                         this.set('isNumber', true);
@@ -193,6 +216,9 @@
                     else{
                         this.input = this.userInput;
                     }
+                }
+                if(this.isEditor){
+                        this.input = this.userInput;
                 }
                 if(this.isDate){
                     this.date.setHours(this.time.hour);

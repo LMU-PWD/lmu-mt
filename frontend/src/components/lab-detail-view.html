@@ -12,10 +12,6 @@
                 text-align: center;
                 font-size: 20px;
             }
-            iron-icon{
-                display: inline-block;
-                float: right;
-            }
             /*Phone*/
             @media screen and (max-width: 767px) {
             }
@@ -32,19 +28,19 @@
         <paper-item class="title">Detailansicht:</paper-item>
         <lab-detail-content-element
                 text="Date" data="[[lab.date]]" input="{{ dateInput }}"
-                is-date-from-parent="true" is-id-from-parent="false"></lab-detail-content-element>
+                is-date-from-parent="true" is-id-from-parent="false" is-editor-from-parent="false"></lab-detail-content-element>
         <lab-detail-content-element
                 text="Duration" data="[[lab.duration]]"  input="{{ durationInput }}"
-                is-date-from-parent="false" is-id-from-parent="false"></lab-detail-content-element>
+                is-date-from-parent="false" is-id-from-parent="false" is-editor-from-parent="false"></lab-detail-content-element>
         <lab-detail-content-element
                 text="Location" data="[[lab.location]]"  input="{{ locationInput }}"
-                is-date-from-parent="false" is-id-from-parent="false"></lab-detail-content-element>
+                is-date-from-parent="false" is-id-from-parent="false" is-editor-from-parent="false"></lab-detail-content-element>
         <lab-detail-content-element
                 text="Tutor" data="[[labTutor]]"  input="{{ tutorInput }}"
-                is-date-from-parent="false" is-id-from-parent="true" array="[[tutorNames]]"></lab-detail-content-element>
+                is-date-from-parent="false" is-id-from-parent="true" array="[[tutorNames]]" is-editor-from-parent="false"></lab-detail-content-element>
         <lab-detail-content-element
                 text="Group" data="[[labGroup]]" input="{{ groupInput }}"
-                is-date-from-parent="false" is-id-from-parent="true" array="[[groupNames]]"></lab-detail-content-element>
+                is-date-from-parent="false" is-id-from-parent="true" array="[[groupNames]]" is-editor-from-parent="false"></lab-detail-content-element>
     </template>
 
     <script>
