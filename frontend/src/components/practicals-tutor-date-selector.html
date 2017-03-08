@@ -61,11 +61,11 @@
         <div>
             <paper-button raised class="resetButton" on-tap="_handleResetClick">
                 <iron-icon icon="reply"></iron-icon>
-                    Zurücksetzen
+                    [[ localize('practicals_tutordateselector_button-setback') ]]
             </paper-button>
             <paper-button raised class="saveButton" on-tap="_handleSaveClick">
                 <iron-icon icon="save"></iron-icon>
-                Speichern
+                [[ localize('practicals_tutordateselector_button-save') ]]
             </paper-button>
         </div>
         <div class="dateselector">
@@ -79,6 +79,8 @@
                                     on-replace-priority="_handleReplacePriority"></practicals-tutor-date-creator>
             </template>
         </div>
+
+        <iron-signals on-iron-signal-switchlocale="_switchLocale"></iron-signals>
     </template>
 
     <script>
@@ -109,12 +111,29 @@
                 apiAllLabs: {
                     type: Array,
                     observer: '_computeTimeslots'
-                }
+                },
+                language: {
+                    type: String,
+                    value: 'de'
+                },
             },
 
             ready: function() {
 //                this.timeslots = this._transformLabs(this.apiAllLabs,true);
                 console.log(this.timeslots);
+            },
+
+            /**
+             * Localization setup
+             */
+            behaviors: [
+                Polymer.AppLocalizeBehavior
+            ],
+            attached: function() {
+                this.loadResources(this.resolveUrl('../shared/locales.json'));
+            },
+            _switchLocale: function() {
+                this.language = (this.language == 'en') ? 'de' : 'en';
             },
 
             _computeTimeslots: function() {

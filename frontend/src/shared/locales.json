@@ -124,8 +124,24 @@
     "semester_setup_dates_duration": "Duration",
     "semester_setup_dates_button_add": "Add date",
     "semester_setup_dates_dialog_heading": "Add a new date",
-    "semester_setup_dates_dialog_startingat": "Starting at"
+    "semester_setup_dates_dialog_startingat": "Starting at",
 
+    "tutor_card_heading_select-date": "Choose your free dates",
+    "tutor_card_audio-practical": "Audio Practical",
+    "tutor_card_video-practical": "Video Practical",
+    "tutor_card_foto-practical": "Photo Practical",
+    "tutor_card_heading_your-dates": "Your dates for the ",
+
+    "tutor_sessionlist_heading_date": "Date",
+    "tutor_sessionlist_heading_time": "Time",
+
+    "practicals_tutordateselector_button-setback": "Reset",
+    "practicals_tutordateselector_button-save": "Save",
+
+    "practicals_tutordatedetail_button-back": "Back to overview",
+    "practicals_tutordatedetail_button-change": "Change selection",
+    "practicals_tutordatedetail_info_deadline-reached": "The date selection deadline has been reached. You will be assigned fixed lab dates soon.",
+    "practicals_tutordatedetail_info_not-unlocked": "Date selection is not unlocked yet!"
   },
 
   "de": {
@@ -253,6 +269,24 @@
     "semester_setup_dates_duration": "Dauer",
     "semester_setup_dates_button_add": "Termin hinzufügen",
     "semester_setup_dates_dialog_heading": "Neuen Termin hinzufügen",
-    "semester_setup_dates_dialog_startingat": "Beginn:"
+    "semester_setup_dates_dialog_startingat": "Beginn:",
+
+    "tutor_card_heading_select-date": "Wähle deine freien Termine",
+    "tutor_card_audio-practical": "Audio-Praktikum",
+    "tutor_card_video-practical": "Video-Praktikum",
+    "tutor_card_foto-practical": "Foto-Praktikum",
+    "tutor_card_heading_your-dates": "Deine Termine für das ",
+
+    "tutor_sessionlist_heading_date": "Datum",
+    "tutor_sessionlist_heading_time": "Zeit",
+
+    "practicals_tutordateselector_button-setback": "Zurücksetzen",
+    "practicals_tutordateselector_button-save": "Speichern",
+
+    "practicals_tutordatedetail_button-back": "Zurück zur Übersicht",
+    "practicals_tutordatedetail_button-change": "Auswahl ändern",
+    "practicals_tutordatedetail_info_deadline-reached": "Die Deadline zur Terminwahl wurde bereits erreicht. In Kürze werden dir feste Termine zugeteilt werden.",
+    "practicals_tutordatedetail_info_not-unlocked": "Die Terminwahl ist noch nicht freigeschalten!"
   }
 }
+

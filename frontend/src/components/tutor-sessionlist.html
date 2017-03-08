@@ -91,6 +91,12 @@
                 method="[[ ajax_group.method ]]"
                 endpoint="[[ ajax_group.endpoint ]]"
                 on-api-response="_apiGroupResponse"></api-request>
+        <api-request
+                id="ajax_student"
+                headers="[[ ajax_student.headers ]]"
+                method="[[ ajax_student.method ]]"
+                endpoint="[[ ajax_student.endpoint ]]"
+                on-api-response="_apiStudentResponse"></api-request>
 
         <div class="lab-list-container">
             <template is="dom-if" if="[[ !finishedSessionsLoad ]]">
@@ -98,28 +104,49 @@
             </template>
             <template is="dom-if" if="[[ finishedSessionsLoad ]]">
                 <paper-listbox>
+
                     <paper-item on-click="toggleCollapse" class="sessions_heading">
                         <span class="session_toggleDropdown mobile-hidden" style="width: 4%">
                         </span>
-                        <span class="session_date">Datum</span>
-                        <span class="session_time">Zeit</span>
-                        <span class="session_icon" style="width:15%">Typ</span>
+                        <span class="session_date">[[ localize('tutor_sessionlist_heading_date') ]]</span>
+                        <span class="session_time">[[ localize('tutor_sessionlist_heading_time') ]]</span>
+                        <span class="session_icon" style="width:15%"></span>
                         <span class="session_type"></span>
                     </paper-item>
-                    <template  is="dom-repeat" items="[[ sessions ]]" filter="prettySessionEntry">
-                        <paper-item on-click="toggleCollapse" class="sessions_row" id="src-[[ item.id ]]">
-                                <span class="session_toggleDropdown mobile-hidden">
-                                    <iron-icon icon="hardware:keyboard-arrow-right"></iron-icon>
-                                </span>
-                            <span class="session_date">[[ item.date_string ]]</span>
-                            <span class="session_time">[[ item.time_string ]]</span>
-                            <span class="session_icon"><iron-icon icon="[[ item.icon ]]"></iron-icon></span>
-                            <span class="session_type">[[ item.labType_string ]]</span>
+
+                    <template id="sessionlist" is="dom-repeat" items="[[ futureSessions ]]" as="session"
+                        >
+                        <!--[[ session.id ]]-->
+                        <!--<template is="dom-repeat" items="[[ session.groupMembers ]]" as="member">-->
+                            <!--[[ member.name ]]-->
+                        <!--</template>-->
+
+                        <paper-item on-click="toggleCollapse" class="sessions_row" id="src-[[ session.id ]]">
+                            <span class="session_toggleDropdown mobile-hidden">
+                                <iron-icon icon="hardware:keyboard-arrow-right"></iron-icon>
+                            </span>
+                            <span class="session_date">[[ session.date_string ]]</span>
+                            <span class="session_time">[[ session.time_string ]]</span>
+                            <span class="session_icon"><iron-icon icon="[[ session.icon ]]"></iron-icon></span>
+                            <span class="session_type">[[ session.labType_string ]]</span>
                         </paper-item>
-                        <iron-collapse id="collapse-[[ item.id ]]">
+
+                        <iron-collapse id="collapse-[[ session.id ]]">
                             <paper-item class="session_details" style="border-left: 2px solid var(--paper-blue-grey-500)">
-                                [[ item.location ]]
+                                [[ session.location ]]
                             </paper-item>
+                            <paper-item class="session_details" style="border-left: 2px solid var(--paper-blue-grey-500)">
+                                [[ session.labType_description_tutor ]]
+                            </paper-item>
+
+                            <template is="dom-if" if="[[ typeof session.groupMembers == 'undefined' ]]"> groupmembers undefined</template>
+
+                            <template is="dom-repeat" items="[[ session.groupMembers ]]" as="groupMember">
+                                <paper-item>
+                                    [[ groupMember.name ]]
+                                </paper-item>
+                            </template>
+                            </template>
                         </iron-collapse>
 
                     </template>
@@ -153,6 +180,10 @@
                     type: Array,
                     value: []
                 },
+                futureSessions: {
+                    type: Array,
+                    value: []
+                },
                 assignedLabs: {
                     type: Array
                 },
@@ -163,11 +194,16 @@
                     type: Array,
                     value: []
                 },
-                finishedSessionsLoad: false
+                finishedSessionsLoad: false,
+                studentsList: {
+                    type: Array,
+                    value: []
+                },
+                allSessionsRequested: false
             },
 
             observers: [
-                '_initSessionList(labTypeAudio, labTypeVideo, labTypeFoto, assignedLabs)',
+                '_initSessionList(labTypeAudio, labTypeVideo, labTypeFoto, assignedLabs, accessToken)',
 //                '_initSessionList(labTypesArray, assignedLabs)'
             ],
 
@@ -210,12 +246,13 @@
             },
 
             toggleCollapse: function(e) {
-                this.$$("#collapse-" + e.model.item.id).toggle();
-                this.$$("#src-" + e.model.item.id).classList.toggle('session-unfolded');
+                this.$$("#collapse-" + e.model.session.id).toggle();
+                this.$$("#src-" + e.model.session.id).classList.toggle('session-unfolded');
             },
 
             prettySessionEntry: function(item) {
                 prettyItem = item
+                console.log(prettyItem)
 
                 switch(item.labType_string){
                     case "":
@@ -233,6 +270,9 @@
                         break;
                 }
 
+                console.log(item)
+                if(typeof item.groupMembers != 'undefined' && item.groupMembers.length != 0)
+                    console.log("fdasdfsaf")
                 return prettyItem;
             },
 
@@ -249,21 +289,23 @@
 
             /**
              * Function to remove objects that have a property 'date' that lies in the past from an array
-             * @param array
+             * @param allSessions
              * @returns {Array}
              */
-            getOnlyFutureDates: function(array) {
+            onlyFutureSessions: function(allSessions) {
                 var futureDates = [];
                 var today = Date.now();
-                for (var i = 0; i < array.length; i++) {
-                    var currentSession = array[i];
+                for (var i = 0; i < allSessions.length; i++) {
+                    var currentSession = allSessions[i];
                     if (new Date(currentSession.date) > today)
-                        this.push('nextSessions', new Object({ 'info': currentSession }));
+                        this.push('futureSessions', allSessions[i]);
                 }
-                return futureDates;
             },
 
-            _initSessionList: function(labTypeAudio, labTypeVideo, labTypeFoto, assignedLabs) {
+            /**
+             * Initialize sessions list
+             */
+            _initSessionList: function(labTypeAudio, labTypeVideo, labTypeFoto, assignedLabs, accessToken) {
 
                 if (assignedLabs.length == 0)
                     return null;
@@ -274,7 +316,6 @@
 
                 var type = ("labTypeId" in assignedLabs[0]) ? "lab" : "exercise";
                 var sessions_list = [];
-                console.log("received type: " + type);
                 console.log(assignedLabs);
 
                 for (var i = 0; i < assignedLabs.length; i++) {
@@ -283,11 +324,14 @@
                     var date_string = this._getDateString(date);
                     var time_string = (date.getHours() + 1) + ":" + (date.getMinutes()<10 ? '0' : '') + date.getMinutes();
                     var labType_string = ""
+                    var labType_description_tutor = ""
 
                     if (labTypesArray.length != 0) {
                         for (var j = 0; j < labTypesArray.length; j++) {
-                            if (labTypesArray[j].id == assignedLabs[i].labTypeId)
+                            if (labTypesArray[j].id == assignedLabs[i].labTypeId) {
                                 labType_string = labTypesArray[j].type_str
+                                labType_description_tutor = labTypesArray[j].description_tutor
+                            }
                         }
 //                        if (assignedLabs[i].labTypeId in labTypesArray)
 //                            labType_string = labTypesArray[assignedLabs[i].labTypeId]
@@ -303,28 +347,98 @@
                         'groupId': assignedLabs[i].groupId,
                         'labTypeId': assignedLabs[i].labTypeId,
                         'labType_string': labType_string,
-                        'exercise_name': assignedLabs[i].name
+                        'labType_description_tutor': labType_description_tutor,
+                        'exercise_name': assignedLabs[i].name,
+                        'groupMembers': []
                     };
 
                     this.push('sessions', session);
                     this.$.ajax_group.$.request.auto = false;
 
                     // If a group signed up for the session, get their data
-//                    if (typeof assignedLabs[i].groupId != 'undefined') {
-//                        this.ajax_group = {
-//                            'headers': {
-//                                'Authorization': this.accessToken
-//                            },
-//                            'method': 'GET',
-//                            'endpoint': '/labs/' + assignedLabs[i].id + '/group'
-//                        }
-//                        this.$.ajax_group.$.request.generateRequest();
-//                    }
+                    if (typeof assignedLabs[i].groupId != 'undefined') {
+                        this.ajax_group = {
+                            'headers': {
+                                'Authorization': this.accessToken
+                            },
+                            'method': 'GET',
+                            'endpoint': '/labs/' + assignedLabs[i].id + '/group'
+                        }
+                        this.$.ajax_group.$.request.generateRequest();
+                    }
                 }
+                this.onlyFutureSessions(this.sessions);
+                this.allSessionsRequested = true;
             },
 
             _apiGroupResponse: function(response) {
                 console.log(response.detail)
+                var receivedGroup = response.detail
+                var studentsList = []
+
+                for (var j = 0; j < this.sessions.length; j++) {
+                    if(receivedGroup.id == this.sessions[j].groupId) {
+                        this.sessions[j].group = receivedGroup;
+                        this.sessions[j].groupMembers = []
+                        for (var m = 0; m < receivedGroup.groupMemberIds.length; m++) {
+                            var groupmember = { id: receivedGroup.groupMemberIds[m] }
+                            this.sessions[j].groupMembers.push(groupmember)
+
+                            if (this.studentsList.indexOf(groupmember) < 0)
+                                this.studentsList.push(groupmember)
+                        }
+                    }
+                }
+                console.log(this.sessions);
+                console.log(this.studentsList);
+
+                // make students api call if all have been collected in the studentsList only
+                if (!this.allSessionsRequested)
+                    return;
+
+                for (var s = 0; s < this.studentsList.length; s++) {
+                    this.ajax_student = {
+                        'headers': {
+                            'Authorization': this.accessToken
+                        },
+                        'method': 'GET',
+                        'endpoint': '/platformusers/' + this.studentsList[s].id
+                    }
+                    this.$.ajax_student.$.request.generateRequest();
+                }
+            },
+
+            _apiStudentResponse: function(response) {
+//                console.log(response.detail)
+                var receivedStudent = response.detail;
+
+//                for (var s = 0; s < this.studentsList.length; s++) {
+//                    if (this.studentsList[s].id == receivedStudent.id) {
+//                        this.studentsList[s].email = receivedStudent.email;
+//                        this.studentsList[s].first_name = receivedStudent.first_name;
+//                        this.studentsList[s].name = receivedStudent.name;
+//                    }
+//                }
+
+                for (var i = 0; i < this.sessions.length; i++) {
+                    if (typeof this.sessions[i].groupMembers == 'undefined')
+                        continue;
+                    for (var j = 0; j < this.sessions[i].groupMembers.length; j++) {
+                        if (this.sessions[i].groupMembers[j].id == receivedStudent.id) {
+                            this.sessions[i].groupMembers[j].email = receivedStudent.email;
+                            this.sessions[i].groupMembers[j].first_name = receivedStudent.first_name;
+                            this.sessions[i].groupMembers[j].name = receivedStudent.name;
+                        }
+                    }
+                }
+
+                var sessions = this.sessions;
+                console.log("now")
+                console.log(sessions)
+                this.set('sessions', []);
+                this.set('sessions', sessions);
+//                if (this.allStudentsRequested)
+//                    this.$$("#sessionlist").render();
             },
 
             _makeLabTypesArray: function(labtypeAudio, labtypeVideo, labtypeFoto) {

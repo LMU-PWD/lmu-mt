@@ -108,26 +108,26 @@
                         fallback-selection="error">
                     <div class="datepicker-overview" name="datepicker_overview">
                         <paper-listbox style="padding: 0">
-                            <h1 class="heading">  Wähle deine freien Termine</h1>
+                            <h1 class="heading"> [[ localize('tutor_card_heading_select-date') ]]</h1>
                             <paper-item on-tap="_handleAudioTap" >
                                 <img src="../../../images/audio.svg" alt="Audio Icon">
-                                <span style="margin-right: 25px">Audiopraktikum</span>
+                                <span style="margin-right: 25px">[[ localize('tutor_card_audio-practical') ]]</span>
                                 <span class="labtype_deadline">noch offen bis [[ prettyAudioDeadline.date ]] um [[ prettyAudioDeadline.time ]]</span>
                             </paper-item>
                             <paper-item on-tap="_handleVideoTap" >
                                 <img src="../../../images/video.svg" alt="Video Icon">
-                                <span style="margin-right: 25px">Videopraktikum</span>
+                                <span style="margin-right: 25px">[[ localize('tutor_card_video-practical') ]]</span>
                                 <span class="labtype_deadline">noch offen bis [[ prettyVideoDeadline.date ]] um [[ prettyVideoDeadline.time ]]</span>
                             </paper-item>
                             <paper-item on-tap="_handleFotoTap">
                                 <img src="../../../images/photo.svg" alt="Foto Icon">
-                                <span style="margin-right: 25px">Fotopraktikum</span>
+                                <span style="margin-right: 25px">[[ localize('tutor_card_foto-practical') ]]</span>
                                 <span class="labtype_deadline">noch offen bis [[ prettyFotoDeadline.date ]] um [[ prettyFotoDeadline.time ]]</span>
                             </paper-item>
                         </paper-listbox>
                     </div>
                     <div name="datepicker_audio">
-                        <h1 class="heading"> Deine Termine für das Audiopraktikum</h1>
+                        <h1 class="heading"> [[ localize('tutor_card_heading_your-dates') ]] [[ localize('tutor_card_audio-practical') ]]</h1>
                         <template is="dom-if" if="[[ labtypeAudio.registration_open ]]">
                             <practicals-tutor-date-detail
                                     group="{{ group }}"
@@ -143,7 +143,7 @@
                         </template>
                     </div>
                     <div name="datepicker_video">
-                        <h1 class="heading"> Deine Termine für das Videopraktikum</h1>
+                        <h1 class="heading"> [[ localize('tutor_card_heading_your-dates') ]] [[ localize('tutor_card_video-practical') ]]</h1>
                         <template is="dom-if" if="[[ labtypeFoto.registration_open ]]">
                             <practicals-tutor-date-detail
                                     group="{{ group }}"
@@ -159,7 +159,7 @@
                         </template>
                     </div>
                     <div name="datepicker_foto">
-                        <h1 class="heading"> Deine Termine für das Fotopraktikum</h1>
+                        <h1 class="heading"> [[ localize('tutor_card_heading_your-dates') ]] [[ localize('tutor_card_foto-practical') ]]</h1>
                         <template is="dom-if" if="[[ labtypeFoto.registration_open ]]">
                             <practicals-tutor-date-detail
                                     group="{{ group }}"

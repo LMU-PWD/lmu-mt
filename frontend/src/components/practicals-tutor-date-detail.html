@@ -67,17 +67,17 @@
                                                    api-all-labs="[[allLabs]]"
                                                    on-save-click="_handleSaveClick"
                                                    on-reset-click="_handleResetClick"></practicals-tutor-date-selector>
-                        <paper-button on-tap="_handleBackToDateOveriew"  style="width: 50%"><iron-icon icon="reply"></iron-icon>Zurück zur Übersicht</paper-button>
+                        <paper-button on-tap="_handleBackToDateOveriew"  style="width: 50%"><iron-icon icon="reply"></iron-icon>[[ localize('practicals_tutordatedetail_button-back') ]]</paper-button>
                     </template>
                     <template is="dom-if" if="[[labs_already_chosen]]">
                         <!-- Deadline is not over, Registration Open and dates selected; Show saved dates!-->
                         <practicals-show-saved-dates id="practicals_show_saved_dates"
                                                      chosenlabs="{{chosenlabs_transformed}}"
                                                      title="Du hast diese Termine ausgewählt:"></practicals-show-saved-dates>
-                        <paper-button on-tap="_handleBackToDateOveriew"  style="width: 50%"><iron-icon icon="reply"></iron-icon>Zurück zur Übersicht</paper-button>
+                        <paper-button on-tap="_handleBackToDateOveriew"  style="width: 50%"><iron-icon icon="reply"></iron-icon>[[ localize('practicals_tutordatedetail_button-back') ]]</paper-button>
                         <paper-button raised class="changeButton" on-tap="_handleChangeClick" style="width: 49%">
                             <iron-icon icon="image:edit"></iron-icon>
-                            Auswahl ändern
+                            [[ localize('practicals_tutordatedetail_button-change') ]]
                         </paper-button>
                     </template>
                 </template>
@@ -95,19 +95,20 @@
                                 chosenlabs="{{practical_dates_transformed}}"
                                 title="Das sind deine Praktikumstermine:"></practicals-show-saved-dates>
                     </template>
-                    <div class="info">Die Deadline zur Terminwahl wurde bereits erreicht. In Kürze werden dir feste Termine zugeteilt werden.</div>
-                    <paper-button on-tap="_handleBackToDateOveriew"  style="width: 50%"><iron-icon icon="reply"></iron-icon>Zurück zur Übersicht</paper-button>
+                    <div class="info">[[ localize('practicals_tutordatedetail_info_deadline-reached') ]]</div>
+                    <paper-button on-tap="_handleBackToDateOveriew"  style="width: 50%"><iron-icon icon="reply"></iron-icon>[[ localize('practicals_tutordatedetail_button-back') ]]</paper-button>
 
                 </template>
             </template>
             <template is="dom-if" if="[[!registration_open]]">
                 <!-- Registration Open Bool from Api is false; Registration not opened yet -->
                 <div>
-                    Die Terminwahl ist noch nicht freigeschalten!
+                    [[ localize('practicals_tutordatedetail_info_not-unlocked') ]]
                 </div>
             </template>
         </div>
 
+        <iron-signals on-iron-signal-switchlocale="_switchLocale"></iron-signals>
     </template>
 
     <script>
@@ -172,6 +173,10 @@
                     type: String,
                     notify: true
                 },
+                language: {
+                    type: String,
+                    value: 'de'
+                },
             },
             ready: function () {
                 //console.log(this.labType.type_str);
@@ -180,6 +185,19 @@
                 //console.log(this.userId);
                 this.labs_already_chosen = false;
 
+            },
+
+            /**
+             * Localization setup
+             */
+            behaviors: [
+                Polymer.AppLocalizeBehavior
+            ],
+            attached: function() {
+                this.loadResources(this.resolveUrl('../shared/locales.json'));
+            },
+            _switchLocale: function() {
+                this.language = (this.language == 'en') ? 'de' : 'en';
             },
 
             _allLabsListener: function(allLabs) {
