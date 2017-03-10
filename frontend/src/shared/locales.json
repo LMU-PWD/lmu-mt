@@ -139,6 +139,9 @@
     "practicals-student-date labDate_2" : ", the  ",
     "practicals-student-date labDate_3" : ", starting at ",
 
+    "practicals_admin_labs_creator_mode_single": "Single date",
+    "practicals_admin_labs_creator_mode_multiple": "Multiple dates",
+
     "general_weekdays 0": "Sunday",
     "general_weekdays 1": "Monday",
     "general_weekdays 2": "Tuesday",
@@ -288,6 +291,9 @@
     "practicals-student-date labDate_1" : "Dein Praktikumstermin ist am ",
     "practicals-student-date labDate_2" : ", den ",
     "practicals-student-date labDate_3" : ", ab ",
+
+    "practicals_admin_labs_creator_mode_single": "Einzeltermin",
+    "practicals_admin_labs_creator_mode_multiple": "Terminserie",
 
     "general_weekdays 0": "Sonntag",
     "general_weekdays 1": "Montag",

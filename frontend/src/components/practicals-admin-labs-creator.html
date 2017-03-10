@@ -1,0 +1,192 @@
+<!--Localization Imports-->
+<link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
+<link rel="import" href="../services/my-localize-behavior.html">
+
+<dom-module id="practicals-admin-labs-creator">
+
+    <template>
+
+        <style include="shared-styles">
+
+            #dialog {
+                max-width: 1024px;
+            }
+
+            .dialogButton {
+                height: 40px;
+                margin: 0 0.29em;
+                max-width: 200px;
+                min-width: 100px;
+                width: 49.8%;
+            }
+
+            paper-tabs {
+                --paper-tabs-selection-bar-color: var(--paper-blue-grey-900);
+                color: var(--paper-blue-grey-900);
+            }
+
+            paper-tab {
+                --paper-tab-ink: var(--paper-blue-grey-100);
+                margin: 0 0.29em;
+                max-width: 200px;
+            }
+
+            .spinner-container {
+                background-color: rgba(255,255,255,0.8);
+                display: block;
+                height: 100%;
+                left: 0;
+                margin: 0 !important;
+                padding: 0 !important;
+                position: absolute;
+                text-align: center;
+                top: 0;
+                width: 100%;
+                z-index: 100000;
+            }
+
+            paper-spinner[active]{
+                height: 50px;
+                margin: auto;
+                top: calc(50% - 25px);
+                width: 50px;
+            }
+
+        </style>
+
+        <paper-dialog id="dialog" modal>
+
+            <paper-tabs selected="{{page}}">
+                <paper-tab>{{ localize('practicals_admin_labs_creator_mode_single') }}</paper-tab>
+                <paper-tab>{{ localize('practicals_admin_labs_creator_mode_multiple') }}</paper-tab>
+            </paper-tabs>
+
+            <iron-pages selected="[[page]]">
+
+                <!-- SINGLE DATE CREATOR -->
+                <div id="page-single">
+
+                    <h1>Hier gibts einzelne Termine</h1>
+
+                    <!-- TODO Datum -->
+                    <!-- TODO Dauer -->
+                    <!-- TODO Ort -->
+
+                    <div class="buttons">
+                        <paper-button class="dialogButton" on-tap="_dialogCancelled"  raised>
+                            <iron-icon icon="close" ></iron-icon> {{localize('c_button_discard')}}
+                        </paper-button>
+                        <paper-button class="dialogButton" on-tap="_triggerSingleLabCreation"  raised>
+                            <iron-icon icon="save" ></iron-icon> {{localize('c_button_save')}}
+                        </paper-button>
+                    </div>
+
+                </div>
+
+                <!-- MULTIPLE DATE CREATOR -->
+                <div id="page-multiple">
+
+                    <h1>Hier gibts mehrere Termine auf einmal</h1>
+
+                    <!-- TODO Erklärtext -->
+                    <!-- Hier kannst du Termine für Tage erstellen, die immer nach dem gleichen Schema ablaufen.
+                         Ein Beispiel: Du hast das Audiolabor am 13. und 14. Mai sowie am 20. und 21. Mai reserviert.
+                         An diesen Tagen möchtest du jeweils von 9:00 und 12:30, von 12:45 bis 16:15 und von 16:30 bis
+                         20:00 ein Praktikum anbieten. -->
+                    <!-- TODO Auswahl der Tage z.B. über Datepicker-->
+                    <!-- TODO Ort -->
+                    <!-- TODO Liste mit Terminen für einen Tag -->
+                        <!-- TODO Startuhrzeit -->
+                        <!-- TODO Dauer -->
+
+                    <div class="buttons">
+                        <paper-button class="dialogButton" on-tap="_dialogCancelled" raised>
+                            <iron-icon icon="close" ></iron-icon> {{localize('c_button_discard')}}
+                        </paper-button>
+                        <paper-button class="dialogButton" on-tap="_triggerMultipleLabsCreation" raised>
+                            <iron-icon icon="save" ></iron-icon> {{localize('c_button_save')}}
+                        </paper-button>
+                    </div>
+
+                </div>
+
+            </iron-pages>
+
+            <template is="dom-if" if="[[ processingCreateRequest ]]">
+                <div class="spinner-container">
+                    <paper-spinner active="[[ processingCreateRequest ]]"></paper-spinner>
+                </div>
+            </template>
+
+        </paper-dialog>
+
+        <!--Iron Signal for Localization-->
+        <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
+
+    </template>
+
+    <script>
+
+        Polymer({
+
+            is: 'practicals-admin-labs-creator',
+
+            properties: {
+
+                page: {
+                    type: Number,
+                    value: 0
+                },
+
+                processingCreateRequest: {
+                    type: Boolean,
+                    value: false
+                }
+
+            },
+
+            behaviors: [
+                Polymer.MyLocalizeBehavior
+            ],
+
+            open: function () {
+                this.$.dialog.open();
+            },
+
+            _resetProperties: function () {
+                // reset all properties
+                this.page = 0;
+                this.processingCreateRequest = false;
+            },
+
+            _dialogCancelled: function () {
+                this.$.dialog.close();
+                this._resetProperties();
+            },
+
+            _triggerSingleLabCreation: function () {
+                this.processingCreateRequest = true;
+                var that = this;
+                window.setTimeout(function(){
+                    that.processingCreateRequest = false;
+                }, 1000);
+                // Gather data for new Lab
+                // Send them to API
+
+            },
+
+            _triggerMultipleLabsCreation: function () {
+                this.processingCreateRequest = true;
+                var that = this;
+                window.setTimeout(function(){
+                    that.processingCreateRequest = false;
+                }, 1000);
+                // Gather data for new Labs
+                // Send them to API
+            }
+
+        });
+
+    </script>
+
+</dom-module>
