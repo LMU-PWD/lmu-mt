@@ -32,15 +32,23 @@
             .dropdown-content{
                 width: 70px;
             }
+            .selected-slot{
+                color: green;
+                background-color: #CEF6CE;
+            }
+            .lab:hover {
+                background: var(--paper-orange-50);
+                cursor: pointer;
+            }
 
         </style>
         <div class="date-creator">
             <div class="date">
                 [[date]]
             </div>
-            <template is="dom-repeat" items="[[timeslots]]" as="lab" >
-                <paper-item id="lab" class="lab" on-tap="_handleDateClick">
-                    [[_getTimeSlotString(lab)]]
+            <template is="dom-repeat" items="[[mytimeslots]]" as="lab" >
+                <paper-item id="lab" class$="[[_getSelectedStateClass(lab)]]" on-tap="_handleDateClick">
+                     [[ _getTimeSlotString(lab) ]]
                 </paper-item>
             </template>
         </div>
@@ -56,7 +64,7 @@
                 timeslots:{
                     type: Array,
                     value: []
-                },
+            },
                 date:{
                     type: String,
                     value: ""
@@ -66,7 +74,8 @@
                 },
                 chosenlabs:{
                     type: Array,
-                    value: []
+                    value: [],
+                    notify: true
                 },
                 chosenpriority:{
                     type: Number,
@@ -81,11 +90,39 @@
                 },
                 recentpriorityselection:{
                     type: Object
+                },
+                mytimeslots: {
+                    type: Array,
+                    computed: '_computeMytimeslots(chosenlabs, timeslots)'
                 }
             },
             ready: function() {
                 this.date = this._getDateString(this.timeslots[0][0]);
-                //console.log(this.timeslots);
+            },
+
+            /**
+             * Compute method for variable Mytimeslots.
+             */
+            _computeMytimeslots: function(chosenlabs, timeslots) {
+                var array = []
+                for (var i = 0; i < timeslots.length; i++)
+                {
+                    var currentTimeslot = {
+                        from: timeslots[i][0],
+                        to: timeslots[i][1],
+                        id: timeslots[i][2],
+                        selected: false
+                    };
+
+                    for (var j = 0; j < chosenlabs.length; j++) {
+
+                        if (chosenlabs[j].id == timeslots[i][2]  )  {
+                            currentTimeslot.selected = true;
+                        }
+                    }
+                    array.push(currentTimeslot)
+                }
+                return array;
             },
 
             /**
@@ -94,10 +131,10 @@
              */
             _getTimeSlotString: function(slot){
                 if(slot) {
-                        var starthour = slot[0].getHours();
-                        var startminute = slot[0].getMinutes();
-                        var endhour = slot[1].getHours();
-                        var endminute = slot[1].getMinutes();
+                        var starthour = slot.from.getHours();
+                        var startminute = slot.from.getMinutes();
+                        var endhour = slot.to.getHours();
+                        var endminute = slot.to.getMinutes();
                         /*
                     * Add zeros, if necessary
                     */
@@ -156,6 +193,16 @@
             },
 
             /**
+             * Returns selected-slot if the slot has been selected before
+             */
+            _getSelectedStateClass: function(slot) {
+                if (slot.selected)
+                    return 'lab selected-slot'
+                else
+                    return 'lab'
+            },
+
+            /**
              * Click-Event handler
              * Handles the timeslot selection
              * @param {String} e - handle data
@@ -163,26 +210,31 @@
             _handleDateClick: function(e){
                 this.fire("date-click");
 
-                this.chosenlabindex = e.model.index;
+                var chosenlabId = e.model.__data__.lab.id;
                 this.recentlab = e.target;
-                //console.log(this.recentlab);
 
-                if(this.recentlab.style.color == 'green'){
-                    this.recentlab.style.color = '';
-                    this.recentlab.style.backgroundColor = '';
-                    var labId = this.apiAllLabs[this.chosenlabindex].id;
+//                console.log(this.recentlab.classList)
+
+                if(this.recentlab.classList.value.indexOf('selected-slot') >= 0){
+                    this.recentlab.classList.toggle('selected-slot')
                     this.chosenlabs = this.chosenlabs.filter(function(item){
-                        //console.log(labId);
-                        //console.log(item.id);
-                        return item.id != labId;
+                        return item.id != chosenlabId;
                     });
                 }
                 else {
-                    this.recentlab.style.color = 'green';
-                    this.recentlab.style.backgroundColor = '#CEF6CE';
-                    this.chosenlabs.push(this.apiAllLabs[this.chosenlabindex]);
+                    this.recentlab.classList.toggle('selected-slot')
+
+                    // get object by id from allLabs array
+                    var labObject = {};
+                    for (var i = 0, len = this.apiAllLabs.length; i < len; i++) {
+                        if(this.apiAllLabs[i].id == chosenlabId) {
+                            labObject = this.apiAllLabs[i];
+                            break;
+                        }
+                    }
+                    this.chosenlabs.push(labObject);
                 }
-                console.log(this.chosenlabs);
+//                console.log(this.chosenlabs);
             },
 
             _checkFilled: function(arrayItem){
@@ -191,6 +243,7 @@
             /*_getLabFromPaperItem: funtion(paperItem){
                 paperItem.innerHTML
             },*/
+
             /**
              * Checks if given Parameter is 0 and returns true of false
              * @param selector - Given parameter
@@ -204,6 +257,7 @@
                 }
                 return response;
             },
+
             /**
              * Reset labselection on Button click
              * @private
@@ -212,10 +266,10 @@
                 this.chosenlabs =[];
                 var labs = Polymer.dom(this.root).querySelectorAll("#lab");
                 for(j=0; j < labs.length; j++){
-                    labs[j].style.color = '';
-                    labs[j].style.backgroundColor = '';
+                    labs[j].classList.remove("selected-slot");
                 }
-            }
+            },
+
         });
     </script>
 </dom-module>

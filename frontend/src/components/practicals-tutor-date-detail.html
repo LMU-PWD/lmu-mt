@@ -43,12 +43,15 @@
         </style>
 
         <api-request
+                id="ajax_save"
             headers="[[ ajax_save.headers ]]"
             method="[[ ajax_save.method ]]"
             body="[[ ajax_save.body ]]"
             endpoint="[[ ajax_save.endpoint ]]"
             on-api-response="_responseFromPrioritySave"></api-request>
+
         <api-request
+                id="ajax_delete"
                 headers="[[ ajax_delete.headers ]]"
                 method="[[ ajax_delete.method ]]"
                 body="[[ ajax_delete.body ]]"
@@ -59,22 +62,35 @@
             <template is="dom-if" if="[[registration_open]]">
                 <!-- Registration Open Bool from Api is true -->
                 <template is="dom-if" if="[[before_deadline]]">
-                    <template is="dom-if" if="[[!labs_already_chosen]]" >
+                    <template is="dom-if" if="[[show_datepicker]]" >
                         <!-- Deadline is not over, Registration Open and no dates selected; Select your dates!-->
+
+
                         <practicals-tutor-date-selector  id="practicalsDateSelector"
                                                    priority="[[priority]]"
                                                    user="[[ user ]]"
+                                                         chosenlabs="{{ chosenlabs }}"
                                                    api-all-labs="[[allLabs]]"
+                                                   on-back-click="_handleBackClick"
                                                    on-save-click="_handleSaveClick"
                                                    on-reset-click="_handleResetClick"></practicals-tutor-date-selector>
-                        <paper-button on-tap="_handleBackToDateOveriew"  style="width: 50%"><iron-icon icon="reply"></iron-icon>[[ localize('practicals_tutordatedetail_button-back') ]]</paper-button>
+                        <!--<paper-button on-tap="_handleBackToDateOveriew"  style="width: 50%"><iron-icon icon="reply"></iron-icon>[[ localize('practicals_tutordatedetail_button-back') ]]</paper-button>-->
                     </template>
-                    <template is="dom-if" if="[[labs_already_chosen]]">
+                    <template is="dom-if" if="[[!show_datepicker]]">
                         <!-- Deadline is not over, Registration Open and dates selected; Show saved dates!-->
+
+                        <template is="dom-if" if="[[ labs_already_chosen ]]">
+                            <div  style="padding-top: 20px; padding-left: 20px">
+                                [[ localize('practicals_tutordatedetail_info-none-selected') ]]
+
+                            </div>
+
+                        </template>
+
                         <practicals-show-saved-dates id="practicals_show_saved_dates"
                                                      chosenlabs="{{chosenlabs_transformed}}"
                                                      title="Du hast diese Termine ausgewählt:"></practicals-show-saved-dates>
-                        <paper-button on-tap="_handleBackToDateOveriew"  style="width: 50%"><iron-icon icon="reply"></iron-icon>[[ localize('practicals_tutordatedetail_button-back') ]]</paper-button>
+                        <paper-button on-tap="_handleBackToDateOveriew"  style="width: 50%"><iron-icon icon="arrow-back"></iron-icon>[[ localize('practicals_tutordatedetail_button-back') ]]</paper-button>
                         <paper-button raised class="changeButton" on-tap="_handleChangeClick" style="width: 49%">
                             <iron-icon icon="image:edit"></iron-icon>
                             [[ localize('practicals_tutordatedetail_button-change') ]]
@@ -97,7 +113,6 @@
                     </template>
                     <div class="info">[[ localize('practicals_tutordatedetail_info_deadline-reached') ]]</div>
                     <paper-button on-tap="_handleBackToDateOveriew"  style="width: 50%"><iron-icon icon="reply"></iron-icon>[[ localize('practicals_tutordatedetail_button-back') ]]</paper-button>
-
                 </template>
             </template>
             <template is="dom-if" if="[[!registration_open]]">
@@ -126,7 +141,8 @@
                 },
                 chosenlabs: {
                     type: Array,
-                    value: []
+                    value: [],
+//                    observer: '_chosenlabsChagned'
                 },
                 practical_dates:{
                     type: Array,
@@ -149,7 +165,8 @@
                     notify: true
                 },
                 labs_already_chosen:{
-                    type: Boolean
+                    type: Boolean,
+                    computed: '_computelabsChosen(chosenlabs)'
                 },
                 isReady: {
                     type: Boolean,
@@ -177,6 +194,18 @@
                     type: String,
                     value: 'de'
                 },
+                oldChosenLabs: {
+                    type: Array,
+                    value: [],
+//                    observer: "_oldchosenlabsChanged"
+                },
+                chosenlabs_transformed: {
+                    type: Array
+                },
+                show_datepicker: {
+                    type: Boolean,
+                    value: false
+                }
             },
             ready: function () {
                 //console.log(this.labType.type_str);
@@ -184,7 +213,6 @@
                 //console.log(this.allLabs);
                 //console.log(this.userId);
                 this.labs_already_chosen = false;
-
             },
 
             /**
@@ -224,6 +252,10 @@
 
             _computeBeforeDeadline: function(labType) {
                 return this._getBeforeDeadline(this.labType.registration_deadline_tutors);
+            },
+
+            _computelabsChosen: function(chosenlabs) {
+                return (chosenlabs.length == 0);
             },
 
             /**
@@ -268,40 +300,72 @@
              */
             _handleSaveClick: function(e){
                 //console.log(e.target.chosenlabs);
-                var labcounter = 0;
-                for(i=0; i< e.target.chosenlabs.length; i++){
-                    if(e.target.chosenlabs[i] != null){
-                        labcounter++;
-                    }
+//                var labcounter = 0;
+//                for(i=0; i< e.target.chosenlabs.length; i++){
+//                    if(e.target.chosenlabs[i] != null){
+//                        labcounter++;
+//                    }
+//                }
+//                if(labcounter == e.target.chosenlabs.length && labcounter != 0){
+//                    this.chosenlabs = [];
+//                    this.chosenlabs = e.target.chosenlabs;
+                if(this.chosenlabs.length != 0) {
+                    this.chosenlabs_transformed = this._transformLabs(this.chosenlabs, false);
+
+                    var temp = this.chosenlabs_transformed;
+                    this.chosenlabs_transformed = [];
+                    this.chosenlabs_transformed = temp;
                 }
-                if(labcounter == e.target.chosenlabs.length && labcounter != 0){
-                    this.chosenlabs = [];
-                    this.chosenlabs = e.target.chosenlabs;
-                    this.chosenlabs_transformed = this._transformLabs(this.chosenlabs,false);
+                else
+                    this.chosenlabs_transformed = [];
 
-                    this.bodyObject =[];
-                    for(i = 0; i<this.chosenlabs.length; i++) {
-                        this.bodyObject.push({
-                                "labId": this.chosenlabs[i].id
-                        });
+                    this.deletedChoices = this.getChosenLabDiff(this.oldChosenLabs, this.chosenlabs);
+                    this.addedChoices = this.getChosenLabDiff(this.chosenlabs, this.oldChosenLabs);
+
+                    if (this.deletedChoices.length != 0) {
+
+                        this.ajax_delete = {
+                            headers: {
+                                'Authorization': this.accessToken
+                            },
+                            method: 'POST',
+                            endpoint: '/platformusers/removetutorpossiblelabs/',
+                            body: {
+                                "tutorId": this.user.id,
+                                "labIds": this.deletedChoices
+                            }
+                        };
                     }
 
-                    this.ajax_delete = {
-                        headers: {
-                            'Authorization': this.accessToken
-                        },
-                        method: 'DELETE',
-                        endpoint: '/platformusers/' +this.userId+ '/tutorpossiblelabs/'
-                    };
-                    console.log(this.ajax_delete);
 
-                    this.labs_already_chosen = true;
-                    var practicals_show_saved_dates = Polymer.dom(this.root).querySelector("#practicals_show_saved_dates");
-                    if(practicals_show_saved_dates) {
-                        practicals_show_saved_dates._labsChanged(this.chosenlabs_transformed);
+                    if (this.deletedChoices == 0 && this.addedChoices.length != 0) {
+                        this.ajax_save = {
+                            headers: {
+                                'Authorization': this.accessToken
+                            },
+                            method: 'POST',
+                            endpoint: '/platformusers/addtutorpossiblelabs/',
+                            body: {
+                                "tutorId": this.user.id,
+                                "labIds": this.addedChoices
+                            }
+                        };
                     }
-                }
+
+
+                    this.oldChosenLabs = [];
+                    for (var i = 0; i < this.chosenlabs.length; i++) {
+                        this.oldChosenLabs[i] = this.chosenlabs[i];
+                    }
+                    this.show_datepicker = false;
+//                    this.labs_already_chosen = true;
+//                    var practicals_show_saved_dates = Polymer.dom(this.root).querySelector("#practicals_show_saved_dates");
+//                    if(practicals_show_saved_dates) {
+//                        practicals_show_saved_dates._labsChanged(this.chosenlabs_transformed);
+//                    }
+
             },
+
             /**
              * Handle reset click
              * @param e - Event Variable
@@ -310,17 +374,19 @@
             _handleResetClick: function(e){
                 this.chosenlabs = [];
             },
+
             /**
              * Handle change click
              * @param e - Event Variable
              * @private
              */
             _handleChangeClick: function(e){
-                this.labs_already_chosen = false;
-                var practicals_date_selector = Polymer.dom(this.root).querySelector("#practicalsDateSelector");
-                if(practicals_date_selector) {
-                    practicals_date_selector._handleResetClick();
-                }
+//                this.labs_already_chosen = false;
+                this.show_datepicker = true;
+//                var practicals_date_selector = Polymer.dom(this.root).querySelector("#practicalsDateSelector");
+//                if(practicals_date_selector) {
+//                    practicals_date_selector._handleResetClick();
+//                }
             },
 
             /**
@@ -334,6 +400,7 @@
                 }
                 return true;
             },
+
             /**
              * Function that checks for the if there are labs already chosen
              */
@@ -347,6 +414,7 @@
                 }
                 return  true;
             },
+
             _getBeforeDeadline: function (deadline){
                 var deadline_date = new Date(deadline);
                 var today = new Date();
@@ -359,6 +427,7 @@
                 return false;
 
             },
+
             /**
              * Creates string from the given date
              * @param {String} date - date that will be transformed to String
@@ -461,16 +530,36 @@
              * @private
              */
             _responseFromPriorityDelete: function(response) {
+                console.log("from Delete:")
                 console.log(response);
-                this.ajax_save = {
-                    headers: {
-                        'Authorization': this.accessToken
-                    },
-                    body: this.bodyObject,
-                    method: 'POST',
-                    endpoint: '/platformusers/' +this.userId+ '/tutorpossiblelabs/'
-                };
-                console.log(this.ajax_save);
+//                this.ajax_save = {
+//                    headers: {
+//                        'Authorization': this.accessToken
+//                    },
+//                    body: this.bodyObject,
+//                    method: 'POST',
+//                    endpoint: '/platformusers/' +this.userId+ '/tutorpossiblelabs/'
+//                };
+//                console.log(this.ajax_save);
+
+                if (this.addedChoices != 0) {
+                    this.ajax_save = {
+                        headers: {
+                            'Authorization': this.accessToken
+                        },
+                        method: 'POST',
+                        endpoint: '/platformusers/addtutorpossiblelabs/',
+                        body: {
+                            "tutorId": this.user.id,
+                            "labIds": this.addedChoices
+                        }
+                    };
+                }
+            },
+
+            _responseFromPrioritySave: function(response) {
+//                console.log("saved")
+//                console.log(response)
             },
 
             /**
@@ -490,20 +579,68 @@
                     }
                 }
 
+                this.oldChosenLabs = [];
+                for (var i = 0; i < possibleLabsForThisLabtype.length; i++) {
+                    this.oldChosenLabs[i] = possibleLabsForThisLabtype[i];
+                }
+
                 if(this._chosenlabsExist(possibleLabsForThisLabtype)){
                     this.chosenlabs = possibleLabsForThisLabtype;
+                    this.chosenlabs = possibleLabsForThisLabtype;
                     this.chosenlabs_transformed = this._transformLabs(this.chosenlabs,false);
-                    this.labs_already_chosen = true;
+//                    this.labs_already_chosen = true;
                 }
-                //console.log(this.labs_already_chosen);
-                if(!this.before_deadline && !this.practical_dates_exists && !this.labs_already_chosen){
-                    console.log("ERROR: Die Deadline ist vorbei und trotzdem existieren weder zugewiesene noch ausgewählte Labs. Daten sind hier inkorrekt! LabType: "+this.labType.type_str);
-                }
+                else
+                    this.show_datepicker = true;
+//                console.log(this.labs_already_chosen);
+//                if(!this.before_deadline && !this.practical_dates_exists && !this.labs_already_chosen){
+//                    console.log("ERROR: Die Deadline ist vorbei und trotzdem existieren weder zugewiesene noch ausgewählte Labs. Daten sind hier inkorrekt! LabType: "+this.labType.type_str);
+//                }
             },
 
             _handleBackToDateOveriew: function() {
                 this.page = 'datepicker_overview'
-            }
+                for (var i = 0; i < this.chosenlabs.length; i++) {
+                    this.chosenlabs[i] = this.oldChosenLabs[i];
+                }
+//                this.show_datepicker = false;
+            },
+
+            _handleBackClick: function(e) {
+                this.show_datepicker = false;
+            },
+
+            /**
+             * Returns an array containing items that are only in newLabArray but not in oldLabArray
+             * @param oldLabArray
+             * @param newLabArray
+             * @returns {Array}
+             */
+            getChosenLabDiff: function(oldLabArray, newLabArray) {
+
+                var resultArray = [];
+
+                Array.prototype.diff = function(a) {
+                    return this.filter(function(i) {return a.indexOf(i) < 0;});
+                };
+
+                var filteredArray = oldLabArray.diff( newLabArray );
+
+                for (var i = 0; i < filteredArray.length; i ++)
+                    resultArray.push(filteredArray[i].id)
+
+                return resultArray;
+            },
+
+//            _chosenlabsChagned: function() {
+//                console.log("chosenlabs changed")
+//                if (this.chosenlabs.length != 0)
+//                    this.chosenlabs_transformed = this._transformLabs(this.chosenlabs,false)
+//            },
+//            _oldchosenlabsChanged: function() {
+//                console.log("old chosen labs changed");
+//                console.log(this.oldChosenLabs)
+//            }
         });
     </script>
 </dom-module>

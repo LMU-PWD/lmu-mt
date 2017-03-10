@@ -26,14 +26,22 @@
                 height: auto;
                 vertical-align:top;
             }
-            .resetButton{
+            .resetButton, .backButton, .saveButton {
+                display: inline-block;
+            }
+            .backButton{
                 margin-bottom: 10px;
-                width: 49.8%;
+                width: 32.8%;
                 float: left;
+            }
+            .resetButton {
+                margin-bottom: 10px;
+                width: 33.8%;
+                margin-left: 0.3%;
             }
             .saveButton{
                 margin-bottom: 10px;
-                width: 49.8%;
+                width: 32.8%;
                 float: right;
             }
             /*Phone*/
@@ -47,7 +55,6 @@
                 .datecreator{
                     min-width: 400px;
                     width: 49%;
-
                 }
             }
             /*Desktop*/
@@ -59,8 +66,12 @@
             }
         </style>
         <div>
+            <paper-button raised class="backButton" on-tap="_handleBackClick">
+                <iron-icon icon="arrow-back"></iron-icon>
+                [[ localize('practicals_tutordateselector_button-goback') ]]
+            </paper-button>
             <paper-button raised class="resetButton" on-tap="_handleResetClick">
-                <iron-icon icon="reply"></iron-icon>
+                <iron-icon icon="av:replay"></iron-icon>
                     [[ localize('practicals_tutordateselector_button-setback') ]]
             </paper-button>
             <paper-button raised class="saveButton" on-tap="_handleSaveClick">
@@ -73,6 +84,7 @@
                 <practicals-tutor-date-creator id="dateselectors" class="datecreator"
                                     timeslots="[[labs]]"
                                     priority="[[priority]]"
+                                               chosenlabs="{{chosenlabs}}"
                                     api-all-labs="[[apiAllLabs]]"
                                     on-priority-click="_handlePriorityClick"
                                     on-date-click="_handleDateClick"
@@ -98,7 +110,8 @@
 
                 chosenlabs: {
                     type: Array,
-                    value: []
+                    value: [],
+                    notify: true
                 },
 
                 // From API
@@ -120,7 +133,7 @@
 
             ready: function() {
 //                this.timeslots = this._transformLabs(this.apiAllLabs,true);
-                console.log(this.timeslots);
+
             },
 
             /**
@@ -138,6 +151,8 @@
 
             _computeTimeslots: function() {
                 this.timeslots = this._transformLabs(this.apiAllLabs, true);
+//                console.log("timeslots:")
+//                console.log(this.timeslots);
             },
 
             /**
@@ -213,6 +228,10 @@
                 this.fire("save-click", this.chosenlabs);
             },
 
+            _handleBackClick: function() {
+                this.fire("back-click", this.chosenlabs)
+            },
+
             /**
              * Replace a already chosen priority with e newly selected one
              * @param e - Event Variable
@@ -267,7 +286,7 @@
                     }
 
                     var lab = [];
-                    lab = [labdate, endtime];
+                    lab = [labdate, endtime, labsFromApi[i].id];
                     if(divideDates){
                         dates[countLabs] = lab;
                         transformedLabs[countDates] = dates;

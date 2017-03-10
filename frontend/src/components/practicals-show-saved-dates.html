@@ -42,10 +42,11 @@
             ready: function(){
                 //console.log(this.chosenlabs);
             },
-            _labsChanged: function(labs){
-                this.chosenlabs = labs;
-                //console.log(this.chosenlabs);
-//                this.$.saved_dates.render();
+            _labsChanged: function(){
+                if (this.chosenlabs.length == 0)
+                    return
+                console.log('list: labs changed')
+
             },
             /**
              * Creates string from the given date

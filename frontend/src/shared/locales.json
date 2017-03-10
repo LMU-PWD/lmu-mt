@@ -135,13 +135,15 @@
     "tutor_sessionlist_heading_date": "Date",
     "tutor_sessionlist_heading_time": "Time",
 
+    "practicals_tutordateselector_button-goback": "Back to overview",
     "practicals_tutordateselector_button-setback": "Reset",
     "practicals_tutordateselector_button-save": "Save",
 
-    "practicals_tutordatedetail_button-back": "Back to overview",
+    "practicals_tutordatedetail_button-back": "Back",
     "practicals_tutordatedetail_button-change": "Change selection",
     "practicals_tutordatedetail_info_deadline-reached": "The date selection deadline has been reached. You will be assigned fixed lab dates soon.",
-    "practicals_tutordatedetail_info_not-unlocked": "Date selection is not unlocked yet!"
+    "practicals_tutordatedetail_info_not-unlocked": "Date selection is not unlocked yet!",
+    "practicals_tutordatedetail_info-none-selected": "You haven't chosen any lab dates yet."
   },
 
   "de": {
@@ -280,13 +282,15 @@
     "tutor_sessionlist_heading_date": "Datum",
     "tutor_sessionlist_heading_time": "Zeit",
 
+    "practicals_tutordateselector_button-goback": "Zur Übersicht",
     "practicals_tutordateselector_button-setback": "Zurücksetzen",
     "practicals_tutordateselector_button-save": "Speichern",
 
-    "practicals_tutordatedetail_button-back": "Zurück zur Übersicht",
+    "practicals_tutordatedetail_button-back": "Zurück",
     "practicals_tutordatedetail_button-change": "Auswahl ändern",
     "practicals_tutordatedetail_info_deadline-reached": "Die Deadline zur Terminwahl wurde bereits erreicht. In Kürze werden dir feste Termine zugeteilt werden.",
-    "practicals_tutordatedetail_info_not-unlocked": "Die Terminwahl ist noch nicht freigeschalten!"
+    "practicals_tutordatedetail_info_not-unlocked": "Die Terminwahl ist noch nicht freigeschalten!",
+    "practicals_tutordatedetail_info-none-selected": "Du hast bisher keine Termine gewählt."
   }
 }
 
