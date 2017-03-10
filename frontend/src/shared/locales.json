@@ -41,6 +41,7 @@
     "groupsadmin_dialog text-3": "(This action can't be undone!)",
 
     "c_medientechnik": "Media Technology",
+    "c_button_add": "Add",
     "c_button_cancel": "Cancel",
     "c_button_discard": "Discard",
     "c_button_save": "Save",
@@ -52,6 +53,7 @@
     "c_hours": "hours",
     "c_minute": "minute",
     "c_minutes": "minutes",
+    "c_time": "Time",
 
     "admin_toolbar_new_semester_tooltip": "Create new semester",
 
@@ -194,6 +196,7 @@
     "groupsadmin_dialog text-3": "(Diese Aktion kann nicht rückgängig gemacht werden!)",
 
     "c_medientechnik": "Medientechnik",
+    "c_button_add": "Hinzufügen",
     "c_button_cancel": "Abbrechen",
     "c_button_discard": "Verwerfen",
     "c_button_save": "Speichern",
@@ -205,6 +208,7 @@
     "c_hours": "Stunden",
     "c_minute": "Minute",
     "c_minutes": "Minuten",
+    "c_time": "Uhrzeit",
 
     "admin_toolbar_new_semester_tooltip": "Neues Semester anlegen",
 

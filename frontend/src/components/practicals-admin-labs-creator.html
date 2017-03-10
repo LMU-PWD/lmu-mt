@@ -2,14 +2,22 @@
 <link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
 <link rel="import" href="../services/my-localize-behavior.html">
 
+<link rel="import" href="./time-picker.html">
+
 <dom-module id="practicals-admin-labs-creator">
 
     <template>
 
+        <style include="semester-setup-shared"></style>
         <style include="shared-styles">
 
             #dialog {
                 max-width: 1024px;
+                text-align: left;
+            }
+
+            #errorMessage {
+                color: red;
             }
 
             .dialogButton {
@@ -23,6 +31,7 @@
             paper-tabs {
                 --paper-tabs-selection-bar-color: var(--paper-blue-grey-900);
                 color: var(--paper-blue-grey-900);
+                font-size: 1.2em;
             }
 
             paper-tab {
@@ -56,69 +65,97 @@
 
         <paper-dialog id="dialog" modal>
 
+            <!-- Tab navigation -->
             <paper-tabs selected="{{page}}">
                 <paper-tab>{{ localize('practicals_admin_labs_creator_mode_single') }}</paper-tab>
                 <paper-tab>{{ localize('practicals_admin_labs_creator_mode_multiple') }}</paper-tab>
             </paper-tabs>
 
-            <iron-pages selected="[[page]]">
+            <p id="errorMessage">[[ errorMessage ]]</p>
 
-                <!-- SINGLE DATE CREATOR -->
-                <div id="page-single">
+            <!-- Dialog content -->
+            <paper-dialog-scrollable>
 
-                    <h1>Hier gibts einzelne Termine</h1>
+                <iron-pages selected="[[page]]">
 
-                    <!-- TODO Datum -->
-                    <!-- TODO Dauer -->
-                    <!-- TODO Ort -->
+                    <!-- SINGLE DATE CREATOR -->
+                    <div id="page-single">
 
-                    <div class="buttons">
-                        <paper-button class="dialogButton" on-tap="_dialogCancelled"  raised>
-                            <iron-icon icon="close" ></iron-icon> {{localize('c_button_discard')}}
-                        </paper-button>
-                        <paper-button class="dialogButton" on-tap="_triggerSingleLabCreation"  raised>
-                            <iron-icon icon="save" ></iron-icon> {{localize('c_button_save')}}
-                        </paper-button>
+                        <!-- Date and time -->
+                        <paper-date-picker
+                                date="{{ singleDate }}"
+                                responsive-width="630px"></paper-date-picker>
+                        <time-picker hour="{{ singleHour }}" min="{{ singleMin }}"></time-picker>
+
+                        <!-- Duration -->
+                        <paper-input type="number"
+                                     min="0"
+                                     label="[[ localize('semester_setup_dates_duration') ]]"
+                                     value="{{ singleDuration }}">
+                            <div suffix>[[ localize('c_minutes') ]]</div>
+                        </paper-input>
+
+                        <!-- Location -->
+                        <paper-input label="[[ localize('semester_setup_dates_location') ]]"
+                                     value="{{ singleLocation }}"></paper-input>
+
+                        <!-- Actions -->
+                        <div class="buttons">
+                            <paper-button class="dialogButton" on-tap="_dialogCancelled"  raised>
+                                <iron-icon icon="close" ></iron-icon> {{localize('c_button_discard')}}
+                            </paper-button>
+                            <paper-button class="dialogButton" on-tap="_triggerSingleLabCreation"  raised>
+                                <iron-icon icon="save" ></iron-icon> {{localize('c_button_add')}}
+                            </paper-button>
+                        </div>
+
                     </div>
 
-                </div>
+                    <!-- MULTIPLE DATE CREATOR -->
+                    <div id="page-multiple">
 
-                <!-- MULTIPLE DATE CREATOR -->
-                <div id="page-multiple">
+                        <h1>Hier gibts mehrere Termine auf einmal</h1>
 
-                    <h1>Hier gibts mehrere Termine auf einmal</h1>
+                        <!-- TODO Erklärtext -->
+                        <!-- Hier kannst du Termine für Tage erstellen, die immer nach dem gleichen Schema ablaufen.
+                             Ein Beispiel: Du hast das Audiolabor am 13. und 14. Mai sowie am 20. und 21. Mai reserviert.
+                             An diesen Tagen möchtest du jeweils von 9:00 und 12:30, von 12:45 bis 16:15 und von 16:30 bis
+                             20:00 ein Praktikum anbieten. -->
+                        <!-- TODO Auswahl der Tage z.B. über Datepicker-->
+                        <!-- TODO Ort -->
+                        <!-- TODO Liste mit Terminen für einen Tag -->
+                            <!-- TODO Startuhrzeit -->
+                            <!-- TODO Dauer -->
 
-                    <!-- TODO Erklärtext -->
-                    <!-- Hier kannst du Termine für Tage erstellen, die immer nach dem gleichen Schema ablaufen.
-                         Ein Beispiel: Du hast das Audiolabor am 13. und 14. Mai sowie am 20. und 21. Mai reserviert.
-                         An diesen Tagen möchtest du jeweils von 9:00 und 12:30, von 12:45 bis 16:15 und von 16:30 bis
-                         20:00 ein Praktikum anbieten. -->
-                    <!-- TODO Auswahl der Tage z.B. über Datepicker-->
-                    <!-- TODO Ort -->
-                    <!-- TODO Liste mit Terminen für einen Tag -->
-                        <!-- TODO Startuhrzeit -->
-                        <!-- TODO Dauer -->
+                        <div class="buttons">
+                            <paper-button class="dialogButton" on-tap="_dialogCancelled" raised>
+                                <iron-icon icon="close" ></iron-icon> {{localize('c_button_discard')}}
+                            </paper-button>
+                            <paper-button class="dialogButton" on-tap="_triggerMultipleLabsCreation" raised>
+                                <iron-icon icon="save" ></iron-icon> {{localize('c_button_save')}}
+                            </paper-button>
+                        </div>
 
-                    <div class="buttons">
-                        <paper-button class="dialogButton" on-tap="_dialogCancelled" raised>
-                            <iron-icon icon="close" ></iron-icon> {{localize('c_button_discard')}}
-                        </paper-button>
-                        <paper-button class="dialogButton" on-tap="_triggerMultipleLabsCreation" raised>
-                            <iron-icon icon="save" ></iron-icon> {{localize('c_button_save')}}
-                        </paper-button>
                     </div>
 
-                </div>
+                </iron-pages>
 
-            </iron-pages>
+            </paper-dialog-scrollable>
 
-            <template is="dom-if" if="[[ processingCreateRequest ]]">
+            <template is="dom-if" if="[[ processingRequest ]]">
                 <div class="spinner-container">
-                    <paper-spinner active="[[ processingCreateRequest ]]"></paper-spinner>
+                    <paper-spinner active="[[ processingRequest ]]"></paper-spinner>
                 </div>
             </template>
 
         </paper-dialog>
+
+        <api-request endpoint="[[ singleAjax.endpoint ]]"
+                     method="[[ singleAjax.method ]]"
+                     headers="[[ singleAjax.headers ]]"
+                     body="[[ singleAjax.body ]]"
+                     on-api-response="_handleSingleResponse"
+                     on-api-error="_handleApiError"></api-request>
 
         <!--Iron Signal for Localization-->
         <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
@@ -133,15 +170,42 @@
 
             properties: {
 
+                /* Meta properties */
+                accessToken: {
+                    type: String,
+                    value: '' },
+                errorMessage: {
+                    type: String,
+                    value: '' },
+                labTypeId: {
+                    type: String,
+                    value: '' },
                 page: {
                     type: Number,
-                    value: 0
-                },
-
-                processingCreateRequest: {
+                    value: 0 },
+                processingRequest: {
                     type: Boolean,
-                    value: false
-                }
+                    value: false },
+                semesterId: {
+                    type: String,
+                    value: '' },
+
+                /* Single Lab */
+                singleDate: {
+                    type: Date,
+                    value: new Date() },
+                singleHour: {
+                    type: Number,
+                    value: 8 },
+                singleMin: {
+                    type: Number,
+                    value: 0 },
+                singleDuration: {
+                    type: Number,
+                    value: 90 },
+                singleLocation: {
+                    type: String,
+                    value: '' }
 
             },
 
@@ -155,8 +219,15 @@
 
             _resetProperties: function () {
                 // reset all properties
+                this.errorMessage = '';
                 this.page = 0;
-                this.processingCreateRequest = false;
+                this.processingRequest = false;
+                this.singleDate = new Date();
+                this.singleHour = 8;
+                this.singleMin = 0;
+                this.singleDuration = 90;
+                this.singleLocation = '';
+                this.singleAjax = {};
             },
 
             _dialogCancelled: function () {
@@ -165,24 +236,51 @@
             },
 
             _triggerSingleLabCreation: function () {
-                this.processingCreateRequest = true;
-                var that = this;
-                window.setTimeout(function(){
-                    that.processingCreateRequest = false;
-                }, 1000);
+                this.processingRequest = true;
                 // Gather data for new Lab
+                var labObject = {
+                    date: this.singleDate,
+                    duration: this.singleDuration,
+                    location: this.singleLocation,
+                    labTypeId: this.labTypeId,
+                    semesterId: this.semesterId
+                };
+                labObject.date.setHours(this.singleHour);
+                labObject.date.setMinutes(this.singleMin);
+                labObject.date.setSeconds(0);
+                labObject.date.setMilliseconds(0);
                 // Send them to API
+                this.singleAjax = {
+                    endpoint: '/labs',
+                    method: 'POST',
+                    headers: {
+                        Authorization: this.accessToken
+                    },
+                    body: labObject
+                };
+            },
 
+            _handleSingleResponse: function (event) {
+                console.log(event);
+                this.processingRequest = false;
+                this.$.dialog.close();
+                this._resetProperties();
             },
 
             _triggerMultipleLabsCreation: function () {
-                this.processingCreateRequest = true;
+                this.processingRequest = true;
                 var that = this;
                 window.setTimeout(function(){
-                    that.processingCreateRequest = false;
+                    that.processingRequest = false;
                 }, 1000);
                 // Gather data for new Labs
                 // Send them to API
+            },
+
+            _handleApiError: function (event) {
+                console.log(event);
+                this.errorMessage = event.detail.request.xhr.response.error.message;
+                this.processingRequest = false;
             }
 
         });

@@ -79,11 +79,12 @@
             _handleResponse: function (response) {
                 this.fire('api-response', response.detail.response);
                 //Console Info to check if all received data is reset on logout
-                console.info("Received "+ this.endpoint)
+                console.info("Received "+ this.endpoint);
             },
 
             _handleError: function (response) {
-                this.fire('api-error', response.detail.error);
+                console.log(response);
+                this.fire('api-error', response.detail);
             },
 
             _computeUrl: function () {
