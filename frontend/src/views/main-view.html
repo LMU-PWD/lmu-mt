@@ -604,12 +604,14 @@ The Main View contains:
                                     access-token="[[ accessToken ]]"
                                     self-info="{{user}}"
                                     students="{{students}}"
-                                    selected-semester="[[ adminSelectedSemesterId ]]"></students-admin>
+                                    selected-semester="[[ adminSelectedSemesterId ]]"
+                                    groups="[[groups]]"></students-admin>
                             <groups-admin
                                     name="groups"
                                     access-token="[[ accessToken ]]"
                                     self-info="{{user}}"
                                     students="[[students]]"
+                                    groups="{{groups}}"
                                     selected-semester="[[ adminSelectedSemesterId ]]"></groups-admin>
                         </template>
                         <settings-view
@@ -685,6 +687,10 @@ The Main View contains:
 
                 labTypes: {
                     type: Array
+                },
+
+                groups: {
+                    type: Array
                 }
             },
 
@@ -703,17 +709,19 @@ The Main View contains:
             },
 
             _userChanged: function (detail) {
-                console.log(detail);
+                if(Object.keys(detail).length !== 0) {
+                    console.log(detail);
 
 
-                this.ajax_labTypes = {
-                    headers: {
-                        Authorization: this.accessToken,
-                        filter: '{"where":{"semesterId":"'+this.user.semesterId+'"}}'
-                    },
-                    method: 'GET',
-                    endpoint: '/Labtypes'
-                };
+                    this.ajax_labTypes = {
+                        headers: {
+                            Authorization: this.accessToken,
+                            filter: '{"where":{"semesterId":"' + this.user.semesterId + '"}}'
+                        },
+                        method: 'GET',
+                        endpoint: '/Labtypes'
+                    };
+                }
 
 
             },
@@ -823,6 +831,13 @@ The Main View contains:
 
                 //Change scroll position -> 0 (on routeChanged)
                 this.$$('paper-header-panel').scroller.scrollTop = 0;
+
+                if(event.detail.create){
+                    var name = event.detail.role+"-admin";
+                    this.$$(name).create();
+                    //select component where name is passed
+
+                }
             },
 
 

@@ -122,7 +122,7 @@
             <div>
                 <h1>{{localize('groupsadmin_dialog text-1')}}<span></span> {{localize('groupsadmin_dialog text-2')}}
                 </h1>
-                <p>{{localize('groupsadmin_dialog text-3')}}</p>
+                <p>{{localize('admin_dialog text-3')}}</p>
             </div>
             <div class="buttons">
                 <paper-button dialog-dismiss autofocus>{{localize('c_button_cancel')}}</paper-button>
@@ -214,6 +214,10 @@
         <!--Iron Signal for passing Semester-->
         <iron-signals on-iron-signal-semester="_semesterChanged"></iron-signals>
 
+        <!--Iron Signal Fired on Logout-->
+        <iron-signals on-iron-signal-forget="_forget"></iron-signals>
+
+
     </template>
     <script>
         Polymer({
@@ -287,6 +291,8 @@
                     });
                 });
 
+                this.notifyPath('groups');
+
                 //For testing with more groups
                 var testGroups = [
                     {name: 'Gruppe 1', groupMemberIds: ['Member 1', 'Member 2', 'Member 3', 'Member 4']},
@@ -333,7 +339,7 @@
                 this.$$('#deleteDialog > div > H1 > span').textContent = groupName;
                 this.$.deleteDialog.open();
             },
-            _createGroup: function () {
+            _createStudent: function () {
                 var groupSize = 4; //TODO get from semester info
                 console.log(this.students);
                 this.set('members',[]);
@@ -415,7 +421,13 @@
                     self.$$('#collapse' + index).hide();
                 });
             },
-            createGroup: function () {
+            create: function () {
+                this._createStudent();
+            },
+
+            _forget: function () {
+                this.set('groups', []);
+                console.info('Reset Groups');
             }
         });
     </script>

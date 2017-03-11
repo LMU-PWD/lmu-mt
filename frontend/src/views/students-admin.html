@@ -1,13 +1,16 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
+
+<!--Localization Imports-->
+<link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
+<link rel="import" href="../services/my-localize-behavior.html">
+
 
 <dom-module id="students-admin">
     <template>
         <style include="shared-styles iron-flex iron-flex-alignment">
-            :host{
-            }
-
 
             h1 > span {
                 font-style: italic;
@@ -17,93 +20,70 @@
                 height: auto;
             }
 
-            .userInfo {
-                display: block;
-                padding-bottom: 10px;
-            }
-
-            .userInfo > .member {
-                margin: 0 10px;
-                padding: 10px;
-                border-bottom: 1px solid var(--paper-blue-grey-700);
-                background-color: var(--paper-blue-grey-50);
-                height: 20px;
-                overflow: hidden;
-            }
-
-            .userInfo > .member > *:last-child {
-                border-radius: 0 0 5px 5px;
-
-            }
-
-            .userInfo > .member > h2 {
-
-                position: relative;
-                margin: 0 0 0 40px;
-                width: calc(100% - 40px);
-                top: -5px;
-                color: var(--paper-blue-grey-700);
-                font-size: 13px;
-            }
-
-            .userInfo > .member > a {
-                float: left;
-                width: 40px;
-                position: relative;
-                top: -10px;
-            }
-
-            .userInfo > .member > a > paper-icon-button {
-                color: var(--paper-blue-grey-700);
-            }
-
             .container {
-                padding: 20px;
-                background-color: var(--paper-blue-grey-100);
-                border-top: 1px solid var(--paper-blue-grey-700);
+                padding: 0 20px;
             }
 
             .student {
                 /*height: 50px;*/
-                background-color: var(--paper-blue-grey-50);
+                background-color: var(--paper-blue-grey-100);
                 border-bottom: 1px solid var(--paper-blue-grey-700);
                 margin: 5px;
 
-                min-width: 250px;
+                /*min-width: 250px;*/
                 border-radius: 5px;
+                width: auto;
+                padding: 10px;
+                height: auto;
 
-                width: 100%;
             }
 
             .student > h1 {
-                width: calc(100% - 100px);
-                float: left;
-                margin: 10px;
-
+                margin: 0 8px;
+                padding: 0;
                 font-size: 20px;
                 height: 30px;
-                padding: 0 10px;
                 white-space: nowrap;
                 overflow: hidden;
                 text-overflow: ellipsis;
+                width: auto;
             }
 
-            .student > paper-icon-button {
-                float: right;
-                margin: 5px;
-            }
 
-            .group-selected {
-                /*width: 100%;*/
-            }
-
-            #createDialog{
+            #createDialog {
                 min-width: 300px;
             }
 
-           #verified{
-               color: var(--paper-blue-grey-300);
-           }
+            #verified {
+                color: var(--paper-blue-grey-300);
+            }
+
+            .icon-container {
+                width: 100%;
+                height: 30px;
+                position: relative;
+                float: none;
+                min-width: 160px;
+            }
+
+            .icon-container > paper-icon-button {
+                float: right;
+            }
+
+            .icon-wrapper{
+                width:40px;
+                height: 40px;
+                margin: 0;
+                float: left;
+            }
+            iron-icon{
+                padding: 8px;
+            }
+
+            paper-icon-button:hover{
+                color: var(--paper-blue-grey-600);
+            }
+
 
         </style>
         <div></div>
@@ -123,54 +103,101 @@
                 semester-filter="[[ selectedSemester ]]"
                 on-api-response="_handlePendingStudentsResponse"></api-request>
 
+        <!-- Deletes Specific Student -->
+        <api-request
+                headers="[[ deleteAjax.headers ]]"
+                method="[[ deleteAjax.method ]]"
+                endpoint="[[ deleteAjax.endpoint ]]"
+                on-api-response="_handleDeleteResponse"
+                on-api-error="_handleDeleteError"></api-request>
+
+
+        <!-- Create student -->
+        <api-request
+                headers="[[ createAjax.headers ]]"
+                body="[[ createAjax.body ]]"
+                method="[[ createAjax.method ]]"
+                endpoint="[[ createAjax.endpoint ]]"
+                on-api-response="_handleCreateResponse"
+                on-api-error="_handleCreateError"
+                loading="{{ isLoading }}"></api-request>
+
+
+        <paper-dialog id="deleteDialog" on-iron-overlay-closed="_reactToDeleteDialog">
+            <div>
+                <h1>{{localize('usersadmin_dialog text-1')}}<span></span> {{localize('groupsadmin_dialog text-2')}}
+                </h1>
+                <p>{{localize('admin_dialog text-3')}}</p>
+            </div>
+            <div class="buttons">
+                <paper-button dialog-dismiss autofocus>{{localize('c_button_cancel')}}</paper-button>
+                <paper-button dialog-confirm>OK</paper-button>
+            </div>
+        </paper-dialog>
+
+        <paper-dialog id="createDialog" on-iron-overlay-closed="_reactToCreateDialog">
+            <div>
+                <h1>{{localize('usersadmin_dialog create')}}</h1>
+                <paper-input value="{{newUser.first_name}}" label="Vorname"></paper-input>
+                <paper-input value="{{newUser.name}}" label="Nachname"></paper-input>
+                <paper-input class="create-group-input"
+                             label="E-Mail"
+                             value="{{newUser.email}}"
+                             required>
+                    <iron-icon icon="mail" prefix></iron-icon>
+                    <div suffix>@campus.lmu.de</div>
+                </paper-input>
+            </div>
+            <div class="buttons">
+                <paper-button dialog-dismiss autofocus>{{localize('c_button_cancel')}}</paper-button>
+                <paper-button dialog-confirm>OK</paper-button>
+            </div>
+        </paper-dialog>
+
+        <div class="fullbleed horizontal center-justified layout" style="width: 100%; margin: 10px 0;">
+        <paper-icon-button  style="width: 100px;" icon="add-circle-outline" on-tap="create"></paper-icon-button>
+        </div>
+
         <!--Lists all Students-->
         <div class="container horizontal layout wrap">
-            <paper-button on-tap="expandAll" style="width: 33%;">Expand all</paper-button>
-            <paper-button on-tap="collapseAll" style="width: 33%;">Collapse all</paper-button>
-            <paper-icon-button  style="width: 33%;" icon="add-circle-outline" on-tap="_createGroup"></paper-icon-button>
-
             <template is="dom-repeat" items="[[students]]" as="student">
-                <div class="student flex self-center" id="group_[[index]]">
-                    <h1 on-tap="_toggleCollapse">[[student.first_name]] [[student.name]]</h1>
-                    <a href="mailto:[[student.email]]" tabindex="-1"><paper-icon-button icon="icons:mail"></paper-icon-button></a>
-                    <template is="dom-if" if="[[student.emailVerified]]">
-                        <iron-icon id="verified" icon="icons:verified-user"></iron-icon>
-                        <paper-tooltip>User verified his email</paper-tooltip>
-                    </template>
-                    <paper-icon-button icon="icons:delete" on-tap="_deleteGroup"></paper-icon-button>
-                    <iron-collapse id="collapse[[index]]">
-                        <div class="userInfo">
-                            <!--TODO Lists Group Memebers -->
-                                <div class="member">
-                                    <h2>[[student.status]]</h2>
-                                    <!--h2>evtl Gruppennname</h2-->
-                                    <!--h2>evtl Gruppennname</h2-->
-                                </div>
-                                <div class="member">
-                                    <h2>[[student.email]]</h2>
-                                    <!--h2>evtl Gruppennname</h2-->
-                                    <!--h2>evtl Gruppennname</h2-->
-                                </div>
-                                <div class="member">
-                                    <h2>[[student.groupId]]</h2>
-                                    <!--h2>evtl Gruppennname</h2-->
-                                    <!--h2>evtl Gruppennname</h2-->
-                                </div>
-                                <div class="member">
-                                    <h2>[[student.semesterId]]</h2>
-                                    <!--h2>evtl Gruppennname</h2-->
-                                    <!--h2>evtl Gruppennname</h2-->
-                                </div>
-                        </div>
-
-                    </iron-collapse>
+                <div class="student flex self-center" id="student_[[index]]">
+                    <h1>[[student.first_name]] [[student.name]]</h1>
+                    <div class="icon-container">
+                        <a class="icon-wrapper" href="mailto:[[student.email]]" tabindex="-1">
+                            <paper-icon-button icon="icons:mail"></paper-icon-button>
+                        </a>
+                        <template is="dom-if" if="[[student.emailVerified]]">
+                            <div class="icon-wrapper">
+                                <iron-icon id="verified" icon="icons:verified-user"></iron-icon>
+                                <paper-tooltip>{{localize('users-admin email-verified')}}</paper-tooltip>
+                            </div>
+                        </template>
+                        <template is="dom-if" if="[[student.groupId]]">
+                            <div class="icon-wrapper">
+                                <iron-icon id="verified" src="../../images/group.svg"></iron-icon>
+                                <paper-tooltip>{{localize('users-admin group')}}</paper-tooltip>
+                            </div>
+                        </template>
+                        <paper-icon-button icon="icons:delete" on-tap="_deleteStudent"></paper-icon-button>
+                    </div>
 
                 </div>
             </template>
+            <paper-toast id="createSuccess" text="{{localize('admin-toast create-success')}}"></paper-toast>
+            <paper-toast id="createFail" text="{{localize('admin-toast create-fail')}}"></paper-toast>
+            <paper-toast id="deleteSuccess" text="{{localize('admin-toast delete-success')}}"></paper-toast>
+            <paper-toast id="deleteFail" text="{{localize('admin-toast delete-fail')}}"></paper-toast>
 
 
-                <!--Iron Signal for Passing Semester ID-->
-        <iron-signals on-iron-signal-semester="_semesterChanged"></iron-signals>
+            <!--Iron Signal for Localization-->
+            <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
+
+            <!--Iron Signal for passing Semester-->
+            <iron-signals on-iron-signal-semester="_semesterChanged"></iron-signals>
+
+            <!--Iron Signal Fired on Logout-->
+            <iron-signals on-iron-signal-forget="_forget"></iron-signals>
     </template>
     <script>
         Polymer({
@@ -182,54 +209,215 @@
                 },
                 semester: {
                     type: String
+                },
+                groups: {
+                    type: Array,
+                    observer: '_groupsChanged'
+                },
+                newUser: {
+                    type: Object,
+                    value: {
+                        "name": "",
+                        "first_name": "",
+                        "email": "",
+                        "isTutor": false,
+                        "isAdmin": false,
+                        "semesterId": ""
+                    }
                 }
 
             },
-            ready: function() {
+            behaviors: [
+                Polymer.MyLocalizeBehavior
+            ],
+            ready: function () {
             },
             _handleStudentsResponse: function (event) {
-                api_response = event.detail;
-                for(var i=0; i < api_response.length; i++){
-                    this.push('students',api_response[i]);
+                var api_response = event.detail;
+                console.log(api_response);
+                for (var i = 0; i < api_response.length; i++) {
+                    this.push('students', api_response[i]);
                 }
                 console.log(this.students);
+
+                this.ajax_pending = {
+                    contentType: 'application/json',
+                    headers: {
+                        Authorization: this.accessToken,
+                        filter: '{"where":{"isTutor":"false","isAdmin":"false","semesterId":"' + this.semester + '"}}'
+                    },
+                    method: 'GET',
+                    endpoint: '/PendingPlatformUsers'
+                };
             },
             _handlePendingStudentsResponse: function (event) {
                 api_response = event.detail;
-                for(var i=0; i<api_response.length; i++){
-                    this.push('students',api_response[i]);
+                for (var i = 0; i < api_response.length; i++) {
+                    this.push('students', api_response[i]);
                 }
                 console.log(this.students);
+                this.notifyPath('students');
             },
             _semesterChanged: function (event) {
+                //TODO fix logout login -> no student data loaded bug
+                console.log("Heard semester change");
                 this.set('semester', event.detail);
+                this.set('students', []);
+                console.log(this.semester);
 
                 this.ajax = {
                     contentType: 'application/json',
                     headers: {
                         Authorization: this.accessToken,
-                        filter: '{"where":{"isTutor":"false","isAdmin":"false","semesterId":"'+this.semester+'"}}'
+                        filter: '{"where":{"isTutor":"false","isAdmin":"false","semesterId":"' + this.semester + '"}}'
                     },
                     method: 'GET',
                     endpoint: '/platformUsers'
                 };
-                this.ajax_pending = {
-                    contentType: 'application/json',
-                    headers: {
-                        Authorization: this.accessToken,
-                        filter: '{"where":{"isTutor":"false","isAdmin":"false","semesterId":"'+this.semester+'"}}'
-                    },
-                    method: 'GET',
-                    endpoint: '/PendingPlatformUsers'
-                };
 
             },
-            _toggleCollapse: function (event) {
-                index = event.model.__key__.slice(1);
-                this.$$('#collapse' + index).toggle();
-                //Uncomment for 100% width of expanded Tiles
-                //this.$$('#group_' + index).classList.toggle('flex-none');
+
+            /**
+             * Opens Popup to Approve User Deletion
+             * @private
+             */
+            _deleteStudent: function (event) {
+                //Grabbing Student information from target
+                var student = event.model.__data__.student;
+                var studentID = student.id;
+                var studentName = student.first_name + " " + student.name;
+                var pending = !student.emailVerified;
+
+                //Temporarily save Student Info in deleteDialogs Attributes
+                this.$.deleteDialog.dataset.studentID = studentID;
+                this.$.deleteDialog.dataset.pending = pending;
+
+                //Set Popup Text to match selcted Student & Open Popus
+                this.$$('#deleteDialog > div > H1 > span').textContent = studentName;
+                this.$.deleteDialog.open();
             },
+
+            /**
+             * Opens Creation Popup (called on-tap & from main-view)
+             * @public
+             */
+            create: function () {
+                this.$.createDialog.open();
+            },
+
+            /**
+             * Callback on Deletion Popup Closed
+             * @private
+             */
+            _reactToDeleteDialog: function (event) {
+                //Check if Popup Approved or Canceled
+                if (event.detail.confirmed) {
+                    //Calculate API endpoint from pendingFlag & studentId stored in popups data
+                    var data = event.path[0].dataset;
+                    var endpoint = ((data.pending == 'true') ? ('/PendingPlatformUsers/') : ('/PlatformUsers/')) + data.studentID;
+                    //Generate API Request
+                    this.deleteAjax = {
+                        contentType: 'application/json',
+                        headers: {
+                            Authorization: this.accessToken
+                        },
+                        method: 'DELETE',
+                        endpoint: endpoint
+                    };
+
+                } else {
+                    //Reset Attributes
+                    this.$.deleteDialog.dataset.studentId = '';
+                    this.$.deleteDialog.dataset.pending = '';
+                }
+            },
+
+            /**
+             * Callback on Creation Popup Closed
+             * @private
+             */
+            _reactToCreateDialog: function (event) {
+                //Check if Popup Approved or Canceled
+                if (event.detail.confirmed) {
+                    //Validate if all Fields Filled in & not final mail submitted
+                    if (this.newUser.name && this.newUser.first_name && this.newUser.email && !this.newUser.email.includes('@')) {
+                        //Append Mail Suffix & generate API Request
+                        this.newUser.email += '@campus.lmu.de';
+                        this.set('newUser.semesterId', this.semester);
+                        this.createAjax = {
+                            contentType: 'application/json',
+                            headers: {
+                                Authorization: this.accessToken
+                            },
+                            body: this.newUser,
+                            method: 'POST',
+                            endpoint: '/PendingPlatformUsers'
+                        };
+                        //Reset newUser to Display empty fields the next time again
+                        this.set('newUser',{"name": "","first_name": "","email": "","isTutor": false,"isAdmin": false})
+                    } else {
+                        this.$$('#createFail').open();
+                    }
+                } else {
+                    //Reset Attributes
+                    this.$.deleteDialog.dataset.studentId = '';
+                    this.$.deleteDialog.dataset.pending = '';
+                }
+            },
+
+            /**
+             * Callback on API response to Delete User Request
+             * @private
+             */
+            _handleDeleteResponse: function (response) {
+                //Remove Student from Students List
+                var studentID = this.$.deleteDialog.dataset.studentID;
+                index = this.students.findIndex(x => x.id === studentID);
+                this.splice('students', index, 1);
+
+                //Reset Attributes
+                this.$.deleteDialog.dataset.studentId = '';
+                this.$.deleteDialog.dataset.pending = '';
+
+                this.$$('#deleteSuccess').open();
+            },
+
+            /**
+             * Displays Delete Fail Toast on API Error
+             * @private
+             */
+            _handleDeleteError: function (response) {
+                this.$$('#deteleFail').open();
+            },
+
+            /**
+             * Updates students and displays Succeeded Toast
+             * on API response to Create Student Request
+             * @private
+             */
+            _handleCreateResponse: function (response) {
+                this.$$('#createSuccess').open();
+                this.push('students', response.detail);
+                this.notifyPath('students');
+            },
+
+            /**
+             * Displays Creation Fail Toast on API Error
+             * @private
+             */
+            _handleCreateError: function (response) {
+                this.$$('#createFail').open();
+            },
+
+            /**
+             * Function called by Event on Logout
+             * Resetting all Data Component Received on its own
+             * @private
+             */
+            _forget: function () {
+                this.set('students', []);
+                console.info("Reset Students");
+            }
 
         });
     </script>

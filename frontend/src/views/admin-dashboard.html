@@ -74,7 +74,6 @@
                 }
             }
         </style>
-        <div></div>
 
         <div class="user-container">
                 <!-- A D M I N   T O O L B A R -->
@@ -123,15 +122,17 @@
                 },
                 adminSelectedSemesterId: {
                     type: String
-                },
+                }
             
             },
             behaviors: [
                 Polymer.MyLocalizeBehavior
             ],
+            listeners: {
+                'CREATE' : '_openCreate'
+            },
             ready: function() {
                 console.log(this.adminSelectedSemesterId);
-
             },
             _handleTap: function (event) {
                 console.log(event.target);
@@ -140,6 +141,9 @@
                 //this.fire('CHANGE_ROUTE', {path: '/'+key, page: key});
                 //console.log(event.model);
             },
+            _openCreate: function (event) {
+                console.log(event);
+            }
         });
     </script>
 </dom-module>

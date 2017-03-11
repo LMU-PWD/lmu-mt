@@ -147,38 +147,41 @@
             },
 
             _groupChanged: function (detail) {
-                var newLabData = {lab: {}, priorities: []};
+                if(Object.keys(detail).length !== 0){
+                    var newLabData = {lab: {}, priorities: []};
 
-                for (var i = 0; i < this.group.labIds.length; i++) {
-                    //Matching groups labs id with lab id (map photo->photo ect.)
-                    if (this.group.labIds[i].labTypeId == this.labType.id) {
-                        newLabData.lab = this.group.labIds[i];
+                    for (var i = 0; i < this.group.labIds.length; i++) {
+                        //Matching groups labs id with lab id (map photo->photo ect.)
+                        if (this.group.labIds[i].labTypeId == this.labType.id) {
+                            newLabData.lab = this.group.labIds[i];
+                        }
                     }
-                }
-                for (var i = 0; i < this.group.priorityIds.length; i++) {
-                    //Matching groups labs id with lab id (map photo->photo ect.)
-                    if (this.group.priorityIds[i].labTypeId == this.labType.id) {
-                        newLabData.priorities.push(this.group.priorityIds[i]);
+                    for (var i = 0; i < this.group.priorityIds.length; i++) {
+                        //Matching groups labs id with lab id (map photo->photo ect.)
+                        if (this.group.priorityIds[i].labTypeId == this.labType.id) {
+                            newLabData.priorities.push(this.group.priorityIds[i]);
+                        }
                     }
+                    this.set('labData', newLabData);
                 }
-                this.set('labData', newLabData);
-
                 //Just for Testing
                 //console.log(this.labType.type_str + ": Updated labData");
                 //console.log(this.labData);
 
             },
             _userChanged: function (detail) {
-                console.log(detail);
+                if(Object.keys(detail).length !== 0) {
+                    //console.log(detail);
 
-                this.ajax_labs = {
-                    headers: {
-                        Authorization: this.accessToken,
-                        filter: '{"where":{"semesterId":"'+this.user.semesterId+'","labTypeId":"'+this.labType.id+'"}}'
-                    },
-                    method: 'GET',
-                    endpoint: '/Labs'
-                };
+                    this.ajax_labs = {
+                        headers: {
+                            Authorization: this.accessToken,
+                            filter: '{"where":{"semesterId":"' + this.user.semesterId + '","labTypeId":"' + this.labType.id + '"}}'
+                        },
+                        method: 'GET',
+                        endpoint: '/Labs'
+                    };
+                }
 
             },
             _labTypeChanged: function (response) {

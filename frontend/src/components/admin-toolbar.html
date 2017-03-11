@@ -58,7 +58,9 @@
 
         <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
 
-        <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
+        <!--Iron Signal Fired on Logout-->
+        <iron-signals on-iron-signal-forget="_forget"></iron-signals>
+
 
     </template>
 
@@ -100,12 +102,8 @@
                 },
 
                 user: {
-                    type: Object
-                },
-
-                userId: {
-                    type: String,
-                    value: ""
+                    type: Object,
+                    observer: '_userChanged'
                 }
 
             },
@@ -113,13 +111,15 @@
                 Polymer.MyLocalizeBehavior
             ],
 
-            attached: function () {
-                this.ajax = {
-                    headers: {
-                        Authorization: this.accessToken
-                    },
-                    method: 'GET',
-                    endpoint: '/semesters'
+            _userChanged: function (detail) {
+                if(Object.keys(detail).length !== 0) {
+                    this.ajax = {
+                        headers: {
+                            Authorization: this.accessToken
+                        },
+                        method: 'GET',
+                        endpoint: '/semesters'
+                    }
                 }
             },
 
@@ -174,12 +174,16 @@
             },
 
             _handleSemesterResponse: function (event) {
-                this.semesters = event.detail;
-                this.selectedSemesterIndex = this._calcPreselectedSemester();
+                this.set('semesters', event.detail);
+                var selection = this._calcPreselectedSemester();
+                console.log(selection);
+                this.set('selectedSemesterIndex', parseInt(selection));
             },
 
             _getSelectedSemesterId: function (index) {
-                return this.semesters[index].id;
+                if(Object.keys(this.semesters).length !== 0)
+                    return this.semesters[index].id;
+                return '';
             },
 
             _buttonTapped: function () {
@@ -188,8 +192,21 @@
             },
 
             _semesterSelectionChanged: function (detail) {
-                var semesterID = this.semesters[detail].id;
-                this.fire('iron-signal', {name: 'semester', data: semesterID});
+                if(Object.keys(this.semesters).length !== 0){
+                    console.log("fired semesterchange");
+
+                    console.log(this.semesters);
+                    console.log(this.selectedSemesterIndex);
+                    var semesterID = this.semesters[detail].id;
+                    this.fire('iron-signal', {name: 'semester', data: semesterID});
+                }
+            },
+
+            _forget: function () {
+                this.set('semesters', []);
+                this.set('selectedSemesterIndex',-1);
+                console.log(this.selectedSemesterIndex);
+                console.info("Reset Semesters")
             }
 
         });

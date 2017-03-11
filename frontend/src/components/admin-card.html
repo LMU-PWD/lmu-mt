@@ -57,7 +57,7 @@
             <img src="[[pathToIcon]]">
         </div>
         <h1>[[label]]</h1>
-        <paper-icon-button class="add" icon="add-circle-outline"></paper-icon-button>
+        <paper-icon-button class="add" icon="add-circle-outline" on-tap="_fireCreate"></paper-icon-button>
     </div>
     <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
 </template>
@@ -77,6 +77,10 @@
                     //Open popup to add a new <role>
                 }else
                     this.fire('CHANGE_ROUTE', {path: '/'+this.role, page: this.role});
+            },
+
+            _fireCreate: function () {
+                this.fire('CHANGE_ROUTE', {path: '/'+this.role, page: this.role, create:true,  role: this.role});
             }
         });
     </script>
