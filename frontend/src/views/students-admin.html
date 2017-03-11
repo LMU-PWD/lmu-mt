@@ -25,17 +25,12 @@
             }
 
             .student {
-                /*height: 50px;*/
-                background-color: var(--paper-blue-grey-100);
-                border-bottom: 1px solid var(--paper-blue-grey-700);
-                margin: 5px;
-
-                /*min-width: 250px;*/
-                border-radius: 5px;
+                height: 70px;
                 width: auto;
+                background-color: var(--paper-blue-grey-100);
+                margin: 5px;
                 padding: 10px;
-                height: auto;
-
+                border-radius: 5px;
             }
 
             .student > h1 {
@@ -138,8 +133,8 @@
         <paper-dialog id="createDialog" on-iron-overlay-closed="_reactToCreateDialog">
             <div>
                 <h1>{{localize('usersadmin_dialog create')}}</h1>
-                <paper-input value="{{newUser.first_name}}" label="Vorname"></paper-input>
-                <paper-input value="{{newUser.name}}" label="Nachname"></paper-input>
+                <paper-input value="{{newUser.first_name}}" label="{{localize('semester_setup_users_table_firstname')}}"></paper-input>
+                <paper-input value="{{newUser.name}}" label="{{localize('semester_setup_users_table_lastname')}}"></paper-input>
                 <paper-input class="create-group-input"
                              label="E-Mail"
                              value="{{newUser.email}}"
@@ -155,7 +150,7 @@
         </paper-dialog>
 
         <div class="fullbleed horizontal center-justified layout" style="width: 100%; margin: 10px 0;">
-        <paper-icon-button  style="width: 100px;" icon="add-circle-outline" on-tap="create"></paper-icon-button>
+            <paper-icon-button  style="width: 100px;" icon="add-circle-outline" on-tap="create"></paper-icon-button>
         </div>
 
         <!--Lists all Students-->
@@ -181,9 +176,11 @@
                         </template>
                         <paper-icon-button icon="icons:delete" on-tap="_deleteStudent"></paper-icon-button>
                     </div>
-
                 </div>
             </template>
+        </div>
+
+            <!--Paper Toasts on Create & Delete, Success or Failure-->
             <paper-toast id="createSuccess" text="{{localize('admin-toast create-success')}}"></paper-toast>
             <paper-toast id="createFail" text="{{localize('admin-toast create-fail')}}"></paper-toast>
             <paper-toast id="deleteSuccess" text="{{localize('admin-toast delete-success')}}"></paper-toast>
@@ -232,6 +229,35 @@
             ],
             ready: function () {
             },
+
+            /**
+             * Requests registered Users from API
+             * On Semester is Changed
+             * Filtered by Semester & UserRole: Student
+             * @private
+             */
+            _semesterChanged: function (event) {
+                this.set('semester', event.detail);
+                this.set('students', []);
+
+                this.ajax = {
+                    contentType: 'application/json',
+                    headers: {
+                        Authorization: this.accessToken,
+                        filter: '{"where":{"isTutor":"false","isAdmin":"false","semesterId":"' + this.semester + '"}}'
+                    },
+                    method: 'GET',
+                    endpoint: '/platformUsers'
+                };
+
+            },
+
+            /**
+             * Callback on API response to reqgistered Users Request
+             * appending received Users to students array
+             * generating Request for PendingUsers filtered by Semester & Role
+             * @private
+             */
             _handleStudentsResponse: function (event) {
                 var api_response = event.detail;
                 console.log(api_response);
@@ -250,31 +276,18 @@
                     endpoint: '/PendingPlatformUsers'
                 };
             },
+
+            /**
+             * Function appending Pending Users received from API to Students Array
+             * @private
+             */
             _handlePendingStudentsResponse: function (event) {
-                api_response = event.detail;
+                var api_response = event.detail;
                 for (var i = 0; i < api_response.length; i++) {
                     this.push('students', api_response[i]);
                 }
-                console.log(this.students);
+                //To Notify Polymer & other Components of changes to students property
                 this.notifyPath('students');
-            },
-            _semesterChanged: function (event) {
-                //TODO fix logout login -> no student data loaded bug
-                console.log("Heard semester change");
-                this.set('semester', event.detail);
-                this.set('students', []);
-                console.log(this.semester);
-
-                this.ajax = {
-                    contentType: 'application/json',
-                    headers: {
-                        Authorization: this.accessToken,
-                        filter: '{"where":{"isTutor":"false","isAdmin":"false","semesterId":"' + this.semester + '"}}'
-                    },
-                    method: 'GET',
-                    endpoint: '/platformUsers'
-                };
-
             },
 
             /**
