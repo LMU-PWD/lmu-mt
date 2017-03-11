@@ -9,264 +9,266 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 
 <link rel="import" href="../bower_components/polymer/polymer.html">
-<link rel="import" href="../bower_components/app-localize-behavior/app-localize-behavior.html">
-
-<link rel="import" href="../bower_components/app-layout/app-drawer/app-drawer.html">
-<link rel="import" href="../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
-<link rel="import" href="../bower_components/app-layout/app-header/app-header.html">
-<link rel="import" href="../bower_components/app-layout/app-header-layout/app-header-layout.html">
-<link rel="import" href="../bower_components/app-layout/app-scroll-effects/app-scroll-effects.html">
-<link rel="import" href="../bower_components/app-layout/app-toolbar/app-toolbar.html">
 <link rel="import" href="../bower_components/app-route/app-location.html">
 <link rel="import" href="../bower_components/app-route/app-route.html">
-<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
-<link rel="import" href="../bower_components/iron-icons/social-icons.html">
-<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../bower_components/iron-selector/iron-selector.html">
-<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
-<link rel="import" href="../bower_components/iron-signals/iron-signals.html">
 
-<link rel="import" href="components/index-card.html">
-<link rel="import" href="components/group-card.html">
-<link rel="import" href="components/navigation-bar.html">
-<link rel="import" href="components/notifications-card.html">
 <link rel="import" href="services/api-request.html">
-<link rel="import" href="shared/shared-styles.html">
+<link rel="import" href="views/login-view.html">
+<link rel="import" href="views/main-view.html">
+<link rel="import" href="views/error-view.html">
+
+<!--Localization Imports-->
+<link rel="import" href="../bower_components/iron-signals/iron-signals.html">
+<link rel="import" href="services/my-localize-behavior.html">
+
 
 <dom-module id="my-app">
-  <template>
-    <style include="shared-styles">
-      :host {
-        display: block;
-      }
-      iron-pages{
-        margin-top: 0;
-      }
-      /*Phone*/
-      @media screen and (max-width: 767px) {
-        .group-placeholder{
-          width: 100%;
-          min-width: 320px;
-        }
-        .group-info{
-          display: none;
-        }
+    <template>
 
-        .practicalsContainer{
-          min-width: 320px;
-          width: 100%;
+        <!-- Fetches info about currently logged in user -->
+        <api-request
+                headers="[[ ajax.headers ]]"
+                method="[[ ajax.method ]]"
+                endpoint="[[ ajax.endpoint ]]"
+                on-api-response="_handleUserResponse"
+                on-api-error="_handleUserError"
+                loading="{{isLoading}}" ></api-request>
 
-        }
-      }
-      /*Tablet*/
-      @media screen and (min-width: 768px) and (max-width: 1023px) {
-        .group-placeholder{
-          margin: 10px;
-          width: calc(50% - 20px);
-        }
-        .practicalsContainer{
-          margin:10px;
-          width: calc(50% - 20px);
-        }
-      }
-      /*Desktop*/
-      @media screen and (min-width: 1024px) {
-        .group-placeholder{
-          margin:10px;
-          width: calc(35% - 20px);
-        }
-        .practicalsContainer{
-          margin:10px;
-          width: calc(35% - 20px);
-        }
-        .notification-placeholder{
-          margin:10px;
-          width: calc(30% - 20px);
-          height: 200px;
-          background-color: blue;
-          float: right;
-        }
-      }
-    </style>
+        <!--Logout Request-->
+        <api-request
+                headers="[[ ajaxLogout.headers ]]"
+                method="[[ ajaxLogout.method ]]"
+                endpoint="[[ ajaxLogout.endpoint ]]"
+                on-api-response="_handleLogoutResponse"></api-request>
 
-    <app-location route="{{route}}" use-hash-as-path></app-location>
+        <!--App Location Binds to the Apps URL-->
+        <app-location route="{{route}}" use-hash-as-path></app-location>
 
-    <app-route
-        route="{{route}}"
-        pattern="/:page"
-        data="{{routeData}}"
-        tail="{{subroute}}"></app-route>
+        <app-route
+                route="{{route}}"
+                pattern="/:page"
+                data="{{routeData}}"
+                tail="{{subRoute}}"></app-route>
 
-    <app-drawer-layout>
-
-      <app-header-layout>
 
         <!-- P A G E S -->
         <iron-pages
-            selected="[[page]]"
-            attr-for-selected="name"
-            fallback-selection="error">
-
+                selected="[[routeData.page]]"
+                attr-for-selected="name"
+                fallback-selection="error">
             <main-view
-               name="main"
-               access-token="{{ session.accessToken }}"
-               logged-in="{{ session.loggedIn }}"
-               user-id="{{ session.userId }}"
-               show-notifications="{{ showDesktopNotifications }}"></main-view>
+                    name="main"
+                    access-token="{{ session.accessToken }}"
+                    user="{{user}}"
+                    route="{{subRoute}}"></main-view>
             <login-view
-                name="login"
-                access-token="{{ session.accessToken }}"
-                logged-in="{{ session.loggedIn }}"
-                user-id="{{ session.userId }}"
-                route="{{ subroute }}"></login-view>
+                    name="login"
+                    route="{{ subRoute }}"></login-view>
             <error-view name="error"></error-view>
 
         </iron-pages>
 
-      </app-header-layout>
-
-    </app-drawer-layout>
-
-  </template>
-
-  <script>
-    Polymer({
-      is: 'my-app',
-
-      properties: {
-        page: {
-          type: String,
-          reflectToAttribute: false,
-          observer: '_pageChanged'
-        },
-        route: {
-          type: Object,
-          notify: true
-        },
-        subroute: {
-          type: Object,
-          notify: true
-        },
-        session: {
-          type: Object,
-          value: {
-            accessToken: null,
-            loggedIn: false,
-            userId: null
-          }
-        }
-      },
-
-      observers: [
-        '_routePageChanged(routeData.page)',
-        '_loginStateChanged(session.loggedIn)'
-      ],
+        <!--Iron Signal for Localization-->
+        <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
 
 
+    </template>
 
-      ready: function () {
+    <script>
+        Polymer({
+            is: 'my-app',
 
-        // Check for valid session cookies
-        var cookieAccessToken = this._getCookie('mt-api-accesstoken');
-        var cookieUserId = this._getCookie('mt-api-userid');
+            properties: {
+                route: {
+                    type: Object,
+                    notify: true,
+                    observer: '_routeChanged'
+                },
+                subRoute: {
+                    type: Object,
+                    notify: true
+                },
+                routeData: {
+                    type: Object
+                },
+                session: {
+                    type: Object,
+                    value: {
+                        accessToken: null,
+                        loggedIn: false,
+                        userId: null
+                    }
+                },
+                user: {
+                    type: Object
+                }
+            },
 
-          if (cookieAccessToken !== '' && cookieUserId !== '') {
+            listeners: {
+                'USER_LOGOUT': '_fireLogoutRequest',
+                'USER_LOGIN': '_handleLogin'
+            },
+            behaviors: [
+                    Polymer.MyLocalizeBehavior
+            ],
 
-          // TODO: Verify validity of cookies with API request
-          this.set('session.accessToken', cookieAccessToken);
-          this.set('session.userId', cookieUserId);
-          this.set('session.loggedIn', true);
-        }
 
-      },
+            ready: function () {
 
-      /**
-       * Helper function for parsing document.cookie
-       * @param {String} cookieName - key of the cookie whose value should be returned
-       * @returns {String} Cookie value
-       * @private
-       */
-      _getCookie: function (cookieName) {
+                // Check for valid session cookies
+                var cookieAccessToken = this._getCookie('mt-api-accesstoken');
+                var cookieUserId = this._getCookie('mt-api-userid');
 
-        var name = cookieName + '=';
-        var allCookies = document.cookie.split(';');
-        var idx;
-        for (idx in allCookies) {
-          var cookie = allCookies[idx];
-          while (cookie.charAt(0) == ' ') {
-            cookie = cookie.substring(1);
-          }
-          if (cookie.indexOf(name) == 0) {
-            return cookie.substring(name.length, cookie.length);
-          }
-        }
-        return '';
+                if (cookieAccessToken !== '' && cookieUserId !== '') {
 
-      },
+                    this.set('session.accessToken', cookieAccessToken);
+                    this.set('session.userId', cookieUserId);
 
-      /**
-       * Callback fired when the applications route changes
-       * @param {String} page - new value of routeData.page
-       * @private
-       */
-      _routePageChanged: function(page) {
+                    //Fire User Request to verify Cooke Credentials
+                    this.ajax = {
+                        headers: {
+                            Authorization: this.session.accessToken
+                        },
+                        method: 'GET',
+                        endpoint: '/platformusers/' + this.session.userId
+                    };
+                } else {
+                    //Reset Cookies, if parts left
+                    document.cookie = 'mt-api-accesstoken=; expires=Thu, 01 Jan 1970 00:00:00 UTC';
+                    document.cookie = 'mt-api-userid=; expires=Thu, 01 Jan 1970 00:00:00 UTC';
+                }
 
-        this.page = page || 'main';
+            },
 
-        // check if mobile or desktop notifications are needed
-        var screenwidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-        if (screenwidth > 1023) {
-          this.showDesktopNotifications = true;
-          this.showMobileNotifications = false;
-        }
-        else {
-          this.showDesktopNotifications = false;
-        }
-      },
+            /**
+             * Helper function for parsing document.cookie
+             * @param {String} cookieName - key of the cookie whose value should be returned
+             * @returns {String} Cookie value
+             * @private
+             */
+            _getCookie: function (cookieName) {
 
-      /**
-       * Callback fired when the applications page property changes
-       * @param {String} page - new value of page property
-       * @private
-         */
-      _pageChanged: function(page) {
+                var name = cookieName + '=';
+                var allCookies = document.cookie.split(';');
+                var idx;
+                for (idx in allCookies) {
+                    var cookie = allCookies[idx];
+                    while (cookie.charAt(0) == ' ') {
+                        cookie = cookie.substring(1);
+                    }
+                    if (cookie.indexOf(name) == 0) {
+                        return cookie.substring(name.length, cookie.length);
+                    }
+                }
+                return '';
+            },
 
-        if (!this.session.loggedIn && page !== 'login') {
-          this.set('route.path', '/login');
-          return;
-        }
+            /**
+             * Callback fired on API response to Platform User request
+             * @param {Object} response - response to API request
+             * Setting User Property & routing to main page
+             * @private
+             */
+            _handleUserResponse: function (response) {
+                this.set('user', response.detail);
+                console.log(response);
+                this.set('route.path', '/main');
+                this.set('routeData.page', 'main');
+                this.set('session.loggedIn', true);
+            },
 
-        // Load page import on demand.
-        var resolvedPageUrl = this.resolveUrl('./views/' + page + '-view.html');
-        this.importHref(resolvedPageUrl, null, this._showPage404, true);
+            /**
+             * Callback fired on API Error to Platform User request
+             * Resetting the Cookies & Rerouting to Login Page
+             * @private
+             */
+            _handleUserError: function () {
+                //Reset Cookies, if parts left
+                document.cookie = 'mt-api-accesstoken=; expires=Thu, 01 Jan 1970 00:00:00 UTC';
+                document.cookie = 'mt-api-userid=; expires=Thu, 01 Jan 1970 00:00:00 UTC';
 
-        this.unfoldNotifications = (this.page === 'main') ? true : false;
+                this.set('route.path', '/login');
+                this.set('routeData.page', 'login');
+            },
 
-      },
 
-      /**
-       * Set current page to 'error'
-       * @private
-         */
-      _showPage404: function() {
-        this.page = 'error';
-      },
+            /**
+             * Callback fired when route changed
+             * Routing to Login Page if User is not logged in
+             * @private
+             */
+            _routeChanged: function () {
+                //Checking isLoading to wait for API Request on User Info
+                if (!this.session.loggedIn && !this.isLoading ) {
+                    this.set('route.path', '/login');
+                    this.set('routeData.page', 'login');
+                }
+            },
 
-      /**
-       * Callback fired when the applications login state changes, e. g. when
-       * user successfully logs in or out
-       * @param {Boolean} loggedIn - new value of session.loggedIn property
-       * @private
-         */
-      _loginStateChanged: function(loggedIn) {
-        if (loggedIn) {
-          this.set('route.path', '/');
-        } else {
-          this.set('route.path', '/login');
-        }
-      },
+            /**
+             * Callback fired when logout button is pressed. Sets a property
+             * `ajax` containing information for logout API call
+             * @private
+             */
+            _fireLogoutRequest: function () {
+                if (this.session.loggedIn) {
+                    this.ajaxLogout = {
+                        headers: {
+                            'Authorization': this.session.accessToken
+                        },
+                        method: 'POST',
+                        endpoint: '/platformusers/logout'
+                    }
+                }
+            },
 
-    });
-  </script>
+            /**
+             * Callback fired on logout
+             * Resetting Cookies & User Info, Routing to Login Page
+             * @private
+             */
+            _handleLogoutResponse: function () {
+
+                //Reset Cookies
+                document.cookie = 'mt-api-accesstoken=; expires=Thu, 01 Jan 1970 00:00:00 UTC';
+                document.cookie = 'mt-api-userid=; expires=Thu, 01 Jan 1970 00:00:00 UTC';
+
+                //Reset User & Session
+                console.info('Reset Session');
+                this.set('session', {});
+                console.info('Reset User');
+                this.set('user',{});
+
+                //Fire Event forcing every component to forget saved data
+                this.fire('iron-signal',{name:'forget'});
+
+                //Route to Login Page
+                this.set('route.path', '/login');
+                this.set('routeData.page', 'login');
+            },
+
+            /**
+             * Callback fired when User logged in from login-card
+             * @event Containing AccessToken & UserID from Login Request
+             * Fires AJAX request to get User Info
+             * @private
+             */
+            _handleLogin: function (event) {
+
+                this.set('session.accessToken', event.detail.id);
+                this.set('session.userId', event.detail.userId);
+
+                this.ajax = {
+                    headers: {
+                        Authorization: event.detail.id
+                    },
+                    method: 'GET',
+                    endpoint: '/platformusers/' + event.detail.userId
+                };
+            }
+
+        });
+    </script>
 </dom-module>

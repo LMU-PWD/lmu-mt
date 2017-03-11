@@ -3,6 +3,10 @@
 <link rel="import" href="../../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../../bower_components/paper-tooltip/paper-tooltip.html">
 
+<!--Localization Imports-->
+<link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
+<link rel="import" href="../services/my-localize-behavior.html">
+
 <dom-module id="admin-toolbar">
 
     <template>
@@ -52,7 +56,9 @@
                 animation-delay="0"
                 fit-to-visible-bounds="true">[[ localize('admin_toolbar_new_semester_tooltip') ]]</paper-tooltip>
 
-        <iron-signals on-iron-signal-switchlocale="_switchLocale"></iron-signals>
+        <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
+
+        <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
 
     </template>
 
@@ -77,16 +83,6 @@
                     notify: true
                 },
 
-                language: {
-                    value: 'de',
-                    type: String
-                },
-
-                mainViewPage: {
-                    type: String,
-                    notify: true
-                },
-
                 selectedSemester: {
                     type: String,
                     notify: true,
@@ -94,7 +90,8 @@
                 },
 
                 selectedSemesterIndex: {
-                    type: Number
+                    type: Number,
+                    observer: '_semesterSelectionChanged'
                 },
 
                 semesters: {
@@ -112,18 +109,11 @@
                 }
 
             },
-
-            /**
-             * Localization setup
-             */
             behaviors: [
-                Polymer.AppLocalizeBehavior
+                Polymer.MyLocalizeBehavior
             ],
 
             attached: function () {
-
-                this.loadResources(this.resolveUrl('../shared/locales.json'));
-
                 this.ajax = {
                     headers: {
                         Authorization: this.accessToken
@@ -183,10 +173,6 @@
 
             },
 
-            _switchLocale: function(e) {
-                this.language = (this.language == 'en') ? 'de' : 'en';
-            },
-
             _handleSemesterResponse: function (event) {
                 this.semesters = event.detail;
                 this.selectedSemesterIndex = this._calcPreselectedSemester();
@@ -197,7 +183,13 @@
             },
 
             _buttonTapped: function () {
-                this.mainViewPage = 'semester-setup';
+                //this.mainViewPage = 'semester-setup';
+                this.fire('CHANGE_ROUTE', {path: '/semester-setup', page: 'semester-setup'});
+            },
+
+            _semesterSelectionChanged: function (detail) {
+                var semesterID = this.semesters[detail].id;
+                this.fire('iron-signal', {name: 'semester', data: semesterID});
             }
 
         });

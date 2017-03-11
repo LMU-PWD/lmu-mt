@@ -1,5 +1,10 @@
 <link rel="import" href="../shared/shared-styles.html">
 
+<!--Localization Imports-->
+<link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
+<link rel="import" href="../services/my-localize-behavior.html">
+
+
 <dom-module id="notifications-card">
     <template>
         <style  include="shared-styles">
@@ -12,11 +17,6 @@
                 margin-top: 15px;
                 margin-left: 5px;
                 border-left: 5px solid var(--paper-orange-400);
-
-                /*margin:10px;*/
-                /*height: 200px;*/
-                /*!*background-color: blue;*!*/
-                /*float: right;*/
             }
             .notification_item {
                 font-size: 14px;
@@ -42,21 +42,8 @@
                 float: right;
             }
 
-            /* Mobile */
-            @media screen and (max-width: 1023px) {
-                .notificationlist_container {
-                }
-            }
-            /* Desktop */
-            @media screen and (min-width: 1024px) {
-                .notificationlist_container {
-                    margin: 15px 15px 0 5px;
-                    float:right;
-                    width: calc(30% - 25px);
-                }
-            }
-
         </style>
+
 
         <div class="notificationlist_container notification_noitems">
             <!--
@@ -76,10 +63,24 @@
                 <span class="date">01.01.2001</span>
             </div>
             -->
-            <div class="notification_item">
-                <span class="text">{{localize('notifications-card none')}}</span>
-            </div>
-            <iron-signals on-iron-signal-switchlocale="_switchLocale"></iron-signals>
+            <h1>[[length]]</h1>
+
+            <template is="dom-repeat" items="[[notifications]]">
+                <div class="notification_item">
+                    <span class="text">[[item.text]]</span>
+                    <span class="date">[[item.date]]</span>
+                </div>
+            </template>
+            <template is="dom-if" if="!{{length}}">
+                <div class="notification_item">
+                    <span class="text">{{localize('notifications-card none')}}</span>
+                </div>
+            </template>
+
+            <!--Iron Signal for Localization-->
+            <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
+
+
         </div>
     </template>
 
@@ -89,32 +90,20 @@
         is: 'notifications-card',
 
         properties: {
-          showlist: {
-            type: Boolean
+          notifications: {
+              type: Array
           },
-          language: {
-            value: 'de',
-            type: String
+          length:{
+              computed: '_computeLength(notifications)'
           }
         },
-
-        observers: [
-          '_toggleList(showlist)'
-        ],
-
-        /**
-         * Localization setup
-         */
-        behaviors: [
-            Polymer.AppLocalizeBehavior
-        ],
-        attached: function() {
-            this.loadResources(this.resolveUrl('../shared/locales.json'));
-        },
-        _switchLocale: function() {
-            this.language = (this.language == 'en') ? 'de' : 'en';
-        }
-
+          behaviors: [
+              Polymer.MyLocalizeBehavior
+          ],
+          _computeLength: function (notifications) {
+             // this.set('noNotifications',notifications.length<=0);
+              return notifications.length;
+          }
       });
     </script>
 </dom-module>

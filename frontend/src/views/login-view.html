@@ -2,6 +2,11 @@
 <link rel="import" href="../components/login-card.html">
 <link rel="import" href="../components/registration-card.html">
 
+<!--Localization Imports-->
+<link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
+<link rel="import" href="../services/my-localize-behavior.html">
+
+
 <dom-module id="login-view">
 
     <template>
@@ -23,7 +28,7 @@
         <iron-pages
                 selected="[[page]]"
                 attr-for-selected="name"
-                fallback-selection="login">
+                fallback-selection="auth">
 
             <div name="auth" class="horizontal center-justified layout">
                 <login-card
@@ -41,6 +46,10 @@
             </div>
 
         </iron-pages>
+
+        <!--Iron Signal for Localization-->
+        <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
+
 
     </template>
 
@@ -84,6 +93,9 @@
 
             observers: [
                 '_routePageChanged(routeData.page)'
+            ],
+            behaviors: [
+                Polymer.MyLocalizeBehavior
             ],
 
             _routePageChanged: function (page) {

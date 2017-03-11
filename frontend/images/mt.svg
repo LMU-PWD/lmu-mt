@@ -1,14 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 viewBox="0 0 64 64" style="enable-background:new 0 0 64 64;" xml:space="preserve">
+<!-- Generator: Adobe Illustrator 21.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Ebene_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 200 200" style="enable-background:new 0 0 200 200;" xml:space="preserve">
 <style type="text/css">
-	.st0{fill:#cfd8dc; stroke: #263238; stroke-width:2; }
-	.st1{fill:#263238;font-family: 'Roboto', 'Noto', sans-serif; font-size:32px;}
+	.st0{fill:#546E7A;}
+	.st1{display:none;}
+	.st2{display:inline;fill:none;stroke:#000000;stroke-miterlimit:10;}
+	.st3{display:inline;}
+	.st4{fill:#ECEFF1;stroke:#ECEFF1;stroke-width:2;stroke-miterlimit:10;}
 </style>
-<g id="Ebene_2">
-	<circle class="st0" cx="32" cy="32" r="30" />
+<g id="Ebene_1_1_">
+	<circle class="st0" cx="100" cy="100" r="98"/>
+	<polygon class="st0" points="141.8,0 200,58.2 200,141.8 141.8,200 58.2,200 0,141.8 0,58.2 58.2,0 	"/>
 </g>
-<g id="Ebene_1">
-		<text class="st1" x="10" y="44">MT</text>
+<g id="HIlfslinie" class="st1">
+	<line class="st2" x1="0" y1="160" x2="200" y2="160"/>
+	<polyline class="st2" points="40,160 80,60 100,100 160,50 	"/>
+	<path class="st2" d="M71.7,64.2"/>
+</g>
+<g id="HIlfslinie_Kopie" class="st1">
+	<polyline class="st2" points="180,60 100,100 80,60 	"/>
+	<line class="st2" x1="140" y1="80" x2="108" y2="160"/>
+</g>
+<g id="HIlfslinie_Kopie_Kopie" class="st1">
+	<polygon class="st3" points="41,161 79,64 78,62 39,161 	"/>
+	<polygon class="st3" points="181,55 101,95 81,55 80,58 100,98 180,58 	"/>
+	<polygon class="st3" points="111,161 143,81 181,61.5 180,60 141,80 109,161 	"/>
+	<polygon class="st3" points="107,161 139,81 101,100 100.5,102 135.5,85 105,161 	"/>
+	<polygon class="st3" points="43,161 81,66 100,104 99.5,106 81,70 45,161 	"/>
+</g>
+<g id="HIlfslinie_Kopie_Kopie_Kopie">
+	<polygon class="st4" points="42,141 72,66 70,66 40,141 	"/>
+	<polygon class="st4" points="173,54 93,94 73,54 72.5,56 92.5,96 172.5,56 	"/>
+	<polygon class="st4" points="115.5,141 144.5,77.5 179.5,60 180,58 143,76.5 114.5,141 	"/>
+	<polygon class="st4" points="108.5,141 137,78.5 94,100 93.5,102 133.5,82 106.5,141 	"/>
+	<polygon class="st4" points="47,141 74.5,72 90.5,104 90,106 74.5,76 49,141 	"/>
 </g>
 </svg>

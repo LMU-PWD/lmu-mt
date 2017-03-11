@@ -4,6 +4,12 @@
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../shared/shared-styles.html">
 
+<!--Localization Imports-->
+<link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
+<link rel="import" href="../services/my-localize-behavior.html">
+<link rel="import" href="../components/language-switcher.html">
+
+
 <dom-module is="login-card">
 
     <template>
@@ -106,25 +112,13 @@
                 color: #eceff1;
             }
 
-            .localepicker {
+            language-switcher{
+                --primary-switcher-color: var(--paper-blue-grey-50);
+                --secondary-switcher-color: var(--paper-blue-grey-900);
+                --backlay-color: var(--paper-blue-grey-100);
                 float: right;
-            }
-
-            .localepicker paper-button {
-                padding: 0;
-                /*width: 50px;*/
-                color: var(--paper-blue-grey-300);
-                min-width: 0px;
-                font-size: 20px;
-                font-weight: 300;
-            }
-
-            .localepicker paper-button:hover {
-                color: #FFF;
-                -o-transition: .1s;
-                -moz-transition: .1s;
-                -webkit-transition: .1s;
-                transition: .1s;
+                position: relative;
+                top: -16px;
             }
 
         </style>
@@ -145,10 +139,11 @@
         <paper-card>
             <div class="card-header">
                 <span>Login</span>
-                <span class="localepicker">
+                <language-switcher></language-switcher>
+                <!--span class="localepicker">
                     <paper-button style="float:right" on-tap="initSwitchLocale">{{ language }}</paper-button>
                     <paper-tooltip offset="5">{{localize('logincard_locale button tooltip')}}</paper-tooltip>
-                </span>
+                </span-->
             </div>
             <div class="card-content">
                 <template is="dom-if" if="[[ customWelcomeText ]]">
@@ -173,7 +168,10 @@
                 <p>{{localize('logincard_register text')}} <a href="#/login/register">{{localize('logincard_register button')}}</a></p>
             </div>
         </paper-card>
-        <iron-signals on-iron-signal-switchlocale="_switchLocale"></iron-signals>
+
+        <!--Iron Signal for Localization-->
+        <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
+
     </template>
 
     <script>
@@ -183,11 +181,6 @@
             is: 'login-card',
 
             properties: {
-
-                  language: {
-                    value: 'de',
-                    type: String
-                  },
 
                 accessToken: {
                     type: String,
@@ -235,20 +228,9 @@
                 }
 
             },
-
-            /**
-             * Localization setup
-             */
             behaviors: [
-                Polymer.AppLocalizeBehavior
+                Polymer.MyLocalizeBehavior
             ],
-            attached: function() {
-                this.loadResources(this.resolveUrl('../shared/locales.json'));
-            },
-            _switchLocale: function() {
-                this.language = (this.language == 'en') ? 'de' : 'en';
-            },
-
             _handleLoginResponse: function (event) {
 
                     var jsonResponse = event.detail;
@@ -266,6 +248,8 @@
                     this.set('presetEmail', '');
                     this.set('presetName', '');
                     this.customWelcomeText = false;
+
+                this.fire('USER_LOGIN',jsonResponse);
 
             },
 

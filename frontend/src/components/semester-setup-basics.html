@@ -4,6 +4,11 @@
 
 <link rel="import" href="../shared/semester-setup-shared.html">
 
+<!--Localization Imports-->
+<link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
+<link rel="import" href="../services/my-localize-behavior.html">
+
+
 <dom-module id="semester-setup-basics">
 
     <template>
@@ -70,7 +75,8 @@
             </div>
         </paper-card>
 
-        <iron-signals on-iron-signal-switchlocale="_switchLocale"></iron-signals>
+        <!--Iron Signal for Localization-->
+        <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
 
     </template>
 
@@ -99,11 +105,6 @@
                     value: 4
                 },
 
-                language: {
-                    type: String,
-                    value: 'de'
-                },
-
                 semesterTitle: {
                     type: String,
                     notify: true
@@ -121,18 +122,9 @@
                 }
             },
 
-            /**
-             * Localization setup
-             */
             behaviors: [
-                Polymer.AppLocalizeBehavior
+                Polymer.MyLocalizeBehavior
             ],
-            attached: function() {
-                this.loadResources(this.resolveUrl('../shared/locales.json'));
-            },
-            _switchLocale: function() {
-                this.language = (this.language == 'en') ? 'de' : 'en';
-            },
 
             _openStartPickerDialog: function () {
                 this.$.semesterStart.open();

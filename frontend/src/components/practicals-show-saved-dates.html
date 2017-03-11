@@ -1,0 +1,142 @@
+<dom-module id="practicals-show-saved-dates">
+    <template>
+        <style include="shared-styles">
+            .saved-dates-shower{
+                padding-left: 20px;
+            }
+        </style>
+        <div class="saved-dates-shower">[[title]]
+            <ol type="1">
+                <template id="saved_dates" is="dom-repeat" items="{{chosenlabs}}" as="chosen">
+                    <li>[[_getLabString(chosen)]]</li>
+                </template>
+            </ol>
+        </div>
+    </template>
+    <script>
+        Polymer({
+            is: 'practicals-show-saved-dates',
+            properties: {
+                chosenlabs:{
+                    type: Array,
+                    value: [],
+                    notify: true,
+                    observer: '_labsChanged'
+                },
+                title:{
+                    type: String
+                }
+            },
+            ready: function(){
+                //console.log(this.chosenlabs);
+            },
+            _labsChanged: function(labs){
+                this.chosenlabs = labs;
+                //console.log(this.chosenlabs);
+                this.$.saved_dates.render();
+            },
+            /**
+             * Creates string from the given date
+             * @param {String} date - date that will be transformed to String
+             */
+            _getDateString: function(date){
+                //console.log(date);
+                var datestring = "";
+                switch(date.getDay()){
+                    case 0:
+                        datestring = "Sonntag, den ";
+                        break;
+                    case 1:
+                        datestring = "Montag, den ";
+                        break;
+                    case 2:
+                        datestring = "Dienstag, den ";
+                        break;
+                    case 3:
+                        datestring = "Mittwoch, den ";
+                        break;
+                    case 4:
+                        datestring = "Donnerstag, den ";
+                        break;
+                    case 5:
+                        datestring = "Freitag, den ";
+                        break;
+                    case 6:
+                        datestring = "Samstag, den ";
+                        break;
+                }
+                var hours = date.getHours();
+                var minutes = date.getMinutes();
+                if(hours<10){
+                    hours = "0"+hours;
+                }
+                if(minutes<10){
+                    minutes = "0"+minutes;
+                }
+                datestring = datestring+date.getDate()+"."+date.getMonth()+"."+date.getFullYear()+
+                    " um "+hours+":"+minutes+" Uhr";
+                return datestring;
+            },
+            /**
+             * Creates string from the timelab-timits to get a nicer visualisation,
+             * Adds leading zeros, if necessary
+             */
+            _getLabString: function(lab){
+                //console.log(lab);
+                if(lab != [0]) {
+                    //console.log(lab);
+                    var datestring = "";
+                    var starthours = lab[0].getHours();
+                    var startminutes = lab[0].getMinutes();
+                    var endhours = lab[1].getHours();
+                    var endminutes = lab[1].getMinutes();
+
+                    /*
+                     * Add zeros, if necessary
+                     */
+                    switch(lab[0].getDay()){
+                        case 0:
+                            datestring = "Sonntag, ";
+                            break;
+                        case 1:
+                            datestring = "Montag, ";
+                            break;
+                        case 2:
+                            datestring = "Dienstag, ";
+                            break;
+                        case 3:
+                            datestring = "Mittwoch, ";
+                            break;
+                        case 4:
+                            datestring = "Donnerstag, ";
+                            break;
+                        case 5:
+                            datestring = "Freitag, ";
+                            break;
+                        case 6:
+                            datestring = "Samstag, ";
+                            break;
+                    }
+
+                    if(starthours<10){
+                        starthours = "0"+starthours;
+                    }
+                    if(startminutes<10){
+                        startminutes = "0"+startminutes;
+                    }
+                    if(endhours<10){
+                        endhours = "0"+endhours;
+                    }
+                    if(endminutes<10){
+                        endminutes = "0"+endminutes;
+                    }
+
+                    return datestring+lab[0].getDate()+"."+lab[0].getMonth()+"."+lab[0].getFullYear()+
+                        ", "+starthours +":"+startminutes+" - "+endhours+":"+endminutes+" Uhr";
+                }
+            }
+
+        });
+
+    </script>
+</dom-module>
