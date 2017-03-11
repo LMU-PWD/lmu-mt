@@ -64,32 +64,15 @@
                 timeslots:{
                     type: Array,
                     value: []
-            },
+                },
                 date:{
                     type: String,
                     value: ""
-                },
-                chosenlabindex:{
-                    type: Number
                 },
                 chosenlabs:{
                     type: Array,
                     value: [],
                     notify: true
-                },
-                chosenpriority:{
-                    type: Number,
-                    value: 0
-                },
-                chosencounter:{
-                    type: Number,
-                    value: 0
-                },
-                recentlab: {
-                    type: Object
-                },
-                recentpriorityselection:{
-                    type: Object
                 },
                 mytimeslots: {
                     type: Array,
@@ -163,6 +146,7 @@
              * @param {String} date - date that will be transformed to String
              */
             _getDateString: function(date){
+
                 var datestring = "";
                 switch(date.getDay()){
 
@@ -211,18 +195,16 @@
                 this.fire("date-click");
 
                 var chosenlabId = e.model.__data__.lab.id;
-                this.recentlab = e.target;
+                recentlab = e.target;
 
-//                console.log(this.recentlab.classList)
-
-                if(this.recentlab.classList.value.indexOf('selected-slot') >= 0){
-                    this.recentlab.classList.toggle('selected-slot')
+                if(recentlab.classList.value.indexOf('selected-slot') >= 0){
+                    recentlab.classList.toggle('selected-slot')
                     this.chosenlabs = this.chosenlabs.filter(function(item){
                         return item.id != chosenlabId;
                     });
                 }
                 else {
-                    this.recentlab.classList.toggle('selected-slot')
+                    recentlab.classList.toggle('selected-slot')
 
                     // get object by id from allLabs array
                     var labObject = {};
@@ -234,15 +216,11 @@
                     }
                     this.chosenlabs.push(labObject);
                 }
-//                console.log(this.chosenlabs);
             },
 
             _checkFilled: function(arrayItem){
                 return arrayItem == '';
             },
-            /*_getLabFromPaperItem: funtion(paperItem){
-                paperItem.innerHTML
-            },*/
 
             /**
              * Checks if given Parameter is 0 and returns true of false
@@ -251,11 +229,7 @@
              * @private
              */
             _computeSelector: function(selector){
-                var response = true;
-                if(selector == 0){
-                    response = false;
-                }
-                return response;
+                return !(selector == 0);
             },
 
             /**

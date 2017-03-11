@@ -83,12 +83,10 @@
             <template is="dom-repeat" items="{{timeslots}}" as="labs">
                 <practicals-tutor-date-creator id="dateselectors" class="datecreator"
                                     timeslots="[[labs]]"
-                                    priority="[[priority]]"
-                                               chosenlabs="{{chosenlabs}}"
+                                    chosenlabs="{{chosenlabs}}"
                                     api-all-labs="[[apiAllLabs]]"
-                                    on-priority-click="_handlePriorityClick"
                                     on-date-click="_handleDateClick"
-                                    on-replace-priority="_handleReplacePriority"></practicals-tutor-date-creator>
+                ></practicals-tutor-date-creator>
             </template>
         </div>
 
@@ -104,10 +102,6 @@
                     type: Array,
                     value: []
                 },
-                priority:{
-                    type: Number
-                },
-
                 chosenlabs: {
                     type: Array,
                     value: [],
@@ -123,17 +117,12 @@
                 },
                 apiAllLabs: {
                     type: Array,
-                    observer: '_computeTimeslots'
+                    observer: '_apiAllLabsChanged'
                 },
                 language: {
                     type: String,
                     value: 'de'
                 },
-            },
-
-            ready: function() {
-//                this.timeslots = this._transformLabs(this.apiAllLabs,true);
-
             },
 
             /**
@@ -149,10 +138,11 @@
                 this.language = (this.language == 'en') ? 'de' : 'en';
             },
 
-            _computeTimeslots: function() {
+            /**
+             * Computes timeslots for pretty view
+             **/
+            _apiAllLabsChanged: function() {
                 this.timeslots = this._transformLabs(this.apiAllLabs, true);
-//                console.log("timeslots:")
-//                console.log(this.timeslots);
             },
 
             /**
@@ -160,7 +150,9 @@
              * @param {String} date - date that will be transformed to String
              */
             _getDateString: function(date){
+
                 var datestring = "";
+
                 switch(date.getDay()){
                     case 0:
                         datestring = "Sonntag, den ";
@@ -184,8 +176,10 @@
                         datestring = "Samstag, den ";
                         break;
                 }
+
                 var hours = date.getHours();
                 var minutes = date.getMinutes();
+
                 if(hours<10){
                    hours = "0"+hours;
                 }
@@ -194,13 +188,17 @@
                 }
                 datestring = datestring+date.getDate()+"."+date.getMonth()+"."+date.getFullYear()+
                         " um "+hours+":"+minutes+" Uhr";
+
                 return datestring;
             },
+
             /**
              * Handles Reset-Button Click; Resets the priorities-Array and calls childs resetSelection functions
              */
             _handleResetClick: function(e){
+
                 var dateselectors = Polymer.dom(this.root).querySelectorAll("#dateselectors");
+
                 for(i = 0; i < dateselectors.length; i++){
                     dateselectors[i]._resetSelection();
                 }
@@ -215,7 +213,6 @@
              */
             _handleDateClick: function(e){
                 this.chosenlabs = e.target.chosenlabs;
-                //console.log(this.chosenlabs);
             },
 
             /**
@@ -224,26 +221,11 @@
              * @private
              */
             _handleSaveClick: function(e){
-                //console.log(this.chosenlabs);
                 this.fire("save-click", this.chosenlabs);
             },
 
             _handleBackClick: function() {
                 this.fire("back-click", this.chosenlabs)
-            },
-
-            /**
-             * Replace a already chosen priority with e newly selected one
-             * @param e - Event Variable
-             * @private
-             */
-            _handleReplacePriority: function(e){
-                for(i=0; i<this.chosenlabs.length; i++){
-                    labdate = new Date(this.chosenlabs[i]);
-                    if(labdate.toString() == e.target.timeslots[e.target.chosenlabindex][0].toString()){
-                        this.chosenlabs[i]= '';
-                    }
-                }
             },
 
             /**
@@ -256,7 +238,7 @@
 
                 if (typeof labsFromApi == 'undefined' || labsFromApi.length == 0)
                     return [];
-                //console.log(labsFromApi);
+
                 var transformedLabs = []; //Store return-Array here
                 var lastLab = new Date(labsFromApi[0].date);
                 var countDates = 0; //Date counter
@@ -264,8 +246,10 @@
                 var dates = [];
 
                 for(i=0; i<labsFromApi.length; i++){
+
                     // Create a new array-entrie if date from recent lab is different from date of the last lab
                     var labdate = new Date(labsFromApi[i].date);
+
                     if((labdate.getFullYear() != lastLab.getFullYear() ||
                         labdate.getMonth() != lastLab.getMonth() ||
                         labdate.getDate() != lastLab.getDate()) && divideDates) {
@@ -276,6 +260,7 @@
                         countLabs = 0;
                     }
                     var endtime = new Date(labdate.getFullYear(), labdate.getMonth(), labdate.getDate());
+
                     if((labdate.getMinutes() + (labsFromApi[i].duration % 60)) > 60){
                         endtime.setHours(1+Math.floor(labdate.getHours()+(labsFromApi[i].duration) / 60));
                         endtime.setMinutes(labdate.getMinutes() + (labsFromApi[i].duration % 60)-60);
@@ -287,6 +272,7 @@
 
                     var lab = [];
                     lab = [labdate, endtime, labsFromApi[i].id];
+
                     if(divideDates){
                         dates[countLabs] = lab;
                         transformedLabs[countDates] = dates;
@@ -296,8 +282,6 @@
                         transformedLabs[i]=lab;
                     }
                 }
-                //console.log("transformed labs: ");
-                //console.log(transformedLabs);
                 return transformedLabs;
             }
         });

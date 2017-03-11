@@ -131,9 +131,12 @@
     "tutor_card_video-practical": "Video Practical",
     "tutor_card_foto-practical": "Photo Practical",
     "tutor_card_heading_your-dates": "Your dates for the ",
+    "tutor_card_info-open-until": "Open until ",
+    "tutor_card_info-closed": "The registration is closed. ",
 
     "tutor_sessionlist_heading_date": "Date",
     "tutor_sessionlist_heading_time": "Time",
+    "tutor_sessionlist_no-upcoming-sessions": "No upcoming lab sessions.",
 
     "practicals_tutordateselector_button-goback": "Back to overview",
     "practicals_tutordateselector_button-setback": "Reset",
@@ -278,9 +281,12 @@
     "tutor_card_video-practical": "Video-Praktikum",
     "tutor_card_foto-practical": "Foto-Praktikum",
     "tutor_card_heading_your-dates": "Deine Termine für das ",
+    "tutor_card_info-open-until": "Noch offen bis ",
+    "tutor_card_info-closed": "Die Registrierung ist abgeschlossen. ",
 
     "tutor_sessionlist_heading_date": "Datum",
     "tutor_sessionlist_heading_time": "Zeit",
+    "tutor_sessionlist_no-upcoming-sessions": "Keine zukünftigen Termine.",
 
     "practicals_tutordateselector_button-goback": "Zur Übersicht",
     "practicals_tutordateselector_button-setback": "Zurücksetzen",

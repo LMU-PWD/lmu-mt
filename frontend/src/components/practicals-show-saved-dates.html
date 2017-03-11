@@ -16,7 +16,7 @@
         </style>
         <div class="saved-dates-shower">
             <!--[[title]]-->
-            <iron-list items="{{chosenlabs}}" as="chosen" style=" flex: 1 1 auto;">
+            <iron-list items="{{chosenLabsList}}" as="chosen" style=" flex: 1 1 auto;">
                 <template>
                     <div class="listrow">
                         [[_getLabString(chosen)]]
@@ -32,22 +32,29 @@
                 chosenlabs:{
                     type: Array,
                     value: [],
-                    notify: true,
                     observer: '_labsChanged'
                 },
-                title:{
+                chosenLabsList: {
+                    type: Array,
+                },
+                title: {
                     type: String
                 }
             },
-            ready: function(){
-                //console.log(this.chosenlabs);
-            },
+
+
             _labsChanged: function(){
+
+                this.chosenLabsList = [];
+                for (var i = 0; i < this.chosenlabs.length; i++) {
+                    this.push('chosenLabsList', this.chosenlabs[i]);
+                }
+
                 if (this.chosenlabs.length == 0)
                     return
-                console.log('list: labs changed')
 
             },
+
             /**
              * Creates string from the given date
              * @param {String} date - date that will be transformed to String
@@ -90,6 +97,7 @@
                     " um "+hours+":"+minutes+" Uhr";
                 return datestring;
             },
+
             /**
              * Creates string from the timelab-timits to get a nicer visualisation,
              * Adds leading zeros, if necessary

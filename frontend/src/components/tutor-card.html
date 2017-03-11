@@ -30,10 +30,16 @@
                 height: 38px;
                 margin-right: 15px
             }
+            .datepicker-overview span {
+                flex-grow: 1;
+            }
+
             .labtype_deadline {
                 color: var(--paper-grey-500);
                 font-weight: 100;
-                font-size: 12px
+                font-size: 16px;
+                text-align: right;
+                float: right;
             }
             paper-item {
                 border-top: 2px solid var(--paper-grey-200);
@@ -44,13 +50,13 @@
                 background: var(--paper-orange-50);
                 cursor: pointer;
             }
-            .labtype_deadline {
-                float: right;
-            }
             .iron-selected {
                 font-weight: normal;
             }
-
+            .lab-title {
+                margin-right: 25px;
+                font-size: 20px;
+            }
 
             /*Phone*/
             @media screen and (max-width: 767px) {
@@ -101,44 +107,60 @@
 
         <!-- ALL LABS -->
         <div class="content">
+
+            <!--  CASE 1: REGISTRATION PHASE -->
             <template is="dom-if" if="[[ !hasAssignedLabs ]]">
                 <iron-pages
                         selected="[[ page ]]"
                         attr-for-selected="name"
                         fallback-selection="error">
+
                     <div class="datepicker-overview" name="datepicker_overview">
                         <paper-listbox style="padding: 0">
                             <h1 class="heading"> [[ localize('tutor_card_heading_select-date') ]]</h1>
                             <paper-item on-tap="_handleAudioTap" >
                                 <img src="../../../images/audio.svg" alt="Audio Icon">
-                                <span style="margin-right: 25px">[[ localize('tutor_card_audio-practical') ]]</span>
-                                <span class="labtype_deadline">noch offen bis [[ prettyAudioDeadline.date ]] um [[ prettyAudioDeadline.time ]]</span>
+                                <span class="lab-title">[[ localize('tutor_card_audio-practical') ]]</span>
+                                <template is="dom-if" if="[[ !deadline_reached_audio ]]">
+                                    <span class="labtype_deadline">[[ localize('tutor_card_info-open-until')]] [[ prettyAudioDeadline.date ]], [[ prettyAudioDeadline.time ]]</span>
+                                </template>
+                                <template is="dom-if" if="[[ deadline_reached_audio ]]">
+                                    <span class="labtype_deadline">[[ localize('tutor_card_info-closed')]]</span>
+                                </template>
                             </paper-item>
                             <paper-item on-tap="_handleVideoTap" >
                                 <img src="../../../images/video.svg" alt="Video Icon">
-                                <span style="margin-right: 25px">[[ localize('tutor_card_video-practical') ]]</span>
-                                <span class="labtype_deadline">noch offen bis [[ prettyVideoDeadline.date ]] um [[ prettyVideoDeadline.time ]]</span>
+                                <span class="lab-title">[[ localize('tutor_card_video-practical') ]]</span>
+                                <template is="dom-if" if="[[ !deadline_reached_video ]]">
+                                    <span class="labtype_deadline">[[ localize('tutor_card_info-open-until')]] [[ prettyVideoDeadline.date ]], [[ prettyVideoDeadline.time ]]</span>
+                                </template>
+                                <template is="dom-if" if="[[ deadline_reached_video ]]">
+                                    <span class="labtype_deadline">[[ localize('tutor_card_info-closed')]]</span>
+                                </template>
                             </paper-item>
                             <paper-item on-tap="_handleFotoTap">
                                 <img src="../../../images/photo.svg" alt="Foto Icon">
-                                <span style="margin-right: 25px">[[ localize('tutor_card_foto-practical') ]]</span>
-                                <span class="labtype_deadline">noch offen bis [[ prettyFotoDeadline.date ]] um [[ prettyFotoDeadline.time ]]</span>
+                                <span class="lab-title">[[ localize('tutor_card_foto-practical') ]]</span>
+                                <template is="dom-if" if="[[ !deadline_reached_foto ]]">
+                                    <span class="labtype_deadline">[[ localize('tutor_card_info-open-until')]] [[ prettyFotoDeadline.date ]], [[ prettyFotoDeadline.time ]]</span>
+                                </template>
+                                <template is="dom-if" if="[[ deadline_reached_foto ]]">
+                                    <span class="labtype_deadline">[[ localize('tutor_card_info-closed')]]</span>
+                                </template>
                             </paper-item>
                         </paper-listbox>
                     </div>
+
                     <div name="datepicker_audio">
                         <h1 class="heading"> [[ localize('tutor_card_heading_your-dates') ]] [[ localize('tutor_card_audio-practical') ]]</h1>
                         <template is="dom-if" if="[[ labtypeAudio.registration_open ]]">
                             <practicals-tutor-date-detail
-                                    group="{{ group }}"
                                     user="[[ user ]]"
                                     lab-type="[[ labtypeAudio ]]"
-                                    lab-data="[[labData]]"
                                     all-labs="[[allLabsAudio]]"
                                     possible-labs="[[possibleLabs]]"
                                     on-back-click="_handleBackTap"
                                     access-token="{{ accessToken }}"
-                                    user-id="{{ user.id }}"
                                     page="{{ page }}"></practicals-tutor-date-detail>
                         </template>
                     </div>
@@ -146,15 +168,12 @@
                         <h1 class="heading"> [[ localize('tutor_card_heading_your-dates') ]] [[ localize('tutor_card_video-practical') ]]</h1>
                         <template is="dom-if" if="[[ labtypeFoto.registration_open ]]">
                             <practicals-tutor-date-detail
-                                    group="{{ group }}"
                                     user="[[ user ]]"
                                     lab-type="[[ labtypeVideo ]]"
-                                    lab-data="[[labData]]"
                                     all-labs="[[allLabsVideo]]"
                                     possible-labs="[[possibleLabs]]"
                                     on-back-click="_handleBackTap"
                                     access-token="{{ accessToken }}"
-                                    user-id="{{ user.id }}"
                                     page="{{ page }}"></practicals-tutor-date-detail>
                         </template>
                     </div>
@@ -162,33 +181,30 @@
                         <h1 class="heading"> [[ localize('tutor_card_heading_your-dates') ]] [[ localize('tutor_card_foto-practical') ]]</h1>
                         <template is="dom-if" if="[[ labtypeFoto.registration_open ]]">
                             <practicals-tutor-date-detail
-                                    group="{{ group }}"
                                     user="[[ user ]]"
                                     lab-type="[[ labtypeFoto ]]"
-                                    lab-data="[[labData]]"
                                     all-labs="[[allLabsFoto]]"
                                     possible-labs="[[possibleLabs]]"
                                     on-back-click="_handleBackTap"
                                     access-token="{{ accessToken }}"
-                                    user-id="{{ user.id }}"
                                     page="{{ page }}"></practicals-tutor-date-detail>
                         </template>
                     </div>
+
                 </iron-pages>
             </template>
 
+            <!--  CASE 2: WORKING PHASE -->
             <template is="dom-if" if="[[ hasAssignedLabs ]]">
                 <tutor-sessionlist
                         access-token="{{ accessToken }}"
                         lab-type-audio="[[ labtypeAudio ]]"
                         lab-type-video="[[ labtypeVideo ]]"
                         lab-type-foto="[[ labtypeFoto ]]"
-                        assigned-labs="[[ tutorSessions ]]"
-                >
+                        assigned-labs="[[ tutorSessions ]]">
                 </tutor-sessionlist>
             </template>
         </div>
-
 
         <iron-signals on-iron-signal-switchlocale="_switchLocale"></iron-signals>
     </template>
@@ -206,7 +222,7 @@
                 },
                 deadline_reached_audio: Boolean,
                 deadline_reached_video: Boolean,
-                deadline_reached_fotoo: Boolean,
+                deadline_reached_foto: Boolean,
                 hasAssignedLabs: Boolean,
                 labtypeAudio: Object,
                 labtypeVideo: Object,
@@ -233,15 +249,15 @@
                 },
                 prettyAudioDeadline: {
                     type: String,
-                    computed: 'prettyDate(labtypeAudio.registration_deadline_tutors)'
+                    computed: '_computePrettyDate(labtypeAudio.registration_deadline_tutors)'
                 },
                 prettyVideoDeadline: {
                     type: String,
-                    computed: 'prettyDate(labtypeVideo.registration_deadline_tutors)'
+                    computed: '_computePrettyDate(labtypeVideo.registration_deadline_tutors)'
                 },
                 prettyFotoDeadline: {
                     type: String,
-                    computed: 'prettyDate(labtypeFoto.registration_deadline_tutors)'
+                    computed: '_computePrettyDate(labtypeFoto.registration_deadline_tutors)'
                 },
             },
 
@@ -275,7 +291,11 @@
             },
 
             /**
-             *  Observer methods
+             ** OBSERVER & COMPUTING METHODS **
+             */
+            /**
+             * Checks deadlines per labtype and fires API requests to get labs and tutor's lab choices if the
+             * deadlines are not reached yet.
              */
             _setupLabs: function(labtypeAudio, labtypeVideo, labtypeFoto, hasAssignedLabs) {
 
@@ -302,27 +322,36 @@
                         endpoint: '/platformusers/' + this.user.id + '/tutorpossiblelabs/'
                     };
                 }
-                else {
-                    // "Pending" state: deadlines reached but no labs are assigned yet
-//                    this.
-                }
-
             },
 
-            prettyDate: function(uglyDate) {
+
+            _computePrettyDate: function(uglyDate) {
+
                 prettyDate = new Date(uglyDate)
                 prettyDateString = prettyDate.getDate()+"."+ (prettyDate.getMonth()+1) + "."+prettyDate.getFullYear();
                 prettyTimeString = (prettyDate.getHours() + 1) + ":" + (prettyDate.getMinutes()<10 ? '0' : '') + prettyDate.getMinutes();
                 prettyDateObject = { time: prettyTimeString, date: prettyDateString };
+
                 return prettyDateObject;
             },
 
+
             _isAfterDeadline: function (deadline){
+
                 var deadline_date = new Date(deadline);
                 var today = new Date();
+
                 return deadline_date < today;
             },
 
+
+            /**
+             **  API RESPONSE HANDLERS **
+             */
+            /**
+             * Checks if labs have been assigned to this tutor yet. If so, the tutor-sessions card will be shown,
+             * otherwise the datepicker
+             */
             _handleAssignedLabsResponse: function(response) {
 
                 if (typeof response.detail == 'undefined' || response.detail == [] || response.detail.length == 0) {
@@ -336,18 +365,16 @@
 
             /**
              * Gets lab data from API and sets them for each labtype
-             * @param event
-             * @private
              */
             _handleAllLabsResponse: function (event) {
-                //console.log('_handleLabRequest()');
-                //console.log(event.detail);
+
                 var audiolabs = [];
                 var videolabs = [];
                 var fotolabs = [];
                 var alllabs = [];
 
                 for (var i = 0; i < event.detail.length; i++) {
+
                     if (event.detail[i].labTypeId == this.labtypeAudio.id){
                         audiolabs.push(event.detail[i]);
                     }
@@ -357,7 +384,6 @@
                     if (event.detail[i].labTypeId == this.labtypeFoto.id){
                         fotolabs.push(event.detail[i]);
                     }
-
                     alllabs.push(event.detail[i]);
                 }
 
@@ -365,15 +391,13 @@
                 this.allLabsVideo = videolabs;
                 this.allLabsFoto = fotolabs;
                 this.allLabs = alllabs;
-//                console.log("AllLabs: ");
-//                console.log(this.allLabs);
-//                console.log(this.allLabsAudio);
-//                console.log(this.allLabsVideo);
-//                console.log(this.allLabsFoto);
             },
 
+
             _handlePossibleLabsResponse: function(response) {
+
                 var possibleLabsForThisTutor = [];
+
                 for(i = 0; i<this.allLabs.length; i++){
                     for(j = 0; j<response.detail.length; j++) {
                         if (this.allLabs[i].id == response.detail[j]) {
@@ -381,12 +405,11 @@
                         }
                     }
                 }
-                console.log(possibleLabsForThisTutor)
                 this.possibleLabs = possibleLabsForThisTutor;
             },
 
-            /*
-             *  CLICK HANDLERS
+            /**
+             **  CLICK HANDLERS **
              */
             _handleAudioTap: function() {
                 this.page = 'datepicker_audio'
