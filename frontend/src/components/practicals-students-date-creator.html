@@ -166,7 +166,19 @@
                         datestring = "Samstag, ";
                         break;
                 }
-                datestring = datestring+date.getDate()+"."+date.getMonth()+"."+date.getFullYear();
+                var month = date.getMonth()+1;
+                var monthString = month.toString();
+                if(month < 10){
+                    monthString = "0"+month.toString();
+                }
+
+                var day = date.getDate();
+                var dayString = day.toString();
+                if(day < 10){
+                    dayString = "0"+day.toString();
+                }
+
+                datestring = datestring+dayString+"."+monthString+"."+date.getFullYear();
                 return datestring;
             },
 

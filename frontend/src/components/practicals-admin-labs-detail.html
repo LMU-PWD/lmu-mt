@@ -169,7 +169,7 @@
                 }
             },
             ready: function () {
-                console.log(this.semesterId);
+                //console.log(this.semesterId);
                 this.ajax_groups ={
                     headers: {
                         Authorization: this.accessToken
@@ -177,8 +177,6 @@
                     method: 'GET',
                     endpoint: '/groups?filter[where][semesterId]=' + this.semesterId
                 };
-                //console.log(this.user);
-                console.log(this.labType);
             },
 
             /**
@@ -201,14 +199,14 @@
             _getLabGroupName: function(group){
                     //console.log(group);
                     if(group  && this.groups && group != ""){
-                        for(i=0; i<this.groups.length; i++){
+                        for(var i = 0; i < this.groups.length; i++){
                             if(group == this.groups[i].id){
                                 var returnstring = this.groups[i].name;
-                                break;
+                                //break;
                             }
                         }
                     }
-                    console.log(returnstring);
+                    //console.log(returnstring);
                     return returnstring;
             },
             /**
@@ -219,14 +217,14 @@
                 //console.log(tutor);
                 //console.log(this.tutor);
                 if(tutor && this.tutors && tutor != ""){
-                    for(i=0; i<this.tutors.length; i++){
+                    for(var i = 0; i < this.tutors.length; i++){
                         if(tutor == this.tutors[i].id){
                             var returnstring = this.tutors[i].name + ", " + this.tutors[i].first_name;
-                            break;
+                            //break;
                         }
                     }
                 }
-                console.log(returnstring);
+                //console.log(returnstring);
                 return returnstring;
             },
 
@@ -269,7 +267,7 @@
              * @private
              */
             _labsChanged: function(e){
-                //console.log(e);
+                //console.log("labsChanged");
                 if(this.groups && this.tutors) {
                     this.set('transformedLabs', this._transformLabs(this.allLabs,true));
                 }
@@ -279,18 +277,17 @@
              * @param event
              */
             _reactToDetailDialog: function (event) {
-                console.log(event.detail);
                 if(event.detail.confirmed){
                     //Post Lab-Changes in API
                     this.labToSet = event.target.firstChild.nextSibling.lab;
-                    console.log(this.labToSet);
+                    //console.log(this.labToSet);
                     if(this.labToSet.id) {
                         this.ajax_save_lab = {
                             headers: {
                                 Authorization: this.accessToken
                             },
                             body: {
-                                date: this.labToSet.date,
+                                date: this.labToSet.date.toString(),
                                 duration: this.labToSet.duration,
                                 location: this.labToSet.location,
                                 tutorId: this.labToSet.tutorId,
@@ -299,7 +296,7 @@
                             method: 'PATCH',
                             endpoint: '/Labs/' + this.labToSet.id
                         };
-                        console.log(this.ajax_save_lab);
+                        //console.log(this.ajax_save_lab);
                         this.labToSet = {};
                     }
                     else{
@@ -314,11 +311,9 @@
              * @param event
              */
             _reactToNewLabDialog: function (event) {
-                console.log(event.detail);
                 if(event.detail.confirmed){
                     //PODT new lab in API
                     this.labToSet = event.target.firstChild.nextSibling.lab;
-                    console.log(this.labToSet);
                     if(this.labToSet.id) {
                         this.ajax_save_new_lab = {
                             headers: {
@@ -350,7 +345,6 @@
             _responseFromGettingGroups: function(e){
                 //console.log(e.detail);
                 this.groups = e.detail;
-                console.log(e.detail);
 
                 this.ajax_tutors ={
                     headers: {
@@ -372,9 +366,6 @@
                 //console.log(this.tutors);
                 //TODO: when i execute the next line everything goes wrong
                 this._labsChanged(e);
-                //this.set('transformedLabs', this._transformLabs(this.allLabs,true));
-                //this.$.dates.render();
-
             },
             /**
              * Handle response from api-request whith ajax_get_labs
@@ -384,11 +375,8 @@
             _responseFromGettingLabs: function(e){
                 var temporalArray = e.detail;
                 var labTypeId = this.labType.id;
-                console.log(this.labType.id);
                 temporalArray = temporalArray.filter(function(item){return item.labTypeId == labTypeId;});
                 this.allLabs = temporalArray;
-                //this.set('transformedLabs', this._transformLabs(this.allLabs,true));
-                //console.log(this.transformedLabs);
             },
 
             /**
@@ -397,81 +385,76 @@
              * @private
              */
             _responseFromPostingLab: function(e){
-                console.log(e);
-                console.log(this.semesterId);
-                /*this.ajax_get_labs = {
-                    headers: {
-                        Authorization: this.accessToken
-                    },
-                    method: 'GET',
-                    endpoint: '/labs?filter[where][semesterId]=' +  this.semesterId
-                };*/
+                //console.log(e);
                 this.fire('labs-changed');
             },
 
             /**
              * Transform the Format of the given Timelabs from the Api, so it will be easier to handle in the frontend
              * @param labsFromApi - Contains the given timelabs
+             * @param divideDates - Boolean
              * @returns {Array} - timelabs in new format
              * @private
              */
             _transformLabs: function(labsFromApi,divideDates){
-                //console.log(labsFromApi);
                 var transformedLabs = []; //Store return-Array here
                 var lastLab = new Date(labsFromApi[0].date);
                 var countDates = 0; //Date counter
                 var countLabs = 0; //lab counter
                 var dates = [];
 
-                for( i=0 ; i<labsFromApi.length; i++){
-                    // Create a new array-entrie if date from recent lab is different from date of the last lab
-                    var labdate = new Date(labsFromApi[i].date);
-                    if((labdate.getFullYear() != lastLab.getFullYear() ||
-                        labdate.getMonth() != lastLab.getMonth() ||
-                        labdate.getDate() != lastLab.getDate()) && divideDates) {
-                        dates = [];
-                        lastLab = labdate;
-                        transformedLabs.push([]);
-                        countDates++;
-                        countLabs = 0;
-                    }
-                    var endtime = new Date(labdate.getFullYear(), labdate.getMonth(), labdate.getDate());
-                    if((labdate.getMinutes() + (labsFromApi[i].duration % 60)) > 60){
-                        endtime.setHours(1+Math.floor(labdate.getHours()+(labsFromApi[i].duration) / 60));
-                        endtime.setMinutes(labdate.getMinutes() + (labsFromApi[i].duration % 60)-60);
-                    }
-                    else{
-                        endtime.setHours(Math.floor(labdate.getHours()+(labsFromApi[i].duration) / 60));
-                        endtime.setMinutes(labdate.getMinutes() + (labsFromApi[i].duration % 60));
-                    }
+                if(labsFromApi) {
+                    for ( var i = 0; i < labsFromApi.length; i++) {
+                        // Create a new array-entrie if date from recent lab is different from date of the last lab
+                        var labdate = new Date(labsFromApi[i].date);
+                        if ((labdate.getFullYear() != lastLab.getFullYear() ||
+                            labdate.getMonth() != lastLab.getMonth() ||
+                            labdate.getDate() != lastLab.getDate()) && divideDates) {
+                            dates = [];
+                            lastLab = labdate;
+                            transformedLabs.push([]);
+                            countDates++;
+                            countLabs = 0;
+                        }
+                        var endtime = new Date(labdate.getFullYear(), labdate.getMonth(), labdate.getDate());
+                        if ((labdate.getMinutes() + (labsFromApi[i].duration % 60)) > 60) {
+                            endtime.setHours(1 + Math.floor(labdate.getHours() + (labsFromApi[i].duration) / 60));
+                            endtime.setMinutes(labdate.getMinutes() + (labsFromApi[i].duration % 60) - 60);
+                        }
+                        else {
+                            endtime.setHours(Math.floor(labdate.getHours() + (labsFromApi[i].duration) / 60));
+                            endtime.setMinutes(labdate.getMinutes() + (labsFromApi[i].duration % 60));
+                        }
 
-                    var lab = {};
-                    lab.dates = [];
-                    lab.tutor = "";
-                    lab.group = "";
-                    lab.tutorName = "";
-                    lab.groupName = "";
-                    lab.dates = [labdate, endtime];
-                    lab.tutor = labsFromApi[i].tutorId;
-                    lab.group = labsFromApi[i].groupId;
-                    if(lab.tutor){
-                        //console.log(lab.tutor);
-                        lab.tutorName = this._getLabTutorName(labsFromApi[i].tutorId);
-                        console.log(lab.tutorName);
-                    }
-                    if(lab.group) {
-                        //console.log(lab.group);
-                        lab.groupName = this._getLabGroupName(labsFromApi[i].groupId);
-                        console.log(lab.groupName);
-                    }
+                        var lab = {};
+                        lab.dates = [];
+                        lab.tutor = "";
+                        lab.group = "";
+                        lab.tutorName = "";
+                        lab.groupName = "";
+                        lab.dates = [labdate, endtime];
+                        lab.tutor = labsFromApi[i].tutorId;
+                        lab.group = labsFromApi[i].groupId;
 
-                    if(divideDates){
-                        dates[countLabs] = lab;
-                        transformedLabs[countDates] = dates;
+                        if (lab.tutor) {
+                            //console.log(lab.tutor);
+                            lab.tutorName = this._getLabTutorName(labsFromApi[i].tutorId);
+                            console.log(lab.tutorName);
+                        }
+                        if (lab.group) {
+                            //console.log(lab.group);
+                            lab.groupName = this._getLabGroupName(labsFromApi[i].groupId);
+                            console.log(lab.groupName);
+                        }
+
+                        if (divideDates) {
+                            dates[countLabs] = lab;
+                            transformedLabs[countDates] = dates;
+                        }
+                        else {
+                            transformedLabs[i] = lab;
+                        }
                         countLabs++;
-                    }
-                    else{
-                        transformedLabs[i]=lab;
                     }
                 }
                 //console.log("transformed labs: ");

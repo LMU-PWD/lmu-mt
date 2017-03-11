@@ -111,7 +111,7 @@
              */
             _dateChanged: function(e){
                 //console.log(this.dateInput);
-                this.set('labType.descriptionStudentInput', this.dateInput);
+                this.set('labType.registration_deadline', this.dateInput);
                 this.set('showSaveButton', true);
             },
             /**
@@ -121,7 +121,7 @@
              */
             _dateTutorChanged: function(e){
                 //console.log(this.dateTutorInput);
-                this.set('labType.descriptionTutorInput', this.dateTutorInput);
+                this.set('labType.registration_deadline_tutors', this.dateTutorInput);
                 this.set('showSaveButton', true);
             },
 
@@ -160,8 +160,8 @@
                         body: {
                             description_student: this.labType.description_student,
                             description_tutor: this.labType.description_tutor,
-                            registration_deadline: this.labType.registration_deadline,
-                            registration_deadline_tutors: this.labType.registration_deadline_tutors
+                            registration_deadline: this.labType.registration_deadline.toString(),
+                            registration_deadline_tutors: this.labType.registration_deadline_tutors.toString()
                         },
                         method: 'PATCH',
                         endpoint: '/labtypes/' + this.labType.id
@@ -178,7 +178,6 @@
 
             /**
              * Handle click on Student Button to Post registration_open on API
-             * @param e - Event Variable
              * @private
              */
             _handleStudentButtonClick: function(){
