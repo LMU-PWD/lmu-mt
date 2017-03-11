@@ -2,6 +2,8 @@
 <link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
 <link rel="import" href="../services/my-localize-behavior.html">
 
+<link rel="import" href="../plugins/calendar-lite/calendar-lite.html">
+<link rel="import" href="timeslot-list.html">
 <link rel="import" href="./time-picker.html">
 
 <dom-module id="practicals-admin-labs-creator">
@@ -18,6 +20,10 @@
 
             #errorMessage {
                 color: red;
+            }
+
+            #toggleHelpParagraph {
+                margin: 0 0 7px;
             }
 
             .dialogButton {
@@ -82,10 +88,10 @@
                     <div id="page-single">
 
                         <!-- Date and time -->
-                        <paper-date-picker
-                                date="{{ singleDate }}"
-                                responsive-width="630px"></paper-date-picker>
-                        <time-picker hour="{{ singleHour }}" min="{{ singleMin }}"></time-picker>
+                        <calendar-lite id="singleDatePicker"
+                                       date="[[ singleDate ]]"
+                                       main-color="#445A65"></calendar-lite>
+                        <p><time-picker hour="{{ singleHour }}" min="{{ singleMin }}"></time-picker></p>
 
                         <!-- Duration -->
                         <paper-input type="number"
@@ -114,18 +120,33 @@
                     <!-- MULTIPLE DATE CREATOR -->
                     <div id="page-multiple">
 
-                        <h1>Hier gibts mehrere Termine auf einmal</h1>
+                        <!-- Help text -->
+                        <p id="toggleHelpParagraph">
+                            <paper-icon-button icon="help-outline"
+                                               on-tap="_toggleHelp"></paper-icon-button>
+                        </p>
 
-                        <!-- TODO Erklärtext -->
-                        <!-- Hier kannst du Termine für Tage erstellen, die immer nach dem gleichen Schema ablaufen.
-                             Ein Beispiel: Du hast das Audiolabor am 13. und 14. Mai sowie am 20. und 21. Mai reserviert.
-                             An diesen Tagen möchtest du jeweils von 9:00 und 12:30, von 12:45 bis 16:15 und von 16:30 bis
-                             20:00 ein Praktikum anbieten. -->
+                        <iron-collapse id="helpText">
+                            <p>[[ localize('practicals_admin_labs_creator_multiple_helptext_1') ]]</p>
+                            <p>[[ localize('practicals_admin_labs_creator_multiple_helptext_2') ]]</p>
+                        </iron-collapse>
+
                         <!-- TODO Auswahl der Tage z.B. über Datepicker-->
-                        <!-- TODO Ort -->
+                        <p>[[ localize('practicals_admin_labs_creator_multiple_choose_days') ]]</p>
+                        <calendar-lite id="multipleDatePicker"
+                                       multi-select="{consequent:false;}"
+                                       main-color="#445A65"
+                                       on-multiselect="_updateDaySelection"></calendar-lite>
+
+                        <!-- Location -->
+                        <paper-input label="[[ localize('semester_setup_dates_location') ]]"
+                                     value="{{ multipleLocation }}"></paper-input>
+
                         <!-- TODO Liste mit Terminen für einen Tag -->
                             <!-- TODO Startuhrzeit -->
                             <!-- TODO Dauer -->
+                        <p>[[ localize('practicals_admin_labs_creator_multiple_add_timeslots') ]]</p>
+                        <timeslot-list id="timeslotList"></timeslot-list>
 
                         <div class="buttons">
                             <paper-button class="dialogButton" on-tap="_dialogCancelled" raised>
@@ -150,11 +171,11 @@
 
         </paper-dialog>
 
-        <api-request endpoint="[[ singleAjax.endpoint ]]"
-                     method="[[ singleAjax.method ]]"
-                     headers="[[ singleAjax.headers ]]"
-                     body="[[ singleAjax.body ]]"
-                     on-api-response="_handleSingleResponse"
+        <api-request endpoint="[[ ajax.endpoint ]]"
+                     method="[[ ajax.method ]]"
+                     headers="[[ ajax.headers ]]"
+                     body="[[ ajax.body ]]"
+                     on-api-response="_handleApiResponse"
                      on-api-error="_handleApiError"></api-request>
 
         <!--Iron Signal for Localization-->
@@ -170,7 +191,7 @@
 
             properties: {
 
-                /* Meta properties */
+                /* General properties */
                 accessToken: {
                     type: String,
                     value: '' },
@@ -205,6 +226,14 @@
                     value: 90 },
                 singleLocation: {
                     type: String,
+                    value: '' },
+
+                /* Multiple Labs */
+                multipleDays: {
+                    type: Array,
+                    value: [] },
+                multipleLocation: {
+                    type: String,
                     value: '' }
 
             },
@@ -227,7 +256,7 @@
                 this.singleMin = 0;
                 this.singleDuration = 90;
                 this.singleLocation = '';
-                this.singleAjax = {};
+                this.ajax = {};
             },
 
             _dialogCancelled: function () {
@@ -235,11 +264,15 @@
                 this._resetProperties();
             },
 
+            _toggleHelp: function () {
+                this.$.helpText.toggle();
+            },
+
             _triggerSingleLabCreation: function () {
                 this.processingRequest = true;
                 // Gather data for new Lab
                 var labObject = {
-                    date: this.singleDate,
+                    date: this.$.singleDatePicker.date,
                     duration: this.singleDuration,
                     location: this.singleLocation,
                     labTypeId: this.labTypeId,
@@ -250,7 +283,7 @@
                 labObject.date.setSeconds(0);
                 labObject.date.setMilliseconds(0);
                 // Send them to API
-                this.singleAjax = {
+                this.ajax = {
                     endpoint: '/labs',
                     method: 'POST',
                     headers: {
@@ -260,21 +293,55 @@
                 };
             },
 
-            _handleSingleResponse: function (event) {
-                console.log(event);
-                this.processingRequest = false;
-                this.$.dialog.close();
-                this._resetProperties();
+            _updateDaySelection: function (event) {
+                var rawDates = event.detail.dates;
+                var uniqueDates = rawDates.filter(function(val, idx, arr){
+                    return arr.indexOf(val) === idx;
+                });
+                var dateObjects = uniqueDates.map(function(entry){
+                    var arr = entry.split(',');
+                    return new Date(arr[2], arr[1], arr[0]);
+                });
+                this.multipleDays = dateObjects;
             },
 
             _triggerMultipleLabsCreation: function () {
                 this.processingRequest = true;
-                var that = this;
-                window.setTimeout(function(){
-                    that.processingRequest = false;
-                }, 1000);
-                // Gather data for new Labs
+                // Gather data for new labs
+                var timeslotScheme = this.$.timeslotList.items,
+                    labs = [],
+                    that = this;
+                this.multipleDays.forEach(function(day){
+                    timeslotScheme.forEach(function(slot){
+                        var dateObject = new Date(day);
+                        dateObject.setHours(slot.hour);
+                        dateObject.setMinutes(slot.min);
+                        labs.push({
+                            date: dateObject,
+                            duration: slot.duration,
+                            location: that.multipleLocation,
+                            labTypeId: that.labTypeId,
+                            semesterId: that.semesterId
+                        });
+                    });
+                });
+                console.log(labs);
                 // Send them to API
+                this.ajax = {
+                    endpoint: '/labs',
+                    method: 'POST',
+                    headers: {
+                        Authorization: this.accessToken
+                    },
+                    body: labs
+                };
+            },
+
+            _handleApiResponse: function (event) {
+                console.log(event);
+                this.processingRequest = false;
+                this.$.dialog.close();
+                this._resetProperties();
             },
 
             _handleApiError: function (event) {

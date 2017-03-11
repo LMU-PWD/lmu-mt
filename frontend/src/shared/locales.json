@@ -143,6 +143,11 @@
 
     "practicals_admin_labs_creator_mode_single": "Single date",
     "practicals_admin_labs_creator_mode_multiple": "Multiple dates",
+    "practicals_admin_labs_creator_start_time": "Start time",
+    "practicals_admin_labs_creator_multiple_helptext_1": "Use this tool to create lab timeslots for one or more days that follow the same scheme.",
+    "practicals_admin_labs_creator_multiple_helptext_2": "For example: You have booked the audio laboratory on 13th, 14th, 20th and 21st of May. On each of these days you want to offer lab timeslots from 9:00 to 12:30, from 12:45 to 16:15 and from 16:30 to 20:00.",
+    "practicals_admin_labs_creator_multiple_choose_days": "Select all days you want to create labs for:",
+    "practicals_admin_labs_creator_multiple_add_timeslots": "Add timeslots to the scheme. These timeslots will be created for each selected day.",
 
     "general_weekdays 0": "Sunday",
     "general_weekdays 1": "Monday",
@@ -298,6 +303,11 @@
 
     "practicals_admin_labs_creator_mode_single": "Einzeltermin",
     "practicals_admin_labs_creator_mode_multiple": "Terminserie",
+    "practicals_admin_labs_creator_start_time": "Beginn",
+    "practicals_admin_labs_creator_multiple_helptext_1": "Hier kannst du Termine für Tage erstellen, die immer nach dem gleichen Schema ablaufen.",
+    "practicals_admin_labs_creator_multiple_helptext_2": "Ein Beispiel: Du hast das Audiolabor am 13. und 14. Mai sowie am 20. und 21. Mai reserviert. An diesen Tagen möchtest du jeweils von 9:00 und 12:30, von 12:45 bis 16:15 und von 16:30 bis 20:00 ein Praktikum anbieten.",
+    "practicals_admin_labs_creator_multiple_choose_days": "Wähle die Tage aus, für die du neue Termine erstellen willst:",
+    "practicals_admin_labs_creator_multiple_add_timeslots": "Füge Termine zum Schema hinzu. Diese Termine werden für jeden ausgewählten Tag angelegt.",
 
     "general_weekdays 0": "Sonntag",
     "general_weekdays 1": "Montag",
