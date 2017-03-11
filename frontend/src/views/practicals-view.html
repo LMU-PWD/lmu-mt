@@ -107,6 +107,7 @@
                                                      lab-type="[[labType]]"
                                                      all-labs="[[allLabs]]"
                                                      semester-id="[[user.semesterId]]"
+                                                     on-labs-changed="_handleLabsChanged"
                                                      access-token="[[ accessToken ]]"></practicals-admin-labs-detail>
                         </template>
                     </div>
@@ -162,11 +163,12 @@
                 /*Holding information about the labType (infotext, deadlines, ect.. )*/
                 labType: {
                     type: Object,
-                    observer: '_labTypeChanged'
+                    observer:'_labTypeChanged'
                 }
             },
             ready: function () {
                //console.log(this.user);
+                this._handleLabsChanged();
             },
 
             _groupChanged: function (detail) {
@@ -193,15 +195,7 @@
             },
             _userChanged: function (detail) {
                 //console.log(detail);
-
-                this.ajax_labs = {
-                    headers: {
-                        Authorization: this.accessToken,
-                        filter: '{"where":{"semesterId":"'+this.user.semesterId+'","labTypeId":"'+this.labType.id+'"}}'
-                    },
-                    method: 'GET',
-                    endpoint: '/Labs'
-                };
+                this._handleLabsChanged();
 
             },
             _labTypeChanged: function (response) {
@@ -209,6 +203,20 @@
                 //console.log(detail);
                 this.customStyle['--color'] = this.labType.color;
                 this.updateStyles();
+                this._handleLabsChanged();
+            },
+            _handleLabsChanged: function () {
+                //console.log(detail);
+                if (this.user && this.labType)
+                    this.ajax_labs = {
+                        headers: {
+                            Authorization: this.accessToken,
+                            filter: '{"where":{"semesterId":"' + this.user.semesterId + '","labTypeId":"' + this.labType.id + '"}}'
+                        },
+                        method: 'GET',
+                        endpoint: '/Labs'
+                    };
+
             },
             _handleAllLabsRequest: function (response) {
                 this.set('allLabs',response.detail);

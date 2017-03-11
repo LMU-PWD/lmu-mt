@@ -76,12 +76,12 @@
                 body="[[ ajax_save_new_lab.body ]]"
                 endpoint="[[ ajax_save_new_lab.endpoint ]]"
                 on-api-response="_responseFromPostingLab"></api-request>
-        <api-request
+        <!--api-request
                 headers="[[ ajax_get_labs.headers ]]"
                 method="[[ ajax_get_labs.method ]]"
                 body="[[ ajax_get_labs.body ]]"
                 endpoint="[[ ajax_get_labs.endpoint ]]"
-                on-api-response="_responseFromGettingLabs"></api-request>
+                on-api-response="_responseFromGettingLabs"></api-request-->
 
         <iron-signals on-iron-signal-switchlocale="_switchLocale"></iron-signals>
 
@@ -236,6 +236,7 @@
              * @private
              */
             _handleDateClick: function(e){
+                this.chosenlab = {};
                 var labFromChild = new Date(e.detail.dates[0]);
                 //console.log(labFromChild.toString());
                 var lab = new Date();
@@ -269,7 +270,7 @@
              */
             _labsChanged: function(e){
                 //console.log(e);
-                if(this.isReady) {
+                if(this.groups && this.tutors) {
                     this.set('transformedLabs', this._transformLabs(this.allLabs,true));
                 }
             },
@@ -295,8 +296,8 @@
                                 tutorId: this.labToSet.tutorId,
                                 groupId: this.labToSet.groupId
                             },
-                            method: 'PUT',
-                            endpoint: '/labs/' + this.labToSet.id
+                            method: 'PATCH',
+                            endpoint: '/Labs/' + this.labToSet.id
                         };
                         console.log(this.ajax_save_lab);
                         this.labToSet = {};
@@ -370,7 +371,8 @@
                 this.isReady = true;
                 //console.log(this.tutors);
                 //TODO: when i execute the next line everything goes wrong
-                this.set('transformedLabs', this._transformLabs(this.allLabs,true));
+                this._labsChanged(e);
+                //this.set('transformedLabs', this._transformLabs(this.allLabs,true));
                 //this.$.dates.render();
 
             },
@@ -382,7 +384,9 @@
             _responseFromGettingLabs: function(e){
                 var temporalArray = e.detail;
                 var labTypeId = this.labType.id;
-                this.allLabs = temporalArray.filter(function(item){return item.labTypeId == labTypeId;});
+                console.log(this.labType.id);
+                temporalArray = temporalArray.filter(function(item){return item.labTypeId == labTypeId;});
+                this.allLabs = temporalArray;
                 //this.set('transformedLabs', this._transformLabs(this.allLabs,true));
                 //console.log(this.transformedLabs);
             },
@@ -393,14 +397,16 @@
              * @private
              */
             _responseFromPostingLab: function(e){
-                //console.log(e);
-                this.ajax_get_labs = {
+                console.log(e);
+                console.log(this.semesterId);
+                /*this.ajax_get_labs = {
                     headers: {
                         Authorization: this.accessToken
                     },
                     method: 'GET',
                     endpoint: '/labs?filter[where][semesterId]=' +  this.semesterId
-                };
+                };*/
+                this.fire('labs-changed');
             },
 
             /**
