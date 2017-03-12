@@ -140,8 +140,8 @@
                              value="{{newUser.email}}"
                              required>
                     <iron-icon icon="mail" prefix></iron-icon>
-                    <div suffix>@campus.lmu.de</div>
                 </paper-input>
+                <!--TODO evtl zugehöriges Semester -->
             </div>
             <div class="buttons">
                 <paper-button dialog-dismiss autofocus>{{localize('c_button_cancel')}}</paper-button>
@@ -168,6 +168,7 @@
                                 <paper-tooltip>{{localize('users-admin email-verified')}}</paper-tooltip>
                             </div>
                         </template>
+                        <!--TODO evtl zugehöriges Semester -->
                         <paper-icon-button icon="icons:delete" on-tap="_deleteAdmin"></paper-icon-button>
                     </div>
                 </div>
@@ -361,9 +362,7 @@
                 //Check if Popup Approved or Canceled
                 if (event.detail.confirmed) {
                     //Validate if all Fields Filled in & not final mail submitted
-                    if (this.newUser.name && this.newUser.first_name && this.newUser.email && !this.newUser.email.includes('@')) {
-                        //Append Mail Suffix & generate API Request
-                        this.newUser.email += '@campus.lmu.de';
+                    if (this.newUser.name && this.newUser.first_name && this.newUser.email && this.newUser.email.includes('@')) {
                         this.set('newUser.semesterId', this.semester);
                         this.createAjax = {
                             contentType: 'application/json',

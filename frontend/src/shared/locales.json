@@ -134,6 +134,7 @@
     "admin_dashboard students" : "Students",
     "admin_dashboard groups" : "Groups",
     "admin_dashboard tutors" : "Tutors",
+    "admin_dashboard admins" : "Administrators",
     "admin_dashboard semester" : "Terms",
 
     "practicals-student-date labDate_1" : "Your practical takes place on ",
@@ -150,6 +151,7 @@
 
     "users-admin email-verified" : "User verified his email",
     "users-admin group" : "User is member in a group.",
+    "users-admin tutor-count" : "Counts the Labs assigned to this tutor.",
 
     "usersadmin_dialog create" : "Please enter Name and Campus Mail adress to create a new User",
 
@@ -297,6 +299,7 @@
     "admin_dashboard students" : "Studenten",
     "admin_dashboard groups" : "Gruppen",
     "admin_dashboard tutors" : "Tutoren",
+    "admin_dashboard admins" : "Administratoren",
     "admin_dashboard semester" : "Semester",
 
     "practicals-student-date labDate_1" : "Dein Praktikumstermin ist am ",
@@ -313,6 +316,7 @@
 
     "users-admin email-verified" : "Dieser Nutzer hat seine E-Mail bestätigt.",
     "users-admin group" : "Dieser Nutzer ist Mitglied einer Gruppe.",
+    "users-admin tutor-count" : "Zähler für die dem Tutor zugewiesenen Termine.",
 
     "usersadmin_dialog create" : "Bitte geben sie Vor- und Nachname sowie die Campus Mail Adresse an um einen neuen Nutzer zu erstellen ",
 

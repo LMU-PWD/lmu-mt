@@ -236,7 +236,8 @@
                     type: Array
                 },
                 students: {
-                    type: Array
+                    type: Array,
+                    observer: '_studentsChanged'
                 },
                 language: {
                     type: String,
@@ -253,6 +254,10 @@
                 Polymer.MyLocalizeBehavior
             ],
 
+
+            _studentsChanged: function (detail) {
+                console.log(detail);
+            },
 
             _semesterChanged: function (event) {
                 this.set('semester', event.detail);
@@ -339,7 +344,7 @@
                 this.$$('#deleteDialog > div > H1 > span').textContent = groupName;
                 this.$.deleteDialog.open();
             },
-            _createStudent: function () {
+            _createGroup: function () {
                 var groupSize = 4; //TODO get from semester info
                 console.log(this.students);
                 this.set('members',[]);
@@ -378,6 +383,7 @@
                     this.members.forEach(function (element) {
                         if(element.name!=""){
                             mails.push(element.name.concat("@campus.lmu.de"));
+
                         }else{
                             checked = false
                         }
@@ -385,6 +391,8 @@
                     console.log(mails);
                     console.log(this.accessToken);
                     if(checked){
+                        //Find Student IDs in students
+
                         this.ajaxCreateGroup = {
                             headers: {
                                 Authorization: this.accessToken
@@ -422,7 +430,7 @@
                 });
             },
             create: function () {
-                this._createStudent();
+                this._createGroup();
             },
 
             _forget: function () {

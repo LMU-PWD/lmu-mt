@@ -1,5 +1,10 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 
+<!--Localization Imports-->
+<link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
+<link rel="import" href="../services/my-localize-behavior.html">
+
+
 <dom-module id="admin-card"><template>
     <style  include="shared-styles">
         :host {
@@ -59,7 +64,10 @@
         <h1>[[label]]</h1>
         <paper-icon-button class="add" icon="add-circle-outline" on-tap="_fireCreate"></paper-icon-button>
     </div>
+
+    <!--Iron Signal for Localization-->
     <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
+
 </template>
     <script>
         Polymer({
@@ -69,6 +77,9 @@
                 label: String,
                 role: String
             },
+            behaviors: [
+                Polymer.MyLocalizeBehavior
+            ],
             ready: function() {
             
             },

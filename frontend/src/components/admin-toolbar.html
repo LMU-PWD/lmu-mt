@@ -13,7 +13,7 @@
 
         <style>
 
-            :host {
+          /*  :host {
                 display: block;
                 text-align: right;
             }
@@ -28,7 +28,51 @@
                 :host {
                     text-align: left;
                 }
+            }*/
+
+            :host {
+                height: 100px;
+                display: block;
+                background-color: var(--paper-blue-grey-100);
+                border-radius: 5px;
             }
+            .container:hover{
+                background-color: var(--paper-blue-grey-200);
+            }
+
+            .icon{
+                height: 64px;
+                width: 64px;
+                position: relative;
+                margin: 18px 0 0 18px; /*oben rechts unten links old:calc(20% - 54px)*/
+                float: left;
+                border-radius: 50%;
+                border: 2px solid var(--paper-blue-grey-900);
+            }
+            .icon > img {
+                color: var(--paper-blue-grey-900);
+            }
+            paper-dropdown-menu{
+                float: left;
+                position: relative;
+                top: 20px;
+                display:flex;
+                align-items:center;
+                width:calc(100% - 206px);
+                padding: 0 18px;
+                margin: 0 auto;
+                height: 60px;
+                cursor: default;
+            }
+            .add{
+                float: right;
+                padding: 14px;
+                margin: 20px 20px 20px 0;
+                width: 60px;
+                height: 60px;
+                color: var(--paper-blue-grey-800);
+            }
+
 
         </style>
 
@@ -38,23 +82,30 @@
             endpoint="[[ ajax.endpoint ]]"
             on-api-response="_handleSemesterResponse"></api-request>
 
-        <paper-dropdown-menu label="Semester">
-            <paper-listbox class="dropdown-content" selected="{{ selectedSemesterIndex }}">
-                <template is="dom-repeat" items="[[ semesters ]]" as="semester">
-                    <paper-item>[[ semester.term ]]</paper-item>
-                </template>
-            </paper-listbox>
-        </paper-dropdown-menu>
 
-        <paper-icon-button
-                id="newSemesterButton"
-                icon="icons:add-circle-outline"
-                on-tap="_buttonTapped"></paper-icon-button>
-        <paper-tooltip
-                for="newSemesterButton"
-                position="bottom"
-                animation-delay="0"
-                fit-to-visible-bounds="true">[[ localize('admin_toolbar_new_semester_tooltip') ]]</paper-tooltip>
+        <div class="container">
+            <div class="icon">
+                <img src="../../images/semester.svg">
+            </div>
+            <paper-dropdown-menu label="Semester">
+                <paper-listbox class="dropdown-content" selected="{{ selectedSemesterIndex }}">
+                    <template is="dom-repeat" items="[[ semesters ]]" as="semester">
+                        <paper-item>[[ semester.term ]]</paper-item>
+                    </template>
+                </paper-listbox>
+            </paper-dropdown-menu>
+
+
+            <h1>[[label]]</h1>
+            <paper-icon-button class="add" icon="add-circle-outline" on-tap="_buttonTapped"></paper-icon-button>
+            <paper-tooltip
+                    for="newSemesterButton"
+                    position="bottom"
+                    animation-delay="0"
+                    fit-to-visible-bounds="true">[[ localize('admin_toolbar_new_semester_tooltip') ]]</paper-tooltip>
+
+        </div>
+
 
         <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
 

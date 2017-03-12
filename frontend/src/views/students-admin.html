@@ -288,6 +288,7 @@
                 }
                 //To Notify Polymer & other Components of changes to students property
                 this.notifyPath('students');
+                this.fire('STUDENTS_CHANGED',{students: this.students});
             },
 
             /**

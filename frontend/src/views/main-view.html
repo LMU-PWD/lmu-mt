@@ -26,6 +26,7 @@ The Main View contains:
 <link rel="import" href="tutors-admin.html">
 <link rel="import" href="groups-admin.html">
 <link rel="import" href="practicals-view.html">
+<link rel="import" href="admins-admin.html">
 
 <link rel="import" href="../shared/shared-styles.html">
 
@@ -594,6 +595,11 @@ The Main View contains:
                                     name="semester-setup"
                                     page="{{ page }}"
                                     access-token="[[ accessToken ]]"></semester-setup-view>
+                            <admins-admin
+                                    name="admins"
+                                    access-token="[[ accessToken ]]"
+                                    self-info="{{user}}"
+                                    selected-semester="[[ adminSelectedSemesterId ]]"></admins-admin>
                             <tutors-admin
                                     name="tutors"
                                     access-token="[[ accessToken ]]"
@@ -691,6 +697,10 @@ The Main View contains:
 
                 groups: {
                     type: Array
+                },
+
+                students: {
+                    type: Array
                 }
             },
 
@@ -701,7 +711,13 @@ The Main View contains:
             listeners: {
                 'CHANGE_ROUTE' : '_handleRouting',
                 'icon-changed' : '_handleIconChanged',
-                'GROUP_CHANGED': '_updateGroup'
+                'GROUP_CHANGED': '_updateGroup',
+                'STUDENTS_CHANGED': '_updateStudents'
+            },
+
+            _updateStudents: function (event) {
+                console.log(event);
+                this.set('students', event.detail.students);
             },
 
             _updateGroup: function (event) {

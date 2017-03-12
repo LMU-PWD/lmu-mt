@@ -26,37 +26,33 @@
                 width: 100%;
             }
 
-            admin-toolbar {
+
+            .user-container {
                 margin: 0 10px;
-                width: auto;
+            }
+
+            .practicals-container {
+                margin: 10px 10px;
             }
 
             /*Phone*/
             @media screen and (max-width: 767px) {
                 .user-container {
-                    width: 100%;
-                    min-width: 320px;
+                    width: calc(100% - 20px);
                 }
 
                 .practicals-container {
-                    min-width: 320px;
-                    width: 100%;
-                }
-
-                admin-toolbar {
-                    margin: 0;
+                    width: calc(100% - 20px);
                 }
             }
 
             /*Tablet*/
             @media screen and (min-width: 768px) and (max-width: 1023px) {
                 .user-container {
-                    margin: 10px;
                     width: calc(50% - 20px);
                 }
 
                 .practicals-container {
-                    margin: 10px;
                     width: calc(50% - 20px);
                 }
             }
@@ -64,12 +60,10 @@
             /*Desktop*/
             @media screen and (min-width: 1024px) {
                 .user-container {
-                    margin: 10px;
                     width: calc(35% - 20px);
                 }
 
                 .practicals-container {
-                    margin: 10px;
                     width: calc(35% - 20px);
                 }
             }
@@ -81,6 +75,9 @@
                 <admin-toolbar
                         user="[[ user ]]"
                         selected-semester="{{ adminSelectedSemesterId }}"></admin-toolbar>
+            <admin-card label="{{localize('admin_dashboard admins')}}"
+                        path-to-icon="../../images/admin.svg"
+                        role="admins"></admin-card>
             <admin-card label="{{localize('admin_dashboard tutors')}}"
                         path-to-icon="../../images/tutor.svg"
                         role="tutors"></admin-card>
@@ -103,9 +100,8 @@
             <template is="dom-repeat" items="[[labTypes]]" as="labType">
                 <index-card lab-type="[[labType]]" group="[[group]]"></index-card>
             </template>
-            <!--index-card key="photo" type="Fotopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:"
-                        info2="18.05.16, 14-16"></index-card>
-            <index-card key="video" type="Videopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:"
+            <index-card lab-type="[[editTypeSample]]" group="[[group]]"></index-card>
+            <!--index-card key="video" type="Videopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:"
                         info2="18.05.16, 14-16"></index-card>
             <index-card key="audio" type="Audiopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:"
                         info2="18.05.16, 14-16"></index-card-->
@@ -126,6 +122,22 @@
                 },
                 adminSelectedSemesterId: {
                     type: String
+                },
+                editTypeSample: {
+                    type: Object,
+                    value: {
+                        color: "#546e7a",
+                        description_student: "Beschreibung Student",
+                        description_tutor: "Beschreibung Tutor",
+                        id: "58c3f5d0eaa9f54f9eecea12",
+                        name: "edit",
+                        registration_deadline: "2017-06-30T16:30:00.000Z",
+                        registration_deadline_tutors: "2017-06-14T16:30:00.000Z",
+                        registration_open: false,
+                        semesterId: "58c3f5cceaa9f54f9eece9e1",
+                        type: 4,
+                        type_str: "Videoschnitt"
+                    }
                 }
             },
             behaviors: [
