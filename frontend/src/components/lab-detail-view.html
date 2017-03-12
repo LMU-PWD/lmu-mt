@@ -1,3 +1,7 @@
+<!--Localization Imports-->
+<link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
+<link rel="import" href="../services/my-localize-behavior.html">
+
 <link rel="import" href="lab-detail-content-element.html">
 <dom-module id="lab-detail-view">
     <template>
@@ -25,22 +29,23 @@
             }
         </style>
 
-        <paper-item class="title">Detailansicht:</paper-item>
+        <paper-item class="title">[[localize('practicals-admin-lab title')]]</paper-item>
         <lab-detail-content-element
-                text="Date" data="[[lab.date]]" input="{{ dateInput }}"
+                text="[[localize('practicals-admin-lab text1')]]" data="[[lab.date]]" input="{{ dateInput }}"
                 is-date-from-parent="true" is-id-from-parent="false" is-editor-from-parent="false"></lab-detail-content-element>
         <lab-detail-content-element
-                text="Duration" data="[[lab.duration]]"  input="{{ durationInput }}"
+                text="[[localize('practicals-admin-lab text2')]]" data="[[lab.duration]]"  input="{{ durationInput }}"
                 is-date-from-parent="false" is-id-from-parent="false" is-editor-from-parent="false"></lab-detail-content-element>
         <lab-detail-content-element
-                text="Location" data="[[lab.location]]"  input="{{ locationInput }}"
+                text="[[localize('practicals-admin-lab text3')]]" data="[[lab.location]]"  input="{{ locationInput }}"
                 is-date-from-parent="false" is-id-from-parent="false" is-editor-from-parent="false"></lab-detail-content-element>
         <lab-detail-content-element
-                text="Tutor" data="[[labTutor]]"  input="{{ tutorInput }}"
+                text="[[localize('practicals-admin tutor')]]" data="[[labTutor]]"  input="{{ tutorInput }}"
                 is-date-from-parent="false" is-id-from-parent="true" array="[[tutorNames]]" is-editor-from-parent="false"></lab-detail-content-element>
         <lab-detail-content-element
-                text="Group" data="[[labGroup]]" input="{{ groupInput }}"
+                text="[[localize('practicals-admin group')]]" data="[[labGroup]]" input="{{ groupInput }}"
                 is-date-from-parent="false" is-id-from-parent="true" array="[[groupNames]]" is-editor-from-parent="false"></lab-detail-content-element>
+        <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
     </template>
 
     <script>
@@ -105,6 +110,11 @@
                     observer: "_dataFromApiChanged"
                 }
             },
+
+            behaviors: [
+                Polymer.MyLocalizeBehavior
+            ],
+
             ready: function () {
                 //console.log(this.accessToken);
                 //console.log(this.lab);
@@ -115,8 +125,8 @@
              * @private
              */
             _dateChanged: function(e){
-                console.log(e);
-                console.log(this.dateInput);
+                //console.log(e);
+                //console.log(this.dateInput);
                 this.set('lab.date', this.dateInput.toString());
             },
 
@@ -126,12 +136,11 @@
              * @private
              */
             _dataFromApiChanged: function(e){
-                //console.log(e);
-                //console.log(this.groups);
-                //console.log(this.tutors);
                 if(this.tutors && this.groups) {
                     this.tutorNames = [];
                     this.groupNames = [];
+                    this.set('labTutor', "");
+                    this.set('labGroup', "");
                     //console.log(this.lab);
                     for (i = 0; i < this.tutors.length; i++) {
                         this.tutorNames.push(this.tutors[i].name + ", " + this.tutors[i].first_name);
@@ -156,8 +165,8 @@
             * @private
             */
             _durationChanged: function(e){
-                console.log(e);
-                console.log(this.durationInput);
+                //console.log(e);
+                //console.log(this.durationInput);
                 this.set('lab.duration', this.durationInput);
             },
             /** Handle changes of
@@ -165,8 +174,8 @@
             * @private
             */
             _locationChanged: function(e){
-                console.log(e);
-                console.log(this.locationInput);
+                //console.log(e);
+                //console.log(this.locationInput);
                 this.set('lab.location', this.locationInput);
             },
 
@@ -175,8 +184,8 @@
             * @private
             */
             _tutorChanged: function(e){
-                console.log(e);
-                console.log(this.tutorInput);
+                //console.log(e);
+                //console.log(this.tutorInput);
                 this.set('labTutor', this.tutorInput);
                 for (i = 0; i < this.tutors.length; i++) {
                     if(this.tutorInput == (this.tutors[i].name + ", " + this.tutors[i].first_name)){
@@ -189,8 +198,8 @@
              * @private
              */
             _groupChanged: function(e){
-                console.log(e);
-                console.log(this.groupInput);
+                //console.log(e);
+                //console.log(this.groupInput);
                 this.set('labGroup', this.groupInput);
                 for (i = 0; i < this.groups.length; i++) {
                     if(this.groupInput == this.groups[i].name){
@@ -204,9 +213,7 @@
              * @private
              */
             _labChanged: function(e){
-                console.log(this.labFromApi);
-                //console.log(this.lab.groupId);
-                //console.log(this.lab.tutorId);
+                //console.log(this.labFromApi);
                 this.set('lab', this.labFromApi);
                 this.set('lab.date', new Date(this.labFromApi.date));
                 this._dataFromApiChanged(e);

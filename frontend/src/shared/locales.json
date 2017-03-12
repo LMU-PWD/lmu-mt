@@ -135,6 +135,25 @@
     "admin_dashboard tutors" : "Tutors",
     "admin_dashboard semester" : "Terms",
 
+    "practicals practicals": "practicals",
+    "practicals tabtitle_1": "General",
+    "practicals tabtitle_2": "Dates",
+
+    "practicals-admin tutor": "Tutor",
+    "practicals-admin group": "Group",
+    "practicals-admin close_registration": "Close Registration",
+    "practicals-admin open_registration": "Open Registration",
+
+    "practicals-admin-labtype text1":"Registration Deadline Students",
+    "practicals-admin-labtype text2":"Registration Deadline Tutors",
+    "practicals-admin-labtype text3":"Practicals Description Students",
+    "practicals-admin-labtype text4":"Practicals Description Tutors",
+
+    "practicals-admin-lab title":"Detail View",
+    "practicals-admin-lab text1":"Date",
+    "practicals-admin-lab text2":"Duration",
+    "practicals-admin-lab text3":"Location",
+
     "practicals-student-date labDate_1" : "Your practical takes place on ",
     "practicals-student-date labDate_2" : ", the  ",
     "practicals-student-date labDate_3" : ", starting at ",
@@ -145,7 +164,9 @@
     "general_weekdays 3": "Wednesday",
     "general_weekdays 4": "Thursday",
     "general_weekdays 5": "Friday",
-    "general_weekdays 6": "Saturday"
+    "general_weekdays 6": "Saturday",
+
+    "general_hours": "hours"
 
   },
 
@@ -285,6 +306,25 @@
     "admin_dashboard tutors" : "Tutoren",
     "admin_dashboard semester" : "Semester",
 
+    "practicals practicals": "Praktikum",
+    "practicals tabtitle_1": "Allgemeines",
+    "practicals tabtitle_2": "Termine",
+
+    "practicals-admin tutor": "Tutor",
+    "practicals-admin group": "Gruppe",
+    "practicals-admin close_registration": "Registrierung schliessen",
+    "practicals-admin open_registration": "Registrierung freischalten",
+
+    "practicals-admin-labtype text1":"Registrierungsfrist Studenten",
+    "practicals-admin-labtype text2":"Registrierungsfrist Tutoren",
+    "practicals-admin-labtype text3":"Praktikumsbeschreibung Studenten",
+    "practicals-admin-labtype text4":"Praktikumsbeschreibung Tutoren",
+
+    "practicals-admin-lab title":"Detailansicht",
+    "practicals-admin-lab text1":"Datum",
+    "practicals-admin-lab text2":"Dauer",
+    "practicals-admin-lab text3":"Ort",
+
     "practicals-student-date labDate_1" : "Dein Praktikumstermin ist am ",
     "practicals-student-date labDate_2" : ", den ",
     "practicals-student-date labDate_3" : ", ab ",
@@ -295,7 +335,9 @@
     "general_weekdays 3": "Mittwoch",
     "general_weekdays 4": "Donnerstag",
     "general_weekdays 5": "Freitag",
-    "general_weekdays 6": "Samstag"
+    "general_weekdays 6": "Samstag",
+
+    "general_hours": "Uhr"
 
   }
 }

@@ -1,3 +1,7 @@
+<!--Localization Imports-->
+<link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
+<link rel="import" href="../services/my-localize-behavior.html">
+
 <link rel="import" href="lab-detail-content-element.html">
 <dom-module id="labtype-detail-view">
     <template>
@@ -40,30 +44,31 @@
 
         <paper-button raised class="studentsRegistrationButton" on-tap="_handleStudentButtonClick">
             <template is="dom-if" if="[[labType.registration_open]]">
-                Registrierung schliessen
+                [[localize('practicals-admin close_registration')]]
             </template>
             <template is="dom-if" if="[[!labType.registration_open]]">
-                Registrierung freischalten
+                [[localize('practicals-admin open_registration')]]
             </template>
         </paper-button>
         <lab-detail-content-element
-                text="Registration Deadline Studenten" data="[[labType.registration_deadline]]" input="{{ dateInput }}"
+                text="[[localize('practicals-admin-labtype text1')]]" data="[[labType.registration_deadline]]" input="{{ dateInput }}"
                 is-date-from-parent="true" is-id-from-parent="false" is-editor-from-parent="false"></lab-detail-content-element>
         <lab-detail-content-element
-                text="Registration Deadline Tutoren" data="[[labType.registration_deadline_tutors]]" input="{{ dateTutorInput }}"
+                text="[[localize('practicals-admin-labtype text2')]]" data="[[labType.registration_deadline_tutors]]" input="{{ dateTutorInput }}"
                 is-date-from-parent="true" is-id-from-parent="false" is-editor-from-parent="false"></lab-detail-content-element>
         <lab-detail-content-element
-                text="Beschreibung Studenten" data="[[labType.description_student]]"  input="{{ descriptionStudentInput }}"
+                text="[[localize('practicals-admin-labtype text3')]]" data="[[labType.description_student]]"  input="{{ descriptionStudentInput }}"
                 is-date-from-parent="false" is-id-from-parent="false" is-editor-from-parent="true"></lab-detail-content-element>
         <lab-detail-content-element
-                text="Beschreibung Tutoren" data="[[labType.description_tutor]]"  input="{{ descriptionTutorInput }}"
+                text="[[localize('practicals-admin-labtype text4')]]" data="[[labType.description_tutor]]"  input="{{ descriptionTutorInput }}"
                 is-date-from-parent="false" is-id-from-parent="false" is-editor-from-parent="true"></lab-detail-content-element>
 
         <template is="dom-if" if="[[showSaveButton]]">
             <paper-button raised class="button" on-tap="_handleSaveButtonClick">
-                <iron-icon icon="save" ></iron-icon>Änderungen Speichern
+                <iron-icon icon="save" ></iron-icon>[[localize('c_button_save')]]
             </paper-button>
         </template>
+        <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
     </template>
 
     <script>
@@ -100,6 +105,9 @@
                     value: false
                 }
             },
+            behaviors: [
+                Polymer.MyLocalizeBehavior
+            ],
             ready: function () {
                 //console.log(this.accessToken);
                 //console.log(this.labTypeFromApi);

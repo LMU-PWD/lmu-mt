@@ -71,7 +71,8 @@
                 },
                 data: {
                     type: String,
-                    notify: true
+                    notify: true,
+                    observer: '_dataChanged'
                 },
                 date: {
                     type: Date,
@@ -136,9 +137,19 @@
                 this.$.editorElement.toggle(); //Show Data Element
                 this.userInput = this.data;
             },
+
             _aceValueChanged: function(e){
                 //console.log(e.detail.value);
                 this.userInput = e.detail.value;
+            },
+
+            _dataChanged: function(e){
+                if (this.isDateFromParent && this.isDateFromParent == "true") {
+                    if(this.data && this.data != "") {
+                        //console.log(this.data.toString().substring(0,21));
+                        this.data = this.data.toString().substring(0,21);
+                    }
+                }
             },
 
             /**
