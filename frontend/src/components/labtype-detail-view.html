@@ -8,12 +8,14 @@
         <style include="shared-styles">
             :host {
                 display: block;
-                #margin-top: 20px;
                 padding: 3%;
                 text-align: left;
+                padding-bottom: 5%;
             }
-            paper-button{
-                margin: 2%;
+            .button{
+                margin-top: 2%;
+                margin-bottom: 2%;
+                width: 49.8%;
             }
 
             /*Phone*/
@@ -64,8 +66,11 @@
                 is-date-from-parent="false" is-id-from-parent="false" is-editor-from-parent="true"></lab-detail-content-element>
 
         <template is="dom-if" if="[[showSaveButton]]">
-            <paper-button raised class="button" on-tap="_handleSaveButtonClick">
+            <paper-button raised  style="float: left;" class="button" on-tap="_handleSaveButtonClick">
                 <iron-icon icon="save" ></iron-icon>[[localize('c_button_save')]]
+            </paper-button>
+            <paper-button style="float: right;" raised class="button" on-tap="_handleDiscardButtonClick">
+                <iron-icon icon="close" ></iron-icon>[[localize('c_button_discard')]]
             </paper-button>
         </template>
         <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
@@ -152,7 +157,7 @@
                 this.set('showSaveButton', true);
             },
             /**
-             * Handle click on Student Button to Post registration_open on API
+             * Handle click on Save Button to Post changed Labtype on API
              * @param e - Event Variable
              * @private
              */
@@ -177,9 +182,23 @@
                     //console.log(this.ajax_save_labtype);
                 }
                 else {
-                    console.log("Error: LabId is wrong: ");
-                    console.log(this.labToSet.id);
+                    console.log("Error: LabTypeId is wrong: ");
+                    console.log(this.labType.id);
                 }
+
+                this.set('showSaveButton', false);
+            },
+
+            /**
+             * Handle click on Disard Button to discard changes on Labtype
+             * @param e - Event Variable
+             * @private
+             */
+            _handleDiscardButtonClick: function(){
+                //Reset LabtypeValues
+                this.set('labType', this.labTypeFromApi);
+                this.set('labType.registration_deadline', new Date(this.labTypeFromApi.registration_deadline));
+                this.set('labType.registration_deadline_tutors', new Date(this.labTypeFromApi.registration_deadline_tutors));
 
                 this.set('showSaveButton', false);
             },

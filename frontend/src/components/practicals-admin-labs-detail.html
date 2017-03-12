@@ -1,4 +1,5 @@
 <link rel="import" href="practicals-admin-date-creator.html">
+<link rel="import" href="practicals-admin-labs-creator.html">
 <link rel="import" href="lab-detail-view.html">
 
 <!--Localization Imports-->
@@ -88,19 +89,17 @@
                              groups = "[[groups]]"></lab-detail-view>
 
             <div class="buttons">
-                <paper-button class="dialogButton" dialog-dismiss raised><iron-icon icon="close" ></iron-icon>[[localize('c_button_cancel')]]</paper-button>
+                <paper-button class="dialogButton" dialog-dismiss raised><iron-icon icon="close" ></iron-icon>[[localize('c_button_discard')]]</paper-button>
                 <paper-button class="dialogButton" dialog-confirm raised><iron-icon icon="save" ></iron-icon>[[localize('c_button_save')]]</paper-button>
             </div>
         </paper-dialog>
 
-        <paper-dialog id="newLabView" on-iron-overlay-closed="_reactToNewLabDialog">
-            <!-- TODO: here comes a view to add a new lab-->
-
-            <div class="buttons">
-                <paper-button class="dialogButton" dialog-dismiss raised><iron-icon icon="close" ></iron-icon>[[localize('c_button_cancel')]]</paper-button>
-                <paper-button class="dialogButton" dialog-confirm raised><iron-icon icon="save" ></iron-icon>[[localize('c_button_save')]]</paper-button>
-            </div>
-        </paper-dialog>
+        <!-- Dialog for creating new labs -->
+        <practicals-admin-labs-creator id="newLabView"
+                                       access-token="[[ accessToken ]]"
+                                       lab-type-id="[[ labType.id ]]"
+                                       semester-id="[[ semesterId ]]"
+                                       on-labs-changed="[[ _responseFromPostingLab ]]"></practicals-admin-labs-creator>
 
         <div class="page">
             <div>
@@ -300,37 +299,6 @@
                         };
                         //console.log(this.ajax_save_lab);
                         this.labToSet = {};
-                    }
-                    else{
-                        console.log("Error: LabId is wrong: ");
-                        console.log(this.labToSet.id);
-                    }
-                }
-            },
-
-            /**
-             * Handle Dialog button pressed, If confirmed POST a new lab to API
-             * @param event
-             */
-            _reactToNewLabDialog: function (event) {
-                if(event.detail.confirmed){
-                    //PODT new lab in API
-                    this.labToSet = event.target.firstChild.nextSibling.lab;
-                    if(this.labToSet.id) {
-                        this.ajax_save_new_lab = {
-                            headers: {
-                                Authorization: this.accessToken
-                            },
-                            body: {
-                                date: this.labToSet.date,
-                                duration: this.labToSet.duration,
-                                location: this.labToSet.location,
-                                tutorId: this.labToSet.tutorId,
-                                groupId: this.labToSet.groupId
-                            },
-                            method: 'POST',
-                            endpoint: '/labs/'
-                        };
                     }
                     else{
                         console.log("Error: LabId is wrong: ");
