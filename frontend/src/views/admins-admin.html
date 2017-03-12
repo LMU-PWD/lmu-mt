@@ -1,0 +1,445 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
+
+<!--Localization Imports-->
+<link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
+<link rel="import" href="../services/my-localize-behavior.html">
+
+
+<dom-module id="admins-admin">
+    <template>
+        <style include="shared-styles iron-flex iron-flex-alignment">
+
+            h1 > span {
+                font-style: italic;
+            }
+
+            h1 {
+                height: auto;
+            }
+
+            .container {
+                padding: 0 20px;
+            }
+
+            .admin {
+                height: 70px;
+                width: auto;
+                background-color: var(--paper-blue-grey-100);
+                margin: 5px;
+                padding: 10px;
+                border-radius: 5px;
+            }
+
+            .admin > h1 {
+                margin: 0 8px;
+                padding: 0;
+                font-size: 20px;
+                height: 30px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                width: auto;
+            }
+
+
+            #createDialog {
+                min-width: 300px;
+            }
+
+            #verified {
+                color: var(--paper-blue-grey-300);
+            }
+
+            .icon-container {
+                width: 100%;
+                height: 30px;
+                position: relative;
+                float: none;
+                min-width: 160px;
+            }
+
+            .icon-container > paper-icon-button {
+                float: right;
+            }
+
+            .icon-wrapper{
+                width:40px;
+                height: 40px;
+                margin: 0;
+                float: left;
+            }
+            iron-icon{
+                padding: 8px;
+            }
+
+            paper-icon-button:hover{
+                color: var(--paper-blue-grey-600);
+            }
+
+
+        </style>
+        <div></div>
+        <!-- Fetches all registered Admins -->
+        <api-request
+                headers="[[ ajax.headers ]]"
+                method="[[ ajax.method ]]"
+                endpoint="[[ ajax.endpoint ]]"
+                semester-filter="[[ selectedSemester ]]"
+                on-api-response="_handleAdminsResponse"></api-request>
+
+        <!-- Fetches all pending Admins -->
+        <api-request
+                headers="[[ ajax_pending.headers ]]"
+                method="[[ ajax_pending.method ]]"
+                endpoint="[[ ajax_pending.endpoint ]]"
+                semester-filter="[[ selectedSemester ]]"
+                on-api-response="_handlePendingAdminsResponse"></api-request>
+
+        <!-- Deletes Specific Admin -->
+        <api-request
+                headers="[[ deleteAjax.headers ]]"
+                method="[[ deleteAjax.method ]]"
+                endpoint="[[ deleteAjax.endpoint ]]"
+                on-api-response="_handleDeleteResponse"
+                on-api-error="_handleDeleteError"></api-request>
+
+
+        <!-- Create admin -->
+        <api-request
+                headers="[[ createAjax.headers ]]"
+                body="[[ createAjax.body ]]"
+                method="[[ createAjax.method ]]"
+                endpoint="[[ createAjax.endpoint ]]"
+                on-api-response="_handleCreateResponse"
+                on-api-error="_handleCreateError"
+                loading="{{ isLoading }}"></api-request>
+
+
+        <paper-dialog id="deleteDialog" on-iron-overlay-closed="_reactToDeleteDialog">
+            <div>
+                <h1>{{localize('usersadmin_dialog text-1')}}<span></span> {{localize('groupsadmin_dialog text-2')}}
+                </h1>
+                <p>{{localize('admin_dialog text-3')}}</p>
+            </div>
+            <div class="buttons">
+                <paper-button dialog-dismiss autofocus>{{localize('c_button_cancel')}}</paper-button>
+                <paper-button dialog-confirm>OK</paper-button>
+            </div>
+        </paper-dialog>
+
+        <paper-dialog id="createDialog" on-iron-overlay-closed="_reactToCreateDialog">
+            <div>
+                <h1>{{localize('usersadmin_dialog create')}}</h1>
+                <paper-input value="{{newUser.first_name}}" label="{{localize('semester_setup_users_table_firstname')}}"></paper-input>
+                <paper-input value="{{newUser.name}}" label="{{localize('semester_setup_users_table_lastname')}}"></paper-input>
+                <paper-input class="create-group-input"
+                             label="E-Mail"
+                             value="{{newUser.email}}"
+                             required>
+                    <iron-icon icon="mail" prefix></iron-icon>
+                    <div suffix>@campus.lmu.de</div>
+                </paper-input>
+            </div>
+            <div class="buttons">
+                <paper-button dialog-dismiss autofocus>{{localize('c_button_cancel')}}</paper-button>
+                <paper-button dialog-confirm>OK</paper-button>
+            </div>
+        </paper-dialog>
+
+        <div class="fullbleed horizontal center-justified layout" style="width: 100%; margin: 10px 0;">
+            <paper-icon-button  style="width: 100px;" icon="add-circle-outline" on-tap="create"></paper-icon-button>
+        </div>
+
+        <!--Lists all Admins-->
+        <div class="container horizontal layout wrap">
+            <template is="dom-repeat" items="[[admins]]" as="admin">
+                <div class="admin flex self-center" id="admin_[[index]]">
+                    <h1>[[admin.first_name]] [[admin.name]]</h1>
+                    <div class="icon-container">
+                        <a class="icon-wrapper" href="mailto:[[admin.email]]" tabindex="-1">
+                            <paper-icon-button icon="icons:mail"></paper-icon-button>
+                        </a>
+                        <template is="dom-if" if="[[admin.emailVerified]]">
+                            <div class="icon-wrapper">
+                                <iron-icon id="verified" icon="icons:verified-user"></iron-icon>
+                                <paper-tooltip>{{localize('users-admin email-verified')}}</paper-tooltip>
+                            </div>
+                        </template>
+                        <paper-icon-button icon="icons:delete" on-tap="_deleteAdmin"></paper-icon-button>
+                    </div>
+                </div>
+            </template>
+        </div>
+
+        <!--Paper Toasts on Create & Delete, Success or Failure-->
+        <paper-toast id="createSuccess" text="{{localize('admin-toast create-success')}}"></paper-toast>
+        <paper-toast id="createFail" text="{{localize('admin-toast create-fail')}}"></paper-toast>
+        <paper-toast id="deleteSuccess" text="{{localize('admin-toast delete-success')}}"></paper-toast>
+        <paper-toast id="deleteFail" text="{{localize('admin-toast delete-fail')}}"></paper-toast>
+
+
+        <!--Iron Signal for Localization-->
+        <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
+
+        <!--Iron Signal for passing Semester-->
+        <iron-signals on-iron-signal-semester="_semesterChanged"></iron-signals>
+
+        <!--Iron Signal Fired on Logout-->
+        <iron-signals on-iron-signal-forget="_forget"></iron-signals>
+    </template>
+    <script>
+        Polymer({
+            is: 'admins-admin',
+            properties: {
+                admins: {
+                    type: Array,
+                    value: []
+                },
+                semester: {
+                    type: String
+                },
+                groups: {
+                    type: Array,
+                    observer: '_groupsChanged'
+                },
+                newUser: {
+                    type: Object,
+                    value: {
+                        "name": "",
+                        "first_name": "",
+                        "email": "",
+                        "isTutor": false,
+                        "isAdmin": true,
+                        "semesterId": ""
+                    }
+                }
+
+            },
+            behaviors: [
+                Polymer.MyLocalizeBehavior
+            ],
+            ready: function () {
+            },
+
+            /**
+             * Requests registered Users from API
+             * On Semester is Changed
+             * Filtered by Semester & UserRole: Admin
+             * @private
+             */
+            _semesterChanged: function (event) {
+                this.set('semester', event.detail);
+                this.set('admins', []);
+
+                this.ajax = {
+                    contentType: 'application/json',
+                    headers: {
+                        Authorization: this.accessToken,
+                        filter: '{"where":{"isTutor":"false","isAdmin":"true"}}'
+                    },
+                    method: 'GET',
+                    endpoint: '/platformUsers'
+                };
+
+            },
+
+            /**
+             * Callback on API response to reqgistered Users Request
+             * appending received Users to admins array
+             * generating Request for PendingUsers filtered by Semester & Role
+             * @private
+             */
+            _handleAdminsResponse: function (event) {
+                var api_response = event.detail;
+                console.log(api_response);
+                for (var i = 0; i < api_response.length; i++) {
+                    this.push('admins', api_response[i]);
+                }
+                console.log(this.admins);
+
+                this.ajax_pending = {
+                    contentType: 'application/json',
+                    headers: {
+                        Authorization: this.accessToken,
+                        filter: '{"where":{"isTutor":"false","isAdmin":"true"}}'
+                    },
+                    method: 'GET',
+                    endpoint: '/PendingPlatformUsers'
+                };
+            },
+
+            /**
+             * Function appending Pending Users received from API to Admins Array
+             * @private
+             */
+            _handlePendingAdminsResponse: function (event) {
+                var api_response = event.detail;
+                for (var i = 0; i < api_response.length; i++) {
+                    this.push('admins', api_response[i]);
+                }
+                this.labCountAjax = {
+                    contentType: 'application/json',
+                    headers: {
+                        Authorization: this.accessToken,
+                        filter: '{"where":{"adminId":"'+this.admins[0].id+'","semesterId":"' + this.semester + '"}}'
+                    },
+                    method: 'GET',
+                    endpoint: '/Labs'
+                };
+                //To Notify Polymer & other Components of changes to admins property
+                this.notifyPath('admins');
+            },
+
+            _handleLabCountResponse: function (response) {
+                console.log(response);
+                console.log(this.admins[0].id);
+            },
+
+            /**
+             * Opens Popup to Approve User Deletion
+             * @private
+             */
+            _deleteAdmin: function (event) {
+                //Grabbing Admin information from target
+                var admin = event.model.__data__.admin;
+                var adminID = admin.id;
+                var adminName = admin.first_name + " " + admin.name;
+                var pending = !admin.emailVerified;
+
+                //Temporarily save Admin Info in deleteDialogs Attributes
+                this.$.deleteDialog.dataset.adminID = adminID;
+                this.$.deleteDialog.dataset.pending = pending;
+
+                //Set Popup Text to match selcted Admin & Open Popus
+                this.$$('#deleteDialog > div > H1 > span').textContent = adminName;
+                this.$.deleteDialog.open();
+            },
+
+            /**
+             * Opens Creation Popup (called on-tap & from main-view)
+             * @public
+             */
+            create: function () {
+                this.$.createDialog.open();
+            },
+
+            /**
+             * Callback on Deletion Popup Closed
+             * @private
+             */
+            _reactToDeleteDialog: function (event) {
+                //Check if Popup Approved or Canceled
+                if (event.detail.confirmed) {
+                    //Calculate API endpoint from pendingFlag & adminId stored in popups data
+                    var data = event.path[0].dataset;
+                    var endpoint = ((data.pending == 'true') ? ('/PendingPlatformUsers/') : ('/PlatformUsers/')) + data.adminID;
+                    //Generate API Request
+                    this.deleteAjax = {
+                        contentType: 'application/json',
+                        headers: {
+                            Authorization: this.accessToken
+                        },
+                        method: 'DELETE',
+                        endpoint: endpoint
+                    };
+
+                } else {
+                    //Reset Attributes
+                    this.$.deleteDialog.dataset.adminId = '';
+                    this.$.deleteDialog.dataset.pending = '';
+                }
+            },
+
+            /**
+             * Callback on Creation Popup Closed
+             * @private
+             */
+            _reactToCreateDialog: function (event) {
+                //Check if Popup Approved or Canceled
+                if (event.detail.confirmed) {
+                    //Validate if all Fields Filled in & not final mail submitted
+                    if (this.newUser.name && this.newUser.first_name && this.newUser.email && !this.newUser.email.includes('@')) {
+                        //Append Mail Suffix & generate API Request
+                        this.newUser.email += '@campus.lmu.de';
+                        this.set('newUser.semesterId', this.semester);
+                        this.createAjax = {
+                            contentType: 'application/json',
+                            headers: {
+                                Authorization: this.accessToken
+                            },
+                            body: this.newUser,
+                            method: 'POST',
+                            endpoint: '/PendingPlatformUsers'
+                        };
+                        //Reset newUser to Display empty fields the next time again
+                        this.set('newUser',{"name": "","first_name": "","email": "","isTutor": false,"isAdmin": true})
+                    } else {
+                        this.$$('#createFail').open();
+                    }
+                } else {
+                    //Reset Attributes
+                    this.$.deleteDialog.dataset.adminId = '';
+                    this.$.deleteDialog.dataset.pending = '';
+                }
+            },
+
+            /**
+             * Callback on API response to Delete User Request
+             * @private
+             */
+            _handleDeleteResponse: function (response) {
+                //Remove Admin from Admins List
+                var adminID = this.$.deleteDialog.dataset.adminID;
+                index = this.admins.findIndex(x => x.id === adminID);
+                this.splice('admins', index, 1);
+
+                //Reset Attributes
+                this.$.deleteDialog.dataset.adminId = '';
+                this.$.deleteDialog.dataset.pending = '';
+
+                this.$$('#deleteSuccess').open();
+            },
+
+            /**
+             * Displays Delete Fail Toast on API Error
+             * @private
+             */
+            _handleDeleteError: function (response) {
+                this.$$('#deteleFail').open();
+            },
+
+            /**
+             * Updates admins and displays Succeeded Toast
+             * on API response to Create Admin Request
+             * @private
+             */
+            _handleCreateResponse: function (response) {
+                this.$$('#createSuccess').open();
+                this.push('admins', response.detail);
+                this.notifyPath('admins');
+            },
+
+            /**
+             * Displays Creation Fail Toast on API Error
+             * @private
+             */
+            _handleCreateError: function (response) {
+                this.$$('#createFail').open();
+            },
+
+            /**
+             * Function called by Event on Logout
+             * Resetting all Data Component Received on its own
+             * @private
+             */
+            _forget: function () {
+                this.set('admins', []);
+                console.info("Reset Admins");
+            }
+
+        });
+    </script>
+</dom-module>
