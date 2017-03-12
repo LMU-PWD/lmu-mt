@@ -249,6 +249,7 @@
     "semester_setup_practicals_markdown": "Markdown-Syntax",
     "semester_setup_practicals_title_input": "Titel, der Nutzern angezeigt wird",
     "semester_setup_practicals_deadline_input": "Registrierungsfrist für Studentengruppen (tt / mm / jjjj)",
+    "semester_setup_practicals_cutting_deadline_input": "Registrierungsfrist für Videoschnittplätze (tt / mm / jjjj)",
     "semester_setup_practicals_description_label_1": "Hier kannst du Inhalt zu der Seite hinzufügen, die ",
     "semester_setup_practicals_description_label_2": " sehen, wenn sie auf das ",
     "semester_setup_practicals_description_label_3": "-Praktikum klicken. Verwende ",
