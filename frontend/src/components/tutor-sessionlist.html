@@ -20,7 +20,6 @@
             :host {
                 min-width: 320px;
                 display: block;
-                /*background-color: var(--paper-blue-grey-100);*/
             }
             paper-button {
                 width: calc(35% - 20px);
@@ -29,21 +28,21 @@
                 cursor: pointer
             }
             .session_date {
-                width: 35%;
-                min-width: 150px;
+                min-width: 170px;
+                width: 25%;
             }
             .session_time {
                 width: 20%;
+                padding-right: 5%;
+                text-align: right
             }
             .session_icon {
                 width: 5%;
                 min-width: 24px;
+                margin-left: 5%;
             }
             .session_type {
                 width: 30%;
-            }
-            .session_date, .session_time, .session_type {
-                flex-grow: 1
             }
             .sessions_row {
                 border-top: 2px solid var(--paper-grey-200)
@@ -63,13 +62,15 @@
                 padding-top: 5px;
                 padding-bottom: 5px;
                 font-size: 20px;
-                -o-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
-                -moz-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
-                -webkit-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
-                box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
             }
             .session_details {
                 font-size: 14px;
+            }
+            .session_details a {
+                color: var(--paper-blue-grey-300);
+                text-align: right;
+                text-decoration: none;
+                font-weight: 100;
             }
             paper-listbox {
                 padding: 0
@@ -105,6 +106,10 @@
             }
             paper-item-body .row_title {
                 font-size: 20px
+            }
+            .group_name {
+              color: var(--paper-blue-grey-300);
+              font-weight:100;
             }
 
         </style>
@@ -142,9 +147,9 @@
                     <paper-item class="sessions_heading" disabled>
                         <span class="session_toggleDropdown mobile-hidden" style="width: 4%">
                         </span>
-                        <span class="session_date" style="min-width: 38%">[[ localize('tutor_sessionlist_heading_date') ]]</span>
-                        <span class="session_time">[[ localize('tutor_sessionlist_heading_time') ]]</span>
-                        <span class="session_icon" style="width:15%"></span>
+                        <span class="session_date">[[ localize('tutor_sessionlist_heading_date') ]]</span>
+                        <span class="session_time" style="margin-right: 20px">[[ localize('tutor_sessionlist_heading_time') ]]</span>
+                        <span class="session_icon"></span>
                         <span class="session_type"></span>
                     </paper-item>
 
@@ -155,10 +160,9 @@
                     </template>
 
                     <template id="sessionlist" is="dom-repeat" items="[[ myFutureSessions ]]" as="session">
-
                         <paper-item  class="sessions_row" id="src-[[ session.id ]]">
                             <paper-item-body style="padding: 7px 0">
-                                <div style="margin: 10px 0; display: flex" class="row_title" on-click="toggleCollapse">
+                                  <div style="padding: 10px 0; display: flex" class="row_title" on-click="toggleCollapse">
                                     <span class="session_toggleDropdown mobile-hidden"><iron-icon icon="hardware:keyboard-arrow-right"></iron-icon></span>
                                     <span class="session_date">[[ session.date_string ]]</span>
                                     <span class="session_time">[[ session.time_string ]]</span>
@@ -177,10 +181,13 @@
 
                                         <template is="dom-if" if="[[ !_isEmpty(session.groupMembers) ]]">
                                             <hr>
-                                            <div class="session_details">Gruppe: [[ session.group.name ]]</div>
+                                            <div class="session_details" style="margin-bottom: 0.5em">
+                                              Gruppe <span class="group_name">[[ session.group.name ]] </span>
+                                            </div>
                                             <template is="dom-repeat" items="[[ session.groupMembers ]]" as="groupMember">
-                                                <div class="session_details" style="padding-left: 15px;">
-                                                    [[ _getSth(groupMember) ]] [[ groupMember.name ]] <a href="mailto:[[ groupMember.email ]]"><iron-icon icon="communication:mail-outline"></iron-icon></a>
+                                                <div class="session_details" style="padding-left: 15px; ">
+                                                  <span>  [[ groupMember.first_name ]] [[ groupMember.name ]] </span>
+                                                  <span><a href="mailto:[[ groupMember.email ]]"><iron-icon icon="communication:mail-outline"></iron-icon> [[ groupMember.email ]]</a></span>
                                                 </div>
                                             </template>
                                         </template>
@@ -286,9 +293,15 @@
                 var today = Date.now();
 
                 for (var i = 0; i < allSessions.length; i++) {
+
                     var currentSession = allSessions[i];
                     if (new Date(currentSession.date) > today)
                         futureSessions.push(allSessions[i]);
+
+                    for (var j = 0; j < allSessions[i].groupMembers.length; j++) {
+                        if (typeof allSessions[i].groupMembers[j].name == 'undefined')
+                          return [];
+                    }
                 }
                 if(futureSessions.length == 0)
                     return []
