@@ -10,10 +10,9 @@
                 display: block;
                 padding: 3%;
                 text-align: left;
-                padding-bottom: 5%;
+                padding-bottom: 7%;
             }
             .button{
-                margin-top: 2%;
                 margin-bottom: 2%;
                 width: 49.8%;
             }
@@ -53,17 +52,37 @@
             </template>
         </paper-button>
         <lab-detail-content-element
-                text="[[localize('practicals-admin-labtype text1')]]" data="[[labType.registration_deadline]]" input="{{ dateInput }}"
-                is-date-from-parent="true" is-id-from-parent="false" is-editor-from-parent="false"></lab-detail-content-element>
+                        id="deadlineStudent"
+                        text="[[localize('practicals-admin-labtype text1')]]"
+                        data="[[labType.registration_deadline]]"
+                        input="{{ dateInput }}"
+                        is-date-from-parent="true"
+                        is-id-from-parent="false"
+                        is-editor-from-parent="false"></lab-detail-content-element>
         <lab-detail-content-element
-                text="[[localize('practicals-admin-labtype text2')]]" data="[[labType.registration_deadline_tutors]]" input="{{ dateTutorInput }}"
-                is-date-from-parent="true" is-id-from-parent="false" is-editor-from-parent="false"></lab-detail-content-element>
+                        id="deadlineTutor"
+                        text="[[localize('practicals-admin-labtype text2')]]"
+                        data="[[labType.registration_deadline_tutors]]"
+                        input="{{ dateTutorInput }}"
+                        is-date-from-parent="true"
+                        is-id-from-parent="false"
+                        is-editor-from-parent="false"></lab-detail-content-element>
         <lab-detail-content-element
-                text="[[localize('practicals-admin-labtype text3')]]" data="[[labType.description_student]]"  input="{{ descriptionStudentInput }}"
-                is-date-from-parent="false" is-id-from-parent="false" is-editor-from-parent="true"></lab-detail-content-element>
+                        id="descriptionStudent"
+                        text="[[localize('practicals-admin-labtype text3')]]"
+                        data="[[labType.description_student]]"
+                        input="{{ descriptionStudentInput }}"
+                        is-date-from-parent="false"
+                        is-id-from-parent="false"
+                        is-editor-from-parent="true"></lab-detail-content-element>
         <lab-detail-content-element
-                text="[[localize('practicals-admin-labtype text4')]]" data="[[labType.description_tutor]]"  input="{{ descriptionTutorInput }}"
-                is-date-from-parent="false" is-id-from-parent="false" is-editor-from-parent="true"></lab-detail-content-element>
+                        id="descriptionTutor"
+                        text="[[localize('practicals-admin-labtype text4')]]"
+                        data="[[labType.description_tutor]]"
+                        input="{{ descriptionTutorInput }}"
+                        is-date-from-parent="false"
+                        is-id-from-parent="false"
+                        is-editor-from-parent="true"></lab-detail-content-element>
 
         <template is="dom-if" if="[[showSaveButton]]">
             <paper-button raised  style="float: left;" class="button" on-tap="_handleSaveButtonClick">
@@ -196,9 +215,17 @@
              */
             _handleDiscardButtonClick: function(){
                 //Reset LabtypeValues
-                this.set('labType', this.labTypeFromApi);
+                //console.log(this.labTypeFromApi);
+                this.set('labType.description_tutor', this.labTypeFromApi.description_tutor);
+                this.set('labType.description_student', this.labTypeFromApi.description_student);
                 this.set('labType.registration_deadline', new Date(this.labTypeFromApi.registration_deadline));
                 this.set('labType.registration_deadline_tutors', new Date(this.labTypeFromApi.registration_deadline_tutors));
+                //console.log(this.labType);
+
+                Polymer.dom(this.root).querySelector("#deadlineStudent").data = this.labType.registration_deadline;
+                Polymer.dom(this.root).querySelector("#deadlineTutor").data = this.labType.registration_deadline_tutors;
+                Polymer.dom(this.root).querySelector("#descriptionStudent").data = this.labType.description_student;
+                Polymer.dom(this.root).querySelector("#descriptionTutor").data = this.labType.description_tutor;
 
                 this.set('showSaveButton', false);
             },
@@ -243,10 +270,24 @@
              * @private
              */
             _labTypeChanged: function(e){
-                //console.log(this.labTypeFromApi);
-                this.set('labType', this.labTypeFromApi);
-                this.set('labType.registration_deadline', new Date(this.labTypeFromApi.registration_deadline));
-                this.set('labType.registration_deadline_tutors', new Date(this.labTypeFromApi.registration_deadline_tutors));
+                //console.log("labtypeChanged");
+                //console.log(e);
+
+                this.labType = {};
+                this.labType.id = "";
+                this.labType.registration_open = "";
+                this.labType.description_student = "";
+                this.labType.description_tutor = "";
+                this.labType.registration_deadline = new Date();
+                this.labType.registration_deadline_tutors = new Date();
+
+                this.set('labType.id', e.id);
+                this.set('labType.registration_open', e.registration_open);
+                this.set('labType.description_student', e.description_student);
+                this.set('labType.description_tutor', e.description_tutor);
+                this.set('labType.registration_deadline', new Date(e.registration_deadline));
+                this.set('labType.registration_deadline_tutors', new Date(e.registration_deadline_tutors));
+                //console.log(this.labType);
             },
 
             /**
