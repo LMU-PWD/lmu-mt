@@ -16,11 +16,6 @@
                 background-color: var(--color);
             }
             :host(:hover) {
-                /*-o-box-shadow: 0 0px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);*/
-                /*-moz-box-shadow: 0 0px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);*/
-                /*-webkit-box-shadow: 0 0px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);*/
-                /*box-shadow: 0 0px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);*/
-                /*border: 1px inset var(--paper-blue-grey-900);*/
                 cursor: pointer;
             }
             h2 {
@@ -44,8 +39,6 @@
             .back-fill{
                 width:calc(100% - 40px);
                 height:30px;
-                /*position: absolute;
-                right:0;*/
                 display: inline;
                 float: right;
                 background-color: var(--paper-blue-grey-100);
@@ -163,52 +156,24 @@
             behaviors: [
                 Polymer.MyLocalizeBehavior
             ],
-            /*ready: function () {
-                if(this.type.includes("Photo" || "photo")){
-                    this.icon = "../../../images/photo.svg";
-                    this.customStyle['--color'] = '#78909c';
-                    this.updateStyles();
-                } else if(this.type.includes("Foto" || "foto")){
-                    this.icon = "../../../images/photo.svg";
-                    this.customStyle['--color'] = '#78909c';
-                    this.updateStyles();
-                } else if(this.type.includes("Video" || "video")){
-                    this.icon = "../../../images/video.svg";
-                    this.customStyle['--color'] = '#546e7a';
-                    this.updateStyles();
-                } else if(this.type.includes("Audio" || "audio")){
-                    this.icon = "../../../images/audio.svg";
-                    this.customStyle['--color'] = '#455a64';
-                    this.updateStyles();
-                }
-            },*/
             _handleTap: function (event) {
-                //console.log(event);
-                //console.log(event.path[0].key);
                 var key = this.labType.name;
                 this.fire('CHANGE_ROUTE', {path: '/' + key, page: key});
-                //console.log(event.model);
             },
 
             _labTypeChanged: function (detail) {
-                //console.log(detail);
                 this.customStyle['--color'] = this.labType.color;
                 this.updateStyles();
             },
 
             _groupChanged: function (detail) {
-                //console.log(detail);
                 for (var i=0; i<this.group.labIds.length; i++){
-                    //console.log(this.labType.id);
                     if(this.group.labIds[i].labTypeId === this.labType.id){
                         var d = new Date(this.group.labIds[i].date);
                         this.set('labDate', d.toLocaleString().slice(0,-3));
 
                     }
                 }
-            },
-            _labDateChanged: function (detail) {
-                //console.log(detail);
             }
 
         });
