@@ -86,7 +86,8 @@
                         </template>
                         <template is="dom-if" if="[[user.isAdmin]]">
                             <labtype-detail-view access-token ="[[accessToken]]"
-                                             lab-type-from-api = "[[labType]]"></labtype-detail-view>
+                                                 lab-type-from-api = "[[labType]]"
+                                                 on-labtype-changed = "_handleLabtypeChanged"></labtype-detail-view>
                         </template>
                     </div>
                     <div>
@@ -222,6 +223,9 @@
                         endpoint: '/Labs'
                     };
 
+            },
+            _handleLabtypeChanged: function () {
+                this.fire('labtype-changed');
             },
             _handleAllLabsRequest: function (response) {
                 this.set('allLabs',response.detail);

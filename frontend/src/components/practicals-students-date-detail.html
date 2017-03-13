@@ -354,6 +354,11 @@
                 }
                 return  true;
             },
+
+            /**
+             * Compares given deadline to recent date
+             * @param deadline
+             */
             _getBeforeDeadline: function (deadline){
                 var deadline_date = new Date(deadline);
                 var today = new Date();

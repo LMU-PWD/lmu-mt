@@ -143,6 +143,11 @@
 
     "practicals-admin tutor": "Tutor",
     "practicals-admin group": "Group",
+
+    "practicals-admin students": "Students",
+    "practicals-admin tutors": "Tutors",
+    "practicals-admin distribute_text":"Automatically distribute labs for",
+
     "practicals-admin close_registration": "Close Registration",
     "practicals-admin open_registration": "Open Registration",
 
@@ -324,6 +329,11 @@
 
     "practicals-admin tutor": "Tutor",
     "practicals-admin group": "Gruppe",
+
+    "practicals-admin students": "Studenten",
+    "practicals-admin tutors": "Tutoren",
+    "practicals-admin distribute_text":"Automatische Terminzuweisung für",
+
     "practicals-admin close_registration": "Registrierung schliessen",
     "practicals-admin open_registration": "Registrierung freischalten",
 
