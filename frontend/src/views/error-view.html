@@ -1,6 +1,11 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../shared/shared-styles.html">
 
+<!--Localization Imports-->
+<link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
+<link rel="import" href="../services/my-localize-behavior.html">
+
+
 <dom-module id="error-view">
 
     <template>
@@ -10,13 +15,20 @@
             <p>Sorry about that. <a href="#/">Back to home</a></p>
         </div>
 
+        <!--Iron Signal for Localization-->
+        <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
+
+
     </template>
 
     <script>
 
         Polymer({
 
-            is: 'error-view'
+            is: 'error-view',
+            behaviors: [
+                Polymer.MyLocalizeBehavior
+            ]
 
         });
 

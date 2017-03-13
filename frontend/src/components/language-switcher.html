@@ -1,0 +1,132 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/paper-menu-button/paper-menu-button.html">
+<link rel="import" href="../../bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/iron-localstorage/iron-localstorage.html">
+<link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
+
+<!--Localization-->
+<link rel="import" href="../../bower_components/app-localize-behavior/app-localize-behavior.html">
+<link rel="import" href="../services/my-localize-behavior.html">
+
+<!--Shared Styles-->
+<link rel="import" href="../shared/shared-styles.html">
+
+<dom-module id="language-switcher">
+    <template>
+        <style include="shared-styles">
+            :host{
+                --primary-switcher-color: var(--paper-blue-grey-50);
+                --secondary-switcher-color: var(--paper-blue-grey-500);
+                --backlay-color: var(--paper-blue-grey-50);
+            }
+
+            h2{
+                text-transform: uppercase;
+                color: var(--primary-switcher-color);
+                margin: 0;
+                padding: 0;
+                cursor: default;
+                position: relative;
+                left: 23.5px;
+                top: -78px;
+                text-align: center;
+                vertical-align: middle;
+                pointer-events: none;
+                font-size: 14px;
+                background-color: var(--secondary-switcher-color);
+                width: 17px;
+                height: 12px;
+                line-height: 12px;
+            }
+
+            paper-icon-button{
+                color: var(--secondary-switcher-color);
+                height: 64px;
+                width: 64px;
+                position: relative;
+                top: -40px;
+            }
+            
+            .container{
+                position: relative;
+                height: 64px;
+            }
+            #underlay{
+                background-color: var(--backlay-color);
+                height: 40px;
+                width: 40px;
+                position: relative;
+                top: 12px;
+                left: 12px;
+                border-radius: 50%;
+            }
+
+
+        </style>
+        <div class="container">
+            <div id="underlay"></div>
+
+            <paper-icon-button class="menu-icon" icon="icons:language" on-tap="_handleLanguageSelection">DE</paper-icon-button>
+            <h2 class="menu-icon" icon="icons:language" on-tap="_handleLanguageSelection">[[language]]</h2>
+            <!--paper-menu-button no-animat="_fireLogoutRequ     <paper-icon-button noink icon="language" class="dropdown-trigger"></paper-icon-button>
+                <paper-menu class="dropdown-content" selected="{{selected}}">
+                    <template is="dom-repeat" items="[[languages]]">
+                        <paper-item>[[item.name]]</paper-item>
+                    </template>
+                </paper-menu>
+            </paper-menu-button-->
+            <!--span class="localepicker">
+                    <paper-button style="float:right" on-tap="initSwitchLocale">{{ language }}</paper-button>
+                    <paper-tooltip offset="5">{{localize('logincard_locale button tooltip')}}</paper-tooltip>
+                </span-->
+            <iron-localstorage id="localstorage"
+                               name="language"
+                               value="{{language}}"
+                               use-raw
+                               on-iron-localstorage-load-empty="_initializeLanguage"
+            ></iron-localstorage>
+
+            <!--Iron Signal for Localization-->
+            <iron-signals on-iron-signal-language="_switchLanguage"></iron-signals>
+
+        </div>
+    </template>
+    <script>
+        Polymer({
+            is: 'language-switcher',
+            properties: {
+                language: {
+                    type: String
+                }
+            },
+            behaviors: [
+                    Polymer.MyLocalizeBehavior
+            ],
+            ready: function () {
+                //TODO keep language displayed in sync
+            },
+            _initializeLanguage: function () {
+                //Initialize local storage with language in lang attribute
+                var language = document.querySelector('html').getAttribute('lang');
+                this.set('language', language);
+            },
+            _handleLanguageSelection: function () {
+                //Toggle Language & save to local storage
+                this.set('language',(this.language=='de')?('en'):('de'));
+                this.$.localstorage.save();
+
+                //Fire iron signal to trigger MyLocalizeBehavior to update the language
+                this.fire('iron-signal', {name: 'language', data: this.language});
+
+                //Overwrite body language attribute
+                document.querySelector('html').setAttribute("lang",this.language);
+            },
+            _switchLanguage: function (event) {
+                this.language = event.detail;
+            }
+        });
+    </script>
+</dom-module>

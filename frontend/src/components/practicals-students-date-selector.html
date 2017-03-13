@@ -11,6 +11,13 @@
 <link rel="import" href="../shared/shared-styles.html">
 
 <dom-module id="practicals-students-date-selector">
+
+<!--Localization Imports-->
+<link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
+<link rel="import" href="../services/my-localize-behavior.html">
+
+
+<dom-module id="practical-date-detail">
     <template>
         <style include="shared-styles">
             :host{
@@ -111,6 +118,9 @@
                     value: []
                 }
             },
+            behaviors: [
+                Polymer.MyLocalizeBehavior
+            ],
 
             ready: function() {
                 this._fillPrioritiesArray();

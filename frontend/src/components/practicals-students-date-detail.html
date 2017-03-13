@@ -1,5 +1,8 @@
 <link rel="import" href="../components/practicals-students-date-selector.html">
 <link rel="import" href="../components/practicals-show-saved-dates.html">
+<!--Localization Imports-->
+<link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
+<link rel="import" href="../services/my-localize-behavior.html">
 
 <dom-module id="practicals-students-date-detail">
     <template>
@@ -33,6 +36,7 @@
                 padding: 10px;
             }
         </style>
+
 
         <api-request
                 headers="[[ ajax.headers ]]"
@@ -74,15 +78,18 @@
                 </template>
                 <template is="dom-if" if="[[!before_deadline]]">
                     <!-- Deadline is over and Registration has been started-->
-                    <template is="dom-if" if="[[!practical_date_exists]]">
+                    <template is="dom-if" if="[[!practical_date.exists]]">
                         <!-- Deadline is over, Registration has been started but Practical Date is not given -->
                         <practicals-show-saved-dates chosenlabs="{{chosenlabs_transformed}}"
                                                      title="Deine Gruppe hat diese Termine ausgewählt:"></practicals-show-saved-dates>
                     </template>
-                    <template is="dom-if" if="[[practical_date_exists]]">
+                    <template is="dom-if" if="[[practical_date.exists]]">
                         <!-- Deadline is over, Registration has been started and Practical Date is given-->
                         <div>
-                            Dein Praktikumstermin ist am [[practical_date_string]]
+                            {{localize('practicals-student-date labDate_1')}}
+                            [[practical_date.weekday]]{{localize('practicals-student-date labDate_2')}}
+                            [[practical_date.date]]{{localize('practicals-student-date labDate_3')}}
+                            [[practical_date.time]]
                         </div>
                     </template>
                 </template>
@@ -94,6 +101,9 @@
                 </div>
             </template>
         </div>
+
+        <!--Iron Signal for Localization-->
+        <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
 
     </template>
 
@@ -114,7 +124,7 @@
                     value: []
                 },
                 practical_date:{
-                    type: Date,
+                    type: Object,
                     notify: true
                 },
                 practical_date_exists:{
@@ -122,7 +132,7 @@
                 },
                 priority:{
                     type: Number,
-                    value: 2
+                    value: 5
                 },
                 registration_open:{
                     type: Boolean,
@@ -139,51 +149,101 @@
                     type: Boolean,
                     value: false
                 },
-                group: {
-                    type: Object,
-                    notify: true,
-                    readOnly: false
-                },
+                group:  Object,
                 user: Object,
                 allLabs: {
                     type: Array,
-                    value: []
+                    value: [],
+                    observer: '_allLabsChanged'
                 },
-                labData: Object,
+                labData: {
+                    type: Object,
+                    observer: '_labDataChanged'
+                },
                 labType: Object
             },
-            ready: function () {
-                this.practical_date = this.labData.lab;
+                behaviors: [
+                    Polymer.MyLocalizeBehavior
+                ],
 
-                this.practical_date_exists = this._dateExists(this.practical_date);
+            _labDataChanged: function (detail) {
 
-                if(this.practical_date_exists){
-                    this.practical_date_string = this._getDateString(this.practical_date);
-                }
-                else{
-                    this.labs_already_chosen = this._chosenlabsExist(this.labData.priorities);
-                    if(this.labs_already_chosen){
-                        this.chosenlabs = this.labData.priorities;
-                        this.chosenlabs_transformed = this._transformLabs(this.chosenlabs,false);
+                //TODO set registration_open, before_deadline, labs_already_chosen
+
+                //Set Before Deadline Flag
+                this.set('before_deadline',this._getBeforeDeadline(this.labType.registration_deadline));
+
+                //Set Registration_Open
+                this.set('registration_open',this.labType.registration_open);
+                console.log(this.allLabs);
+                console.log(this.labType.registration_open);
+
+
+
+
+                console.log(Object.keys(this.labData.lab).length);
+                    if(detail.lab.id){
+                        //If Specific Lab exists -> lab has been set
+                        console.log(this.labType.type_str+": Received labData, lab Set:");
+                        console.log(detail.lab);
+                        //this.set('before_deadline',false);
+                        //this.set('practical_date_exists',true);
+                        //var d = new Date(detail.lab.date);
+                        //this.set('practical_date_string', d.toLocaleString().slice(0,-3));
+                        this.setDate(detail.lab.date,'practical_date');
+                        if(this.before_deadline){
+                            console.log("ERROR: Die Praktikumsdaten können nicht vor der Deadline zugewiesen sein. Daten sind hier inkorrekt! LabType: "+this.labType.type_str);
+                            console.log("before_dedline wird statisch auf false gesetzt, damit die Anzeige nicht leer ist");
+                            this.before_deadline = false;
+                        }
+                        //this.practical_date_string = this._getDateString(detail.lab.date);
+                    }else{
+                        //No specific Lab Set
+                        if(this.allLabs == [] || this.allLabs == null){
+                            this.set('registration_open',false);
+                        }
+
+                        if(detail.priorities.length){
+                            //Priorities exist -> show Priorities
+                            this.set('labs_already_chosen',true);
+                            console.log(this.labType.type_str+": Received labData, priorities Set:");
+                            console.log(detail.priorities);
+
+                            this.chosenlabs = this.labData.priorities;
+                            this.chosenlabs_transformed = this._transformLabs(this.chosenlabs,false);
+                        }else{
+                            //Neither Lab nor Priorities set -> show date Picker
+                            this.set('labs_already_chosen',false);
+                            console.log(this.labType.type_str+": Received labData, nothing Set:");
+                            console.log(detail);
+
+                            if(!this.before_deadline){
+                                console.log("ERROR: Die Deadline ist vorbei und trotzdem existieren weder zugewiesene noch ausgewählte Labs. Daten sind hier inkorrekt! LabType: "+this.labType.type_str);
+                            }
+                        }
                     }
-                }
-                this.before_deadline = this._getBeforeDeadline(this.labType.registration_deadline);
-                if(!this.practical_date_exists && (this.allLabs == [] || this.allLabs == null)){
-                    this.registration_open = false;
-                }
-                else{
-                    this.registration_open = this.labType.registration_open;
-                }
-
-                if(this.practical_date_exists && this.before_deadline){
-                    console.log("ERROR: Die Praktikumsdaten können nicht vor der Deadline zugewiesen sein. Daten sind hier inkorrekt! LabType: "+this.labType.type_str);
-                    console.log("before_dedline wird statisch auf false gesetzt, damit die Anzeige nicht leer ist");
-                    this.before_deadline = false;
-                }
-                else if(!this.before_deadline && !this.practical_dates_exists && !this.labs_already_chosen){
-                    console.log("ERROR: Die Deadline ist vorbei und trotzdem existieren weder zugewiesene noch ausgewählte Labs. Daten sind hier inkorrekt! LabType: "+this.labType.type_str);
-                }
+                console.log(this.labType);
             },
+
+
+            /**
+             * Converts a date sting into an object, localize-able
+             * containing weekday, date, time and a flag if set
+             * @param{string} date - Date String to be converted
+             * @param{string} propertyName - name of Object, Date should be saved to
+             * @private
+             */
+            setDate: function (date, propertyName) {
+                var d = new Date(date);
+                var newDate = {
+                    weekday: this.localize('general_weekdays '+d.getDay()),
+                    date: d.toLocaleDateString(),
+                    time: d.toLocaleTimeString().slice(0,-3),
+                    exists: true
+                };
+                this.set(propertyName,newDate);
+            },
+
             /**
              * Back-button click handler
              */
@@ -194,6 +254,10 @@
                 if(practicals_date_selector) {
                     practicals_date_selector._handleResetClick();
                 }
+            },
+            _allLabsChanged: function (detail) {
+                //console.log(this.labType.type_str+": Received allLabs:");
+                console.log(detail);
             },
 
             /**
@@ -258,7 +322,7 @@
              * @param e - Event Variable
              * @private
              */
-            _backClick: function(){
+            _handleChangeClick: function(e){
                 this.labs_already_chosen = false;
                 this.chosenlabs = [];
                 var practicals_date_selector = Polymer.dom(this.root).querySelector("#practicalsDateSelector");
@@ -308,6 +372,7 @@
              */
             _getDateString: function(date){
                 var datestring = "";
+                console.log(date);
                 switch(date.getDay()){
                     case 0:
                         datestring = "Sonntag, den ";

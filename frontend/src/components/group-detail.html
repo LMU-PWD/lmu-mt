@@ -8,6 +8,11 @@
 <link rel="import" href="../services/get-access-token.html">
 <link rel="import" href="mail-input.html">
 
+<!--Localization Imports-->
+<link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
+<link rel="import" href="../services/my-localize-behavior.html">
+
+
 <dom-module id="group-detail">
 
     <template>
@@ -157,6 +162,20 @@
                         on-api-response="_handleGroupResponse"
                         loading="{{ isLoading }}"></api-request>
 
+                <!--Fetching info about the groups labs-->
+                <api-request
+                        headers="[[ ajax_glabs.headers ]]"
+                        method="[[ ajax_glabs.method ]]"
+                        endpoint="[[ ajax_glabs.endpoint ]]"
+                        on-api-response="_handleGroupLabsRequest"></api-request>
+
+                <!--Fetching info about the groups priorities-->
+                <api-request
+                        headers="[[ ajax_prios.headers ]]"
+                        method="[[ ajax_prios.method ]]"
+                        endpoint="[[ ajax_prios.endpoint ]]"
+                        on-api-response="_handlePriosRequest"></api-request>
+
                 <template is="dom-repeat" items="[[group.groupMemberIds]]" as="member">
                     <div class="member">
                         <get-user-info
@@ -214,8 +233,10 @@
                     </paper-input-error>
                 </div>
             </div>
-            <iron-signals on-iron-signal-switchlocale="_switchLocale"></iron-signals>
         </template>
+
+        <!--Iron Signal for Localization-->
+        <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
 
     </template>
     <script>
@@ -226,7 +247,8 @@
                 group: {
                     type: Object,
                     notify: true,
-                    readOnly: false
+                    readOnly: false,
+                    observer: '_groupChanged'
                 },
                 groupSize: {
                     //TODO make input dependent
@@ -246,31 +268,15 @@
                     type: Object,
                     notify: true,
                     readOnly: false,
-                    value: {
-                        groupId: ''
-                    }
-                },
-                language: {
-                    type: String,
-                    value: 'de'
+                    observer: '_selfInfoChanged'
                 }
             },
             observers: [
                 '_selfInfoGroupIdChanged(selfInfo.groupId)'
             ],
-
-            /**
-             * Localization setup
-             */
             behaviors: [
-                Polymer.AppLocalizeBehavior
+                Polymer.MyLocalizeBehavior
             ],
-            attached: function() {
-                this.loadResources(this.resolveUrl('../shared/locales.json'));
-            },
-            _switchLocale: function() {
-                this.language = (this.language == 'en') ? 'de' : 'en';
-            },
 
             ready: function() {
 
@@ -317,7 +323,7 @@
                 //Check for empty inputs
                 this.members.forEach(function(element) {
                     if(element.name==""){
-                        console.log('element was empty');
+                        //console.log('element was empty');
                         checked = false;
                     }
                 });
@@ -354,6 +360,7 @@
              * @private
              */
             _handleGroupResponse: function (event) {
+                //console.log(event);
                 var self = this;
                 var receivedGroup = event.detail;
                 this.set('group', receivedGroup);
@@ -362,6 +369,59 @@
                 this.group.groupMemberIds.forEach(function () {
                     self.push('group.groupMemberIds',{"id":self.shift('group.groupMemberIds'),"name":"","mail":""});
                 });
+
+                if(this.group.labIds){
+                    // Get the first group-lab
+                    this.ajax_glabs = {
+                        headers: {
+                            Authorization: this.accessToken
+                        },
+                        method: 'GET',
+                        endpoint: '/labs/' + this.pop('group.labIds')
+                    };
+                }
+            },
+
+            _handleGroupLabsRequest: function (response) {
+                var labInfo = response.detail;
+                //console.log(labInfo);
+                ////console.log(this.pop('group.labIds'));
+                this.push('group.labIds',labInfo);
+
+                //console.log(this.group);
+
+                if((typeof this.group.labIds[0])=='string'){
+                    var labId = this.splice('group.labIds',0,1);
+                    // Get further group-labs until all strings replaced
+                    this.ajax_glabs = {
+                        headers: {
+                            Authorization: this.accessToken
+                        },
+                        method: 'GET',
+                        endpoint: '/labs/' + labId[0]
+                    };
+                }else {
+                    //Notify labIds Changed
+                    //this.splice('group.labIds')
+
+                    //Get the Groups Priorities
+                    this.ajax_prios = {
+                        headers: {
+                            Authorization: this.accessToken,
+                            filter: '{"where":{"semesterId":"' + this.selfInfo.semesterId + '","groupId":"' + this.selfInfo.groupId + '"}}'
+                        },
+                        method: 'GET',
+                        endpoint: '/Priorities'
+                    };
+                }
+            },
+
+
+            _handlePriosRequest: function (response) {
+                this.set('group.priorityIds',response.detail);
+
+                //Notify Main to Update Group Property
+                this.fire('GROUP_CHANGED',this.group);
             },
 
             /**
@@ -377,7 +437,7 @@
             },
 
             _handleCreateGroupError: function (event) {
-                console.log('there has been an error');
+                //console.log('there has been an error');
                 this.$$('#requestError').toggleAttribute("invalid",true);
             },
 
@@ -402,6 +462,17 @@
                     method:'POST',
                     endpoint: '/groups/randomJoin/'
                 };
+            },
+
+            _selfInfoChanged: function (detail) {
+                //console.log(detail);
+                //console.log(this.selfInfo.groupId);
+                this.notifyPath('selfInfo.groupId');
+                this.fire('dom-change');
+
+            },
+            _groupChanged: function (detail) {
+                //console.log(detail);
             }
 
         });

@@ -126,6 +126,27 @@
     "semester_setup_dates_dialog_heading": "Add a new date",
     "semester_setup_dates_dialog_startingat": "Starting at",
 
+    "tooltip_menu logout" : "Log out the current User",
+    "tooltip_menu language" : "Change language to German",
+    "tooltip_menu settings" : "User Settings",
+
+    "admin_dashboard students" : "Students",
+    "admin_dashboard groups" : "Groups",
+    "admin_dashboard tutors" : "Tutors",
+    "admin_dashboard semester" : "Terms",
+
+    "practicals-student-date labDate_1" : "Your practical takes place on ",
+    "practicals-student-date labDate_2" : ", the  ",
+    "practicals-student-date labDate_3" : ", starting at ",
+
+    "general_weekdays 0": "Sunday",
+    "general_weekdays 1": "Monday",
+    "general_weekdays 2": "Tuesday",
+    "general_weekdays 3": "Wednesday",
+    "general_weekdays 4": "Thursday",
+    "general_weekdays 5": "Friday",
+    "general_weekdays 6": "Saturday",
+
     "tutor_card_heading_select-date": "Choose your free dates",
     "tutor_card_audio-practical": "Audio Practical",
     "tutor_card_video-practical": "Video Practical",
@@ -296,7 +317,28 @@
     "practicals_tutordatedetail_button-change": "Auswahl ändern",
     "practicals_tutordatedetail_info_deadline-reached": "Die Deadline zur Terminwahl wurde bereits erreicht. In Kürze werden dir feste Termine zugeteilt werden.",
     "practicals_tutordatedetail_info_not-unlocked": "Die Terminwahl ist noch nicht freigeschalten!",
-    "practicals_tutordatedetail_info-none-selected": "Du hast bisher keine Termine gewählt."
+    "practicals_tutordatedetail_info-none-selected": "Du hast bisher keine Termine gewählt.",
+
+    "tooltip_menu logout" : "Den aktuellen Benutzer ausloggen",
+    "tooltip_menu language" : "Plattformsprache zu Englisch ändern",
+    "tooltip_menu settings" : "Benutzereinstellungen",
+
+    "admin_dashboard students" : "Studenten",
+    "admin_dashboard groups" : "Gruppen",
+    "admin_dashboard tutors" : "Tutoren",
+    "admin_dashboard semester" : "Semester",
+
+    "practicals-student-date labDate_1" : "Dein Praktikumstermin ist am ",
+    "practicals-student-date labDate_2" : ", den ",
+    "practicals-student-date labDate_3" : ", ab ",
+
+    "general_weekdays 0": "Sonntag",
+    "general_weekdays 1": "Montag",
+    "general_weekdays 2": "Dienstag",
+    "general_weekdays 3": "Mittwoch",
+    "general_weekdays 4": "Donnerstag",
+    "general_weekdays 5": "Freitag",
+    "general_weekdays 6": "Samstag"
+
   }
 }
-

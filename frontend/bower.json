@@ -11,7 +11,7 @@
     "iron-flex-layout": "PolymerElements/iron-flex-layout#^1.0.0",
     "iron-icon": "PolymerElements/iron-icon#^1.0.0",
     "iron-iconset-svg": "PolymerElements/iron-iconset-svg#^1.0.0",
-    "iron-localstorage": "PolymerElements/iron-localstorage#^1.0.0",
+    "iron-localstorage": "PolymerElements/iron-localstorage#^1.0.6",
     "iron-media-query": "PolymerElements/iron-media-query#^1.0.0",
     "iron-pages": "PolymerElements/iron-pages#^1.0.0",
     "iron-selector": "PolymerElements/iron-selector#^1.0.0",
@@ -39,7 +39,11 @@
     "ace-widget": "LostInBrittany/ace-widget#^1.2.5",
     "papa-parser": "milesje/papa-parser#^0.1.4",
     "paper-dialog-scrollable": "PolymerElements/paper-dialog-scrollable#^1.1.5",
-    "iron-data-table": "^1.0.6"
+    "iron-data-table": "^1.0.6",
+    "transburger-icon": "^2.0.0",
+    "paper-scroll-header-panel": "^1.0.16",
+    "paper-menu-button": "^1.5.2",
+    "paper-menu": "^1.2.2"
   },
   "devDependencies": {
     "web-component-tester": "^4.0.0"

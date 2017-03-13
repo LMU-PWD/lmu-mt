@@ -1,0 +1,83 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="admin-card"><template>
+    <style  include="shared-styles">
+        :host {
+            height: 100px;
+            margin-top: 5px;
+            display: block;
+            background-color: var(--paper-blue-grey-100);
+            border-radius: 5px;
+        }
+        .container:hover{
+            background-color: var(--paper-blue-grey-200);
+        }
+
+        .icon{
+            height: 64px;
+            width: 64px;
+            position: relative;
+            margin: 18px 0 0 18px; /*oben rechts unten links old:calc(20% - 54px)*/
+            float: left;
+            border-radius: 50%;
+            border: 2px solid var(--paper-blue-grey-900);
+        }
+        .icon > img {
+            color: var(--paper-blue-grey-900);
+        }
+        h1{
+            float: left;
+            position: relative;
+            top: 20px;
+            display:flex;
+            align-items:center;
+            width:calc(100% - 206px);
+            padding: 0 18px;
+            margin: 0 auto;
+            height: 60px;
+            cursor: default;
+        }
+        .add{
+            float: right;
+            padding: 14px;
+            margin: 20px 20px 20px 0;
+            width: 60px;
+            height: 60px;
+            color: var(--paper-blue-grey-800);
+        }
+
+        /*@media screen and (max-width: 767px) {
+            :host{
+                border-radius: 0;
+            }
+        }*/
+    </style>
+    <div on-tap="_handleTap" class="container">
+        <div class="icon">
+            <img src="[[pathToIcon]]">
+        </div>
+        <h1>[[label]]</h1>
+        <paper-icon-button class="add" icon="add-circle-outline"></paper-icon-button>
+    </div>
+    <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
+</template>
+    <script>
+        Polymer({
+            is: 'admin-card',
+            properties: {
+                pathToIcon: String,
+                label: String,
+                role: String
+            },
+            ready: function() {
+            
+            },
+            _handleTap: function (event) {
+                if(event.target.className=='add'){
+                    //Open popup to add a new <role>
+                }else
+                    this.fire('CHANGE_ROUTE', {path: '/'+this.role, page: this.role});
+            }
+        });
+    </script>
+</dom-module>

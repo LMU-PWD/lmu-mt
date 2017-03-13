@@ -48,12 +48,12 @@
                         Authorization: this.accessToken
                     },
                     method: 'GET',
-                    endpoint: '/platformusers/' + this.userId
+                    endpoint: '/platformUsers/' + this.userId
                 }
             },
 
             _userIdChanged: function () {
-                this.set('ajax.endpoint', '/platformusers/' + this.userId);
+                this.set('ajax.endpoint', '/platformUsers/' + this.userId);
             },
 
             //Function for setting Mail & Name on Ajax response
