@@ -90,7 +90,8 @@
             properties: {
                 timeslots:{
                     type: Array,
-                    value: []
+                    value: [],
+                    computed: '_computeTimeslots(apiAllLabs)'
                 },
                 priority:{
                     type: Number
@@ -112,8 +113,7 @@
                     notify: true
                 },
                 apiAllLabs: {
-                    type: Array,
-                    value: []
+                    type: Array
                 }
             },
             behaviors: [
@@ -123,8 +123,13 @@
             ready: function() {
                 this._fillPrioritiesArray();
                 //console.log(this.apiAllLabs);
-                this.timeslots = this._transformLabs(this.apiAllLabs,true);
+//                this.timeslots = this._transformLabs(this.apiAllLabs,true);
                 //console.log(this.timeslots);
+            },
+
+            _computeTimeslots: function(apiAllLabs) {
+                var result =  this._transformLabs(this.apiAllLabs, true);
+                return result;
             },
 
             /**

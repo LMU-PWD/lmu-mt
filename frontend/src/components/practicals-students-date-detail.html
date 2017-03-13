@@ -175,9 +175,9 @@
 
                 //Set Registration_Open
                 this.set('registration_open',this.labType.registration_open);
-                console.log(this.labType.type_str+" labdata Changed");
-                console.log(this.labData);
-                console.log(this.allLabs);
+//                console.log(this.labType.type_str+" labdata Changed");
+//                console.log(this.labData);
+//                console.log(this.allLabs);
                 //console.log(this.labType.registration_open);
                 //console.log(Object.keys(this.labData.lab).length);
                 //console.log(detail);
@@ -213,17 +213,17 @@
                                 }
                             }
                             //this.chosenlabs = detail.priorities;
-                            console.log(this.labType.type_str+": Received labData, priorities Set:");
-                            console.log(this.chosenlabs);
+//                            console.log(this.labType.type_str+": Received labData, priorities Set:");
+//                            console.log(this.chosenlabs);
 
                             this.chosenlabs_transformed = this._transformLabs(this.chosenlabs, false);
-                            console.log(this.chosenlabs_transformed);
+//                            console.log(this.chosenlabs_transformed);
 
                         }else{
                             //Neither Lab nor Priorities set -> show date Picker
                             this.set('labs_already_chosen',false);
-                            console.log(this.labType.type_str+": Received labData, nothing Set:");
-                            console.log(detail);
+//                            console.log(this.labType.type_str+": Received labData, nothing Set:");
+//                            console.log(detail);
 
                             if(!this.before_deadline){
                                 console.log("ERROR: Die Deadline ist vorbei und trotzdem existieren weder zugewiesene noch ausgewählte Labs. Daten sind hier inkorrekt! LabType: "+this.labType.type_str);
@@ -260,17 +260,17 @@
             _handleBackTap: function(e) {
                 this.chosenlabs = [];
                 var practicals_date_selector = Polymer.dom(this.root).querySelector("#practicalsDateSelector");
-                console.log(practicals_date_selector);
+//                console.log(practicals_date_selector);
                 if(practicals_date_selector) {
                     practicals_date_selector._handleResetClick();
                 }
             },
             _allLabsChanged: function (detail) {
                 //console.log(this.labType.type_str+": Received allLabs:");
-                console.log(detail);
+//                console.log(detail);
                 if(this.labData && this.labData.priorities && this.labData.priorities.length > 0){
                     //Priorities exist -> show Priorities
-                    console.log(this.labData.priorities);
+//                    console.log(this.labData.priorities);
                     this.chosenlabs = [];
                     this.set('labs_already_chosen',true);
                     for(var i = 0; i< this.allLabs.length; i++){
@@ -285,11 +285,11 @@
                         }
                     }
                     //this.chosenlabs = detail.priorities;
-                    console.log(this.labType.type_str+": Received labs, priorities Set:");
-                    console.log(this.chosenlabs);
+//                    console.log(this.labType.type_str+": Received labs, priorities Set:");
+//                    console.log(this.chosenlabs);
 
                     this.chosenlabs_transformed = this._transformLabs(this.chosenlabs, false);
-                    console.log(this.chosenlabs_transformed);
+//                    console.log(this.chosenlabs_transformed);
                 }
             },
 
@@ -335,7 +335,7 @@
                         method: 'DELETE',
                         endpoint: '/Priorities/deleteByGroupAndLabType/'
                     };
-                    console.log(this.ajax_delete);
+//                    console.log(this.ajax_delete);
                     this.labs_already_chosen = true;
                     var practicals_show_saved_dates = Polymer.dom(this.root).querySelector("#practicals_show_saved_dates");
                     if(practicals_show_saved_dates) {
@@ -409,7 +409,7 @@
              */
             _getDateString: function(date){
                 var datestring = "";
-                console.log(date);
+//                console.log(date);
                 switch(date.getDay()){
                     case 0:
                         datestring = "Sonntag, den ";
@@ -436,9 +436,10 @@
                 var hours = date.getHours();
                 var minutes = date.getMinutes();
                 var day = date.getDate();
-                var month = date.getMonth();
+                var month = date.getMonth()+1;
 
                 if(hours<10){
+                    hours = "0"+hours;
                     hours = "0"+hours;
                 }
                 if(minutes<10){
@@ -462,8 +463,8 @@
              * @private
              */
             _transformLabs: function(labsFromApi,divideDates){
-                console.log("labs to transform:");
-                console.log(labsFromApi);
+//                console.log("labs to transform:");
+//                console.log(labsFromApi);
                 var transformedLabs = []; //Store return-Array here
 
                 if(labsFromApi[0] && labsFromApi[0].date) {
@@ -517,7 +518,7 @@
              * @private
              */
             _responseFromPrioritySave: function(response) {
-                console.log(response);
+//                console.log(response);
             },
             /**
              * Gets response from API call to create a new priority
@@ -525,7 +526,7 @@
              * @private
              */
             _responseFromPrioritySaveDelete: function(response) {
-                console.log(response);
+//                console.log(response);
                 this.ajax = {
                     headers: {
                         'Authorization': this.accessToken
