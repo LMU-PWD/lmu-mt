@@ -163,7 +163,7 @@
                 },
                 labs_already_chosen:{
                     type: Boolean,
-                    computed: '_computelabsChosen(chosenlabs)'
+                    computed: '_computeBooleanLabsChosen(chosenlabs)'
                 },
                 isReady: {
                     type: Boolean,
@@ -246,7 +246,7 @@
                 return this._getBeforeDeadline(this.labType.registration_deadline_tutors);
             },
 
-            _computelabsChosen: function(chosenlabs) {
+            _computeBooleanLabsChosen: function(chosenlabs) {
                 return (chosenlabs.length == 0);
             },
 
@@ -256,8 +256,6 @@
             _backClicked: function(e) {
                 this.fire("back-click");
             },
-
-
 
             _getPracticalDates: function(labs){
 
@@ -321,7 +319,6 @@
                         }
                     };
                 }
-
                 this.oldChosenLabs = [];
 
                 for (var i = 0; i < this.chosenlabs.length; i++) {
@@ -478,6 +475,7 @@
             _responseFromPriorityDelete: function(response) {
 
                 if (this.addedChoices != 0) {
+
                     this.ajax_save = {
                         headers: {
                             'Authorization': this.accessToken
@@ -490,16 +488,28 @@
                         }
                     };
                 }
+                else {
+                  var currentPage = this.page;
+                  this.page = '';
+                  this.page = currentPage;
+                  console.log("this page is (from del): " + this.page);
+                }
             },
 
             _responseFromPrioritySave: function(response) {
+              var currentPage = this.page;
+              console.log("this page is (from save): " + this.page);
+              this.page = '';
+              this.page = currentPage;
             },
 
             /**
-             * Sets up the list of chosen labs for this labtype
+             * Filters already chosen lab dates for this labtype.
+             * allLabs contains all lab dates already chosen by this tutor.
              * @private
              */
             _possibleLabsChanged: function() {
+
                 if(this.practical_dates_exists)
                     return
 
@@ -511,6 +521,7 @@
                         }
                     }
                 }
+                console.log(possibleLabsForThisLabtype);
 
                 this.oldChosenLabs = [];
                 for (var i = 0; i < possibleLabsForThisLabtype.length; i++) {
@@ -534,6 +545,9 @@
 
             _handleBackClick: function(e) {
                 this.show_datepicker = false;
+                var currentPage = this.page;
+                console.log("this page is: " + this.page);
+                this.page = currentPage;
             },
 
             /**
