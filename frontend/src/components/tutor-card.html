@@ -233,6 +233,10 @@
                     type: Array,
                     value: []
                 },
+                labTypes: {
+                    type: Array,
+                    value: []
+                },
                 allLabsVideo: {
                     type: Array,
                     value: []
@@ -264,7 +268,7 @@
             },
 
             observers: [
-                '_setupLabs(labtypeAudio, labtypeVideo, labtypeFoto, hasAssignedLabs)'
+                '_setupLabs(labTypes, hasAssignedLabs)'
             ],
 
             ready: function () {
@@ -299,11 +303,23 @@
              * Checks deadlines per labtype and fires API requests to get labs and tutor's lab choices if the
              * deadlines are not reached yet.
              */
-            _setupLabs: function(labtypeAudio, labtypeVideo, labtypeFoto, hasAssignedLabs) {
+            _setupLabs: function(labTypes, hasAssignedLabs) {
 
-                this.deadline_reached_audio = this._isAfterDeadline(labtypeAudio.registration_deadline_tutors);
-                this.deadline_reached_video = this._isAfterDeadline(labtypeVideo.registration_deadline_tutors);
-                this.deadline_reached_foto = this._isAfterDeadline(labtypeFoto.registration_deadline_tutors);
+                for (var i = 0; i < labTypes.length; i++) {
+                    if (labTypes[i].type_str == "Audio") {
+                        this.labtypeAudio = labTypes[i];
+                    }
+                    else if (labTypes[i].type_str == "Video") {
+                        this.labtypeVideo = labTypes[i];
+                    }
+                    else if (labTypes[i].type_str == "Foto") {
+                        this.labtypeFoto = labTypes[i];
+                    }
+                }
+
+                this.deadline_reached_audio = this._isAfterDeadline(this.labtypeAudio.registration_deadline_tutors);
+                this.deadline_reached_video = this._isAfterDeadline(this.labtypeVideo.registration_deadline_tutors);
+                this.deadline_reached_foto = this._isAfterDeadline(this.labtypeFoto.registration_deadline_tutors);
 
                 if ((!this.labtypeAudio.deadline_reached_audio || !this.labtypeVideo.deadline_reached_video
                     || !this.labtypeFoto.deadline_reached_foto) && !hasAssignedLabs)
