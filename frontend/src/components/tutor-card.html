@@ -315,14 +315,6 @@
                         method: 'GET',
                         endpoint: '/Labs?filter[where][semesterId]=' + this.labtypeAudio.semesterId
                     };
-
-                    this.ajax_possibleLabs = {
-                        headers: {
-                            'Authorization': this.accessToken
-                        },
-                        method: 'GET',
-                        endpoint: '/platformusers/' + this.user.id + '/tutorpossiblelabs/'
-                    };
                 }
             },
 
@@ -393,6 +385,14 @@
                 this.allLabsVideo = videolabs;
                 this.allLabsFoto = fotolabs;
                 this.allLabs = alllabs;
+
+                this.ajax_possibleLabs = {
+                    headers: {
+                        'Authorization': this.accessToken
+                    },
+                    method: 'GET',
+                    endpoint: '/platformusers/' + this.user.id + '/tutorpossiblelabs/'
+                };
             },
 
 
