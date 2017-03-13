@@ -80,6 +80,19 @@
             }
 
 
+            #title{
+                height: 20px;
+                padding: 0 8px;
+                font-size: 20px;
+                line-height: 20px;
+                margin: 10px 20px;
+            }
+
+            #add{
+                margin: 0 20px;
+            }
+
+
         </style>
         <div></div>
         <!-- Fetches all registered Students -->
@@ -149,8 +162,9 @@
             </div>
         </paper-dialog>
 
-        <div class="fullbleed horizontal center-justified layout" style="width: 100%; margin: 10px 0;">
-            <paper-icon-button  style="width: 100px;" icon="add-circle-outline" on-tap="create"></paper-icon-button>
+        <div class="fullbleed horizontal justified layout" style="width: 100%; margin: 10px 0;">
+            <h1 id="title">{{localize('admin_dashboard students')}}</h1>
+            <paper-icon-button  id="add" icon="add-circle-outline" on-tap="create"></paper-icon-button>
         </div>
 
         <!--Lists all Students-->
@@ -410,7 +424,6 @@
              * @private
              */
             _handleCreateResponse: function (response) {
-                this.$$('#createSuccess').open();
                 this.push('students', response.detail);
                 this.notifyPath('students');
             },

@@ -10,6 +10,7 @@
     "logincard_register button": "Register",
 
     "groupdetail_create group": "Create new group",
+    "groupdetail_create groupname": "Group-name",
     "groupdetail_group comment": "You have to be 4 people to create a new group.",
     "groupdetail_write mail": "Send an e-mail",
     "groupdetail_button randomjoin": "Join a random group",
@@ -175,6 +176,7 @@
     "logincard_register button": "Registrieren",
 
     "groupdetail_create group": "Neue Gruppe Erstellen",
+    "groupdetail_create groupname": "Gruppenname",
     "groupdetail_group comment": "Ihr müsst zu viert sein, um eine neue Gruppe zu erstellen.",
     "groupdetail_write mail": "E-Mail senden",
     "groupdetail_button randomjoin": "Zufallsgruppe beitreten",

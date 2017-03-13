@@ -46,9 +46,12 @@
                 overflow: hidden;
             }
 
-            .userInfo > .member > *:last-child {
+            /*div :last-of-type {
                 border-radius: 0 0 5px 5px;
-
+                border-bottom: hidden !important;
+            }*/
+            .member div :last-of-type {
+                border-radius: 5px 5px 0 0;
             }
 
             .userInfo > .member > h2 {
@@ -74,14 +77,11 @@
 
             .container {
                 padding: 20px;
-                background-color: var(--paper-blue-grey-100);
-                border-top: 1px solid var(--paper-blue-grey-700);
             }
 
             .student {
                 /*height: 50px;*/
-                background-color: var(--paper-blue-grey-50);
-                border-bottom: 1px solid var(--paper-blue-grey-700);
+                background-color: var(--paper-blue-grey-100);
                 margin: 5px;
 
                 min-width: 250px;
@@ -108,10 +108,6 @@
                 margin: 5px;
             }
 
-            .group-selected {
-                /*width: 100%;*/
-            }
-
             #createDialog{
                 min-width: 300px;
             }
@@ -133,6 +129,10 @@
         <paper-dialog id="createDialog" on-iron-overlay-closed="_reactToCreateDialog">
             <div>
                 <h1>Please enter the Users E-Mails to create a new group</h1>
+                <paper-input class="create-group-input"
+                             label="{{localize('groupdetail_create groupname')}} [[calcNaturalIndex(index)]]"
+                             value="{{newGroupName}}"
+                             required></paper-input>
                 <template is="dom-repeat" items="{{members}}" as="member">
                     <paper-input class="create-group-input"
                                  label="{{localize('groupdetail_member')}} [[calcNaturalIndex(index)]]"
@@ -148,6 +148,13 @@
                 <paper-button dialog-confirm>OK</paper-button>
             </div>
         </paper-dialog>
+
+        <!-- Fetches Semester Group Size -->
+        <api-request
+                headers="[[ groupSizeAJAX.headers ]]"
+                method="[[ groupSizeAJAX.method ]]"
+                endpoint="[[ groupSizeAJAX.endpoint ]]"
+                on-api-response="_handleGroupSizeResponse"></api-request>
 
         <!-- Fetches all current Groups -->
         <api-request
@@ -179,7 +186,7 @@
         <div class="container horizontal layout wrap">
             <paper-button on-tap="expandAll" style="width: 33%;">Expand all</paper-button>
             <paper-button on-tap="collapseAll" style="width: 33%;">Collapse all</paper-button>
-            <paper-icon-button  style="width: 33%;" icon="add-circle-outline" on-tap="_createGroup"></paper-icon-button>
+            <paper-icon-button  style="width: 33%;" icon="add-circle-outline" on-tap="create"></paper-icon-button>
 
             <template is="dom-repeat" items="[[groups]]" as="group">
                 <div class="student flex self-center" id="group_[[index]]">
@@ -187,15 +194,8 @@
                     <paper-icon-button icon="icons:delete" on-tap="_deleteGroup"></paper-icon-button>
                     <iron-collapse id="collapse[[index]]">
                         <div class="userInfo">
-                            <!--TODO Lists Group Memebers -->
                             <template is="dom-repeat" items="[[group.groupMemberIds]]" as="member">
                                 <div class="member">
-                                    <!--TODO lookup in students for saving requests-->
-                                    <get-user-info
-                                            access-token="[[ accessToken ]]"
-                                            user-id="[[member.id]]"
-                                            name="{{member.name}}"
-                                            mail="{{member.mail}}"></get-user-info>
                                     <a href="mailto:[[member.mail]]" tabindex="-1"><paper-icon-button icon="icons:mail"></paper-icon-button></a>
                                     <h2>[[member.name]]</h2>
                                 </div>
@@ -207,6 +207,13 @@
 
             </template>
         </div>
+
+        <!--Paper Toasts on Create & Delete, Success or Failure-->
+        <paper-toast id="createSuccess" text="{{localize('admin-toast create-success')}}"></paper-toast>
+        <paper-toast id="createFail" text="{{localize('admin-toast create-fail')}}"></paper-toast>
+        <paper-toast id="deleteSuccess" text="{{localize('admin-toast delete-success')}}"></paper-toast>
+        <paper-toast id="deleteFail" text="{{localize('admin-toast delete-fail')}}"></paper-toast>
+
 
         <!--Iron Signal for Localization-->
         <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
@@ -235,6 +242,7 @@
                 groups: {
                     type: Array
                 },
+                newGroupName: String,
                 students: {
                     type: Array,
                     observer: '_studentsChanged'
@@ -256,23 +264,37 @@
 
 
             _studentsChanged: function (detail) {
-                console.log(detail);
+                if(detail.length!==0) {
+                    this.set('students',detail);
+
+                    this.ajax = {
+                        contentType: 'application/json',
+                        headers: {
+                            Authorization: this.accessToken,
+                            filter: '{"where":{"semesterId":"' + this.semester + '"}}'
+                        },
+                        method: 'GET',
+                        endpoint: '/groups'
+                    };
+
+                }
             },
 
             _semesterChanged: function (event) {
                 this.set('semester', event.detail);
+                this.groupSizeAJAX = {
+                        contentType: 'application/json',
+                        headers: {
+                            Authorization: this.accessToken
+                        },
+                        method: 'GET',
+                        endpoint: '/semesters/' + event.detail
+                    };
+            },
 
-
-                this.ajax = {
-                    contentType: 'application/json',
-                    headers: {
-                        Authorization: this.accessToken,
-                        filter: '{"where":{"semesterId":"'+this.semester+'"}}'
-                    },
-                    method: 'GET',
-                    endpoint: '/groups'
-                };
-
+            _handleGroupSizeResponse: function (response) {
+                console.log(response);
+                this.set('groupSize', response.detail.group_size);
             },
 
             /**
@@ -281,61 +303,31 @@
              * @private
              */
             _handleGroupsResponse: function (event) {
-                var self = this;
-                var receivedGroup = event.detail;
-                this.set('groups', receivedGroup);
+                var groups = event.detail;
 
                 //Change groupMemberIds to Array Containing Objects with ID, Name and Mail
-                this.groups.forEach(function (element, index) {
-                    element.groupMemberIds.forEach(function () {
-                        self.push('groups.' + index + '.groupMemberIds', {
-                            "id": self.shift('groups.' + index + '.groupMemberIds'),
-                            "name": "",
-                            "mail": ""
+                for(var i=0; i<groups.length; i++){
+                    for(var j=0; j<groups[i].groupMemberIds.length; j++) {
+                        var memberId = groups[i].groupMemberIds.shift();
+                        var member = this.students.filter(function (obj) {
+                            return obj.id === memberId;
+                        })[0];
+                        var valid = member!==undefined;
+                        groups[i].groupMemberIds.push({
+                            "id": memberId,
+                            "name": (valid)?(member.first_name + ' ' + member.name):(''),
+                            "mail": (valid)?(member.email):('')
                         });
-                    });
-                });
+                    }
+                }
 
-                this.notifyPath('groups');
-
-                //For testing with more groups
-                var testGroups = [
-                    {name: 'Gruppe 1', groupMemberIds: ['Member 1', 'Member 2', 'Member 3', 'Member 4']},
-                    {name: 'Gruppe 2', groupMemberIds: ['Member 1', 'Member 2', 'Member 3', 'Member 4']},
-                    {name: 'Gruppe 3', groupMemberIds: ['Member 1', 'Member 2', 'Member 3', 'Member 4']},
-                    {name: 'Gruppe 4', groupMemberIds: ['Member 1', 'Member 2', 'Member 3', 'Member 4']},
-                    {name: 'Gruppe 5', groupMemberIds: ['Member 1', 'Member 2', 'Member 3', 'Member 4']},
-                    {name: 'Gruppe 6', groupMemberIds: ['Member 1', 'Member 2', 'Member 3', 'Member 4']},
-                    {name: 'Gruppe 7', groupMemberIds: ['Member 1', 'Member 2', 'Member 3', 'Member 4']},
-                    {name: 'Gruppe 8', groupMemberIds: ['Member 1', 'Member 2', 'Member 3', 'Member 4']},
-                    {name: 'Gruppe 9', groupMemberIds: ['Member 1', 'Member 2', 'Member 3', 'Member 4']},
-                    {name: 'Gruppe 10', groupMemberIds: ['Member 1', 'Member 2', 'Member 3', 'Member 4']},
-                    {name: 'Gruppe 11', groupMemberIds: ['Member 1', 'Member 2', 'Member 3', 'Member 4']},
-                    {name: 'Gruppe 12', groupMemberIds: ['Member 1', 'Member 2', 'Member 3', 'Member 4']},
-                    {name: 'Gruppe 13', groupMemberIds: ['Member 1', 'Member 2', 'Member 3', 'Member 4']},
-                    {name: 'Gruppe 14', groupMemberIds: ['Member 1', 'Member 2', 'Member 3', 'Member 4']},
-                    {name: 'Gruppe 15', groupMemberIds: ['Member 1', 'Member 2', 'Member 3', 'Member 4']},
-                    {name: 'Gruppe 16', groupMemberIds: ['Member 1', 'Member 2', 'Member 3', 'Member 4']},
-                    {name: 'Gruppe 17', groupMemberIds: ['Member 1', 'Member 2', 'Member 3', 'Member 4']},
-                    {name: 'Gruppe 18', groupMemberIds: ['Member 1', 'Member 2', 'Member 3', 'Member 4']},
-                    {name: 'Gruppe 19', groupMemberIds: ['Member 1', 'Member 2', 'Member 3', 'Member 4']},
-                    {name: 'Gruppe 20', groupMemberIds: ['Member 1', 'Member 2', 'Member 3', 'Member 4']},
-                    {name: 'Gruppe 21', groupMemberIds: ['Member 1', 'Member 2', 'Member 3', 'Member 4']},
-                    {name: 'Gruppe 22', groupMemberIds: ['Member 1', 'Member 2', 'Member 3', 'Member 4']},
-                    {name: 'Gruppe 23', groupMemberIds: ['Member 1', 'Member 2', 'Member 3', 'Member 4']},
-                    {name: 'Gruppe 24', groupMemberIds: ['Member 1', 'Member 2', 'Member 3', 'Member 4']},
-                    {name: 'Gruppe 25', groupMemberIds: ['Member 1', 'Member 2', 'Member 3', 'Member 4']},
-                    {name: 'Gruppe 26', groupMemberIds: ['Member 1', 'Member 2', 'Member 3', 'Member 4']},
-                    {name: 'Gruppe 27', groupMemberIds: ['Member 1', 'Member 2', 'Member 3', 'Member 4']},
-                    {name: 'Gruppe 28', groupMemberIds: ['Member 1', 'Member 2', 'Member 3', 'Member 4']},
-                    {name: 'Gruppe 29', groupMemberIds: ['Member 1', 'Member 2', 'Member 3', 'Member 4']}];
-                //this.set('groups', testGroups);
+                this.set('groups', groups);
             },
 
-            _handleDeleteGroupResponse: function (event) {
-                this._groupsChanged();
-            },
-
+            /**
+             * Opens Popup to Approve Group Deletion
+             * @private
+             */
             _deleteGroup: function (event, groupId) {
                 var groupID = event.model.__data__.group.id;
                 var groupName = event.model.__data__.group.name;
@@ -344,15 +336,23 @@
                 this.$$('#deleteDialog > div > H1 > span').textContent = groupName;
                 this.$.deleteDialog.open();
             },
-            _createGroup: function () {
-                var groupSize = 4; //TODO get from semester info
-                console.log(this.students);
+
+            /**
+             * Opens Creation Popup (called on-tap & from main-view)
+             * @public
+             */
+            create: function () {
                 this.set('members',[]);
-                for(var i=0; i<groupSize; i++)
+                for(var i=0; i<this.groupSize; i++)
                     this.push('members',{name:''});
+                this.set('newGroupName', 'Gruppe '+(this.groups.length+1));
                 this.$.createDialog.open();
             },
 
+            /**
+             * Callback on Deletion Popup Closed
+             * @private
+             */
             _reactToDeleteDialog: function (event) {
                 if (event.detail.confirmed) {
                     //Get bakc groupID
@@ -367,29 +367,48 @@
                     };
 
                 }
-                //Reset groupID Attribute
-                this.$.deleteDialog.dataset.groupID = '';
             },
+
+            /**
+             * Callback on Creation Popup Closed
+             * @private
+             */
             _reactToCreateDialog: function (event) {
 
                 if (event.detail.confirmed) {
 
-                    console.log(event);
-                    console.log(this.members);
-
-                    var mails = [];
+                    var memberIds = [];
                     var checked = true;
+                    var self = this;
                     //Add suffix back to Mails and Push to Array
                     this.members.forEach(function (element) {
                         if(element.name!=""){
-                            mails.push(element.name.concat("@campus.lmu.de"));
+                            var mail = element.name.concat("@campus.lmu.de");
+                            //Find Student in students
+                            var student = self.students.filter(function ( obj ) {
+                                return obj.email === mail;
+                            })[0];
+                            //Check if user Exists
+                            if(student != undefined){
+                                //Check if User not in group
+                                if(student.groupId==undefined){
+                                    memberIds.push(student.id);
+                                }else{
+                                    checked = false;
+                                    self.$$('#createFail').open();
+                                }
+                            }else{
+                                checked = false;
+                                self.$$('#createFail').open();
+                            }
+
+
 
                         }else{
-                            checked = false
+                            checked = false;
+                            self.$$('#createFail').open();
                         }
                     });
-                    console.log(mails);
-                    console.log(this.accessToken);
                     if(checked){
                         //Find Student IDs in students
 
@@ -399,17 +418,65 @@
                             },
                             method: 'POST',
                             body: {
-                                "emails": mails
+                                "groupMemberIds": memberIds,
+                                "name": this.newGroupName,
+                                "semesterId": this.semester
                             },
-                            endpoint: '/groups/createbymail/'
+                            endpoint: '/groups'
                         };
-                    }else{
-                        console.log("Nicht alle felder ausgefüllt");
                     }
 
                 }
             },
 
+            /**
+             * Callback on API response to Delete Group Request
+             * @private
+             */
+            _handleDeleteGroupResponse: function (event) {
+                var groupID = this.$.deleteDialog.dataset.groupID;
+                index = this.groups.findIndex(x => x.id === groupID);
+                this.splice('groups', index, 1);
+                this.$.deleteDialog.dataset.groupID = '';
+                this.$$('#deleteSuccess').open();
+            },
+
+            /**
+             * Updates groups and displays Succeeded Toast
+             * on API response to Create Group Request
+             * @private
+             */
+            _handleCreateGroupResponse: function (response) {
+                var group = response.detail;
+                for(var j=0; j<group.groupMemberIds.length; j++) {
+                    var memberId = group.groupMemberIds.shift();
+                    var member = this.students.filter(function (obj) {
+                        return obj.id === memberId;
+                    })[0];
+                    var valid = member!==undefined;
+                    group.groupMemberIds.push({
+                        "id": memberId,
+                        "name": (valid)?(member.first_name + ' ' + member.name):(''),
+                        "mail": (valid)?(member.email):('')
+                    });
+                }
+                this.push('groups', group);
+                this.$$('#createSuccess').open();
+
+            },
+
+            /**
+             * Displays Creation Fail Toast on API Error
+             * @private
+             */
+            _handleCreateGroupError: function (response) {
+                this.$$('#createFail').open();
+            },
+
+            /**
+             * Tap-Handler to expand/collapse specific group information
+             * @private
+             */
             _toggleCollapse: function (event) {
                 index = event.model.__key__.slice(1);
                 this.$$('#collapse' + index).toggle();
@@ -417,25 +484,46 @@
                 //this.$$('#group_' + index).classList.toggle('flex-none');
             },
 
+            /**
+             * Tap-Handler to expand all groupMembers
+             * @private
+             */
             expandAll: function () {
                 var self = this;
                 this.groups.forEach(function (item, index) {
                     self.$$('#collapse' + index).show();
                 });
             },
+
+            /**
+             * Tap-Handler to collapse all groupMembers
+             * @private
+             */
             collapseAll: function () {
                 var self = this;
                 this.groups.forEach(function (item, index) {
                     self.$$('#collapse' + index).hide();
                 });
             },
-            create: function () {
-                this._createGroup();
-            },
 
+
+            /**
+             * Function called by Event on Logout
+             * Resetting all Data Component Received on its own
+             * @private
+             */
             _forget: function () {
                 this.set('groups', []);
                 console.info('Reset Groups');
+            },
+
+            /**
+             * helper function for Member numbers in create Group
+             * @param index
+             * @returns {number}
+             */
+            calcNaturalIndex: function (index) {
+                return ++index;
             }
         });
     </script>

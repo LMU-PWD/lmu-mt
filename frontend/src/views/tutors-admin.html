@@ -89,13 +89,17 @@
                 color: var(--paper-blue-grey-600);
             }
 
-            .icon{
-                height: 64px;
-                width: 64px;
-                position: relative;
-                float: left;
-                border-radius: 50%;
-                border: 2px solid var(--paper-blue-grey-900);
+
+            #title{
+                height: 20px;
+                padding: 0 8px;
+                font-size: 20px;
+                line-height: 20px;
+                margin: 10px 20px;
+            }
+
+            #add{
+                margin: 0 20px;
             }
 
         </style>
@@ -176,11 +180,8 @@
 
 
         <div class="fullbleed horizontal justified layout" style="width: 100%; margin: 10px 0;">
-            <h1>{{localize('admin_dashboard tutors')}}</h1>
-            <paper-icon-button  style="width: 100px;" icon="add-circle-outline" on-tap="create"></paper-icon-button>
-            <div class="icon">
-                <img src="../../images/tutor.svg">
-            </div>
+            <h1 id="title">{{localize('admin_dashboard tutors')}}</h1>
+            <paper-icon-button  id="add" icon="add-circle-outline" on-tap="create"></paper-icon-button>
         </div>
 
         <!--Lists all Tutors-->

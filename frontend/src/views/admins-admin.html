@@ -79,6 +79,17 @@
                 color: var(--paper-blue-grey-600);
             }
 
+            #title{
+                height: 20px;
+                padding: 0 8px;
+                font-size: 20px;
+                line-height: 20px;
+                margin: 10px 20px;
+            }
+
+            #add{
+                margin: 0 20px;
+            }
 
         </style>
         <div></div>
@@ -141,7 +152,6 @@
                              required>
                     <iron-icon icon="mail" prefix></iron-icon>
                 </paper-input>
-                <!--TODO evtl zugehöriges Semester -->
             </div>
             <div class="buttons">
                 <paper-button dialog-dismiss autofocus>{{localize('c_button_cancel')}}</paper-button>
@@ -149,8 +159,9 @@
             </div>
         </paper-dialog>
 
-        <div class="fullbleed horizontal center-justified layout" style="width: 100%; margin: 10px 0;">
-            <paper-icon-button  style="width: 100px;" icon="add-circle-outline" on-tap="create"></paper-icon-button>
+        <div class="fullbleed horizontal justified layout" style="width: 100%; margin: 10px 0;">
+            <h1 id="title">{{localize('admin_dashboard admins')}}</h1>
+            <paper-icon-button  id="add" icon="add-circle-outline" on-tap="create"></paper-icon-button>
         </div>
 
         <!--Lists all Admins-->
@@ -168,7 +179,6 @@
                                 <paper-tooltip>{{localize('users-admin email-verified')}}</paper-tooltip>
                             </div>
                         </template>
-                        <!--TODO evtl zugehöriges Semester -->
                         <paper-icon-button icon="icons:delete" on-tap="_deleteAdmin"></paper-icon-button>
                     </div>
                 </div>
