@@ -10,14 +10,12 @@
 <link rel="import" href="practicals-students-date-creator.html">
 <link rel="import" href="../shared/shared-styles.html">
 
-<dom-module id="practicals-students-date-selector">
-
 <!--Localization Imports-->
 <link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
 <link rel="import" href="../services/my-localize-behavior.html">
 
 
-<dom-module id="practical-date-detail">
+<dom-module id="practicals-students-date-selector">
     <template>
         <style include="shared-styles">
             :host{
@@ -68,23 +66,23 @@
             <div>
                 <paper-button raised class="resetButton" on-tap="_handleResetClick">
                     <iron-icon icon="reply"></iron-icon>
-                        Zurücksetzen
+                    [[localize('c_button_discard')]]
                 </paper-button>
                 <paper-button raised class="saveButton" on-tap="_handleSaveClick">
                     <iron-icon icon="save"></iron-icon>
-                    Speichern
+                    [[localize('c_button_save')]]
                 </paper-button>
             </div>
             <div class="dateselector">
-                <!--template is="dom-if" if="[[user.isStudent]]"-->
                     <template is="dom-repeat" items="{{timeslots}}" as="labs">
                         <practicals-students-date-creator id="dateselectors" class="datecreator" timeslots="[[labs]]" priority="[[priority]]"
                                       on-priority-click="_handlePriorityClick"
                                       on-date-click="_handleDateClick"
                                       on-replace-priority="_handleReplacePriority"></practicals-students-date-creator>
                     </template>
-                <!--/template-->
             </div>
+        <!--Iron Signal for Localization-->
+        <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
     </template>
     <script>
         Polymer({
@@ -129,62 +127,13 @@
                 //console.log(this.timeslots);
             },
 
+            /**
+             * Fills priorities-Array with numbers from 1 to array.length
+             */
             _fillPrioritiesArray: function(){
                 for (i = 0; i < this.priority; i++) {
                     this.priorities[i]=i+1;
                 }
-            },
-
-            /**
-             * Creates string from the given date
-             * @param {String} date - date that will be transformed to String
-             */
-            _getDateString: function(date){
-                var datestring = "";
-                switch(date.getDay()){
-                    case 0:
-                        datestring = "Sonntag, den ";
-                        break;
-                    case 1:
-                        datestring = "Montag, den ";
-                        break;
-                    case 2:
-                        datestring = "Dienstag, den ";
-                        break;
-                    case 3:
-                        datestring = "Mittwoch, den ";
-                        break;
-                    case 4:
-                        datestring = "Donnerstag, den ";
-                        break;
-                    case 5:
-                        datestring = "Freitag, den ";
-                        break;
-                    case 6:
-                        datestring = "Samstag, den ";
-                        break;
-                }
-                var hours = date.getHours();
-                var minutes = date.getMinutes();
-                var day = date.getDate();
-                var month = date.getMonth();
-                console.log(day);
-
-                if(hours<10){
-                    hours = "0"+hours;
-                }
-                if(minutes<10){
-                    minutes = "0"+minutes;
-                }
-                if(month<10){
-                    month = "0"+month;
-                }
-                if(day<10){
-                    day = "0"+day;
-                }
-                datestring = datestring+day+"."+month+"."+date.getFullYear()+
-                        " um "+hours+":"+minutes+" Uhr";
-                return datestring;
             },
             /**
              * Handles Reset-Button Click; Resets the priorities-Array and calls childs resetSelection functions
@@ -254,6 +203,7 @@
             /**
              * Transform the Format of the given Timelabs from the Api, so it will be easier to handle in the frontend
              * @param labsFromApi - Contains the given timelabs
+             *  @param divideDates - Contains the given timelabs
              * @returns {Array} - timelabs in new format
              * @private
              */

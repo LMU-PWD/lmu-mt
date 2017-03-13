@@ -175,21 +175,16 @@
 
                 //Set Registration_Open
                 this.set('registration_open',this.labType.registration_open);
+                console.log(this.labType.type_str+" labdata Changed");
+                console.log(this.labData);
                 console.log(this.allLabs);
-                console.log(this.labType.registration_open);
-
-
-
-
-                console.log(Object.keys(this.labData.lab).length);
+                //console.log(this.labType.registration_open);
+                //console.log(Object.keys(this.labData.lab).length);
+                //console.log(detail);
                     if(detail.lab.id){
                         //If Specific Lab exists -> lab has been set
-                        console.log(this.labType.type_str+": Received labData, lab Set:");
-                        console.log(detail.lab);
-                        //this.set('before_deadline',false);
-                        //this.set('practical_date_exists',true);
-                        //var d = new Date(detail.lab.date);
-                        //this.set('practical_date_string', d.toLocaleString().slice(0,-3));
+                        //console.log(this.labType.type_str+": Received labData, lab Set:");
+                        //console.log(detail.lab);
                         this.setDate(detail.lab.date,'practical_date');
                         if(this.before_deadline){
                             console.log("ERROR: Die Praktikumsdaten können nicht vor der Deadline zugewiesen sein. Daten sind hier inkorrekt! LabType: "+this.labType.type_str);
@@ -202,15 +197,28 @@
                         if(this.allLabs == [] || this.allLabs == null){
                             this.set('registration_open',false);
                         }
-
                         if(detail.priorities.length){
                             //Priorities exist -> show Priorities
+                            this.chosenlabs = [];
                             this.set('labs_already_chosen',true);
+                            for(var i = 0; i< this.allLabs.length; i++){
+                                for(var j = 0; j< detail.priorities.length; j++){
+                                    if(i==0){
+                                        //First time the loop is passing through the chosenlabs-Array
+                                        this.chosenlabs.push({});
+                                    }
+                                    if(detail.priorities[j].labId == this.allLabs[i].id){
+                                        this.chosenlabs[this.labData.priorities[j].priority - 1] = this.allLabs[i];
+                                    }
+                                }
+                            }
+                            //this.chosenlabs = detail.priorities;
                             console.log(this.labType.type_str+": Received labData, priorities Set:");
-                            console.log(detail.priorities);
+                            console.log(this.chosenlabs);
 
-                            this.chosenlabs = this.labData.priorities;
-                            this.chosenlabs_transformed = this._transformLabs(this.chosenlabs,false);
+                            this.chosenlabs_transformed = this._transformLabs(this.chosenlabs, false);
+                            console.log(this.chosenlabs_transformed);
+
                         }else{
                             //Neither Lab nor Priorities set -> show date Picker
                             this.set('labs_already_chosen',false);
@@ -222,7 +230,9 @@
                             }
                         }
                     }
-                console.log(this.labType);
+                //console.log(this.labType);
+                //console.log(this.chosenlabs);
+                //console.log(this.chosenlabs_transformed);
             },
 
 
@@ -258,6 +268,29 @@
             _allLabsChanged: function (detail) {
                 //console.log(this.labType.type_str+": Received allLabs:");
                 console.log(detail);
+                if(this.labData && this.labData.priorities && this.labData.priorities.length > 0){
+                    //Priorities exist -> show Priorities
+                    console.log(this.labData.priorities);
+                    this.chosenlabs = [];
+                    this.set('labs_already_chosen',true);
+                    for(var i = 0; i< this.allLabs.length; i++){
+                        for(var j = 0; j< this.labData.priorities.length; j++){
+                            if(i==0){
+                                //First time the loop is passing through the chosenlabs-Array
+                                this.chosenlabs.push({});
+                            }
+                            if(this.labData.priorities[j].labId == this.allLabs[i].id){
+                                this.chosenlabs[this.labData.priorities[j].priority - 1] = this.allLabs[i];
+                            }
+                        }
+                    }
+                    //this.chosenlabs = detail.priorities;
+                    console.log(this.labType.type_str+": Received labs, priorities Set:");
+                    console.log(this.chosenlabs);
+
+                    this.chosenlabs_transformed = this._transformLabs(this.chosenlabs, false);
+                    console.log(this.chosenlabs_transformed);
+                }
             },
 
             /**
@@ -295,10 +328,14 @@
                         headers: {
                             'Authorization': this.accessToken
                         },
+                        body:{
+                            groupId:this.user.groupId,
+                            labTypeId: this.labType.id
+                        },
                         method: 'DELETE',
-                        endpoint: '/groups/'+this.user.groupId+'/Priorities?filter[where][labTypeId]=' + this.labType
+                        endpoint: '/Priorities/deleteByGroupAndLabType/'
                     };
-
+                    console.log(this.ajax_delete);
                     this.labs_already_chosen = true;
                     var practicals_show_saved_dates = Polymer.dom(this.root).querySelector("#practicals_show_saved_dates");
                     if(practicals_show_saved_dates) {
@@ -425,49 +462,53 @@
              * @private
              */
             _transformLabs: function(labsFromApi,divideDates){
-                //console.log(labsFromApi);
+                console.log("labs to transform:");
+                console.log(labsFromApi);
                 var transformedLabs = []; //Store return-Array here
-                var lastLab = new Date(labsFromApi[0].date);
-                var countDates = 0; //Date counter
-                var countLabs = 0; //lab counter
-                var dates = [];
 
-                for(i=0; i<labsFromApi.length; i++){
-                    // Create a new array-entrie if date from recent lab is different from date of the last lab
-                    var labdate = new Date(labsFromApi[i].date);
-                    if(labdate.getFullYear() != lastLab.getFullYear() ||
-                        labdate.getMonth() != lastLab.getMonth() ||
-                        labdate.getDate() != lastLab.getDate()) {
-                        dates = [];
-                        lastlab = labdate.date;
-                        transformedLabs.push([]);
-                        countDates++;
-                        countLabs = 0;
-                    }
-                    var endtime = new Date(labdate.getFullYear(), labdate.getMonth(), labdate.getDate());
-                    if((labdate.getMinutes() + (labsFromApi[i].duration % 60)) > 60){
-                        endtime.setHours(1+Math.floor(labdate.getHours()+(labsFromApi[i].duration) / 60));
-                        endtime.setMinutes(labdate.getMinutes() + (labsFromApi[i].duration % 60)-60);
-                    }
-                    else{
-                        endtime.setHours(Math.floor(labdate.getHours()+(labsFromApi[i].duration) / 60));
-                        endtime.setMinutes(labdate.getMinutes() + (labsFromApi[i].duration % 60));
-                    }
+                if(labsFromApi[0] && labsFromApi[0].date) {
+                    var lastLab = new Date(labsFromApi[0].date);
+                    var countDates = 0; //Date counter
+                    var countLabs = 0; //lab counter
+                    var dates = [];
 
-                    var lab = [];
-                    lab = [labdate, endtime];
-                    if(divideDates){
-                        dates[countLabs] = lab;
-                        transformedLabs[countDates] = dates;
-                        countLabs++;
-                    }
-                    else{
-                        transformedLabs[i]=lab;
-                    }
+                    for (i = 0; i < labsFromApi.length; i++) {
+                        // Create a new array-entrie if date from recent lab is different from date of the last lab
+                        var labdate = new Date(labsFromApi[i].date);
+                        if (labdate.getFullYear() != lastLab.getFullYear() ||
+                            labdate.getMonth() != lastLab.getMonth() ||
+                            labdate.getDate() != lastLab.getDate()) {
+                            dates = [];
+                            lastLab = labdate;
+                            transformedLabs.push([]);
+                            countDates++;
+                            countLabs = 0;
+                        }
+                        var endtime = new Date(labdate.getFullYear(), labdate.getMonth(), labdate.getDate());
+                        if ((labdate.getMinutes() + (labsFromApi[i].duration % 60)) > 60) {
+                            endtime.setHours(1 + Math.floor(labdate.getHours() + (labsFromApi[i].duration) / 60));
+                            endtime.setMinutes(labdate.getMinutes() + (labsFromApi[i].duration % 60) - 60);
+                        }
+                        else {
+                            endtime.setHours(Math.floor(labdate.getHours() + (labsFromApi[i].duration) / 60));
+                            endtime.setMinutes(labdate.getMinutes() + (labsFromApi[i].duration % 60));
+                        }
 
+                        var lab = [];
+                        lab = [labdate, endtime];
+                        if (divideDates) {
+                            dates[countLabs] = lab;
+                            transformedLabs[countDates] = dates;
+                            countLabs++;
+                        }
+                        else {
+                            transformedLabs[i] = lab;
+                        }
+
+                    }
+                    //console.log("transformed labs: ");
+                    //console.log(transformedLabs);
                 }
-                //console.log("transformed labs: ");
-                //console.log(transformedLabs);
                 return transformedLabs;
             },
             /**
