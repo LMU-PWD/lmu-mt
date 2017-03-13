@@ -163,6 +163,14 @@
                                 description_tutor: audio.descriptionTutor,
                                 description_student: audio.descriptionStudent,
                                 semesterId: this.semesterId
+                            },{
+                                type: 3,
+                                type_str: 'Videoschnitt',
+                                registration_deadline: video.deadline, // Only for API validation, not used in app
+                                registration_open: false,
+                                description_tutor: video.descriptionTutor,
+                                description_student: video.descriptionStudent,
+                                semesterId: this.semesterId
                             }];
                     this.labtypeAjax = {
                         method: 'POST',
