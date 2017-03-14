@@ -2,6 +2,7 @@
 <link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
+<link rel="import" href="../../bower_components/iron-icons/editor-icons.html">
 
 <!--Localization Imports-->
 <link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
@@ -143,6 +144,21 @@
             </div>
         </paper-dialog>
 
+        <paper-dialog id="editDialog" on-iron-overlay-closed="_reactToDeleteDialog">
+            <div>
+                <h1>{{localize('usersadmin_dialog text-1')}}<span></span> {{localize('groupsadmin_dialog text-2')}}
+                </h1>
+                <!--p>{{localize('admin_dialog text-3')}}</p-->
+                <h2>Semester: </h2>
+                <h2>Role: </h2>
+                <h2>Passed Labs: </h2>
+            </div>
+            <div class="buttons">
+                <paper-button dialog-dismiss autofocus>{{localize('c_button_cancel')}}</paper-button>
+                <paper-button dialog-confirm>OK</paper-button>
+            </div>
+        </paper-dialog>
+
         <paper-dialog id="createDialog" on-iron-overlay-closed="_reactToCreateDialog">
             <div>
                 <h1>{{localize('usersadmin_dialog create')}}</h1>
@@ -189,6 +205,7 @@
                             </div>
                         </template>
                         <paper-icon-button icon="icons:delete" on-tap="_deleteStudent"></paper-icon-button>
+                        <paper-icon-button icon="editor:mode-edit" on-tap="_editStudent"></paper-icon-button>
                     </div>
                 </div>
             </template>
@@ -234,6 +251,14 @@
                         "isTutor": false,
                         "isAdmin": false,
                         "semesterId": ""
+                    }
+                },
+                editUser: {
+                    type: Object,
+                    value: {
+                        semester: "",
+                        passedLabs: [],
+                        userRole: ""
                     }
                 }
 
@@ -323,6 +348,31 @@
                 //Set Popup Text to match selcted Student & Open Popus
                 this.$$('#deleteDialog > div > H1 > span').textContent = studentName;
                 this.$.deleteDialog.open();
+            },
+
+            /**
+             * Opens Popup to Approve User Deletion
+             * @private
+             */
+            _editStudent: function (event) {
+                //Grabbing Student information from target
+                var student = event.model._config.student;
+                var passedLabTypes = student.passedLabsIds;
+                var semester = student.semesterId;
+                var studentID = student.id;
+                var isStudent = student.isStudent;
+                var isTutor = student.isTutor;
+                var studentName = student.first_name + " " + student.name;
+                var pending = !student.emailVerified;
+                console.log(student);
+
+                //Temporarily save Student Info in deleteDialogs Attributes
+                this.$.editDialog.dataset.studentID = studentID;
+                this.$.editDialog.dataset.pending = pending;
+
+                //Set Popup Text to match selcted Student & Open Popus
+                this.$$('#editDialog > div > H1 > span').textContent = studentName;
+                this.$.editDialog.open();
             },
 
             /**
@@ -426,6 +476,8 @@
             _handleCreateResponse: function (response) {
                 this.push('students', response.detail);
                 this.notifyPath('students');
+                this.$$('#createSuccess').open();
+
             },
 
             /**
