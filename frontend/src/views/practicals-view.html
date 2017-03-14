@@ -2,10 +2,7 @@
 <link rel="import" href="../shared/shared-styles.html">
 <link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../../bower_components/paper-tabs/paper-tabs.html">
-<link rel="import" href="../../bower_components/iron-icons/editor-icons.html">
 <link rel="import" href="../components/practicals-students-date-detail.html">
-<link rel="import" href="../components/practicals-admin-labs-detail.html">
-<link rel="import" href="../components/labtype-detail-view.html">
 
 <!--Localization Imports-->
 <link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
@@ -45,9 +42,9 @@
             }
             .icon{
               position: absolute;
-                left: calc(50% - 12px);
-                height: 48px;
-                width: 48px;
+                left: calc(50% - 24px);
+                height: 40px;
+                width: 40px;
               border-radius: 50%;
               background-color: var(--paper-blue-grey-100);
               border:  2px solid var(--paper-blue-grey-900);
@@ -68,53 +65,37 @@
         <div class="page">
             <img class="icon" src="../../images/[[name]].svg" z-index="1">
             <paper-tabs selected="{{selectedTab}}" class="tabheader" no-slide>
-                <paper-tab class="tabheaderbuttons">[[localize('practicals tabtitle_1')]]</paper-tab>
-                <paper-tab class="tabheaderbuttons">[[localize('practicals tabtitle_2')]]</paper-tab>
+                <paper-tab class="tabheaderbuttons">[[ localize('practicals-view tab_general') ]]</paper-tab>
+                <paper-tab class="tabheaderbuttons">[[ localize('practicals-view tab_dates') ]]</paper-tab>
             </paper-tabs>
             <div class="content">
-                <h1>[[labType.type_str]] [[localize('practicals practicals')]]</h1>
+                <h1>[[labType.type_str]] [[ localize('practicals-view title_practical') ]]</h1>
                 <iron-pages selected="[[selectedTab]]">
                     <div>
-                        <template is="dom-if" if="[[!user.isAdmin]]">
-                            <h1>Informationen</h1>
-                            <template is="dom-if" if="[[user.isTutor]]">
-                                <p>[[labType.description_tutor]]</p>
-                            </template>
-                            <template is="dom-if" if="[[user.isStudent]]">
-                                <p>[[labType.description_student]]</p>
-                            </template>
+                        <h1>[[ localize('practicals-view title_information') ]]</h1>
+                        <template is="dom-if" if="[[user.isTutor]]">
+                            <p>[[labType.description_tutor]]</p>
                         </template>
-                        <template is="dom-if" if="[[user.isAdmin]]">
-                            <labtype-detail-view access-token ="[[accessToken]]"
-                                                 lab-type-from-api = "[[labType]]"
-                                                 on-labtype-changed = "_handleLabtypeChanged"></labtype-detail-view>
+                        <template is="dom-if" if="[[user.isStudent]]">
+                            <p>[[labType.description_student]]</p>
                         </template>
                     </div>
                     <div>
-                        <template is="dom-if" if="[[!user.isAdmin]]">
-                            <practicals-students-date-detail id="detailView"
-                                                             group="{{ group }}"
-                                                             user="{{ user }}"
-                                                             lab-type="[[labType]]"
-                                                             lab-data="[[labData]]"
-                                                             all-labs="[[allLabs]]"
-                                                             access-token="{{ accessToken }}"></practicals-students-date-detail>
-                        </template>
-                        <template is="dom-if" if="[[user.isAdmin]]">
-                            <practicals-admin-labs-detail id="practicalsAdminDetail"
-                                                     user="[[ user ]]"
-                                                     user-id="{{ userId }}"
-                                                     lab-type="[[labType]]"
-                                                     all-labs="[[allLabs]]"
-                                                     semester-id="[[user.semesterId]]"
-                                                     on-labs-changed = "_handleLabsChanged"
-                                                     access-token="[[ accessToken ]]"></practicals-admin-labs-detail>
-                        </template>
+                        <h1>[[ localize('practicals-view title_datepick') ]]</h1>
+                        <practicals-students-date-detail id="detailView"
+                                                         group="{{ group }}"
+                                                         user="{{ user }}"
+                                                         lab-type="[[labType]]"
+                                                         lab-data="[[labData]]"
+                                                         all-labs="[[allLabs]]"
+                                                         access-token="{{ accessToken }}"></practicals-students-date-detail>
                     </div>
                 </iron-pages>
             </div>
         </div>
+
         <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
+
     </template>
 
     <script>
@@ -164,29 +145,23 @@
                 /*Holding information about the labType (infotext, deadlines, ect.. )*/
                 labType: {
                     type: Object,
-                    observer:'_labTypeChanged'
+                    observer: '_labTypeChanged'
                 }
             },
-
             behaviors: [
                 Polymer.MyLocalizeBehavior
             ],
 
-            ready: function () {
-               //console.log(this.labType);
-                this._handleLabsChanged();
-            },
-
             _groupChanged: function (detail) {
                 var newLabData = {lab: {}, priorities: []};
 
-                for (i = 0; i < this.group.labIds.length; i++) {
+                for (var i = 0; i < this.group.labIds.length; i++) {
                     //Matching groups labs id with lab id (map photo->photo ect.)
                     if (this.group.labIds[i].labTypeId == this.labType.id) {
                         newLabData.lab = this.group.labIds[i];
                     }
                 }
-                for (i = 0; i < this.group.priorityIds.length; i++) {
+                for (var i = 0; i < this.group.priorityIds.length; i++) {
                     //Matching groups labs id with lab id (map photo->photo ect.)
                     if (this.group.priorityIds[i].labTypeId == this.labType.id) {
                         newLabData.priorities.push(this.group.priorityIds[i]);
@@ -200,32 +175,22 @@
 
             },
             _userChanged: function (detail) {
-                //console.log(detail);
-                this._handleLabsChanged();
+//                console.log(detail);
+
+                this.ajax_labs = {
+                    headers: {
+                        Authorization: this.accessToken,
+                        filter: '{"where":{"semesterId":"'+this.user.semesterId+'","labTypeId":"'+this.labType.id+'"}}'
+                    },
+                    method: 'GET',
+                    endpoint: '/Labs'
+                };
 
             },
             _labTypeChanged: function (response) {
-                //console.log("Labtype changed!");
                 //console.log(detail);
                 this.customStyle['--color'] = this.labType.color;
                 this.updateStyles();
-                this._handleLabsChanged();
-            },
-            _handleLabsChanged: function () {
-                //console.log(detail);
-                if (this.user && this.labType)
-                    this.ajax_labs = {
-                        headers: {
-                            Authorization: this.accessToken,
-                            filter: '{"where":{"semesterId":"' + this.user.semesterId + '","labTypeId":"' + this.labType.id + '"}}'
-                        },
-                        method: 'GET',
-                        endpoint: '/Labs'
-                    };
-
-            },
-            _handleLabtypeChanged: function () {
-                this.fire('labtype-changed');
             },
             _handleAllLabsRequest: function (response) {
                 this.set('allLabs',response.detail);
