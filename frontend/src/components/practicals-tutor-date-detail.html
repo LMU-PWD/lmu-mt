@@ -128,7 +128,7 @@
             </template>
         </div>
 
-        <iron-signals on-iron-signal-switchlocale="_switchLocale"></iron-signals>
+        <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
     </template>
 
 
@@ -207,14 +207,8 @@
              * Localization setup
              */
             behaviors: [
-                Polymer.AppLocalizeBehavior
+                Polymer.MyLocalizeBehavior
             ],
-            attached: function() {
-                this.loadResources(this.resolveUrl('../shared/locales.json'));
-            },
-            _switchLocale: function() {
-                this.language = (this.language == 'en') ? 'de' : 'en';
-            },
 
             /**
              * Observer method for allLabs Array

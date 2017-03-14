@@ -162,14 +162,9 @@
                     }
                 }
                 this.set('labData', newLabData);
-
-                //Just for Testing
-                //console.log(this.labType.type_str + ": Updated labData");
-                //console.log(this.labData);
-
             },
+
             _userChanged: function (detail) {
-                console.log(detail);
 
                 this.ajax_labs = {
                     headers: {
@@ -182,13 +177,13 @@
 
             },
             _labTypeChanged: function (response) {
-                //console.log(detail);
+
                 this.customStyle['--color'] = this.labType.color;
                 this.updateStyles();
             },
+
             _handleAllLabsRequest: function (response) {
                 this.set('allLabs',response.detail);
-                //console.log(this.allLabs);
             }
         });
     </script>

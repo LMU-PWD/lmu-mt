@@ -4,6 +4,10 @@
 <link rel="import" href="../components/tutor-sessionlist.html">
 <link rel="import" href="../components/practicals-tutor-date-detail.html">
 
+<!--Localization Imports-->
+<link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
+<link rel="import" href="../services/my-localize-behavior.html">
+
 <dom-module id="tutor-card">
 
     <template>
@@ -77,6 +81,7 @@
                 .content {
                     width: calc(70% - 25px);
                     padding: 15px 0 15px 15px;
+                    display: inline-block;
                 }
             }
 
@@ -208,7 +213,7 @@
             </template>
         </div>
 
-        <iron-signals on-iron-signal-switchlocale="_switchLocale"></iron-signals>
+        <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
     </template>
 
 
@@ -287,14 +292,8 @@
              * Localization setup
              */
             behaviors: [
-                Polymer.AppLocalizeBehavior
+                Polymer.MyLocalizeBehavior
             ],
-            attached: function() {
-                this.loadResources(this.resolveUrl('../shared/locales.json'));
-            },
-            _switchLocale: function() {
-                this.language = (this.language == 'en') ? 'de' : 'en';
-            },
 
             /**
              ** OBSERVER & COMPUTING METHODS **
