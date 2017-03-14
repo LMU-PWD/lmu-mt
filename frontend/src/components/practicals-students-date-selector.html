@@ -195,11 +195,14 @@
              * @private
              */
             _handleReplacePriority: function(e){
+                //console.log(e.target.timeslots[e.target.chosenlabindex][0].toString());
                 for(i=0; i<this.priorities.length; i++){
-                    labdate = new Date(this.chosenlabs[i]);
-                    if(labdate.toString() == e.target.timeslots[e.target.chosenlabindex][0].toString()){
-                        this.chosenlabs[i]= '';
-                        this.priorities[i] = i+1;
+                    if(this.chosenlabs[i] && this.chosenlabs[i].date){
+                        var labdate = new Date(this.chosenlabs[i].date);
+                        if (labdate.toString() == e.target.timeslots[e.target.chosenlabindex][0].toString()) {
+                            this.chosenlabs[i] = '';
+                            this.priorities[i] = i + 1;
+                        }
                     }
                 }
                 //console.log(this.priorities);
