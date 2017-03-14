@@ -10,11 +10,24 @@
                 display: block;
                 padding: 3%;
                 text-align: left;
-                padding-bottom: 7%;
+                padding-bottom: 9%;
             }
             .button{
+                margin: 1%;
                 margin-bottom: 2%;
-                width: 49.8%;
+                width: 47.8%;
+            }
+            .distributeblock{
+                display: inline-block;
+                width: 100%;
+                text-align: center;
+                border-radius: 10px;
+                background-color:  var(--paper-blue-grey-50);
+                margin-bottom: 2%;
+            }
+            .distributetext{
+                margin: 2%;
+                #margin-bottom: 2%;
             }
 
             /*Phone*/
@@ -42,8 +55,31 @@
                 body="[[  ajax_save_labtype.body ]]"
                 endpoint="[[  ajax_save_labtype.endpoint ]]"
                 on-api-response="_responseFromPostingRegistrationOpen"></api-request>
+        <api-request
+                headers="[[ ajax_call_distribute.headers ]]"
+                method="[[  ajax_call_distribute.method ]]"
+                body="[[  ajax_call_distribute.body ]]"
+                endpoint="[[  ajax_call_distribute.endpoint ]]"
+                on-api-response="_responseFromCallingDistribute"></api-request>
 
-        <paper-button raised class="studentsRegistrationButton" on-tap="_handleStudentButtonClick">
+
+        <template is="dom-if" if="[[showDistribute]]">
+            <div class="distributeblock">
+                <div class="distributetext">
+                    [[localize('practicals-admin distribute_text')]]:
+                </div>
+                <div>
+                    <paper-button raised  disabled$="{{!showDistributeStudents}}"  style="float: left;" class="button" on-tap="_handleDistributeStudents">
+                        [[localize('practicals-admin students')]]
+                    </paper-button>
+                    <paper-button style="float: right;" raised class="button" disabled$="{{!showDistributeTutors}}" on-tap="_handleDistributeTutors">
+                        [[localize('practicals-admin tutors')]]
+                    </paper-button>
+                </div>
+            </div>
+        </template>
+
+        <paper-button raised on-tap="_handleStudentButtonClick">
             <template is="dom-if" if="[[labType.registration_open]]">
                 [[localize('practicals-admin close_registration')]]
             </template>
@@ -51,6 +87,8 @@
                 [[localize('practicals-admin open_registration')]]
             </template>
         </paper-button>
+
+
         <lab-detail-content-element
                         id="deadlineStudent"
                         text="[[localize('practicals-admin-labtype text1')]]"
@@ -127,14 +165,25 @@
                 showSaveButton:{
                     type: Boolean,
                     value: false
+                },
+                showDistribute:{
+                    type: Boolean,
+                    value: false
+                },
+                showDistributeStudents:{
+                    type: Boolean,
+                    value: false
+                },
+                showDistributeTutors:{
+                    type: Boolean,
+                    value: false
                 }
             },
             behaviors: [
                 Polymer.MyLocalizeBehavior
             ],
             ready: function () {
-                //console.log(this.accessToken);
-                //console.log(this.labTypeFromApi);
+
             },
             /**
              * Handle changes of
@@ -183,7 +232,7 @@
             _handleSaveButtonClick: function(){
                 //console.log(event.detail);
                 //Post LabType-Changes in API
-                console.log(this.labType);
+                //console.log(this.labType);
                 if (this.labType.id) {
                     this.ajax_save_labtype = {
                         headers: {
@@ -210,8 +259,6 @@
 
             /**
              * Handle click on Disard Button to discard changes on Labtype
-             * @param e - Event Variable
-             * @private
              */
             _handleDiscardButtonClick: function(){
                 //Reset LabtypeValues
@@ -228,6 +275,60 @@
                 Polymer.dom(this.root).querySelector("#descriptionTutor").data = this.labType.description_tutor;
 
                 this.set('showSaveButton', false);
+            },
+
+            /**
+             * Compares given deadline to recent date
+             * @param deadline
+             */
+            _getBeforeDeadline: function (deadline){
+                var deadline_date = new Date(deadline);
+                var today = new Date();
+                if(deadline_date > today){
+                    //Before deadline
+                    return true;
+
+                }
+                //After deadline
+                return false;
+            },
+
+            /**
+             * Handle click on Distribute Button for Students to automatically distribute the chosen labs to groups
+             * @param e - Event Variable
+             * @private
+             */
+            _handleDistributeStudents: function(e){
+                this.ajax_call_distribute = {
+                    headers: {
+                        Authorization: this.accessToken
+                    },
+                    body: {
+                        labTypeId: this.labType.id
+                    },
+                    method: 'POST',
+                    endpoint: '/labtypes/autodistributegroups'
+                };
+                //console.log(this.ajax_call_distribute);
+            },
+
+            /**
+             * Handle click on Distribute Button for Students to automatically distribute the chosen labs to groups
+             * @param e - Event Variable
+             * @private
+             */
+            _handleDistributeTutors: function(e){
+                this.ajax_call_distribute = {
+                    headers: {
+                        Authorization: this.accessToken
+                    },
+                    body: {
+                        labTypeId: this.labType.id
+                    },
+                    method: 'POST',
+                    endpoint: '/labtypes/autodistributetutors'
+                };
+                //console.log(this.ajax_call_distribute);
             },
 
             /**
@@ -287,7 +388,27 @@
                 this.set('labType.description_tutor', e.description_tutor);
                 this.set('labType.registration_deadline', new Date(e.registration_deadline));
                 this.set('labType.registration_deadline_tutors', new Date(e.registration_deadline_tutors));
-                //console.log(this.labType);
+
+
+                //Set Before Deadline Flags
+                this.set('showDistributeTutors', (!this._getBeforeDeadline(e.registration_deadline_tutors)));
+                this.set('showDistributeStudents', (!this._getBeforeDeadline(e.registration_deadline)));
+                if(this.showDistributeStudents ||this.showDistributeTutors){
+                    this.set('showDistribute', true);
+                }
+                else {
+                    this.set('showDistribute', false);
+                }
+            },
+
+            /**
+             * Handle response from api-request whith ajax_groups
+             * @param e - Event Variable
+             * @private
+             */
+            _responseFromCallingDistribute: function(e){
+                //console.log(e.detail);
+                this.fire('labtype-changed');
             },
 
             /**
@@ -296,7 +417,8 @@
              * @private
              */
             _responseFromPostingRegistrationOpen: function(e){
-                console.log(e.detail);
+                //console.log(e.detail);
+                this.fire('labtype-changed');
             },
 
             /**
@@ -305,7 +427,8 @@
              * @private
              */
             _responseFromPostingLabtype: function(e){
-                console.log(e);
+                //console.log(e);
+                this.fire('labtype-changed');
             }
         });
     </script>

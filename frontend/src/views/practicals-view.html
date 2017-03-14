@@ -16,45 +16,49 @@
     <template>
         <style include="shared-styles">
             :host {
-              #display: block;
+                #display: block;
             }
             .page{
-              /*border-radius: 25px;*/
-              margin: 24px;
-              background-color: var(--paper-blue-grey-100);
-              color: var(--paper-blue-grey-900);
+                /*border-radius: 25px;*/
+                margin: 24px;
+                background-color: var(--paper-blue-grey-100);
+                color: var(--paper-blue-grey-900);
             }
             .tabheader{
-              background-color: var(--color);
-              font-size: 18px;
-              /*border-radius: 25px 25px 0px 0px;*/
-              overflow: hidden;
-              height: 40px;
+                background-color: var(--color);
+                font-size: 18px;
+                /*border-radius: 25px 25px 0px 0px;*/
+                overflow: hidden;
+                height: 40px;
             }
             .tabheaderbuttons{
-              color: var(--paper-blue-grey-50);
-              text-align: center;
+                color: var(--paper-blue-grey-50);
+                text-align: center;
+            }
+            .titles{
+                text-align: center;
             }
             paper-tab{
-              --paper-tab-ink:var(--paper-blue-grey-100);
-              font-weight: 300;
+                --paper-tab-ink:var(--paper-blue-grey-100);
+                font-weight: 300;
             }
             paper-tab.iron-selected {
-              color: var(--paper-blue-grey-900);
-              background-color: var(--paper-blue-grey-100);
+                color: var(--paper-blue-grey-900);
+                background-color: var(--paper-blue-grey-100);
             }
             .icon{
-              position: absolute;
-                left: calc(50% - 12px);
-                height: 48px;
-                width: 48px;
-              border-radius: 50%;
-              background-color: var(--paper-blue-grey-100);
-              border:  2px solid var(--paper-blue-grey-900);
-              z-index: 1;
+                position: absolute;
+                left: calc(50% - 24px);
+                height: 40px;
+                width: 40px;
+                border-radius: 50%;
+                background-color: var(--paper-blue-grey-100);
+                border:  2px solid var(--paper-blue-grey-900);
+                z-index: 1;
             }
             .content{
-              padding: 10px;
+                padding: 10px;
+                margin: 24px;
             }
         </style>
 
@@ -68,15 +72,15 @@
         <div class="page">
             <img class="icon" src="../../images/[[name]].svg" z-index="1">
             <paper-tabs selected="{{selectedTab}}" class="tabheader" no-slide>
-                <paper-tab class="tabheaderbuttons">[[localize('practicals tabtitle_1')]]</paper-tab>
-                <paper-tab class="tabheaderbuttons">[[localize('practicals tabtitle_2')]]</paper-tab>
+                <paper-tab class="tabheaderbuttons">[[ localize('practicals-view tab_general') ]]</paper-tab>
+                <paper-tab class="tabheaderbuttons">[[ localize('practicals-view tab_dates') ]]</paper-tab>
             </paper-tabs>
             <div class="content">
-                <h1>[[labType.type_str]] [[localize('practicals practicals')]]</h1>
+                <h1 class="titles">[[labType.type_str]] [[ localize('practicals-view title_practical') ]]</h1>
                 <iron-pages selected="[[selectedTab]]">
                     <div>
                         <template is="dom-if" if="[[!user.isAdmin]]">
-                            <h1>Informationen</h1>
+                            <!--h1 class="titles">[[ localize('practicals-view title_information') ]]</h1-->
                             <template is="dom-if" if="[[user.isTutor]]">
                                 <p>[[labType.description_tutor]]</p>
                             </template>
@@ -86,11 +90,13 @@
                         </template>
                         <template is="dom-if" if="[[user.isAdmin]]">
                             <labtype-detail-view access-token ="[[accessToken]]"
-                                             lab-type-from-api = "[[labType]]"></labtype-detail-view>
+                                                 lab-type-from-api = "[[labType]]"
+                                                 on-labtype-changed = "_handleLabTypeChanged"></labtype-detail-view>
                         </template>
                     </div>
                     <div>
                         <template is="dom-if" if="[[!user.isAdmin]]">
+                            <!--h1 class="titles">[[ localize('practicals-view title_datepick') ]]</h1-->
                             <practicals-students-date-detail id="detailView"
                                                              group="{{ group }}"
                                                              user="{{ user }}"
@@ -100,14 +106,15 @@
                                                              access-token="{{ accessToken }}"></practicals-students-date-detail>
                         </template>
                         <template is="dom-if" if="[[user.isAdmin]]">
+                            <!--h1 class="titles">[[ localize('practicals-view title_datepick') ]]</h1-->
                             <practicals-admin-labs-detail id="practicalsAdminDetail"
-                                                     user="[[ user ]]"
-                                                     user-id="{{ userId }}"
-                                                     lab-type="[[labType]]"
-                                                     all-labs="[[allLabs]]"
-                                                     semester-id="[[user.semesterId]]"
-                                                     on-labs-changed = "_handleLabsChanged"
-                                                     access-token="[[ accessToken ]]"></practicals-admin-labs-detail>
+                                                          user="[[ user ]]"
+                                                          user-id="{{ userId }}"
+                                                          lab-type="[[labType]]"
+                                                          all-labs="[[allLabs]]"
+                                                          semester-id="[[user.semesterId]]"
+                                                          on-labs-changed = "_labsChanged"
+                                                          access-token="[[ accessToken ]]"></practicals-admin-labs-detail>
                         </template>
                     </div>
                 </iron-pages>
@@ -155,7 +162,7 @@
                     observer: '_groupChanged'
                 },
                 /*Paths:• Lab (final lab from group object)
-                *       • Priorities (groups )    */
+                 *       • Priorities (groups )    */
                 labData: {
                     type: Object
                 },
@@ -172,14 +179,10 @@
             ],
 
             ready: function () {
-               //console.log(this.labType);
-                this._handleLabsChanged();
+                //console.log(this.labType);
+                this._labsChanged();
             },
 
-            /**
-             * Handles changes of group-Object from API
-             * @param detail
-             */
             _groupChanged: function (detail) {
                 var newLabData = {lab: {}, priorities: []};
 
@@ -202,33 +205,19 @@
                 //console.log(this.labData);
 
             },
-
-            /**
-             * Handles changes of user-Object from API
-             * @param detail
-             */
             _userChanged: function (detail) {
                 //console.log(detail);
-                this._handleLabsChanged();
+                this._labsChanged();
 
             },
-
-            /**
-             * Handles changes of labType-Object from API
-             * @param response
-             */
             _labTypeChanged: function (response) {
                 //console.log("Labtype changed!");
                 //console.log(detail);
                 this.customStyle['--color'] = this.labType.color;
                 this.updateStyles();
-                this._handleLabsChanged();
+                this._labsChanged();
             },
-
-            /**
-             * Handles changes of labs-Array from API
-             */
-            _handleLabsChanged: function () {
+            _labsChanged: function () {
                 //console.log(detail);
                 if (this.user && this.labType)
                     this.ajax_labs = {
@@ -240,6 +229,9 @@
                         endpoint: '/Labs'
                     };
 
+            },
+            _handleLabTypeChanged: function (response) {
+                this.fire('labtype-changed');
             },
             _handleAllLabsRequest: function (response) {
                 this.set('allLabs',response.detail);

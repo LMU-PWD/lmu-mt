@@ -44,21 +44,21 @@
             </div>
             <template is="dom-repeat" items="[[timeslots]]" as="lab" >
                 <paper-item id="lab" class="lab" on-tap="_handleDateClick">
-                    [[_getTimeSlotString(lab)]] [[localize('general_hours')]] miau
+                    [[_getTimeSlotString(lab)]] [[localize('general_hours')]]
                     <div id="priorityShower"></div>
                 </paper-item>
                 <iron-collapse id="priorityselection">
                     <div>
-                        <paper-dropdown-menu label="Priorität: ">
+                        <paper-dropdown-menu label="[[localize('practicals-student-date priority')]]: ">
                             <paper-listbox class="dropdown-content">
                                 <template is="dom-repeat" items="[[priorities]]" as="selector">
                                     <template is="dom-if" if="[[_computeSelector(selector)]]">
-                                          <paper-item on-tap="_handlePriorityClick">[[selector]]</paper-item>
+                                        <paper-item on-tap="_handlePriorityClick">[[selector]]</paper-item>
                                     </template>
                                 </template>
                             </paper-listbox>
                         </paper-dropdown-menu>
-                        <div>(1 - gering; [[priority]] - hoch)</div>
+                        <div>(1 - [[localize('practicals-student-date priorities_min')]]; [[priority]] - [[localize('practicals-student-date priorities_max')]])</div>
                     </div>
                 </iron-collapse>
             </template>
@@ -115,7 +115,7 @@
                 this.date = this._getDateString(this.timeslots[0][0]);
 
                 for (i = 0; i < this.priority; i++) {
-                        this.priorities[i]=i+1;
+                    this.priorities[i]=i+1;
                 }
             },
 
@@ -124,11 +124,12 @@
              * Adds leading zeros, if necessary
              */
             _getTimeSlotString: function(slot){
+                //console.log(slot);
                 if(slot) {
-                    var starthour = slot.dates[0].getHours();
-                    var startminute = slot.dates[0].getMinutes();
-                    var endhour = slot.dates[1].getHours();
-                    var endminute = slot.dates[1].getMinutes();
+                    var starthour = slot[0].getHours();
+                    var startminute = slot[0].getMinutes();
+                    var endhour = slot[1].getHours();
+                    var endminute = slot[1].getMinutes();
                     /*
                      * Add zeros, if necessary
                      */
@@ -270,9 +271,9 @@
                     this.chosenpriority = e.model.selector;
                     if (this.recentlab.lastChild.textContent.search('Priorität:') >= 0) {
                         this.fire("replace-priority");
-                        //TODO: replace lab on practical-date-detail chosenlabs-Array and priorities-Array
+                        //TODO: replace lab on practical-students-date-detail chosenlabs-Array and priorities-Array
                     }
-                    else {
+                    //else {
                         this.fire("priority-click"); //Notifies Parent (practical-date-detail.html)
                         this.recentpriorityselection.toggle(); //Hide Priorityselection
                         this.recentlab.style.color = 'green';
@@ -280,7 +281,7 @@
                         this.recentlab.lastChild.textContent = 'Priorität: ' + e.model.selector;
                         //this.recentlab.innerHTML = this.recentlab.innerHTML +'<div id="priorityShower">'+'Priorität: ' + e.model.selector+'</div>';
 
-                    }
+                    //}
                 }
             },
 
@@ -297,10 +298,18 @@
                 }
                 return response;
             },
+
+            /**
+             * Handles changes of labs-Array from API
+             * @param e - event
+             */
             _labsChanged: function(e){
                 //console.log("labsChanged");
-                this.date = this._getDateString(this.labs[0].dates[0]);
+                if(this.labs && this.labs[0]) {
+                    this.date = this._getDateString(this.labs[0].dates[0]);
+                }
             },
+
             /**
              * Reset labselection on Button click
              * @private
