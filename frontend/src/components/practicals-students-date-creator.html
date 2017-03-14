@@ -271,9 +271,9 @@
                     this.chosenpriority = e.model.selector;
                     if (this.recentlab.lastChild.textContent.search('Priorität:') >= 0) {
                         this.fire("replace-priority");
-                        //TODO: replace lab on practical-date-detail chosenlabs-Array and priorities-Array
+                        //TODO: replace lab on practical-students-date-detail chosenlabs-Array and priorities-Array
                     }
-                    else {
+                    //else {
                         this.fire("priority-click"); //Notifies Parent (practical-date-detail.html)
                         this.recentpriorityselection.toggle(); //Hide Priorityselection
                         this.recentlab.style.color = 'green';
@@ -281,7 +281,7 @@
                         this.recentlab.lastChild.textContent = 'Priorität: ' + e.model.selector;
                         //this.recentlab.innerHTML = this.recentlab.innerHTML +'<div id="priorityShower">'+'Priorität: ' + e.model.selector+'</div>';
 
-                    }
+                    //}
                 }
             },
 

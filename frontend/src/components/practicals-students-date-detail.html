@@ -300,11 +300,12 @@
                 //console.log(e.target.chosenlabs);
                 var labcounter = 0;
                 for(i=0; i< e.target.chosenlabs.length; i++){
-                    if(e.target.chosenlabs[i] != null){
+                    if(e.target.chosenlabs[i]){
                         labcounter++;
                     }
                 }
-                if(labcounter == e.target.chosenlabs.length && labcounter != 0){
+                //console.log(labcounter);
+                if(labcounter != 0 && labcounter == this.priority ){
                     this.chosenlabs = [];
                     this.chosenlabs = e.target.chosenlabs;
                     this.chosenlabs_transformed = this._transformLabs(this.chosenlabs,false);
