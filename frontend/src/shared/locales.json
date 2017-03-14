@@ -137,9 +137,11 @@
     "admin_dashboard tutors" : "Tutors",
     "admin_dashboard semester" : "Terms",
 
-    "practicals practicals": "practicals",
-    "practicals tabtitle_1": "General",
-    "practicals tabtitle_2": "Dates",
+    "practicals-view tab_general": "General",
+    "practicals-view tab_dates": "Dates",
+    "practicals-view title_practical": "practical",
+    "practicals-view title_information": "Information",
+    "practicals-view title_datepick": "Date selection",
 
     "practicals-admin tutor": "Tutor",
     "practicals-admin group": "Group",
@@ -191,12 +193,6 @@
     "general_hours": "hours"
 
     "general_hours": "hours",
-
-    "practicals-view tab_general": "General",
-    "practicals-view tab_dates": "Dates",
-    "practicals-view title_practical": "practical",
-    "practicals-view title_information": "Information",
-    "practicals-view title_datepick": "Date selection"
   },
 
   "de": {
@@ -337,9 +333,11 @@
     "admin_dashboard tutors" : "Tutoren",
     "admin_dashboard semester" : "Semester",
 
-    "practicals practicals": "Praktikum",
-    "practicals tabtitle_1": "Allgemeines",
-    "practicals tabtitle_2": "Termine",
+    "practicals-view tab_general": "Allgemeines",
+    "practicals-view tab_dates": "Termine",
+    "practicals-view title_practical": "Praktikum",
+    "practicals-view title_information": "Informationen",
+    "practicals-view title_datepick": "Terminauswahl",
 
     "practicals-admin tutor": "Tutor",
     "practicals-admin group": "Gruppe",
@@ -391,11 +389,5 @@
     "general_hours": "Uhr"
 
     "general_hours": "Uhr",
-
-    "practicals-view tab_general": "Allgemein",
-    "practicals-view tab_dates": "Termine",
-    "practicals-view title_practical": "Praktikum",
-    "practicals-view title_information": "Informationen",
-    "practicals-view title_datepick": "Terminauswahl"
   }
 }
