@@ -1,5 +1,6 @@
 <link rel="import" href="../components/practicals-students-date-selector.html">
 <link rel="import" href="../components/practicals-show-saved-dates.html">
+<link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
 <!--Localization Imports-->
 <link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
 <link rel="import" href="../services/my-localize-behavior.html">
@@ -35,6 +36,10 @@
             .content{
                 padding: 10px;
             }
+            #error_toast {
+                --paper-toast-background-color: var(--paper-red-600);
+                --paper-toast-color: white;
+            }
         </style>
 
 
@@ -69,10 +74,10 @@
                         <!-- Deadline is not over, Registration Open and dates selected; Show saved dates!-->
                         <practicals-show-saved-dates id="practicals_show_saved_dates"
                                                      chosenlabs="{{chosenlabs_transformed}}"
-                                                     title="Deine Gruppe hat diese Termine ausgewählt:"></practicals-show-saved-dates>
+                                                     title="[[ localize('practicals-student-date info_chosen_dates') ]]"></practicals-show-saved-dates>
                         <paper-button raised class="changeButton" on-tap="_handleChangeClick">
                             <iron-icon icon="reply"></iron-icon>
-                            Auswahl ändern
+                            [[ localize('practicals-student-date change_selection') ]]
                         </paper-button>
                     </template>
                 </template>
@@ -81,7 +86,7 @@
                     <template is="dom-if" if="[[!practical_date.exists]]">
                         <!-- Deadline is over, Registration has been started but Practical Date is not given -->
                         <practicals-show-saved-dates chosenlabs="{{chosenlabs_transformed}}"
-                                                     title="Deine Gruppe hat diese Termine ausgewählt:"></practicals-show-saved-dates>
+                                                     title="[[ localize('practicals-student-date info_chosen_dates') ]]"></practicals-show-saved-dates>
                     </template>
                     <template is="dom-if" if="[[practical_date.exists]]">
                         <!-- Deadline is over, Registration has been started and Practical Date is given-->
@@ -97,10 +102,12 @@
             <template is="dom-if" if="[[!registration_open]]">
                 <!-- Registration Open Bool from Api is false; Registration not opened yet -->
                 <div>
-                    Die Terminwahl ist noch nicht freigeschalten!
+                    [[ localize('practicals-student-date no_registration') ]]
                 </div>
             </template>
         </div>
+
+        <paper-toast id="error_toast" class="fit-bottom" text="Error: Please choose 5 lab dates."></paper-toast>
 
         <!--Iron Signal for Localization-->
         <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
@@ -343,7 +350,8 @@
                     }
                 }
                 else{
-                    alert("Error: Not enough labs chosen. Just "+labcounter+" labs chosen.");
+//                    alert("Error: Not enough labs chosen. Just "+labcounter+" labs chosen.");
+                    this.$.error_toast.open();
                 }
             },
             /**

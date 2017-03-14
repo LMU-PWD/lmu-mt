@@ -30,6 +30,9 @@
             ready: function(){
                 //console.log(this.chosenlabs);
             },
+            behaviors: [
+                Polymer.MyLocalizeBehavior
+            ],
             _labsChanged: function(labs){
                 this.chosenlabs = labs;
                 //console.log(this.chosenlabs);
