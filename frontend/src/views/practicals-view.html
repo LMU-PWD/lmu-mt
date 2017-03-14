@@ -176,6 +176,10 @@
                 this._handleLabsChanged();
             },
 
+            /**
+             * Handles changes of group-Object from API
+             * @param detail
+             */
             _groupChanged: function (detail) {
                 var newLabData = {lab: {}, priorities: []};
 
@@ -198,11 +202,21 @@
                 //console.log(this.labData);
 
             },
+
+            /**
+             * Handles changes of user-Object from API
+             * @param detail
+             */
             _userChanged: function (detail) {
                 //console.log(detail);
                 this._handleLabsChanged();
 
             },
+
+            /**
+             * Handles changes of labType-Object from API
+             * @param response
+             */
             _labTypeChanged: function (response) {
                 //console.log("Labtype changed!");
                 //console.log(detail);
@@ -210,6 +224,10 @@
                 this.updateStyles();
                 this._handleLabsChanged();
             },
+
+            /**
+             * Handles changes of labs-Array from API
+             */
             _handleLabsChanged: function () {
                 //console.log(detail);
                 if (this.user && this.labType)
