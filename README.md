@@ -19,20 +19,20 @@ Was du brauchst um das Projekt installieren zu können.
 
 * Datenbank: [mongo.db](https://www.mongodb.com/download-center)
 * Backend: [Node.js](https://nodejs.org/)
-* Im Backend-Ordner: `npm install`
+* Im Backend-Ordner (`...\backend\`): `npm install`
 
 
 ### Installation
 
 Schritt-für-Schritt Anleitung zur Installation
 
-* npm-Install im `\backend\` Ordner
+* npm-Install im `...\backend\` Ordner
 
 ```
 npm install
 ```
 
-* npm-Install im `\frontend\` Ordner
+* npm-Install im `...\frontend\` Ordner
 
 ```
 npm install
@@ -51,13 +51,13 @@ Mongo.db starten, die auf Verbindungen auf dem Port `27017` wartet
 ```
 "[path to mongod.exe]"
 ```
-Server starten in `\backend\server\` der auf den Port `3000` hört
+Server starten in `...\backend\server\` der auf den Port `3000` hört
 ```
 node server.js
 ```
 
 ### Frontend starten
-Frontend serven im `\frontend\` auf dem Port `8080`
+Frontend serven in `...\frontend\` auf dem Port `8080`
 ```
 polymer serve
 ```
