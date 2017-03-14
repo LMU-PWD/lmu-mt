@@ -10,11 +10,12 @@
                 display: block;
                 padding: 3%;
                 text-align: left;
-                padding-bottom: 7%;
+                padding-bottom: 9%;
             }
             .button{
+                margin: 1%;
                 margin-bottom: 2%;
-                width: 49.8%;
+                width: 47.8%;
             }
             .distributeblock{
                 display: inline-block;
@@ -22,12 +23,11 @@
                 text-align: center;
                 border-radius: 10px;
                 background-color:  var(--paper-blue-grey-50);
-                padding: 2%;
-                margin-right: 2%;
                 margin-bottom: 2%;
             }
             .distributetext{
-                margin-bottom: 2%;
+                margin: 2%;
+                #margin-bottom: 2%;
             }
 
             /*Phone*/
@@ -69,17 +69,17 @@
                     [[localize('practicals-admin distribute_text')]]:
                 </div>
                 <div>
-                        <paper-button raised  disabled$="{{!showDistributeStudents}}"  style="float: left;" class="button" on-tap="_handleDistributeStudents">
-                            [[localize('practicals-admin students')]]
-                        </paper-button>
-                        <paper-button style="float: right;" raised class="button" disabled$="{{!showDistributeTutors}}" on-tap="_handleDistributeTutors">
-                            [[localize('practicals-admin tutors')]]
-                        </paper-button>
+                    <paper-button raised  disabled$="{{!showDistributeStudents}}"  style="float: left;" class="button" on-tap="_handleDistributeStudents">
+                        [[localize('practicals-admin students')]]
+                    </paper-button>
+                    <paper-button style="float: right;" raised class="button" disabled$="{{!showDistributeTutors}}" on-tap="_handleDistributeTutors">
+                        [[localize('practicals-admin tutors')]]
+                    </paper-button>
                 </div>
             </div>
         </template>
 
-        <paper-button raised class="studentsRegistrationButton" on-tap="_handleStudentButtonClick">
+        <paper-button raised on-tap="_handleStudentButtonClick">
             <template is="dom-if" if="[[labType.registration_open]]">
                 [[localize('practicals-admin close_registration')]]
             </template>
@@ -183,9 +183,7 @@
                 Polymer.MyLocalizeBehavior
             ],
             ready: function () {
-                //console.log(this.accessToken);
-                //console.log(this.labTypeFromApi);
-                //this.set('showDistribute', true);
+
             },
             /**
              * Handle changes of
@@ -234,7 +232,7 @@
             _handleSaveButtonClick: function(){
                 //console.log(event.detail);
                 //Post LabType-Changes in API
-                console.log(this.labType);
+                //console.log(this.labType);
                 if (this.labType.id) {
                     this.ajax_save_labtype = {
                         headers: {
@@ -287,11 +285,11 @@
                 var deadline_date = new Date(deadline);
                 var today = new Date();
                 if(deadline_date > today){
-                    //console.log("before deadline");
+                    //Before deadline
                     return true;
 
                 }
-                //console.log("after deadline");
+                //After deadline
                 return false;
             },
 
@@ -390,7 +388,7 @@
                 this.set('labType.description_tutor', e.description_tutor);
                 this.set('labType.registration_deadline', new Date(e.registration_deadline));
                 this.set('labType.registration_deadline_tutors', new Date(e.registration_deadline_tutors));
-                //console.log(this.labType);
+
 
                 //Set Before Deadline Flags
                 this.set('showDistributeTutors', (!this._getBeforeDeadline(e.registration_deadline_tutors)));
@@ -402,6 +400,7 @@
                     this.set('showDistribute', false);
                 }
             },
+
             /**
              * Handle response from api-request whith ajax_groups
              * @param e - Event Variable

@@ -30,8 +30,9 @@
         </style>
 
         <paper-item>
-            <div id="text">[[text]]:  [[data]]</div>
+            <div id="text">[[text]]:  </div>
             <iron-collapse id="editorElement">
+                [[data]]
                 <iron-icon icon="editor:mode-edit" on-tap="_handleContentClick"></iron-icon>
             </iron-collapse>
             <iron-collapse id="changeContentElement">
@@ -196,7 +197,7 @@
                 this.$.editorElement.toggle();
                 this.$.changeContentElement.toggle();
                 this.userInput = this.data;
-                this.data = "";
+                //this.data = "";
             },
             /**
              * Handle click on dropdown menu item
