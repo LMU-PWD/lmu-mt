@@ -32,6 +32,9 @@
               color: var(--paper-blue-grey-50);
               text-align: center;
             }
+            .titles{
+                text-align: center;
+            }
             paper-tab{
               --paper-tab-ink:var(--paper-blue-grey-100);
               font-weight: 300;
@@ -51,7 +54,8 @@
               z-index: 1;
             }
             .content{
-              padding: 10px;
+                padding: 10px;
+                margin: 24px;
             }
         </style>
 
@@ -69,10 +73,10 @@
                 <paper-tab class="tabheaderbuttons">[[ localize('practicals-view tab_dates') ]]</paper-tab>
             </paper-tabs>
             <div class="content">
-                <h1>[[labType.type_str]] [[ localize('practicals-view title_practical') ]]</h1>
+                <h1 class="titles">[[labType.type_str]] [[ localize('practicals-view title_practical') ]]</h1>
                 <iron-pages selected="[[selectedTab]]">
                     <div>
-                        <h1>[[ localize('practicals-view title_information') ]]</h1>
+                        <!--h1 class="titles">[[ localize('practicals-view title_information') ]]</h1-->
                         <template is="dom-if" if="[[user.isTutor]]">
                             <p>[[labType.description_tutor]]</p>
                         </template>
@@ -81,7 +85,7 @@
                         </template>
                     </div>
                     <div>
-                        <h1>[[ localize('practicals-view title_datepick') ]]</h1>
+                        <!--h1 class="titles">[[ localize('practicals-view title_datepick') ]]</h1-->
                         <practicals-students-date-detail id="detailView"
                                                          group="{{ group }}"
                                                          user="{{ user }}"
