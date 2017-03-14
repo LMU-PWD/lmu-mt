@@ -20,9 +20,12 @@
 
     "groupcard_tritt bei": "Join a group now!",
 
-    "notifications-card none": "No notifications.",
-
-    "mainview_praktikum typ": "Photo ",
+    "notifications_header": "Your upcoming dates",
+    "notifications_none": "Nothing to see here...",
+    "notifications_add_date": "Add a date",
+    "notifications_delete_date": "Delete date",
+    "notifications_date_title": "Title of the date",
+    "notifications_date_start": "Starting at",
 
     "registrationcard_header": "Register",
     "registrationcard_descr text-1": "Students and tutors, who are signed in the course ",
@@ -170,9 +173,12 @@
 
     "groupcard_tritt bei": "Tritt jetzt einer Gruppe bei!",
 
-    "notifications-card none": "Keine Benachrichtigungen.",
-
-    "mainview_praktikum typ": "Photo ",
+    "notifications_header": "Deine nächsten Termine",
+    "notifications_none": "Noch nichts geplant...",
+    "notifications_add_date": "Termin hinzufügen",
+    "notifications_delete_date": "Termin löschen",
+    "notifications_date_title": "Titel des Termins",
+    "notifications_date_start": "Beginn",
 
     "registrationcard_header": "Registrierung",
     "registrationcard_descr text-1": "Studenten und Tutoren, die in UniworX für den Kurs",

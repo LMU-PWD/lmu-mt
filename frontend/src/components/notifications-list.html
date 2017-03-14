@@ -1,0 +1,289 @@
+<link rel="import" href="../../bower_components/paper-date-picker/paper-date-picker.html">
+<link rel="import" href="../shared/shared-styles.html">
+
+<!--Localization Imports-->
+<link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
+<link rel="import" href="../services/my-localize-behavior.html">
+
+
+<dom-module id="notifications-list">
+    <template>
+        <style  include="shared-styles">
+
+            :host {
+                line-height: 1.3em;
+            }
+
+            .notifications-scrollarea {
+                height: 320px;
+                overflow: scroll;
+            }
+
+            .notifications-headline-mobile {
+                display: none;
+            }
+
+            .notifications-none {
+                margin: 10px 20px;
+            }
+
+            .notifications-actions {
+                margin-bottom: -10px;
+            }
+
+            .notifications-actions > paper-icon-button {
+                float: right;
+                margin: 5px;
+            }
+
+            .notification {
+                background: var(--paper-blue-grey-50);
+                border-radius: 5px;
+                margin: 10px 10px 0;
+                padding: 10px;
+            }
+
+            span.notification-time {
+                color: var(--paper-blue-grey-400);
+                float: right;
+                font-size: 0.7em;
+                margin: 5px 0 0 10px;
+            }
+
+            h4.notification-title {
+                display: inline-block;
+                font-weight: 400;
+                margin: 0;
+            }
+
+            .dialogButton {
+                height: 40px;
+                margin: 0 0.29em;
+                max-width: 200px;
+                min-width: 100px;
+                width: 49.8%;
+            }
+
+            paper-dialog {
+                z-index: 1000;
+            }
+
+            paper-dialog h3 {
+                font-weight: 400;
+                margin-bottom: 0;
+            }
+
+            .spinner-container {
+                background-color: rgba(255,255,255,0.8);
+                display: block;
+                height: 100%;
+                left: 0;
+                margin: 0 !important;
+                padding: 0 !important;
+                position: absolute;
+                text-align: center;
+                top: 0;
+                width: 100%;
+                z-index: 100000;
+            }
+
+            paper-spinner[active] {
+                height: 50px;
+                margin: auto;
+                top: calc(50% - 25px);
+                width: 50px;
+            }
+
+            @media screen and (max-width: 1023px) {
+                .notifications-scrollarea {
+                    height: 100vh;
+                }
+                .notifications-wrapper {
+                    background: var(--paper-blue-grey-300);
+                    padding-bottom: 10px;
+                    padding-top: 110px;
+                }
+                .notifications-headline-mobile {
+                    display: block;
+                }
+                .notifications-none {
+                    margin: 10px;
+                }
+                .notification {
+                    background: var(--paper-blue-grey-100);
+                }
+            }
+
+        </style>
+
+        <paper-dialog id="addDateDialog">
+
+            <h1>Ein Unique Date hinzufügen</h1>
+
+            <!-- Dialog content -->
+            <paper-dialog-scrollable>
+
+                <paper-input label="[[ localize('notifications_date_title') ]]"
+                             value="{{ singleLocation }}"></paper-input>
+
+                <h3>[[ localize('notifications_date_start') ]]</h3>
+
+                <!-- Date and time -->
+                <paper-date-picker
+                        id="picker"
+                        date="{{ startDate }}"
+                        responsive-width="630px"></paper-date-picker>
+                <p><time-picker hour="{{ singleHour }}" min="{{ singleMin }}"></time-picker></p>
+
+                <!-- Duration -->
+                <paper-input type="number"
+                             min="0"
+                             label="[[ localize('semester_setup_dates_duration') ]]"
+                             value="{{ singleDuration }}">
+                    <div suffix>[[ localize('c_minutes') ]]</div>
+                </paper-input>
+
+                <!-- Location -->
+                <paper-input label="[[ localize('semester_setup_dates_location') ]]"
+                             value="{{ singleLocation }}"></paper-input>
+
+            </paper-dialog-scrollable>
+
+            <!-- Actions -->
+            <div class="buttons">
+                <paper-button class="dialogButton" on-tap="_dialogCancelled" raised>
+                    <iron-icon icon="close" ></iron-icon> [[localize('c_button_discard')]]
+                </paper-button>
+                <paper-button class="dialogButton" on-tap="_triggerDateCreation" raised>
+                    <iron-icon icon="save" ></iron-icon> [[localize('c_button_add')]]
+                </paper-button>
+            </div>
+
+            <template is="dom-if" if="[[ processingRequest ]]">
+                <div class="spinner-container">
+                    <paper-spinner active="[[ processingRequest ]]"></paper-spinner>
+                </div>
+            </template>
+        </paper-dialog>
+
+        <div class="notifications-scrollarea">
+
+            <div class="notifications-wrapper">
+                <h2 class="notifications-headline-mobile">[[ localize('notifications_header') ]]</h2>
+                <div class="notification">
+                    <paper-icon-button icon="delete" id="remove-0"></paper-icon-button>
+                    <paper-tooltip for="remove-0"
+                                   animation-delay="0">[[ localize('notifications_delete_date') ]]</paper-tooltip>
+                    <h4 class="notification-title">Milchsaufen im Stall mit der Kuh und dem Landwirt</h4>
+                    <span class="notification-time">In 2 Tagen</span>
+                    <div style="clear:both;"></div>
+                </div>
+                <div class="notification">
+                    <paper-icon-button icon="delete" id="remove-1"></paper-icon-button>
+                    <paper-tooltip for="remove-1"
+                                   animation-delay="0">[[ localize('notifications_delete_date') ]]</paper-tooltip>
+                    <h4 class="notification-title">Oscar-Verleihung</h4>
+                    <span class="notification-time">In 5 Tagen</span>
+                    <div style="clear:both;"></div>
+                </div>
+                <div class="notification">
+                    <paper-icon-button icon="delete" id="remove-2"></paper-icon-button>
+                    <paper-tooltip for="remove-2"
+                                   animation-delay="0">[[ localize('notifications_delete_date') ]]</paper-tooltip>
+                    <h4 class="notification-title">Schriftliche Klausur</h4>
+                    <span class="notification-time">In 2 Wochen</span>
+                    <div style="clear:both;"></div>
+                </div>
+                <div class="notification">
+                    <paper-icon-button icon="delete" id="remove-3"></paper-icon-button>
+                    <paper-tooltip for="remove-3"
+                                   animation-delay="0">[[ localize('notifications_delete_date') ]]</paper-tooltip>
+                    <h4 class="notification-title">Milchsaufen im Stall mit der Kuh und dem Landwirt</h4>
+                    <span class="notification-time">In 2 Tagen</span>
+                    <div style="clear:both;"></div>
+                </div>
+                <div class="notification">
+                    <paper-icon-button icon="delete" id="remove-4"></paper-icon-button>
+                    <paper-tooltip for="remove-4"
+                                   animation-delay="0">[[ localize('notifications_delete_date') ]]</paper-tooltip>
+                    <h4 class="notification-title">Oscar-Verleihung</h4>
+                    <span class="notification-time">In 5 Tagen</span>
+                    <div style="clear:both;"></div>
+                </div>
+                <div class="notification">
+                    <paper-icon-button icon="delete" id="remove-5"></paper-icon-button>
+                    <paper-tooltip for="remove-5"
+                                   animation-delay="0">[[ localize('notifications_delete_date') ]]</paper-tooltip>
+                    <h4 class="notification-title">Schriftliche Klausur</h4>
+                    <span class="notification-time">In 2 Wochen</span>
+                    <div style="clear:both;"></div>
+                </div>
+                <div class="notification">
+                    <paper-icon-button icon="delete" id="remove-6"></paper-icon-button>
+                    <paper-tooltip for="remove-6"
+                                   animation-delay="0">[[ localize('notifications_delete_date') ]]</paper-tooltip>
+                    <h4 class="notification-title">Milchsaufen im Stall mit der Kuh und dem Landwirt</h4>
+                    <span class="notification-time">In 2 Tagen</span>
+                    <div style="clear:both;"></div>
+                </div>
+                <div class="notification">
+                    <paper-icon-button icon="delete" id="remove-7"></paper-icon-button>
+                    <paper-tooltip for="remove-7"
+                                   animation-delay="0">[[ localize('notifications_delete_date') ]]</paper-tooltip>
+                    <h4 class="notification-title">Oscar-Verleihung</h4>
+                    <span class="notification-time">In 5 Tagen</span>
+                    <div style="clear:both;"></div>
+                </div>
+                <div class="notification">
+                    <paper-icon-button icon="delete" id="remove-8"></paper-icon-button>
+                    <paper-tooltip for="remove-8"
+                                   animation-delay="0">[[ localize('notifications_delete_date') ]]</paper-tooltip>
+                    <h4 class="notification-title">Schriftliche Klausur</h4>
+                    <span class="notification-time">In 2 Wochen</span>
+                    <div style="clear:both;"></div>
+                </div>
+                <!--p class="notifications-none">[[ localize('notifications_none') ]]</p-->
+                <div class="notifications-actions">
+                    <paper-icon-button icon="add" id="add-date" on-tap="_openDialog"></paper-icon-button>
+                    <paper-tooltip for="add-date"
+                                   animation-delay="0">[[ localize('notifications_add_date') ]]</paper-tooltip>
+                    <div style="clear:both;"></div>
+                </div>
+            </div>
+
+        </div>
+
+        <!--Iron Signal for Localization-->
+        <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
+
+    </template>
+
+    <script>
+        Polymer({
+            is: 'notifications-list',
+
+            properties: {
+                processingRequest: {
+                    type: Boolean,
+                    value: false
+                }
+            },
+
+            behaviors: [
+                Polymer.MyLocalizeBehavior
+            ],
+
+            _openDialog: function () {
+                this.$.addDateDialog.open();
+            },
+
+            _dialogCancelled: function () {
+                this.$.addDateDialog.close();
+            },
+
+            _triggerDateCreation: function () {
+                this.$.addDateDialog.close();
+            }
+        });
+    </script>
+</dom-module>
