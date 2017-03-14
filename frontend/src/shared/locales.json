@@ -144,6 +144,7 @@
     "practicals-student-date labDate_2" : ", the  ",
     "practicals-student-date labDate_3" : ", starting at ",
     "practicals-student-date info_chosen_dates" : "These dates have been chosen by your group: ",
+    "practicals-student-date error_text": "Please choose exactly 5 lab dates!",
 
     "general_weekdays 0": "Sunday",
     "general_weekdays 1": "Monday",
@@ -307,6 +308,7 @@
     "practicals-student-date labDate_2" : ", den ",
     "practicals-student-date labDate_3" : ", ab ",
     "practicals-student-date info_chosen_dates" : "Deine Gruppe hat diese Termine ausgewählt: ",
+    "practicals-student-date error_text": "Bitte wähle genau 5 Termine!",
 
     "general_weekdays 0": "Sonntag",
     "general_weekdays 1": "Montag",

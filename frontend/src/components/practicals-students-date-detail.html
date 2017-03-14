@@ -91,9 +91,9 @@
                     <template is="dom-if" if="[[practical_date.exists]]">
                         <!-- Deadline is over, Registration has been started and Practical Date is given-->
                         <div>
-                            {{localize('practicals-student-date labDate_1')}}
-                            [[practical_date.weekday]]{{localize('practicals-student-date labDate_2')}}
-                            [[practical_date.date]]{{localize('practicals-student-date labDate_3')}}
+                            [[ localize('practicals-student-date labDate_1') ]]
+                            [[practical_date.weekday]][[ localize('practicals-student-date labDate_2') ]]
+                            [[practical_date.date]][[ localize('practicals-student-date labDate_3') ]]
                             [[practical_date.time]]
                         </div>
                     </template>
@@ -107,7 +107,7 @@
             </template>
         </div>
 
-        <paper-toast id="error_toast" class="fit-bottom" text="Error: Please choose 5 lab dates."></paper-toast>
+        <paper-toast id="error_toast" class="fit-bottom" text="[[ localize('practicals-student-date error_text') ]] "></paper-toast>
 
         <!--Iron Signal for Localization-->
         <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
