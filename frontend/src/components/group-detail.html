@@ -37,10 +37,10 @@
 
             .info > .member {
                 margin: 10px;
-                padding: 10px;
-                border: 1px solid var(--paper-blue-grey-700);
-                background-color: var(--paper-blue-grey-50);
-                border-radius: 5px;
+                padding: 11px;
+                /*border: 1px solid var(--paper-blue-grey-700);*/
+                background-color: #FFF;
+                border-radius: 0px;
                 height: 30px;
                 overflow: hidden;
             }
@@ -63,6 +63,13 @@
 
             .info > .member > a > paper-icon-button {
                 color: var(--paper-blue-grey-700);
+            }
+
+            .info > .member > a > paper-icon-button:hover {
+                /*color: var(--paper-blue-grey-400);*/
+                transition: transform;
+                border: 2px solid var(--paper-blue-grey-300);
+                border-radius: 50%;
             }
 
             .create-group{
@@ -184,7 +191,7 @@
                                 name="{{member.name}}"
                                 mail="{{member.mail}}"></get-user-info>
                         <a id="mail-[[member.id]]" href="mailto:[[member.mail]]" tabindex="-1"><paper-icon-button icon="icons:mail"></paper-icon-button></a>
-                        <paper-tooltip for="mail-[[member.id]]" offset="5">{{localize('groupdetail_write mail')}}</paper-tooltip>
+                        <paper-tooltip for="mail-[[member.id]]" offset="5" animation-delay="0">{{localize('groupdetail_write mail')}}</paper-tooltip>
                         <h2>[[member.name]]</h2>
                     </div>
                 </template>
