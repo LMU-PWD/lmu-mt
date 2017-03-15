@@ -3,6 +3,8 @@
 <link rel="import" href="../services/my-localize-behavior.html">
 
 <link rel="import" href="lab-detail-content-element.html">
+<link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
+
 <dom-module id="labtype-detail-view">
     <template>
         <style include="shared-styles">
@@ -28,6 +30,14 @@
             .distributetext{
                 margin: 2%;
                 #margin-bottom: 2%;
+            }
+            #success_toast {
+                --paper-toast-background-color: var(--paper-green-600);
+                --paper-toast-color: white;
+            }
+            #error_toast {
+                --paper-toast-background-color: var(--paper-red-600);
+                --paper-toast-color: white;
             }
 
             /*Phone*/
@@ -130,6 +140,10 @@
                 <iron-icon icon="close" ></iron-icon>[[localize('c_button_discard')]]
             </paper-button>
         </template>
+
+        <paper-toast id="success_toast" class="fit-bottom" text="[[localize('c_function_success')]]"></paper-toast>
+        <paper-toast id="error_toast" class="fit-bottom" text="[[localize('c_function_error')]]"></paper-toast>
+
         <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
     </template>
 
@@ -407,7 +421,11 @@
              * @private
              */
             _responseFromCallingDistribute: function(e){
-                //console.log(e.detail);
+                console.log(e.detail);
+                if (e.detail.length != 0)
+                    this.$.success_toast.open();
+                else
+                    this.$.error_toast.open();
                 this.fire('labtype-changed');
             },
 

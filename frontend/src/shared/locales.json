@@ -189,8 +189,9 @@
     "general_weekdays 4": "Thursday",
     "general_weekdays 5": "Friday",
     "general_weekdays 6": "Saturday",
-
-    "general_hours": "hours"
+    "general_hours": "hours",
+    "c_function_success": "The function has been executed sucessfully",
+    "c_function_error": "Error at function execution"
   },
 
   "de": {
@@ -383,7 +384,8 @@
     "general_weekdays 4": "Donnerstag",
     "general_weekdays 5": "Freitag",
     "general_weekdays 6": "Samstag",
-
-    "general_hours": "Uhr"
+    "general_hours": "Uhr",
+    "c_function_success": "Die Funktion wurde erfolgreich ausgeführt",
+    "c_function_error": "Fehler bei der Funktionsausführung"
   }
 }
