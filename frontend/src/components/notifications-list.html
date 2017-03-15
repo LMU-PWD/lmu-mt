@@ -468,13 +468,18 @@
             },
 
             _toggleNotificationDetail: function (event) {
-                var searchHead = 0, target = event.path[searchHead];
-                while (!target.hasAttribute('data-index')) {
+                var searchHead = 0;
+                var target = event.path[0];
+                while (!target && !target.hasAttribute('data-index')) {
                     searchHead++;
                     target = event.path[searchHead];
                 }
                 var targetIndex = target.getAttribute('data-index');
-                this.$$('#collapse-'+targetIndex).toggle();
+                var targetCollapsible = this.$$('#collapse-'+targetIndex);
+                if (targetCollapsible) {
+                    targetCollapsible.toggle();
+                }
+
             },
 
             _updateRemainingLabels: function () {
