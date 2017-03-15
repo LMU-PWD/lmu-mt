@@ -33,9 +33,9 @@
     "notifications_remaining_days": "days",
     "notifications_remaining_tomorrow": "tomorrow",
     "notifications_remaining_passed": "passed",
-    "notifications_api_error": "Operation failed. Pleasy try again.",
+    "notifications_api_error": "Operation failed. Please try again.",
     "notifications_api_success_post": "Date stored successfully",
-    "notifications_api_success_delete": "Date deleted successully",
+    "notifications_api_success_delete": "Date deleted successfully",
 
     "registrationcard_header": "Register",
     "registrationcard_descr text-1": "Students and tutors, who are signed in the course ",

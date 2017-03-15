@@ -340,8 +340,13 @@
                 this.$.getRequest.trigger();
             },
 
-            /** API Logic **/
+            /** * * * * * * * * * **/
+            /** * * API Logic * * **/
+            /** * * * * * * * * * **/
 
+            /**
+             * On every semester change reload list data
+             */
             _selectedSemesterChanged: function (semesterId) {
 
                 this.getAjax = {
@@ -354,12 +359,21 @@
                 };
             },
 
+            /**
+             * If a new user is not an admin, take his semesterId for
+             * filtering of dates
+             */
             _userChanged: function (user) {
                 if (user && !user.isAdmin) {
                     this.selectedSemester = user.semesterId;
                 }
             },
 
+            /**
+             * Filter and sort dates that were received from API:
+             * We only need dates in the futures and we want to
+             * display them sorted ascending by their beginning
+             */
             _receivedDates: function (event) {
                 var that = this;
                 var receivedDates = event.detail;
@@ -383,11 +397,17 @@
                 });
             },
 
+            /**
+             * Error handler for GET request
+             */
             _receivedDatesError: function (event) {
-                console.log("error");
                 console.log(event);
             },
 
+            /**
+             * Generate a new POST request to the API from data
+             * entered in the paper-dialog, and fire request
+             */
             _triggerDateCreation: function () {
                 var postDate = this.dialogDate;
                 postDate.setHours(this.dialogHours);
@@ -408,16 +428,27 @@
                 };
             },
 
+            /**
+             * On successful POST notify all other instances about
+             * the neccessary update and display a message
+             */
             _postSuccess: function (event) {
                 this._discardDialog();
                 this.fire('iron-signal', {name: 'update-notifications'});
                 this.$.postSuccessToast.open();
             },
 
+            /**
+             * Error handler for POST request
+             */
             _postError: function (event) {
                 this.$.errorToast.open();
             },
 
+            /**
+             * Generate a DELETE request for a specific date. Fetch date
+             * by parsing the id attribute of the click event's target element
+             */
             _triggerDeleteRequest: function (event) {
                 // If user hits just the button and not the iron-icon inside of it,
                 // this is the correct id
@@ -438,16 +469,25 @@
                 }
             },
 
+            /**
+             * On sucessful DELETE, notify all other instances of neccessary
+             * update and display a message
+             */
             _deleteSuccess: function (event) {
                 this.fire('iron-signal', {name: 'update-notifications'});
                 this.$.deleteSuccessToast.open();
             },
 
+            /**
+             * Error handler for DELETE request
+             */
             _deleteError: function (event) {
-
+                console.log(event);
             },
 
-            /** UI Logic **/
+            /** * * * * * * * * * **/
+            /** * *  UI Logic * * **/
+            /** * * * * * * * * * **/
 
             _openDialog: function () {
                 this.$.addDateDialog.open();
@@ -467,6 +507,9 @@
                 this.dialogLocation = '';
             },
 
+            /**
+             * Open or close one entry in the dates list
+             */
             _toggleNotificationDetail: function (event) {
                 var searchHead = 0;
                 var target = event.path[0];
@@ -482,6 +525,11 @@
 
             },
 
+            /**
+             * Localization workaround: Since we generate remaining time strings
+             * in a function, we need to call this function every time the locale
+             * changes
+             */
             _updateRemainingLabels: function () {
                 var that = this;
                 this.dates = this.dates.map(function(date){
@@ -496,14 +544,26 @@
                 });
             },
 
-            /** Property computers **/
+            /** * * * * * * * * * * **/
+            /** Property computers  **/
+            /** * * * * * * * * * * **/
 
             _datesAvailable: function (dates) {
                 return dates.length > 0;
             },
 
-            /** Helpers **/
+            /** * * * * * * * * * **/
+            /** * * Helpers * * * **/
+            /** * * * * * * * * * **/
 
+            /**
+             * Generate a string that describes the distance in time from now
+             * to a given date.
+             *
+             * @param dateString - JavaScript dateString compatible with JS Date
+             * @returns {string}
+             * @private
+             */
             _computeRemainingDayString: function (dateString) {
 
                 const ONE_DAY_IN_MILLISECONDS = 86400000;
@@ -536,6 +596,13 @@
                         +this.localize('notifications_remaining_days');
             },
 
+            /**
+             * Generates a `hh:mm` formatted string from a Unix Timestamp
+             *
+             * @param milliseconds
+             * @returns {string}
+             * @private
+             */
             _computeTimeString: function (milliseconds) {
                 var date = new Date(milliseconds);
                 var hours = date.getHours();
@@ -543,6 +610,15 @@
                 return ((hours < 10) ? '0'+hours : hours) + ':' + ((mins < 10) ? '0'+mins : mins);
             },
 
+            /**
+             * Generates a `dd.mm.yyyy, hh:mm - hh:mm` formatted string from a
+             * given date and duration
+             *
+             * @param startDate - JavaScript Date object
+             * @param durationMins - Integer representing a number of minutes
+             * @returns {string}
+             * @private
+             */
             _computeDateString: function (startDate, durationMins) {
                 var dayString = (startDate.getDate() < 10) ? '0'+startDate.getDate() : startDate.getDate();
                 var monthString = (startDate.getMonth() < 9) ? '0'+(startDate.getMonth()+1) : startDate.getMonth();
@@ -552,6 +628,9 @@
                        + this._computeTimeString(msStart) + ' - ' + this._computeTimeString(msEnd);
             },
 
+            /**
+             * Reset all relevant values
+             */
             _forget: function () {
                 this.accessToken = '';
                 this.selectedSemester = '';
