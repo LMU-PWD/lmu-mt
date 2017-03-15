@@ -183,12 +183,12 @@
                     var temporal_deadline_tutors = new Date(this.labType.registration_deadline_tutors);
                     if(temporal_deadline_tutors && temporal_deadline_tutors.getDate()) {
                         this.deadlineTutors = temporal_deadline_tutors.getDate()+"."
-                            +temporal_deadline_tutors.getMonth()
+                            +(temporal_deadline_tutors.getMonth()+1)
                             +"."+temporal_deadline_tutors.getFullYear();
                     }
                     if(temporal_deadline_students && temporal_deadline_students.getDate()) {
                         this.deadlineStudents = temporal_deadline_students.getDate()+"."
-                                                +temporal_deadline_students.getMonth()
+                                                +(temporal_deadline_students.getMonth()+1)
                                                 +"."+ temporal_deadline_students.getFullYear();
                     }
                 }
