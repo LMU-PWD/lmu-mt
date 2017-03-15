@@ -11,8 +11,8 @@ Die App erlaubt es den Studenten Gruppen zu bilden, sich für Prakita einzutrage
 ## Getting Started
 
 Diese Anleitung umfasst alle nötigen Informationen um eine Kopie des Projekts auf deiner lokalen Maschine zur Entwicklung- und Testzwecken nutzen zu können. Für Informationen über das deployen auf einem Livesystem siehe den Punkt "Deployment".
-Das Backend befindet sich hier: [backend](https://gitlab.lrz.de/ru67xoz/mt-common-api.git)
-Und das Frontend hier: [frontend](https://gitlab.cip.ifi.lmu.de/altmannp/PWD_MT.git)
+* Das Backend befindet sich hier: [backend](https://gitlab.lrz.de/ru67xoz/mt-common-api.git)
+* Und das Frontend hier: [frontend](https://gitlab.cip.ifi.lmu.de/altmannp/PWD_MT.git)
 
 ### Voraussetzungen
 
