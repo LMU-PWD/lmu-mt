@@ -189,13 +189,14 @@
             },
 
             /**
-             * Creates string from the timeslot-timits to get a nicer visualisation,
-             * Adds leading zeros, if necessary
+             * Creates a groupName string searching for the given groupId inside the this.groups-Array
+             * and transforming the groupname
+             * @param group - groupId
              */
             _getLabGroupName: function(group){
                     //console.log(group);
                     var returnstring = "";
-                    if(group  && this.groups && group != ""){
+                    if(group  && this.groups && group != "" && this.groups.length > 0){
                         for(var i = 0; i < this.groups.length; i++){
                             if(group == this.groups[i].id){
                                 returnstring = this.groups[i].name;
@@ -207,14 +208,15 @@
                     return returnstring;
             },
             /**
-             * Creates string from the timeslot-timits to get a nicer visualisation,
-             * Adds leading zeros, if necessary
+             * Creates a tutorName string searching for the given tutorId inside the this.tutor-Array
+             * and transforming the tutor name and firstname
+             * @param tutor - tutorId
              */
             _getLabTutorName: function(tutor){
                 //console.log(tutor);
                 //console.log(this.tutor);
                 var returnstring = "";
-                if(tutor && this.tutors && tutor != ""){
+                if(tutor && this.tutors && tutor != "" && this.tutors.length > 0){
                     for(var i = 0; i < this.tutors.length; i++){
                         if(tutor == this.tutors[i].id){
                             returnstring = this.tutors[i].name + ", " + this.tutors[i].first_name;
@@ -227,9 +229,8 @@
             },
 
             /**
-             * Handle date click, Get chosenlab and open LAb-Detail-Dialog
+             * Handle date click, Get chosenlab and open Lab-Detail-Dialog
              * @param e - Event Variable
-             * @private
              */
             _handleDateClick: function(e){
                 this.set('chosenlab', {});
@@ -261,7 +262,7 @@
                 this.$.newLabView.open();
             },
             /**
-             * Handle allLabs array changes
+             * Handle allLabs array changes, transform labs if group and tutors are already there
              * @param e - Event Variable
              * @private
              */
@@ -306,7 +307,7 @@
             },
 
             /**
-             * Handle response from api-request whith ajax_groups
+             * Handle response from api-request whith ajax_groups, start ajax_tutors api-request
              * @param e - Event Variable
              * @private
              */
@@ -323,20 +324,20 @@
                 };
             },
             /**
-             * Handle response from api-request whith ajax_groups
+             * Handle response from api-request whith ajax_tutors, filter plamtformUsers to get only tutors
              * @param e - Event Variable
              * @private
              */
             _responseFromGettingTutors: function(e){
                 var temporalArray = e.detail;
+                //filter plamtformUsers to get only tutors
                 this.tutors = temporalArray.filter(function(item){return item.isTutor;});
                 this.isReady = true;
                 //console.log(this.tutors);
-                //TODO: when i execute the next line everything goes wrong
                 this._labsChanged(e);
             },
             /**
-             * Handle response from api-request whith ajax_get_labs
+             * Handle response from api-request whith ajax_get_labs, filter labs to get only labs with this labTypeId
              * @param e - Event Variable
              * @private
              */
@@ -348,7 +349,7 @@
             },
 
             /**
-             * Handle response from api-request to save changed lab data
+             * Handle response from api-request to save changed lab data, make parent look for changed in Labs on API
              * @param e - Event Variable
              * @private
              */

@@ -54,6 +54,7 @@
                 </template>
                 <template is="dom-if" if="[[isEditor]]">
                     <ace-widget
+                            id="aceEditor"
                             on-editor-content="_aceValueChanged"
                             theme="[[ editorTheme ]]"></ace-widget>
                 </template>
@@ -67,8 +68,7 @@
             is: 'lab-detail-content-element',
             properties: {
                 array: {
-                    type: Array,
-                    notify: true
+                    type: Array
                 },
                 data: {
                     type: String,
@@ -129,8 +129,11 @@
                     notify: true
                 }
             },
+            /**
+             * Automatically called, when component is ready
+             */
             ready: function () {
-                //console.log(this.text);
+                //console.log(this.array);
                 //console.log(this.data);
                 this.time = {};
                 this.time.min = "0";
@@ -138,12 +141,18 @@
                 this.$.editorElement.toggle(); //Show Data Element
                 this.userInput = this.data;
             },
-
+            /**
+             * Handles changes in ACE-Editor User Input
+             * @param e - event Variable
+             */
             _aceValueChanged: function(e){
                 //console.log(e.detail.value);
                 this.userInput = e.detail.value;
             },
-
+            /**
+             * Handles changes of Data coming from Parent
+             * @param e - event Variable
+             */
             _dataChanged: function(e){
                 if (this.isDateFromParent && this.isDateFromParent == "true") {
                     if(this.data && this.data != "") {
@@ -230,7 +239,10 @@
                     }
                 }
                 if(this.isEditor){
-                        this.input = this.userInput;
+                    this.input = this.userInput;
+                    var aceEditor = Polymer.dom(this.root).querySelector("#aceEditor");
+                    //console.log(aceEditor.editor);
+                    aceEditor.editor.setValue("");
                 }
                 if(this.isDate){
                     this.date.setHours(this.time.hour);

@@ -48,7 +48,7 @@
             }
             .icon{
                 position: absolute;
-                left: calc(50% - 24px);
+                left: 50%;
                 height: 40px;
                 width: 40px;
                 border-radius: 50%;
@@ -75,12 +75,13 @@
                 <paper-tab class="tabheaderbuttons">[[ localize('practicals-view tab_general') ]]</paper-tab>
                 <paper-tab class="tabheaderbuttons">[[ localize('practicals-view tab_dates') ]]</paper-tab>
             </paper-tabs>
+
             <div class="content">
                 <h1 class="titles">[[labType.type_str]] [[ localize('practicals-view title_practical') ]]</h1>
                 <iron-pages selected="[[selectedTab]]">
                     <div>
                         <template is="dom-if" if="[[!user.isAdmin]]">
-                            <!--h1 class="titles">[[ localize('practicals-view title_information') ]]</h1-->
+                            <!-- if this user is not an Admin, show correct practical description-->
                             <template is="dom-if" if="[[user.isTutor]]">
                                 <p>[[labType.description_tutor]]</p>
                             </template>
@@ -89,6 +90,7 @@
                             </template>
                         </template>
                         <template is="dom-if" if="[[user.isAdmin]]">
+                            <!-- if this user an Admin, view to change labtype attributes-->
                             <labtype-detail-view access-token ="[[accessToken]]"
                                                  lab-type-from-api = "[[labType]]"
                                                  on-labtype-changed = "_handleLabTypeChanged"></labtype-detail-view>
@@ -96,7 +98,6 @@
                     </div>
                     <div>
                         <template is="dom-if" if="[[!user.isAdmin]]">
-                            <!--h1 class="titles">[[ localize('practicals-view title_datepick') ]]</h1-->
                             <practicals-students-date-detail id="detailView"
                                                              group="{{ group }}"
                                                              user="{{ user }}"
@@ -106,7 +107,6 @@
                                                              access-token="{{ accessToken }}"></practicals-students-date-detail>
                         </template>
                         <template is="dom-if" if="[[user.isAdmin]]">
-                            <!--h1 class="titles">[[ localize('practicals-view title_datepick') ]]</h1-->
                             <practicals-admin-labs-detail id="practicalsAdminDetail"
                                                           user="[[ user ]]"
                                                           user-id="{{ userId }}"
@@ -178,11 +178,17 @@
                 Polymer.MyLocalizeBehavior
             ],
 
+            /**
+             * Automatically called, when component is ready
+             */
             ready: function () {
                 //console.log(this.labType);
                 this._labsChanged();
             },
-
+            /**
+             * Handle changes of group from API, get labs (practicals dates) and priorities from this group
+             * @param detail - changed Variable
+             */
             _groupChanged: function (detail) {
                 var newLabData = {lab: {}, priorities: []};
 
@@ -205,18 +211,30 @@
                 //console.log(this.labData);
 
             },
+            /**
+             * Handle changes of user from API, notify _labsChanged
+             * @param detail - changed Variable
+             */
             _userChanged: function (detail) {
                 //console.log(detail);
                 this._labsChanged();
 
             },
-            _labTypeChanged: function (response) {
+            /**
+             * Handle changes of labType from API, change color of tabheader depending on labtype
+             * notify _labsChanged
+             * @param detail - changed Variable
+             */
+            _labTypeChanged: function (detail) {
                 //console.log("Labtype changed!");
                 //console.log(detail);
                 this.customStyle['--color'] = this.labType.color;
                 this.updateStyles();
                 this._labsChanged();
             },
+            /**
+             * Gets changed Labs from Api when called
+             */
             _labsChanged: function () {
                 //console.log(detail);
                 if (this.user && this.labType)
@@ -230,9 +248,15 @@
                     };
 
             },
-            _handleLabTypeChanged: function (response) {
+            /**
+             * Handles labtype-changed event call from child and fires labtype-changed event to parent
+             */
+            _handleLabTypeChanged: function (e) {
                 this.fire('labtype-changed');
             },
+            /**
+             * Handles response from api from the ajax_labs api-request to get all Labs with this labType
+             */
             _handleAllLabsRequest: function (response) {
                 this.set('allLabs',response.detail);
                 //console.log(this.allLabs);

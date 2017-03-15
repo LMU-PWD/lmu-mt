@@ -82,13 +82,9 @@
                 Polymer.MyLocalizeBehavior
             ],
 
-            ready: function() {
-                //this.date = this._getDateString(this.labs[0].dates[0]);
-            },
-
             /**
-             * Creates string from the timeslot-timits to get a nicer visualisation,
-             * Adds leading zeros, if necessary
+             * Creates string from the aditional timeslot informations (tutorName and groupName) to get a nicer visualisation,
+             * @param slot - selected timeslot input
              */
             _getLabTutorString: function(slot){
                 var returnstring = "XXX";
@@ -115,6 +111,7 @@
             /**
              * Creates string from the timeslot-timits to get a nicer visualisation,
              * Adds leading zeros, if necessary
+             * @param slot - selected timeslot input
              */
             _getLabGroupString: function(slot){
                 var returnstring = "XXX";

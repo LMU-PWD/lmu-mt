@@ -182,13 +182,15 @@
             behaviors: [
                 Polymer.MyLocalizeBehavior
             ],
+            /**
+             * Automatically called, when component is ready
+             */
             ready: function () {
 
             },
             /**
-             * Handle changes of
+             * Handle changes of dateTutorInput variable, get inserted deadline date on lab-detail-content Element
              * @param e - Event Variable
-             * @private
              */
             _dateChanged: function(e){
                 //console.log(this.dateInput);
@@ -196,9 +198,8 @@
                 this.set('showSaveButton', true);
             },
             /**
-             * Handle changes of
+             * Handle changes of dateTutorInput variable, get inserted deadline date on lab-detail-content Element
              * @param e - Event Variable
-             * @private
              */
             _dateTutorChanged: function(e){
                 //console.log(this.dateTutorInput);
@@ -206,28 +207,26 @@
                 this.set('showSaveButton', true);
             },
 
-            /** Handle changes of
-            * @param e - Event Variable
-            * @private
-            */
+            /**
+             * Handle changes of descriptionTutorInput variable, get inserted description on lab-detail-content Element
+             * @param e - Event Variable
+             */
             _descriptionTutorChanged: function(e){
                 //console.log(this.descriptionTutorInput);
                 this.set('labType.description_tutor', this.descriptionTutorInput);
                 this.set('showSaveButton', true);
             },
-            /** Handle changes of
+            /**
+             * Handle changes of descriptionStudentInput variable, get inserted description on lab-detail-content Element
              * @param e - Event Variable
-             * @private
              */
             _descriptionStudentChanged: function(e){
-                //console.log(this.descriptionStudentInput);
+                console.log(this.descriptionStudentInput);
                 this.set('labType.description_student', this.descriptionStudentInput);
                 this.set('showSaveButton', true);
             },
             /**
              * Handle click on Save Button to Post changed Labtype on API
-             * @param e - Event Variable
-             * @private
              */
             _handleSaveButtonClick: function(){
                 //console.log(event.detail);

@@ -115,15 +115,16 @@
             behaviors: [
                 Polymer.MyLocalizeBehavior
             ],
-
-            ready: function () {
+            /**
+             * Automatically called, when component is ready
+             */
+            ready: function() {
                 //console.log(this.accessToken);
                 //console.log(this.lab);
             },
             /**
-             * Handle changes of
+             * Handle changes of dateInput variable, get inserted date at lab-detail-content Element
              * @param e - Event Variable
-             * @private
              */
             _dateChanged: function(e){
                 //console.log(e);
@@ -138,80 +139,83 @@
              */
             _dataFromApiChanged: function(e){
                 if(this.tutors && this.groups) {
-                    this.tutorNames = [];
-                    this.groupNames = [];
-                    this.set('labTutor', "");
-                    this.set('labGroup', "");
-                    //console.log(this.lab);
-                    for (i = 0; i < this.tutors.length; i++) {
-                        this.tutorNames.push(this.tutors[i].name + ", " + this.tutors[i].first_name);
-                        if(this.lab && this.lab.tutorId == this.tutors[i].id){
-                            this.set('labTutor', (this.tutors[i].name + ", " + this.tutors[i].first_name));
-                            //console.log(this.labTutor);
+                    //console.log(e);
+                    if(this.tutors.length > 0) {
+                        this.set('labTutor', "");
+                        this.tutorNames = [];
+                        for (var i = 0; i < this.tutors.length; i++) {
+                            this.push('tutorNames',this.tutors[i].name + ", " + this.tutors[i].first_name);
+                            if (this.lab && this.lab.tutorId == this.tutors[i].id) {
+                                this.set('labTutor', (this.tutors[i].name + ", " + this.tutors[i].first_name));
+                                //console.log(this.labTutor);
+                            }
                         }
                     }
-                    for (i = 0; i < this.groups.length; i++) {
-                        this.groupNames.push(this.groups[i].name);
-                        if(this.lab && this.lab.groupId == this.groups[i].id){
-                            this.set('labGroup', this.groups[i].name);
-                            //console.log(this.labGroup);
+                    if(this.groups.length > 0){
+                        this.groupNames = [];
+                        this.set('labGroup', "");
+                        for (var i = 0; i < this.groups.length; i++) {
+                            this.push('groupNames',this.groups[i].name);
+                            if (this.lab && this.lab.groupId == this.groups[i].id) {
+                                this.set('labGroup', this.groups[i].name);
+                                //console.log(this.labGroup);
+                            }
                         }
                     }
                     //console.log(this.groupNames);
                     //console.log(this.tutorNames);
                 }
             },
-            /** Handle changes of
-            * @param e - Event Variable
-            * @private
-            */
+            /**
+             * Handle changes of durationInput variable, get inserted duration at lab-detail-content Element
+             * @param e - Event Variable
+             */
             _durationChanged: function(e){
                 //console.log(e);
                 //console.log(this.durationInput);
                 this.set('lab.duration', this.durationInput);
             },
-            /** Handle changes of
-            * @param e - Event Variable
-            * @private
-            */
+            /**
+             * Handle changes of locationInput variable, get inserted loaction at lab-detail-content Element
+             * @param e - Event Variable
+             */
             _locationChanged: function(e){
                 //console.log(e);
                 //console.log(this.locationInput);
                 this.set('lab.location', this.locationInput);
             },
 
-            /** Handle changes of
-            * @param e - Event Variable
-            * @private
-            */
+            /**
+             * Handle changes of tutorInput variable, get selected tutor at lab-detail-content Element
+             * @param e - Event Variable
+             */
             _tutorChanged: function(e){
                 //console.log(e);
                 //console.log(this.tutorInput);
                 this.set('labTutor', this.tutorInput);
-                for (i = 0; i < this.tutors.length; i++) {
+                for (var i = 0; i < this.tutors.length; i++) {
                     if(this.tutorInput == (this.tutors[i].name + ", " + this.tutors[i].first_name)){
                         this.set('lab.tutorId', this.tutors[i].id);
                     }
                 }
             },
-            /** Handle changes of
+            /**
+             * Handle changes of tutorInput variable, get selected tutor at lab-detail-content Element
              * @param e - Event Variable
-             * @private
              */
             _groupChanged: function(e){
                 //console.log(e);
                 //console.log(this.groupInput);
                 this.set('labGroup', this.groupInput);
-                for (i = 0; i < this.groups.length; i++) {
+                for (var i = 0; i < this.groups.length; i++) {
                     if(this.groupInput == this.groups[i].name){
                         this.set('lab.groupId', this.groups[i].id);
                     }
                 }
             },
             /**
-             * Handle chages of lab-Object
+             * Handle chages of lab-Object form the API, gets lab from parent
              * @param e - Event Variable
-             * @private
              */
             _labChanged: function(e){
                 //console.log(this.labFromApi);
