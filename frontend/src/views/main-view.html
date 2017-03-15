@@ -645,7 +645,7 @@ The Main View contains:
             },
 
             _userChanged: function (detail) {
-                console.log(detail);
+//                console.log(detail);
 
 
                 this.ajax_labTypes = {
@@ -959,8 +959,13 @@ The Main View contains:
                     name = 'photo';
                     customColor = '#78909c';
                 } else if(labObject.type_str.includes("Video" || "video")){
-                    name = 'video';
-                    customColor = '#546e7a';
+                    if(labObject.type_str.includes("schnitt" || "edit")){
+                        name = 'edit';
+                        customColor = '#546e7a';
+                    } else{
+                        name = 'video';
+                        customColor = '#546e7a';
+                    }
                 } else if(labObject.type_str.includes("Audio" || "audio")){
                     name = 'audio';
                     customColor = '#455a64';
