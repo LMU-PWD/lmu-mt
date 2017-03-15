@@ -180,6 +180,14 @@
                     type: Boolean,
                     value: false
                 },
+                studentsDistributed:{
+                    type: Boolean,
+                    value: false
+                },
+                tutorsDistributed:{
+                    type: Boolean,
+                    value: false
+                },
                 showDistribute:{
                     type: Boolean,
                     value: false
@@ -402,10 +410,21 @@
                 this.set('labType.registration_deadline', new Date(e.registration_deadline));
                 this.set('labType.registration_deadline_tutors', new Date(e.registration_deadline_tutors));
 
+                //console.log(e.tutorsDistributed);
+                //console.log(e.groupsDistributed);
+
+                if(e.tutorsDistributed == "true" || e.tutorsDistributed) {
+                    this.tutorsDistributed = true;
+                }
+                if(e.groupsDistributed == "true" || e.groupsDistributed) {
+                    this.studentsDistributed = true;
+                }
+                //console.log(this.tutorsDistributed);
+                //console.log(this.studentsDistributed);
 
                 //Set Before Deadline Flags
-                this.set('showDistributeTutors', (!this._getBeforeDeadline(e.registration_deadline_tutors)));
-                this.set('showDistributeStudents', (!this._getBeforeDeadline(e.registration_deadline)));
+                this.set('showDistributeTutors', (!this._getBeforeDeadline(e.registration_deadline_tutors))&& !this.studentsDistributed);
+                this.set('showDistributeStudents', (!this._getBeforeDeadline(e.registration_deadline)) && this.tutorsDistributed);
                 if(this.showDistributeStudents ||this.showDistributeTutors){
                     this.set('showDistribute', true);
                 }
