@@ -21,11 +21,24 @@
             h1 {
                 margin: 0;
                 height: inherit;
+                padding: 14px;
+                font-size: 16px;
+                color: var(--paper-blue-grey-400);
             }
-            .heading {
-                background-color: var(--paper-blue-grey-800);
+            .tabs {
+                background-color: var(--paper-blue-grey-400);
                 color: white;
-                padding: 25px;
+                height: 66px;
+                font-weight: 400;
+            }
+            paper-tab.iron-selected {
+                background-color: var(--paper-blue-grey-800);
+            }
+            paper-tab {
+                font-size: 24px;
+            }
+            .card-title{
+
             }
             .datepicker-overview img {
                 border-radius: 50%;
@@ -47,8 +60,8 @@
             }
             paper-item {
                 border-top: 2px solid var(--paper-grey-200);
-                padding-top: 14px;
-                padding-bottom: 14px;
+                padding-top: 16px;
+                padding-bottom: 16px;
             }
             .datepicker-overview paper-item:hover {
                 background: var(--paper-orange-50);
@@ -113,16 +126,24 @@
         <!-- ALL LABS -->
         <div class="content">
 
+            <paper-tabs selected="0" no-bar class="tabs">
+                <paper-tab on-click="_handleTabClick">[[ localize('tutor_card tab_calendar') ]]</paper-tab>
+                <template is="dom-if" if="[[ _showDatepicker(deadline_reached_audio, deadline_reached_video, deadline_reached_foto) ]]">
+                    <paper-tab on-click="_handleTabClick" >[[ localize('tutor_card tab_datepicker') ]]</paper-tab>
+                </template>
+            </paper-tabs>
+
             <!--  CASE 1: REGISTRATION PHASE -->
-            <template is="dom-if" if="[[ !hasAssignedLabs ]]">
+            <template is="dom-if" if="[[ selectedTab ]]">
                 <iron-pages
                         selected="[[ page ]]"
                         attr-for-selected="name"
                         fallback-selection="error">
 
-                    <div class="datepicker-overview" name="datepicker_overview">
+                    <div  class="datepicker-overview" name="datepicker_overview">
+                        <h1 class="card-title">[[ localize('tutor_card_heading_select-date') ]]</h1>
+
                         <paper-listbox style="padding: 0">
-                            <h1 class="heading"> [[ localize('tutor_card_heading_select-date') ]]</h1>
                             <paper-item on-tap="_handleAudioTap" >
                                 <img src="../../../images/audio.svg" alt="Audio Icon">
                                 <span class="lab-title">[[ localize('tutor_card_audio-practical') ]]</span>
@@ -157,7 +178,7 @@
                     </div>
 
                     <div name="datepicker_audio">
-                        <h1 class="heading"> [[ localize('tutor_card_heading_your-dates') ]] [[ localize('tutor_card_audio-practical') ]]</h1>
+                        <h1 class="card-title"> [[ localize('tutor_card_heading_your-dates') ]] [[ localize('tutor_card_audio-practical') ]]</h1>
                         <template is="dom-if" if="[[ labtypeAudio.registration_open ]]">
                             <practicals-tutor-date-detail
                                     user="[[ user ]]"
@@ -171,7 +192,7 @@
                     </div>
 
                     <div name="datepicker_video">
-                        <h1 class="heading"> [[ localize('tutor_card_heading_your-dates') ]] [[ localize('tutor_card_video-practical') ]]</h1>
+                        <h1 class="card-title"> [[ localize('tutor_card_heading_your-dates') ]] [[ localize('tutor_card_video-practical') ]]</h1>
                         <template is="dom-if" if="[[ labtypeFoto.registration_open ]]">
                             <practicals-tutor-date-detail
                                     user="[[ user ]]"
@@ -183,9 +204,9 @@
                                     page="{{ page }}"></practicals-tutor-date-detail>
                         </template>
                     </div>
-                    
+
                     <div name="datepicker_foto">
-                        <h1 class="heading"> [[ localize('tutor_card_heading_your-dates') ]] [[ localize('tutor_card_foto-practical') ]]</h1>
+                        <h1 class="card-title"> [[ localize('tutor_card_heading_your-dates') ]] [[ localize('tutor_card_foto-practical') ]]</h1>
                         <template is="dom-if" if="[[ labtypeFoto.registration_open ]]">
                             <practicals-tutor-date-detail
                                     user="[[ user ]]"
@@ -202,7 +223,7 @@
             </template>
 
             <!--  CASE 2: WORKING PHASE -->
-            <template is="dom-if" if="[[ hasAssignedLabs ]]">
+            <template is="dom-if" if="[[ !selectedTab ]]">
                 <tutor-sessionlist
                         access-token="{{ accessToken }}"
                         lab-type-audio="[[ labtypeAudio ]]"
@@ -223,9 +244,9 @@
             is: 'tutor-card',
             properties: {
                 accessToken: String,
-                language: {
-                    type: String,
-                    value: 'de'
+                selectedTab: {
+                    type: Number,
+                    value: 0
                 },
                 deadline_reached_audio: Boolean,
                 deadline_reached_video: Boolean,
@@ -270,10 +291,11 @@
                     type: String,
                     computed: '_computePrettyDate(labtypeFoto.registration_deadline_tutors)'
                 },
+                tutorSessions: Array
             },
 
             observers: [
-                '_setupLabs(labTypes, hasAssignedLabs)'
+                '_setupLabs(labTypes, tutorSessions)'
             ],
 
             ready: function () {
@@ -302,7 +324,7 @@
              * Checks deadlines per labtype and fires API requests to get labs and tutor's lab choices if the
              * deadlines are not reached yet.
              */
-            _setupLabs: function(labTypes, hasAssignedLabs) {
+            _setupLabs: function(labTypes, tutorSessions) {
 
                 for (var i = 0; i < labTypes.length; i++) {
                     if (labTypes[i].type_str == "Audio") {
@@ -320,8 +342,8 @@
                 this.deadline_reached_video = this._isAfterDeadline(this.labtypeVideo.registration_deadline_tutors);
                 this.deadline_reached_foto = this._isAfterDeadline(this.labtypeFoto.registration_deadline_tutors);
 
-                if ((!this.labtypeAudio.deadline_reached_audio || !this.labtypeVideo.deadline_reached_video
-                    || !this.labtypeFoto.deadline_reached_foto) && !hasAssignedLabs)
+                if (!this.labtypeAudio.deadline_reached_audio || !this.labtypeVideo.deadline_reached_video
+                    || !this.labtypeFoto.deadline_reached_foto)
                 {
                     this.ajax_allLabs = {
                         headers: {
@@ -353,6 +375,10 @@
                 return deadline_date < today;
             },
 
+            _showDatepicker: function(deadline_reached_audio, deadline_reached_video, deadline_reached_foto) {
+                return !(this.deadline_reached_audio && this.deadline_reached_video && this.deadline_reached_foto)
+            },
+
 
             /**
              **  API RESPONSE HANDLERS **
@@ -363,13 +389,8 @@
              */
             _handleAssignedLabsResponse: function(response) {
 
-                if (typeof response.detail == 'undefined' || response.detail == [] || response.detail.length == 0) {
-                    this.hasAssignedLabs = false;
-                }
-                else {
-                    this.hasAssignedLabs = true;
+                if (typeof response.detail != 'undefined')
                     this.tutorSessions = response.detail;
-                }
             },
 
             /**
@@ -439,6 +460,9 @@
             },
             _handleBackToDateOveriew: function() {
                 this.page = 'datepicker_overview'
+            },
+            _handleTabClick: function(e) {
+                this.selectedTab = e.target.parentElement.selected;
             }
 
         });

@@ -117,7 +117,13 @@
                     </template>
 
                     <div class="info">[[ localize('practicals_tutordatedetail_info_deadline-reached') ]]</div>
-                    <paper-button on-tap="_handleBackToDateOveriew"  style="width: 50%"><iron-icon icon="reply"></iron-icon>[[ localize('practicals_tutordatedetail_button-back') ]]</paper-button>
+                    <div style="text-align: center">
+                        <paper-button on-tap="_handleBackToDateOveriew"  style="width: 50%; text-align: center">
+                            <iron-icon icon="reply"></iron-icon>
+                            [[ localize('practicals_tutordatedetail_button-back') ]]
+                        </paper-button>
+                    </div>
+
                 </template>
             </template>
             <template is="dom-if" if="[[!registration_open]]">
@@ -172,20 +178,15 @@
                 user: Object,
                 allLabs: {
                     type: Array,
-                    observer: '_allLabsChanged'
+                    value: []
                 },
                 possibleLabs: {
                     type: Array,
-                    observer: '_possibleLabsChanged'
                 },
                 labType: Object,
                 page: {
                     type: String,
                     notify: true
-                },
-                language: {
-                    type: String,
-                    value: 'de'
                 },
                 oldChosenLabs: {
                     type: Array,
@@ -199,6 +200,12 @@
                     value: false
                 }
             },
+
+            observers: [
+                '_allLabsChanged(allLabs, user)',
+                '_possibleLabsChanged(possibleLabs)'
+            ],
+
             ready: function () {
                 this.labs_already_chosen = false;
             },
@@ -213,7 +220,7 @@
             /**
              * Observer method for allLabs Array
              */
-            _allLabsChanged: function(allLabs) {
+            _allLabsChanged: function(allLabs, user) {
 
                 this.practical_dates = this._getPracticalDates(this.allLabs);
                 this.practical_dates_exists = this._practicalDateExists(this.practical_dates);
@@ -486,13 +493,11 @@
                   var currentPage = this.page;
                   this.page = '';
                   this.page = currentPage;
-                  console.log("this page is (from del): " + this.page);
                 }
             },
 
             _responseFromPrioritySave: function(response) {
               var currentPage = this.page;
-              console.log("this page is (from save): " + this.page);
               this.page = '';
               this.page = currentPage;
             },
@@ -502,7 +507,7 @@
              * allLabs contains all lab dates already chosen by this tutor.
              * @private
              */
-            _possibleLabsChanged: function() {
+            _possibleLabsChanged: function(allLabs) {
 
                 if(this.practical_dates_exists)
                     return
@@ -539,7 +544,6 @@
             _handleBackClick: function(e) {
                 this.show_datepicker = false;
                 var currentPage = this.page;
-                console.log("this page is: " + this.page);
                 this.page = currentPage;
             },
 

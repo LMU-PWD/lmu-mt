@@ -154,10 +154,13 @@
     "tutor_card_heading_your-dates": "Your dates for the ",
     "tutor_card_info-open-until": "Open until ",
     "tutor_card_info-closed": "The registration is closed. ",
+    "tutor_card tab_calendar": "Calendar",
+    "tutor_card tab_datepicker": "Date Selection",
 
     "tutor_sessionlist_heading_date": "Date",
     "tutor_sessionlist_heading_time": "Time",
     "tutor_sessionlist_no-upcoming-sessions": "No upcoming lab sessions.",
+    "tutor_sessionlist no-sessions-yet": "You haven't been assigned fixed lab dates yet. Please choose your lab date preferences under 'Date Selection'",
 
     "practicals_tutordateselector_button-goback": "Back to overview",
     "practicals_tutordateselector_button-setback": "Reset",
@@ -304,10 +307,13 @@
     "tutor_card_heading_your-dates": "Deine Termine für das ",
     "tutor_card_info-open-until": "Noch offen bis ",
     "tutor_card_info-closed": "Die Registrierung ist abgeschlossen. ",
+    "tutor_card tab_calendar": "Kalender",
+    "tutor_card tab_datepicker": "Terminwahl",
 
     "tutor_sessionlist_heading_date": "Datum",
     "tutor_sessionlist_heading_time": "Zeit",
     "tutor_sessionlist_no-upcoming-sessions": "Keine zukünftigen Termine.",
+    "tutor_sessionlist no-sessions-yet": " Dir wurden noch keine Termine fest zugeteilt. Bitte wähle unter 'Terminwahl' Termine, an denen du Zeit hast.",
 
     "practicals_tutordateselector_button-goback": "Zur Übersicht",
     "practicals_tutordateselector_button-setback": "Zurücksetzen",

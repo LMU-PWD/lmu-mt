@@ -10,7 +10,9 @@
 <link rel="import" href="../../bower_components/iron-collapse/iron-collapse.html">
 <link rel="import" href="../../bower_components/paper-item/paper-item-body.html">
 
-
+<!--Localization Imports-->
+<link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
+<link rel="import" href="../services/my-localize-behavior.html">
 
 <dom-module id="tutor-sessionlist">
 
@@ -57,11 +59,9 @@
                 background-color: var(--paper-grey-100)
             }
             .sessions_heading {
-                background-color: var(--paper-blue-grey-800);
-                color: white;
-                padding-top: 5px;
-                padding-bottom: 5px;
-                font-size: 20px;
+                background-color: #FFF;
+                color: var(--paper-blue-grey-400);
+                font-size: 16px;
             }
             .session_details {
                 font-size: 14px;
@@ -138,10 +138,6 @@
                 on-api-response="_apiStudentResponse"></api-request>
 
         <div class="lab-list-container">
-            <template is="dom-if" if="[[ !finishedSessionsLoad ]]">
-                <paper-spinner active></paper-spinner>
-            </template>
-            <template is="dom-if" if="[[ finishedSessionsLoad ]]">
                 <paper-listbox>
 
                     <paper-item class="sessions_heading" disabled>
@@ -152,6 +148,12 @@
                         <span class="session_icon"></span>
                         <span class="session_type"></span>
                     </paper-item>
+
+                    <template is="dom-if" if="[[ noAssignedDates ]]">
+                        <paper-item disabled>
+                            [[ localize('tutor_sessionlist no-sessions-yet') ]]
+                        </paper-item>
+                    </template>
 
                     <template is="dom-if" if="[[ _isEmpty(futureSessions) ]]">
                         <paper-item disabled>
@@ -197,10 +199,9 @@
                         </paper-item>
                     </template>
                 </paper-listbox>
-            </template>
         </div>
 
-        <iron-signals on-iron-signal-switchlocale="_switchLocale"></iron-signals>
+        <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
     </template>
     <script>
 
@@ -209,10 +210,6 @@
             is: 'tutor-sessionlist',
             properties: {
                 accessToken: String,
-                language: {
-                    type: String,
-                    value: 'de'
-                },
                 selfInfo: String,
                 nextSessions: {
                     type: Array,
@@ -242,6 +239,7 @@
                     value: []
                 },
                 finishedSessionsLoad: false,
+                noAssignedDates: false,
                 studentsList: {
                     type: Array,
                     value: []
@@ -264,14 +262,8 @@
              * Localization setup
              */
             behaviors: [
-                Polymer.AppLocalizeBehavior
+                Polymer.MyLocalizeBehavior
             ],
-            attached: function() {
-                this.loadResources(this.resolveUrl('../shared/locales.json'));
-            },
-            _switchLocale: function() {
-                this.language = (this.language == 'en') ? 'de' : 'en';
-            },
 
 
             /**
@@ -317,7 +309,7 @@
 
                 switch(session.labType_string){
                     case "":
-                        icon = "social:school";
+                        icon = "av:videocam";
                         break;
                     case "Audio":
                         icon = "av:volume-mute";
@@ -328,7 +320,8 @@
                     case "Foto":
                         icon = "image:photo-camera";
                         break;
-                }                return icon;
+                }
+                return icon;
             },
 
 
@@ -337,8 +330,10 @@
              */
             _initSessionList: function(labTypeAudio, labTypeVideo, labTypeFoto, assignedLabs, accessToken) {
 
-                if (assignedLabs.length == 0)
-                    return null;
+                if (assignedLabs.length == 0) {
+                    this.noAssignedDates = true;
+                    return
+                }
 
                 this._makeLabTypesArray(labTypeAudio, labTypeVideo, labTypeFoto);
 
