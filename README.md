@@ -11,6 +11,8 @@ Die App erlaubt es den Studenten Gruppen zu bilden, sich für Prakita einzutrage
 ## Getting Started
 
 Diese Anleitung umfasst alle nötigen Informationen um eine Kopie des Projekts auf deiner lokalen Maschine zur Entwicklung- und Testzwecken nutzen zu können. Für Informationen über das deployen auf einem Livesystem siehe den Punkt "Deployment".
+Das Backend befindet sich hier: [backend](https://gitlab.lrz.de/ru67xoz/mt-common-api.git)
+Und das Frontend hier: [frontend](https://gitlab.cip.ifi.lmu.de/altmannp/PWD_MT.git)
 
 ### Voraussetzungen
 
@@ -19,14 +21,14 @@ Was du brauchst um das Projekt installieren zu können.
 
 * Datenbank: [mongo.db](https://www.mongodb.com/download-center)
 * Backend: [Node.js](https://nodejs.org/)
-* Im Backend-Ordner (`...\backend\`): `npm install`
+* Im Backend-Ordner (`\backend\`): `npm install`
 
 
 ### Installation
 
 Schritt-für-Schritt Anleitung zur Installation
 
-* npm-Install im `...\backend\` Ordner
+* npm-Install im `\backend\` Ordner
 
 ```
 npm install
@@ -51,7 +53,7 @@ Mongo.db starten, die auf Verbindungen auf dem Port `27017` wartet
 ```
 "[path to mongod.exe]"
 ```
-Server starten in `...\backend\server\` der auf den Port `3000` hört
+Server starten in `\backend\server\` der auf den Port `3000` hört
 ```
 node server.js
 ```
