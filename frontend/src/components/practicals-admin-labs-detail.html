@@ -87,7 +87,7 @@
                              groups = "[[groups]]"></lab-detail-view>
 
             <div class="buttons">
-                <paper-button class="dialogButton" dialog-dismiss raised><iron-icon icon="close" ></iron-icon>[[localize('c_button_discard')]]</paper-button>
+                <paper-button class="dialogButton" dialog-dismiss raised><iron-icon icon="close" on-tap="_handleDiscard"></iron-icon>[[localize('c_button_discard')]]</paper-button>
                 <paper-button class="dialogButton" dialog-confirm raised><iron-icon icon="save" ></iron-icon>[[localize('c_button_save')]]</paper-button>
             </div>
         </paper-dialog>
@@ -260,6 +260,13 @@
              */
             _handleAddNewLab: function(e){
                 this.$.newLabView.open();
+            },
+            /**
+             * Handle discard click, inside the lab-detial-view dialog, reset chosenlab
+             * @param event - Event Variable
+             */
+            _handleDiscard: function(event){
+                this.chosenlab = {};
             },
             /**
              * Handle allLabs array changes, transform labs if group and tutors are already there

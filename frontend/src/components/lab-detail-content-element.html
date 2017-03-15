@@ -19,6 +19,12 @@
                 display: inline-block;
                 float: right;
             }
+            .checkicon{
+                background-color:var(--paper-blue-grey-700);
+                color:var(--paper-blue-grey-100);
+                border-radius: 50%;
+                padding: 3px;
+            }
             paper-item{
                 margin-bottom: 1%;
                 margin-top: 1%;
@@ -58,7 +64,7 @@
                             on-editor-content="_aceValueChanged"
                             theme="[[ editorTheme ]]"></ace-widget>
                 </template>
-                <iron-icon class="textInputElements" icon="check" on-tap="_handleSetClick"></iron-icon>
+                <iron-icon class="textInputElements checkicon" icon="check" on-tap="_handleSetClick"></iron-icon>
             </iron-collapse>
         </paper-item>
     </template>
