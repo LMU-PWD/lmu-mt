@@ -66,6 +66,10 @@
                 top: calc(50% - 25px);
                 width: 50px;
             }
+            #error_toast {
+                --paper-toast-background-color: var(--paper-red-600);
+                --paper-toast-color: white;
+            }
 
         </style>
 
@@ -160,6 +164,7 @@
                     </div>
 
                 </iron-pages>
+                <paper-toast id="error_toast" class="fit-bottom" text="[[ localize('practicals_admin_labs_creator_multiple_location_error') ]] "></paper-toast>
 
             </paper-dialog-scrollable>
 
@@ -269,28 +274,33 @@
             },
 
             _triggerSingleLabCreation: function () {
-                this.processingRequest = true;
-                // Gather data for new Lab
-                var labObject = {
-                    date: this.$.singleDatePicker.date,
-                    duration: this.singleDuration,
-                    location: this.singleLocation,
-                    labTypeId: this.labTypeId,
-                    semesterId: this.semesterId
-                };
-                labObject.date.setHours(this.singleHour);
-                labObject.date.setMinutes(this.singleMin);
-                labObject.date.setSeconds(0);
-                labObject.date.setMilliseconds(0);
-                // Send them to API
-                this.ajax = {
-                    endpoint: '/labs',
-                    method: 'POST',
-                    headers: {
-                        Authorization: this.accessToken
-                    },
-                    body: labObject
-                };
+                if(this.singleLocation && this.singleLocation != "") {
+                    this.processingRequest = true;
+                    // Gather data for new Lab
+                    var labObject = {
+                        date: this.$.singleDatePicker.date,
+                        duration: this.singleDuration,
+                        location: this.singleLocation,
+                        labTypeId: this.labTypeId,
+                        semesterId: this.semesterId
+                    };
+                    labObject.date.setHours(this.singleHour);
+                    labObject.date.setMinutes(this.singleMin);
+                    labObject.date.setSeconds(0);
+                    labObject.date.setMilliseconds(0);
+                    // Send them to API
+                    this.ajax = {
+                        endpoint: '/labs',
+                        method: 'POST',
+                        headers: {
+                            Authorization: this.accessToken
+                        },
+                        body: labObject
+                    };
+                }
+                else{
+                    this.$.error_toast.open();
+                }
             },
 
             _updateDaySelection: function (event) {
@@ -306,35 +316,40 @@
             },
 
             _triggerMultipleLabsCreation: function () {
-                this.processingRequest = true;
-                // Gather data for new labs
-                var timeslotScheme = this.$.timeslotList.items,
-                    labs = [],
-                    that = this;
-                this.multipleDays.forEach(function(day){
-                    timeslotScheme.forEach(function(slot){
-                        var dateObject = new Date(day);
-                        dateObject.setHours(slot.hour);
-                        dateObject.setMinutes(slot.min);
-                        labs.push({
-                            date: dateObject,
-                            duration: slot.duration,
-                            location: that.multipleLocation,
-                            labTypeId: that.labTypeId,
-                            semesterId: that.semesterId
+                if(this.multipleLocation != "") {
+                    this.processingRequest = true;
+                    // Gather data for new labs
+                    var timeslotScheme = this.$.timeslotList.items,
+                        labs = [],
+                        that = this;
+                    this.multipleDays.forEach(function (day) {
+                        timeslotScheme.forEach(function (slot) {
+                            var dateObject = new Date(day);
+                            dateObject.setHours(slot.hour);
+                            dateObject.setMinutes(slot.min);
+                            labs.push({
+                                date: dateObject,
+                                duration: slot.duration,
+                                location: that.multipleLocation,
+                                labTypeId: that.labTypeId,
+                                semesterId: that.semesterId
+                            });
                         });
                     });
-                });
-                console.log(labs);
-                // Send them to API
-                this.ajax = {
-                    endpoint: '/labs',
-                    method: 'POST',
-                    headers: {
-                        Authorization: this.accessToken
-                    },
-                    body: labs
-                };
+                    console.log(labs);
+                    // Send them to API
+                    this.ajax = {
+                        endpoint: '/labs',
+                        method: 'POST',
+                        headers: {
+                            Authorization: this.accessToken
+                        },
+                        body: labs
+                    };
+                }
+                else{
+                    this.$.error_toast.open();
+                }
             },
 
             _handleApiResponse: function (event) {
