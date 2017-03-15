@@ -33,6 +33,9 @@
     "notifications_remaining_days": "days",
     "notifications_remaining_tomorrow": "tomorrow",
     "notifications_remaining_passed": "passed",
+    "notifications_api_error": "Operation failed. Pleasy try again.",
+    "notifications_api_success_post": "Date stored successfully",
+    "notifications_api_success_delete": "Date deleted successully",
 
     "registrationcard_header": "Register",
     "registrationcard_descr text-1": "Students and tutors, who are signed in the course ",
@@ -51,6 +54,7 @@
     "groupsadmin_dialog text-3": "(This action can't be undone!)",
 
     "c_medientechnik": "Media Technology",
+    "c_button_add": "Add",
     "c_button_cancel": "Cancel",
     "c_button_discard": "Discard",
     "c_button_save": "Save",
@@ -193,6 +197,9 @@
     "notifications_remaining_days": "Tagen",
     "notifications_remaining_tomorrow": "morgen",
     "notifications_remaining_passed": "vorbei",
+    "notifications_api_error": "Operation fehlgeschlagen. Bitte versuche es noch einmal.",
+    "notifications_api_success_post": "Termin erfolgreich gespeichert",
+    "notifications_api_success_delete": "Termin erfolgreich gelöscht",
 
     "registrationcard_header": "Registrierung",
     "registrationcard_descr text-1": "Studenten und Tutoren, die in UniworX für den Kurs",
@@ -211,6 +218,7 @@
     "groupsadmin_dialog text-3": "(Diese Aktion kann nicht rückgängig gemacht werden!)",
 
     "c_medientechnik": "Medientechnik",
+    "c_button_add": "Hinzufügen",
     "c_button_cancel": "Abbrechen",
     "c_button_discard": "Verwerfen",
     "c_button_save": "Speichern",

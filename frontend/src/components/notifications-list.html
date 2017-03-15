@@ -5,6 +5,7 @@
 <link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
 <link rel="import" href="../services/my-localize-behavior.html">
 
+<link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
 
 <dom-module id="notifications-list">
     <template>
@@ -102,6 +103,11 @@
                 width: 50px;
             }
 
+            #errorToast {
+                --paper-toast-background-color: var(--paper-red-400);
+                --paper-toast-color: var(--paper-blue-grey-900);
+            }
+
             @media screen and (max-width: 1023px) {
                 .notifications-scrollarea {
                     height: 100vh;
@@ -189,7 +195,9 @@
                         <!-- Date list item -->
                         <div class="notification" data-index$="[[index]]" on-tap="_toggleNotificationDetail">
                             <template is="dom-if" if="[[user.isAdmin]]">
-                                <paper-icon-button icon="delete" id="remove-[[index]]"></paper-icon-button>
+                                <paper-icon-button icon="delete"
+                                                   id="remove-[[index]]"
+                                                   on-tap="_triggerDeleteRequest"></paper-icon-button>
                                 <paper-tooltip for="remove-[[index]]"
                                                animation-delay="0">[[ localize('notifications_delete_date') ]]</paper-tooltip>
                             </template>
@@ -229,6 +237,10 @@
             </div>
         </template>
 
+        <paper-toast id="errorToast" text="[[localize('notifications_api_error')]]"></paper-toast>
+        <paper-toast id="postSuccessToast" text="[[localize('notifications_api_success_post')]]"></paper-toast>
+        <paper-toast id="deleteSuccessToast" text="[[localize('notifications_api_success_delete')]]"></paper-toast>
+
         <!-- Getting dates -->
         <api-request method="[[getAjax.method]]"
                      headers="[[getAjax.headers]]"
@@ -263,6 +275,8 @@
         <iron-signals on-iron-signal-language="_updateRemainingLabels"></iron-signals>
         <!-- Iron signal for synchronisation of notification list instances -->
         <iron-signals on-iron-signal-update-notifications="reload"></iron-signals>
+        <!--Iron Signal Fired on Logout-->
+        <iron-signals on-iron-signal-forget="_forget"></iron-signals>
 
     </template>
 
@@ -359,6 +373,7 @@
                 });
                 this.dates = futureDates.map(function(date){
                     return {
+                        id: date.id,
                         title: date.name,
                         location: date.location,
                         date: that._computeDateString(new Date(date.date), date.duration),
@@ -395,18 +410,40 @@
 
             _postSuccess: function (event) {
                 this._discardDialog();
-                this.fire('iron-signal', {name: 'update-notifications', data: this.language});
+                this.fire('iron-signal', {name: 'update-notifications'});
+                this.$.postSuccessToast.open();
             },
 
             _postError: function (event) {
-
+                this.$.errorToast.open();
             },
 
-            deleteSuccess: function (event) {
-
+            _triggerDeleteRequest: function (event) {
+                // If user hits just the button and not the iron-icon inside of it,
+                // this is the correct id
+                var id = event.path[0].getAttribute('id');
+                if (id == 'icon') {
+                    // User has hit the icon, therefore we need the id of the
+                    // icon's ancestor paper-icon-button
+                    id = event.path[2].getAttribute('id');
+                }
+                var index = id.split('remove-')[1];
+                var objectId = this.dates[index].id;
+                this.deleteAjax = {
+                    endpoint: '/uniquedates/'+objectId,
+                    method: 'DELETE',
+                    headers: {
+                        Authorization: this.accessToken
+                    }
+                }
             },
 
-            deleteError: function (event) {
+            _deleteSuccess: function (event) {
+                this.fire('iron-signal', {name: 'update-notifications'});
+                this.$.deleteSuccessToast.open();
+            },
+
+            _deleteError: function (event) {
 
             },
 
@@ -444,6 +481,7 @@
                 var that = this;
                 this.dates = this.dates.map(function(date){
                     return {
+                        id: date.id,
                         title: date.title,
                         location: date.location,
                         date: date.date,
@@ -507,6 +545,14 @@
                 var msEnd = msStart + (durationMins * 60 * 1000);
                 return dayString + '.' + monthString + '.' + startDate.getUTCFullYear() + ', '
                        + this._computeTimeString(msStart) + ' - ' + this._computeTimeString(msEnd);
+            },
+
+            _forget: function () {
+                this.accessToken = '';
+                this.selectedSemester = '';
+                this.user = {};
+                this.dates = [];
+                this._resetDialog();
             }
         });
     </script>
