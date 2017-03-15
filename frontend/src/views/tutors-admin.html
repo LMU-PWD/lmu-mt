@@ -266,7 +266,7 @@
              * @private
              */
             _semesterChanged: function (event) {
-                this.set('semester', event.detail);
+                this.set('semester', event.detail.semesterId);
                 this.set('tutors', []);
 
                 this.ajax = {

@@ -249,7 +249,7 @@
                     console.log(this.semesters);
                     console.log(this.selectedSemesterIndex);
                     var semesterID = this.semesters[detail].id;
-                    this.fire('iron-signal', {name: 'semester', data: semesterID});
+                    this.fire('iron-signal', {name: 'semester', data: {semesterId: semesterID, semesters: this.semesters}});
                 }
             },
 

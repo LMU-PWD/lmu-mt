@@ -281,14 +281,14 @@
             },
 
             _semesterChanged: function (event) {
-                this.set('semester', event.detail);
+                this.set('semester', event.detail.semesterId);
                 this.groupSizeAJAX = {
                         contentType: 'application/json',
                         headers: {
                             Authorization: this.accessToken
                         },
                         method: 'GET',
-                        endpoint: '/semesters/' + event.detail
+                        endpoint: '/semesters/' + this.semester
                     };
             },
 

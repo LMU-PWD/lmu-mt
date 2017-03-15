@@ -144,14 +144,26 @@
             </div>
         </paper-dialog>
 
-        <paper-dialog id="editDialog" on-iron-overlay-closed="_reactToDeleteDialog">
+        <paper-dialog id="editDialog" on-iron-overlay-closed="_reactToEditDialog">
             <div>
                 <h1>{{localize('usersadmin_dialog text-1')}}<span></span> {{localize('groupsadmin_dialog text-2')}}
                 </h1>
                 <!--p>{{localize('admin_dialog text-3')}}</p-->
                 <h2>Semester: </h2>
+                <paper-dropdown-menu label="Semester">
+                    <paper-listbox class="dropdown-content" attr-for-selected="semesterId" selected="{{ editUser.semesterId }}">
+                        <template is="dom-repeat" items="[[ semesters ]]" as="semester">
+                            <paper-item semesterId$="[[semester.id]]">[[ semester.term ]]</paper-item>
+                        </template>
+                    </paper-listbox>
+                </paper-dropdown-menu>
+
                 <h2>Role: </h2>
                 <h2>Passed Labs: </h2>
+                <template is="dom-repeat" items="[[labTypes]]" as="labType">
+                    <paper-checkbox>[[labType.type_str]]</paper-checkbox>
+                    <h3>[[labType.id]]</h3>
+                </template>
             </div>
             <div class="buttons">
                 <paper-button dialog-dismiss autofocus>{{localize('c_button_cancel')}}</paper-button>
@@ -242,6 +254,7 @@
                     type: Array,
                     observer: '_groupsChanged'
                 },
+                labTypes: Array,
                 newUser: {
                     type: Object,
                     value: {
@@ -276,8 +289,9 @@
              * @private
              */
             _semesterChanged: function (event) {
-                this.set('semester', event.detail);
+                this.set('semester', event.detail.semesterId);
                 this.set('students', []);
+                this.set('semesters', event.detail.semesters);
 
                 this.ajax = {
                     contentType: 'application/json',
@@ -357,14 +371,25 @@
             _editStudent: function (event) {
                 //Grabbing Student information from target
                 var student = event.model._config.student;
-                var passedLabTypes = student.passedLabsIds;
+                var passedLabTypes = student.passedLabTypesIds;
+                var labTyes = this.lab
+                student.passedLabTypes.set(this.labTypes);
+                for(var i=0; i< length(this.labTypes); i++){
+                    for(var j=0; j< length(passedLabTypes); j++){
+                        if(passedLabTypes[j]===student.passedLabTypes[i]){
+                            student.passedLabTypes[i].set({passed: true});
+                        }
+                    }
+                }
+
+                this.set('editUser', student);
                 var semester = student.semesterId;
                 var studentID = student.id;
                 var isStudent = student.isStudent;
                 var isTutor = student.isTutor;
                 var studentName = student.first_name + " " + student.name;
                 var pending = !student.emailVerified;
-                console.log(student);
+                console.log(this.editUser);
 
                 //Temporarily save Student Info in deleteDialogs Attributes
                 this.$.editDialog.dataset.studentID = studentID;
@@ -402,6 +427,34 @@
                         method: 'DELETE',
                         endpoint: endpoint
                     };
+
+                } else {
+                    //Reset Attributes
+                    this.$.deleteDialog.dataset.studentId = '';
+                    this.$.deleteDialog.dataset.pending = '';
+                }
+            },
+
+            /**
+             * Callback on Edit Popup Closed
+             * @private
+             */
+            _reactToEditDialog: function (event) {
+                //Check if Popup Approved or Canceled
+                if (event.detail.confirmed) {
+
+                    console.log(this.editUser);
+                    //Generate API Request to Update User
+                    this.deleteAjax = {
+                        contentType: 'application/json',
+                        headers: {
+                            Authorization: this.accessToken
+                        },
+                        method: 'PUT',
+                        endpoint: '/PlatformUsers/'+this.editUser.id,
+                        body: this.editUser
+                    };
+                    console.log(this.deleteAjax);
 
                 } else {
                     //Reset Attributes
