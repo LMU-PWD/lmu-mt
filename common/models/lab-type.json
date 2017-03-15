@@ -1,0 +1,80 @@
+{
+  "name": "LabType",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "forceId": false,
+  "properties": {
+    "type": {
+      "type": "number",
+      "required": true
+    },
+    "type_str": {
+      "type": "string",
+      "required": true
+    },
+    "registration_deadline": {
+      "type": "date",
+      "required": true
+    },
+    "registration_open": {
+      "type": "boolean",
+      "required": true,
+      "default": false
+    },
+    "registration_deadline_tutors": {
+      "type": "date"
+    },
+    "description_tutor": {
+      "type": "string"
+    },
+    "description_student": {
+      "type": "string"
+    }
+  },
+  "validations": [],
+  "relations": {
+    "semester": {
+      "type": "belongsTo",
+      "model": "Semester",
+      "foreignKey": "semesterId"
+    }
+  },
+  "acls": [
+    {
+      "accessType": "*",
+      "principalType": "ROLE",
+      "principalId": "$everyone",
+      "permission": "DENY"
+    },
+    {
+      "accessType": "READ",
+      "principalType": "ROLE",
+      "principalId": "$authenticated",
+      "permission": "ALLOW"
+    },
+    {
+      "accessType": "WRITE",
+      "principalType": "ROLE",
+      "principalId": "admin",
+      "permission": "ALLOW"
+    },
+    {
+      "accessType": "EXECUTE",
+      "principalType": "ROLE",
+      "principalId": "admin",
+      "permission": "ALLOW",
+      "property": "autoDistributeTutors"
+    },
+    {
+      "accessType": "EXECUTE",
+      "principalType": "ROLE",
+      "principalId": "admin",
+      "permission": "ALLOW",
+      "property": "autoDistributeGroups"
+    }
+  ],
+  "methods": {}
+}

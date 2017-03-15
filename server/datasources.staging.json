@@ -1,0 +1,16 @@
+{
+  "db": {
+    "name": "db",
+    "connector": "memory"
+  },
+  "mongo": {
+    "host": "ds117189.mlab.com",
+    "port": 17189,
+    "url": "",
+    "database": "mtplanr",
+    "password": "l00pback",
+    "name": "mongo",
+    "user": "mt-loopback",
+    "connector": "mongodb"
+  }
+}

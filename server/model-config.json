@@ -1,0 +1,81 @@
+{
+  "_meta": {
+    "sources": [
+      "loopback/common/models",
+      "loopback/server/models",
+      "../common/models",
+      "./models"
+    ],
+    "mixins": [
+      "loopback/common/mixins",
+      "loopback/server/mixins",
+      "../common/mixins",
+      "./mixins"
+    ]
+  },
+  "User": {
+    "dataSource": "db"
+  },
+  "AccessToken": {
+    "dataSource": "mongo",
+    "public": false
+  },
+  "ACL": {
+    "dataSource": "mongo",
+    "public": false
+  },
+  "RoleMapping": {
+    "dataSource": "mongo",
+    "public": false
+  },
+  "Role": {
+    "dataSource": "mongo",
+    "public": false
+  },
+  "PlatformUser": {
+    "dataSource": "mongo",
+    "public": true,
+    "options": {
+      "emailVerificationRequired": true
+    }
+  },
+  "Semester": {
+    "dataSource": "mongo",
+    "public": true
+  },
+  "UniqueDate": {
+    "dataSource": "mongo",
+    "public": true
+  },
+  "Exercise": {
+    "dataSource": "mongo",
+    "public": true
+  },
+  "Group": {
+    "dataSource": "mongo",
+    "public": true
+  },
+  "Lab": {
+    "dataSource": "mongo",
+    "public": true
+  },
+  "Priority": {
+    "dataSource": "mongo",
+    "public": true
+  },
+  "LabType": {
+    "dataSource": "mongo",
+    "public": true
+  },
+  "PendingPlatformUser": {
+    "dataSource": "mongo",
+    "public": true
+  },
+  "NewsEntry": {
+    "dataSource": "mongo",
+    "public": true
+  },
+  "Email": {
+    "dataSource": "Email"
+  }
+}

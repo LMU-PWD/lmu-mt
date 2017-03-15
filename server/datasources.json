@@ -1,0 +1,32 @@
+{
+  "db": {
+    "name": "db",
+    "connector": "memory"
+  },
+  "mongo": {
+    "host": "ds145868.mlab.com",
+    "port": 45868,
+    "url": "",
+    "database": "mt-api",
+    "password": "l00pback",
+    "name": "mongo",
+    "user": "mt-loopback",
+    "connector": "mongodb"
+  },
+  "Email": {
+    "name": "Email",
+    "connector": "mail",
+    "transports": [
+      {
+        "type": "SMTP",
+        "host": "smtp.gmail.com",
+        "secure": true,
+        "port": 465,
+        "auth": {
+          "user": "mediatechnologytest2017@gmail.com",
+          "pass": "mtadmin2017"
+        }
+      }
+    ]
+  }
+}
