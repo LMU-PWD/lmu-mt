@@ -161,6 +161,7 @@
     "tutor_sessionlist_heading_time": "Time",
     "tutor_sessionlist_no-upcoming-sessions": "No upcoming lab sessions.",
     "tutor_sessionlist no-sessions-yet": "You haven't been assigned fixed lab dates yet. Please choose your lab date preferences under 'Date Selection'",
+    "tutor_sessionlist_group": "Group",
 
     "practicals_tutordateselector_button-goback": "Back to overview",
     "practicals_tutordateselector_button-setback": "Reset",
@@ -314,6 +315,7 @@
     "tutor_sessionlist_heading_time": "Zeit",
     "tutor_sessionlist_no-upcoming-sessions": "Keine zukünftigen Termine.",
     "tutor_sessionlist no-sessions-yet": " Dir wurden noch keine Termine fest zugeteilt. Bitte wähle unter 'Terminwahl' Termine, an denen du Zeit hast.",
+    "tutor_sessionlist_group": "Gruppe ",
 
     "practicals_tutordateselector_button-goback": "Zur Übersicht",
     "practicals_tutordateselector_button-setback": "Zurücksetzen",

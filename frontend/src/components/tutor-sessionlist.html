@@ -64,7 +64,7 @@
             }
             .sessions_heading {
                 background-color: var(--paper-blue-grey-100);
-                color: var(--paper-blue-grey-400);
+                color: var(--paper-blue-grey-700);
                 font-size: 16px;
             }
             .session_details {
@@ -154,7 +154,7 @@
                     </paper-item>
 
                     <template is="dom-if" if="[[ noAssignedDates ]]">
-                        <paper-item disabled>
+                        <paper-item disabled style="color: var(--paper-blue-grey-700);">
                             [[ localize('tutor_sessionlist no-sessions-yet') ]]
                         </paper-item>
                     </template>
@@ -188,7 +188,7 @@
                                         <template is="dom-if" if="[[ !_isEmpty(session.groupMembers) ]]">
                                             <hr>
                                             <div class="session_details" style="margin-bottom: 0.5em">
-                                              Gruppe <span class="group_name">[[ session.group.name ]] </span>
+                                                [[ localize('tutor_sessionlist_group') ]] <span class="group_name">[[ session.group.name ]] </span>
                                             </div>
                                             <template is="dom-repeat" items="[[ session.groupMembers ]]" as="groupMember">
                                                 <div class="session_details" style="padding-left: 15px; ">

@@ -199,9 +199,12 @@
 
                 if(recentlab.classList.value.indexOf('selected-slot') >= 0){
                     recentlab.classList.toggle('selected-slot')
-                    this.chosenlabs = this.chosenlabs.filter(function(item){
+
+                    var temp = this.chosenlabs.filter(function(item){
                         return item.id != chosenlabId;
                     });
+                    this.chosenlabs = [];
+                    this.chosenlabs = temp;
                 }
                 else {
                     recentlab.classList.toggle('selected-slot')
@@ -214,7 +217,13 @@
                             break;
                         }
                     }
-                    this.chosenlabs.push(labObject);
+//                    this.chosenlabs.push(labObject);
+//                    this.push('chosenlabs', labObject);
+
+                    var temp = this.chosenlabs;
+                    temp.push(labObject);
+                    this.chosenlabs = [];
+                    this.chosenlabs = temp;
                 }
             },
 

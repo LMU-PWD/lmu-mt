@@ -42,7 +42,7 @@
                 background-color: var(--paper-blue-grey-100);
             }
             .card-title{
-
+                color: var(--paper-blue-grey-700);
             }
             .datepicker-overview img {
                 border-radius: 50%;
@@ -56,7 +56,7 @@
             }
 
             .labtype_deadline {
-                color: var(--paper-grey-500);
+                color: var(--paper-grey-700);
                 font-weight: 100;
                 font-size: 16px;
                 text-align: right;
@@ -137,7 +137,18 @@
                 </template>
             </paper-tabs>
 
-            <!--  CASE 1: REGISTRATION PHASE -->
+            <!--  TAB 1: CALENDAR -->
+            <template is="dom-if" if="[[ !selectedTab ]]">
+                <tutor-sessionlist
+                        access-token="{{ accessToken }}"
+                        lab-type-audio="[[ labtypeAudio ]]"
+                        lab-type-video="[[ labtypeVideo ]]"
+                        lab-type-foto="[[ labtypeFoto ]]"
+                        assigned-labs="[[ tutorSessions ]]">
+                </tutor-sessionlist>
+            </template>
+
+            <!--  TAB 2: DATE PICKER -->
             <template is="dom-if" if="[[ selectedTab ]]">
                 <iron-pages
                         selected="[[ page ]]"
@@ -226,16 +237,6 @@
                 </iron-pages>
             </template>
 
-            <!--  CASE 2: WORKING PHASE -->
-            <template is="dom-if" if="[[ !selectedTab ]]">
-                <tutor-sessionlist
-                        access-token="{{ accessToken }}"
-                        lab-type-audio="[[ labtypeAudio ]]"
-                        lab-type-video="[[ labtypeVideo ]]"
-                        lab-type-foto="[[ labtypeFoto ]]"
-                        assigned-labs="[[ tutorSessions ]]">
-                </tutor-sessionlist>
-            </template>
         </div>
 
         <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
