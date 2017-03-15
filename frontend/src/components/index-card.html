@@ -178,7 +178,7 @@
 
             _labTypeChanged: function (detail) {
                 if(this.isAdmin && this.labType){
-                    console.log(this.labType);
+                    //console.log(this.labType);
                     var temporal_deadline_students = new Date(this.labType.registration_deadline);
                     var temporal_deadline_tutors = new Date(this.labType.registration_deadline_tutors);
                     if(temporal_deadline_tutors && temporal_deadline_tutors.getDate()) {
