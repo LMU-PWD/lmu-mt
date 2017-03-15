@@ -1,0 +1,172 @@
+<!--Localization Imports-->
+<link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
+<link rel="import" href="../services/my-localize-behavior.html">
+
+<dom-module id="timeslot-list">
+
+    <template>
+
+        <style include="shared-styles">
+
+            .timeslot {
+                background: var(--paper-blue-grey-500);
+                border-radius: 5px;
+                color: var(--paper-blue-grey-50);
+                margin-bottom: 7px;
+            }
+
+            .label {
+                margin: 0 10px;
+            }
+
+            #addTimeslotButton {
+                background: var(--paper-light-green-300);
+            }
+
+            #discardDialogButton {
+                background: var(--paper-red-300);
+            }
+
+        </style>
+
+        <!-- Timeslot list -->
+        <template is="dom-repeat" items="[[ items ]]" as="timeslot">
+            <div class="timeslot">
+                <span class="actions">
+                    <paper-icon-button icon="icons:delete"
+                                       id="remove-[[index]]"
+                                       on-tap="_removeTimeslot"></paper-icon-button>
+                </span>
+                <span class="label">[[ _printTimeslot(timeslot.hour, timeslot.min, timeslot.duration) ]]</span>
+            </div>
+        </template>
+
+        <!-- New timeslot dialog -->
+        <iron-collapse id="newTimeslot">
+            <time-picker hour="{{ newTimeslotHour }}"
+                         min="{{ newTimeslotMin }}"></time-picker>
+            <paper-input type="number"
+                         min="0"
+                         label="[[ localize('semester_setup_dates_duration') ]]"
+                         value="{{ newTimeslotDuration }}">
+                <div suffix>[[ localize('c_minutes') ]]</div>
+            </paper-input>
+        </iron-collapse>
+
+        <template is="dom-if" if="[[ !newTimeslotOpen ]]">
+            <paper-icon-button icon="icons:add-circle-outline" on-tap="_openCollapsible"></paper-icon-button>
+        </template>
+        <template is="dom-if" if="[[ newTimeslotOpen ]]">
+            <paper-icon-button on-tap="_closeCollapsible" id="discardDialogButton" icon="close" raised></paper-icon-button>
+            <paper-icon-button on-tap="_addTimeslot" id="addTimeslotButton" icon="check" raised></paper-icon-button>
+        </template>
+
+        <!--Iron Signal for Localization-->
+        <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
+
+    </template>
+
+    <script>
+
+        Polymer({
+
+            is: 'timeslot-list',
+
+            properties: {
+
+                items: {
+                    type: Array,
+                    value: []
+                },
+
+                /* New timeslot dialog */
+                newTimeslotOpen: {
+                    type: Boolean,
+                    value: false },
+                newTimeslotHour: {
+                    type: Number,
+                    value: 8 },
+                newTimeslotMin: {
+                    type: Number,
+                    value: 0 },
+                newTimeslotDuration: {
+                    type: Number,
+                    value: 90 }
+            },
+
+            behaviors: [
+                Polymer.MyLocalizeBehavior
+            ],
+
+            _resetFields: function () {
+                this.newTimeslotOpen = false;
+                this.newTimeslotHour = 8;
+                this.newTimeslotMin = 0;
+                this.newTimeslotDuration = 90;
+            },
+
+            _printTime: function (hour, min) {
+                var clippedHour = hour % 24,
+                    clippedMin = min % 60;
+                return hour + ':' + ((clippedMin < 10) ? '0'+min : min);
+            },
+
+            _printTimeslot: function (hour, min, duration) {
+                var hourRange = Math.floor(duration / 60),
+                    minsOnTop = duration % 60,
+                    hoursAdded = hour + hourRange,
+                    minsAdded = min + minsOnTop,
+                    endHour = hoursAdded + Math.floor(minsAdded / 60),
+                    endMin = minsAdded % 60;
+                return this._printTime(hour, min) + ' - ' + this._printTime(endHour, endMin);
+            },
+
+            _openCollapsible: function () {
+                this.$.newTimeslot.show();
+                this.newTimeslotOpen = true;
+            },
+
+            _closeCollapsible: function () {
+                this.$.newTimeslot.hide();
+                this.newTimeslotOpen = true;
+                this._resetFields();
+            },
+
+            _addTimeslot: function () {
+                var itemsModified = this.items.slice();
+                itemsModified.push({
+                    hour: this.newTimeslotHour,
+                    min: this.newTimeslotMin,
+                    duration: this.newTimeslotDuration
+                });
+                itemsModified.sort(function(a,b){
+                    if (a.hour !== b.hour)
+                        return a.hour - b.hour;
+                    else if (a.min !== b.min)
+                        return a.min - b.min;
+                    else return 0;
+                });
+                this.items = itemsModified;
+                this.$.newTimeslot.hide();
+                this._resetFields();
+            },
+
+            _removeTimeslot: function (event) {
+                // If user hits just the button and not the iron-icon inside of it,
+                // this is the correct id
+                var id = event.path[0].getAttribute('id');
+                if (id == 'icon') {
+                    // User has hit the icon, therefore we need the id of the
+                    // icon's ancestor paper-icon-button
+                    id = event.path[2].getAttribute('id');
+                }
+                id = id.split('remove-')[1];
+                var itemsModified = this.items.slice();
+                itemsModified.splice(id, 1);
+                this.items = itemsModified;
+            }
+        });
+
+    </script>
+
+</dom-module>
