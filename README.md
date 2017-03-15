@@ -21,7 +21,6 @@ Was du brauchst um das Projekt installieren zu können.
 
 * Datenbank: [mongo.db](https://www.mongodb.com/download-center)
 * Backend: [Node.js](https://nodejs.org/)
-* Im Backend-Ordner (`\backend\`): `npm install`
 
 
 ### Installation
