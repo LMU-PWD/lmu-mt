@@ -22,6 +22,7 @@
             :host {
                 min-width: 320px;
                 display: block;
+                background-color: var(--paper-blue-grey-500);
             }
             paper-button {
                 width: calc(35% - 20px);
@@ -52,14 +53,17 @@
             .sessions_row:first-of-type {
                 border-top: none
             }
+            paper-item{
+                background-color: var(--paper-blue-grey-100);
+            }
             paper-item:not(.sessions-row):focus {
-                background-color: #FFF;
+                background-color: var(--paper-blue-grey-100);
             }
             .sessions_row:hover {
                 background-color: var(--paper-grey-100)
             }
             .sessions_heading {
-                background-color: #FFF;
+                background-color: var(--paper-blue-grey-100);
                 color: var(--paper-blue-grey-400);
                 font-size: 16px;
             }
