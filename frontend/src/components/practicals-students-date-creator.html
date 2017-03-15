@@ -1,3 +1,7 @@
+<!--Localization Imports-->
+<link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
+<link rel="import" href="../services/my-localize-behavior.html">
+
 <dom-module id="practicals-students-date-creator">
     <template>
         <style include="shared-styles">
@@ -40,25 +44,28 @@
             </div>
             <template is="dom-repeat" items="[[timeslots]]" as="lab" >
                 <paper-item id="lab" class="lab" on-tap="_handleDateClick">
-                    [[_getTimeSlotString(lab)]]
+                    [[_getTimeSlotString(lab)]] [[localize('general_hours')]]
                     <div id="priorityShower"></div>
                 </paper-item>
                 <iron-collapse id="priorityselection">
                     <div>
-                        <paper-dropdown-menu label="Priorität: ">
+                        <paper-dropdown-menu label="[[localize('practicals-student-date priority')]]: ">
                             <paper-listbox class="dropdown-content">
                                 <template is="dom-repeat" items="[[priorities]]" as="selector">
                                     <template is="dom-if" if="[[_computeSelector(selector)]]">
-                                          <paper-item on-tap="_handlePriorityClick">[[selector]]</paper-item>
+                                        <paper-item on-tap="_handlePriorityClick">[[selector]]</paper-item>
                                     </template>
                                 </template>
                             </paper-listbox>
                         </paper-dropdown-menu>
-                        <div>(1 - gering; [[priority]] - hoch)</div>
+                        <div>(1 - [[localize('practicals-student-date priorities_min')]]; [[priority]] - [[localize('practicals-student-date priorities_max')]])</div>
                     </div>
                 </iron-collapse>
             </template>
         </div>
+
+        <!--Iron Signal for Localization-->
+        <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
     </template>
     <script>
         Polymer({
@@ -88,6 +95,11 @@
                 chosenlabindex:{
                     type: Number
                 },
+                labs:{
+                    type: Array,
+                    value: [],
+                    observer: "_labsChanged"
+                },
                 recentlab: {
                     type: Object
                 },
@@ -95,11 +107,15 @@
                     type: Object
                 }
             },
+            behaviors: [
+                Polymer.MyLocalizeBehavior
+            ],
+
             ready: function() {
                 this.date = this._getDateString(this.timeslots[0][0]);
 
                 for (i = 0; i < this.priority; i++) {
-                        this.priorities[i]=i+1;
+                    this.priorities[i]=i+1;
                 }
             },
 
@@ -108,33 +124,34 @@
              * Adds leading zeros, if necessary
              */
             _getTimeSlotString: function(slot){
+                //console.log(slot);
                 if(slot) {
-                        var starthour = slot[0].getHours();
-                        var startminute = slot[0].getMinutes();
-                        var endhour = slot[1].getHours();
-                        var endminute = slot[1].getMinutes();
-                        /*
-                    * Add zeros, if necessary
-                    */
+                    var starthour = slot[0].getHours();
+                    var startminute = slot[0].getMinutes();
+                    var endhour = slot[1].getHours();
+                    var endminute = slot[1].getMinutes();
+                    /*
+                     * Add zeros, if necessary
+                     */
 
-                    if(starthour<10){
+                    if(starthour< 10){
 
                         starthour = "0"+ starthour;
                     }
-                    if(startminute<10){
-                        startminute = "0"+startminute;
+                    if(startminute<10) {
+                        startminute = "0"+ startminute;
                     }
-                    if(endhour<10
-                    ){
-                        endhour = "0"+endhour;
+                    if(endhour<10){
+                        endhour = "0"+ endhour;
                     }
-                    if(endminute< 10){
-                        endminute = "0" +endminute;
+                    if(endminute< 10) {
+                        endminute = "0" + endminute;
                     }
 
-                    return starthour + ":" + startminute + " - " + endhour + ":" + endminute+ " Uhr";
+                    return starthour + ":" + startminute + " - " + endhour + ":" + endminute;
                 }
             },
+
 
             /**
              * Creates string from the given date
@@ -145,28 +162,75 @@
                 switch(date.getDay()){
 
                     case 0:
-                        datestring = "Sonntag, ";
+                        try {
+                            datestring = this.localize('general_weekdays 0') + ", ";
+                        }
+                        catch(e){
+                            datestring = " ";
+                        }
                         break;
                     case 1:
-                        datestring = "Montag, ";
+                        try  {
+                            datestring = this.localize('general_weekdays 1') + ", ";
+                        }
+                        catch(e){
+                            datestring = " ";
+                        }
                         break;
                     case 2:
-                        datestring = "Dienstag, ";
+                        try  {
+                            datestring = this.localize('general_weekdays 2') + ", ";
+                        }
+                        catch(e){
+                            datestring = " ";
+                        }
                         break;
                     case 3:
-                        datestring = "Mittwoch, ";
+                        try  {
+                            datestring = this.localize('general_weekdays 3') + ", ";
+                        }
+                        catch(e){
+                            datestring = " ";
+                        }
                         break;
                     case 4:
-                        datestring = "Donnerstag, ";
+                        try  {
+                            datestring = this.localize('general_weekdays 4') + ", ";
+                        }
+                        catch(e){
+                            datestring = " ";
+                        }
                         break;
                     case 5:
-                        datestring = "Freitag, ";
+                        try {
+                            datestring = this.localize('general_weekdays 5') + ", ";
+                        }
+                        catch(e){
+                            datestring = "";
+                        }
                         break;
                     case 6:
-                        datestring = "Samstag, ";
+                        try {
+                            datestring = this.localize('general_weekdays 6') + ", ";
+                        }
+                        catch(e){
+                            datestring = "";
+                        }
                         break;
                 }
-                datestring = datestring+date.getDate()+"."+date.getMonth()+"."+date.getFullYear();
+                var month = date.getMonth()+1;
+                var monthString = month.toString();
+                if(month < 10){
+                    monthString = "0"+month.toString();
+                }
+
+                var day = date.getDate();
+                var dayString = day.toString();
+                if(day < 10){
+                    dayString = "0"+day.toString();
+                }
+
+                datestring = datestring+dayString+"."+monthString+"."+date.getFullYear();
                 return datestring;
             },
 
@@ -207,9 +271,9 @@
                     this.chosenpriority = e.model.selector;
                     if (this.recentlab.lastChild.textContent.search('Priorität:') >= 0) {
                         this.fire("replace-priority");
-                        //TODO: replace lab on practical-date-detail chosenlabs-Array and priorities-Array
+                        //TODO: replace lab on practical-students-date-detail chosenlabs-Array and priorities-Array
                     }
-                    else {
+                    //else {
                         this.fire("priority-click"); //Notifies Parent (practical-date-detail.html)
                         this.recentpriorityselection.toggle(); //Hide Priorityselection
                         this.recentlab.style.color = 'green';
@@ -217,7 +281,7 @@
                         this.recentlab.lastChild.textContent = 'Priorität: ' + e.model.selector;
                         //this.recentlab.innerHTML = this.recentlab.innerHTML +'<div id="priorityShower">'+'Priorität: ' + e.model.selector+'</div>';
 
-                    }
+                    //}
                 }
             },
 
@@ -234,6 +298,18 @@
                 }
                 return response;
             },
+
+            /**
+             * Handles changes of labs-Array from API
+             * @param e - event
+             */
+            _labsChanged: function(e){
+                //console.log("labsChanged");
+                if(this.labs && this.labs[0]) {
+                    this.date = this._getDateString(this.labs[0].dates[0]);
+                }
+            },
+
             /**
              * Reset labselection on Button click
              * @private
