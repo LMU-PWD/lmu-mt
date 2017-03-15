@@ -65,62 +65,27 @@ polymer serve
 
 Jetzt ist die App im Browser deiner Wahl unter der url `localhost:8080` erreichbar
 
-## 
-# Ich bin noch nicht weiter als bis hier
-## 
-
-
-## Running the tests
-
-Explain how to run the automated tests for this system
-
-### Break down into end to end tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-### And coding style tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
 ## Deployment
 
 Add additional notes about how to deploy this on a live system
 
 ## Built With
 
-* [Dropwizard](http://www.dropwizard.io/1.0.2/docs/) - The web framework used
-* [Maven](https://maven.apache.org/) - Dependency Management
-* [ROME](https://rometools.github.io/rome/) - Used to generate RSS Feeds
+* [Polymer](https://www.polymer-project.org/) - Frontend JavaScript Bibliothek
+* [Mongo.db](https://www.mongodb.com/download-center) - Datenbank
+* [Node.js](https://nodejs.org/) - Backend/API
 
-## Contributing
 
-Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
+## Autoren
 
-## Versioning
-
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags). 
-
-## Authors
-
-* **Billie Thompson** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
+* **Bettina Noglik**
+* **Martin Schön**
+* **Philipp Altmann**
+* **Sarah Delgado Rodriguez**
 
 See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
 
-## License
-
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
-
 ## Acknowledgments
 
-* Hat tip to anyone who's code was used
-* Inspiration
-* etc
+* Dieses Projekt ist im Rahmen des Praktikums Webprogrammierung an der LMU durchgeführt von Juliane Franze und Tobias Seitz entstanden
 
