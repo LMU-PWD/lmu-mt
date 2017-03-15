@@ -26,6 +26,7 @@
     "notifications_delete_date": "Delete date",
     "notifications_date_title": "Title of the date",
     "notifications_date_start": "Starting at",
+    "notifications_dialog_description": "All students and tutors of the current semester will see this date.",
 
     "registrationcard_header": "Register",
     "registrationcard_descr text-1": "Students and tutors, who are signed in the course ",
@@ -179,6 +180,7 @@
     "notifications_delete_date": "Termin löschen",
     "notifications_date_title": "Titel des Termins",
     "notifications_date_start": "Beginn",
+    "notifications_dialog_description": "Diesen Termin können alle Tutoren und Studenten des aktuellen Semesters sehen.",
 
     "registrationcard_header": "Registrierung",
     "registrationcard_descr text-1": "Studenten und Tutoren, die in UniworX für den Kurs",

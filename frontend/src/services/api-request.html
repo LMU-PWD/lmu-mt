@@ -76,6 +76,10 @@
                 }
             },
 
+            trigger: function () {
+                this.$$('iron-ajax').generateRequest();
+            },
+
             _handleResponse: function (response) {
                 this.fire('api-response', response.detail.response);
                 //Console Info to check if all received data is reset on logout
