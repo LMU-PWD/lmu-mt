@@ -101,7 +101,7 @@
 
         <div class="practicals-container">
             <template is="dom-repeat" items="[[labTypes]]" as="labType">
-                <index-card lab-type="[[labType]]" group="[[group]]"></index-card>
+                <index-card lab-type="[[labType]]" group="[[group]]" is-admin="[[user.isAdmin]]"></index-card>
             </template>
             <!--index-card key="photo" type="Fotopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:"
                         info2="18.05.16, 14-16"></index-card>

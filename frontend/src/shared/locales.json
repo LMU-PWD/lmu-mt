@@ -145,6 +145,7 @@
 
     "practicals-admin tutor": "Tutor",
     "practicals-admin group": "Group",
+    "practicals-admin lab": "Labdate",
 
     "practicals-admin students": "Students",
     "practicals-admin tutors": "Tutors",
@@ -157,6 +158,9 @@
     "practicals-admin-labtype text2":"Registration Deadline Tutors",
     "practicals-admin-labtype text3":"Practicals Description Students",
     "practicals-admin-labtype text4":"Practicals Description Tutors",
+
+    "practicals-admin-labtype text1_short":"Deadline Students",
+    "practicals-admin-labtype text2_short":"Deadline Tutors",
 
     "practicals-admin-lab title":"Detail View",
     "practicals-admin-lab text1":"Date",
@@ -339,6 +343,8 @@
     "practicals-view title_information": "Informationen",
     "practicals-view title_datepick": "Terminauswahl",
 
+    "practicals-admin lab": "Termin",
+
     "practicals-admin tutor": "Tutor",
     "practicals-admin group": "Gruppe",
 
@@ -353,6 +359,8 @@
     "practicals-admin-labtype text2":"Registrierungsfrist Tutoren",
     "practicals-admin-labtype text3":"Praktikumsbeschreibung Studenten",
     "practicals-admin-labtype text4":"Praktikumsbeschreibung Tutoren",
+    "practicals-admin-labtype text1_short":"Frist Studenten",
+    "practicals-admin-labtype text2_short":"Frist Tutoren",
 
     "practicals-admin-lab title":"Detailansicht",
     "practicals-admin-lab text1":"Datum",
