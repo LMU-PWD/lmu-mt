@@ -458,7 +458,9 @@ The Main View contains:
                     </div>
 
                     <iron-collapse id="notifications" class="no-desktop">
-                        <notifications-list dialog-modal="false"></notifications-list>
+                        <notifications-list user="[[user]]"
+                                            access-token="[[accessToken]]"
+                                            selected-semester="[[adminSelectedSemesterId]]"></notifications-list>
                     </iron-collapse>
 
                     <div class="larger_geometry_container">
@@ -490,6 +492,7 @@ The Main View contains:
                         <div class="main-page" name="dashboard">
                             <template is="dom-if" if="{{user.isAdmin}}">
                                 <admin-dashboard
+                                        admin-selected-semester-id="{{adminSelectedSemesterId}}"
                                         lab-types="{{labTypes}}"
                                         user="{{user}}"
                                         access-token="[[accessToken]]"
@@ -511,7 +514,9 @@ The Main View contains:
                                         lab-types="[[labTypes]]"></student-dashboard>
                             </template>
 
-                            <notifications-card></notifications-card>
+                            <notifications-card user="[[user]]"
+                                                access-token="[[accessToken]]"
+                                                selected-semester="[[adminSelectedSemesterId]]"></notifications-card>
                         </div>
 
                         <!-- Practical Detail Pages -->

@@ -43,6 +43,14 @@
                 padding: 10px;
             }
 
+            .notification:hover {
+                cursor: pointer;
+            }
+
+            .notification-detail {
+                margin: 10px 15px;
+            }
+
             span.notification-time {
                 color: var(--paper-blue-grey-400);
                 float: right;
@@ -116,6 +124,7 @@
 
         </style>
 
+        <!-- NEW DATE DIALOG -->
         <paper-dialog id="addDateDialog">
 
             <h1>Ein Unique Date hinzufügen</h1>
@@ -166,92 +175,64 @@
             </template>
         </paper-dialog>
 
+        <!-- UPCOMING DATES LIST -->
         <div class="notifications-scrollarea">
 
             <div class="notifications-wrapper">
+
                 <h2 class="notifications-headline-mobile">[[ localize('notifications_header') ]]</h2>
-                <div class="notification">
-                    <paper-icon-button icon="delete" id="remove-0"></paper-icon-button>
-                    <paper-tooltip for="remove-0"
-                                   animation-delay="0">[[ localize('notifications_delete_date') ]]</paper-tooltip>
-                    <h4 class="notification-title">Milchsaufen im Stall mit der Kuh und dem Landwirt</h4>
-                    <span class="notification-time">In 2 Tagen</span>
-                    <div style="clear:both;"></div>
-                </div>
-                <div class="notification">
-                    <paper-icon-button icon="delete" id="remove-1"></paper-icon-button>
-                    <paper-tooltip for="remove-1"
-                                   animation-delay="0">[[ localize('notifications_delete_date') ]]</paper-tooltip>
-                    <h4 class="notification-title">Oscar-Verleihung</h4>
-                    <span class="notification-time">In 5 Tagen</span>
-                    <div style="clear:both;"></div>
-                </div>
-                <div class="notification">
-                    <paper-icon-button icon="delete" id="remove-2"></paper-icon-button>
-                    <paper-tooltip for="remove-2"
-                                   animation-delay="0">[[ localize('notifications_delete_date') ]]</paper-tooltip>
-                    <h4 class="notification-title">Schriftliche Klausur</h4>
-                    <span class="notification-time">In 2 Wochen</span>
-                    <div style="clear:both;"></div>
-                </div>
-                <div class="notification">
-                    <paper-icon-button icon="delete" id="remove-3"></paper-icon-button>
-                    <paper-tooltip for="remove-3"
-                                   animation-delay="0">[[ localize('notifications_delete_date') ]]</paper-tooltip>
-                    <h4 class="notification-title">Milchsaufen im Stall mit der Kuh und dem Landwirt</h4>
-                    <span class="notification-time">In 2 Tagen</span>
-                    <div style="clear:both;"></div>
-                </div>
-                <div class="notification">
-                    <paper-icon-button icon="delete" id="remove-4"></paper-icon-button>
-                    <paper-tooltip for="remove-4"
-                                   animation-delay="0">[[ localize('notifications_delete_date') ]]</paper-tooltip>
-                    <h4 class="notification-title">Oscar-Verleihung</h4>
-                    <span class="notification-time">In 5 Tagen</span>
-                    <div style="clear:both;"></div>
-                </div>
-                <div class="notification">
-                    <paper-icon-button icon="delete" id="remove-5"></paper-icon-button>
-                    <paper-tooltip for="remove-5"
-                                   animation-delay="0">[[ localize('notifications_delete_date') ]]</paper-tooltip>
-                    <h4 class="notification-title">Schriftliche Klausur</h4>
-                    <span class="notification-time">In 2 Wochen</span>
-                    <div style="clear:both;"></div>
-                </div>
-                <div class="notification">
-                    <paper-icon-button icon="delete" id="remove-6"></paper-icon-button>
-                    <paper-tooltip for="remove-6"
-                                   animation-delay="0">[[ localize('notifications_delete_date') ]]</paper-tooltip>
-                    <h4 class="notification-title">Milchsaufen im Stall mit der Kuh und dem Landwirt</h4>
-                    <span class="notification-time">In 2 Tagen</span>
-                    <div style="clear:both;"></div>
-                </div>
-                <div class="notification">
-                    <paper-icon-button icon="delete" id="remove-7"></paper-icon-button>
-                    <paper-tooltip for="remove-7"
-                                   animation-delay="0">[[ localize('notifications_delete_date') ]]</paper-tooltip>
-                    <h4 class="notification-title">Oscar-Verleihung</h4>
-                    <span class="notification-time">In 5 Tagen</span>
-                    <div style="clear:both;"></div>
-                </div>
-                <div class="notification">
-                    <paper-icon-button icon="delete" id="remove-8"></paper-icon-button>
-                    <paper-tooltip for="remove-8"
-                                   animation-delay="0">[[ localize('notifications_delete_date') ]]</paper-tooltip>
-                    <h4 class="notification-title">Schriftliche Klausur</h4>
-                    <span class="notification-time">In 2 Wochen</span>
-                    <div style="clear:both;"></div>
-                </div>
-                <!--p class="notifications-none">[[ localize('notifications_none') ]]</p-->
-                <div class="notifications-actions">
-                    <paper-icon-button icon="add" id="add-date" on-tap="_openDialog"></paper-icon-button>
-                    <paper-tooltip for="add-date"
-                                   animation-delay="0">[[ localize('notifications_add_date') ]]</paper-tooltip>
-                    <div style="clear:both;"></div>
-                </div>
+
+                <template is="dom-if" if="[[datesAvailable]]">
+                    <template is="dom-repeat" items="[[ dates ]]" as="date">
+                        <div class="notification" data-index$="[[index]]" on-tap="_toggleNotificationDetail">
+                            <template is="dom-if" if="[[user.isAdmin]]">
+                                <paper-icon-button icon="delete" id="remove-[[index]]"></paper-icon-button>
+                                <paper-tooltip for="remove-[[index]]"
+                                               animation-delay="0">[[ localize('notifications_delete_date') ]]</paper-tooltip>
+                            </template>
+                            <h4 class="notification-title">[[ date.title ]]</h4>
+                            <span class="notification-time">[[ date.remainingLabel ]]</span>
+                            <div style="clear:both;"></div>
+                        </div>
+                        <iron-collapse id="collapse-[[index]]">
+                            <div class="notification-detail">
+                                <p>Date: [[date.date]]</p>
+                                <p>Location: [[date.location]]</p>
+                            </div>
+                        </iron-collapse>
+                    </template>
+                </template>
+
+                <template is="dom-if" if="[[!datesAvailable]]">
+                    <p class="notifications-none">[[ localize('notifications_none') ]]</p>
+                </template>
+
+                <template is="dom-if" if="[[user.isAdmin]]">
+                    <div class="notifications-actions">
+                        <paper-icon-button icon="add" id="add-date" on-tap="_openDialog"></paper-icon-button>
+                        <paper-tooltip for="add-date"
+                                       animation-delay="0">[[ localize('notifications_add_date') ]]</paper-tooltip>
+                        <div style="clear:both;"></div>
+                    </div>
+                </template>
             </div>
 
         </div>
+
+        <template is="dom-if" if="[[ processingRequest ]]">
+            <div class="spinner-container">
+                <paper-spinner active="[[ processingRequest ]]"></paper-spinner>
+            </div>
+        </template>
+
+        <!-- Getting dates -->
+        <api-request method="[[getAjax.method]]"
+                     headers="[[getAjax.headers]]"
+                     endpoint="[[getAjax.endpoint]]"
+                     semester-filter="[[getAjax.semesterId]]"
+                     on-api-response="_receivedDates"
+                     on-api-error="_receivedDatesError"
+                     loading="{{processingRequest}}"></api-request>
 
         <!--Iron Signal for Localization-->
         <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
@@ -263,15 +244,84 @@
             is: 'notifications-list',
 
             properties: {
+
+                accessToken: {
+                    type: String },
+
+                dates: {
+                    type: Array,
+                    value: []},
+
+                datesAvailable: {
+                    type: Boolean,
+                    computed: '_datesAvailable(dates)'
+                },
+
                 processingRequest: {
                     type: Boolean,
-                    value: false
-                }
+                    value: false },
+
+                selectedSemester: {
+                    type: String,
+                    observer: '_selectedSemesterChanged' },
+
+                user: {
+                    type: Object,
+                    value: {},
+                    observer: '_userChanged' }
             },
 
             behaviors: [
                 Polymer.MyLocalizeBehavior
             ],
+
+            /** API Logic **/
+
+            _selectedSemesterChanged: function (semesterId) {
+
+                this.getAjax = {
+                    headers: {
+                        Authorization: this.accessToken
+                    },
+                    endpoint: '/uniquedates',
+                    method: 'GET',
+                    semesterId: semesterId
+                };
+            },
+
+            _userChanged: function (user) {
+                if (user && !user.isAdmin) {
+                    this.selectedSemester = user.semesterId;
+                }
+            },
+
+            _receivedDates: function (event) {
+                var that = this;
+                var receivedDates = event.detail;
+                var futureDates = receivedDates.filter(function(date){
+                    var now = new Date();
+                    var then = new Date(date.date);
+                    return ((then.getTime() - now.getTime()) > 0);
+                });
+                futureDates.sort(function(a,b){
+                    return new Date(a.date).getTime() - new Date(b.date).getTime();
+                });
+                this.dates = futureDates.map(function(date){
+                    return {
+                        title: date.name,
+                        location: date.location,
+                        date: date.date,
+                        remainingLabel: that._computeRemainingDayString(date.date)
+                    };
+                });
+            },
+
+            _receivedDatesError: function (event) {
+                console.log("error");
+                console.log(event);
+            },
+
+            /** UI Logic **/
 
             _openDialog: function () {
                 this.$.addDateDialog.open();
@@ -283,6 +333,56 @@
 
             _triggerDateCreation: function () {
                 this.$.addDateDialog.close();
+            },
+
+            _toggleNotificationDetail: function (event) {
+                var searchHead = 0, target = event.path[searchHead];
+                while (!target.hasAttribute('data-index')) {
+                    searchHead++;
+                    target = event.path[searchHead];
+                }
+                var targetIndex = target.getAttribute('data-index');
+                this.$$('#collapse-'+targetIndex).toggle();
+            },
+
+            /** Property computers **/
+
+            _datesAvailable: function (dates) {
+                return dates.length > 0;
+            },
+
+            /** Helpers **/
+
+            _computeRemainingDayString: function (dateString) {
+
+                const ONE_DAY_IN_MILLISECONDS = 86400000;
+
+                var date = new Date(dateString);
+                var dateHours = date.getTime() / 3600000;
+                var now = new Date();
+                var endOfDay = new Date();
+                endOfDay.setHours(25);
+                endOfDay.setMinutes(0);
+                endOfDay.setSeconds(0);
+                endOfDay.setMilliseconds(0);
+
+                var diffToEndOfDay = date.getTime() - endOfDay.getTime();
+                var diffToNow = date.getTime() - now.getTime();
+
+                // Date lies in the past
+                if (diffToEndOfDay < 0 && diffToNow < 0) {
+                    return 'vorbei';
+                }
+                // Date is today in the future
+                if (diffToEndOfDay < 0) {
+                    return 'in '+Math.floor(diffToNow/3600000)+' Stunden';
+                }
+                // Date is tomorrow
+                if (diffToEndOfDay < ONE_DAY_IN_MILLISECONDS) {
+                    return 'morgen';
+                }
+                return 'in '+Math.ceil(diffToEndOfDay / ONE_DAY_IN_MILLISECONDS)+' Tagen';
+
             }
         });
     </script>

@@ -71,7 +71,9 @@
             [[ localize('notifications_header') ]]
             <iron-icon src="../../images/notifications.svg"></iron-icon>
         </div>
-        <notifications-list></notifications-list>
+        <notifications-list access-token="[[accessToken]]"
+                            selected-semester="[[selectedSemester]]"
+                            user="[[user]]"></notifications-list>
 
         <template is="dom-if" if="[[ processingRequest ]]">
             <div class="spinner-container">
@@ -90,9 +92,21 @@
             is: 'notifications-card',
 
             properties: {
+
+                accessToken: {
+                    type: String },
+
                 processingRequest: {
                     type: Boolean,
                     value: false
+                },
+
+                selectedSemester: {
+                    type: String },
+
+                user: {
+                    type: Object,
+                    value: {}
                 }
             },
 
