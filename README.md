@@ -63,6 +63,8 @@ Frontend serven in `...\frontend\` auf dem Port `8080`
 polymer serve
 ```
 
+Jetzt ist die App im Browser deiner Wahl unter der url `localhost:8080` erreichbar
+
 ## 
 # Ich bin noch nicht weiter als bis hier
 ## 
