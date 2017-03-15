@@ -162,7 +162,7 @@
 
             <!-- Actions -->
             <div class="buttons">
-                <paper-button class="dialogButton" on-tap="_dialogCancelled" raised>
+                <paper-button class="dialogButton" on-tap="_discardDialog" raised>
                     <iron-icon icon="close" ></iron-icon> [[localize('c_button_discard')]]
                 </paper-button>
                 <paper-button class="dialogButton" on-tap="_triggerDateCreation" raised>
@@ -170,9 +170,9 @@
                 </paper-button>
             </div>
 
-            <template is="dom-if" if="[[ processingRequest ]]">
+            <template is="dom-if" if="[[ processingPostRequest ]]">
                 <div class="spinner-container">
-                    <paper-spinner active="[[ processingRequest ]]"></paper-spinner>
+                    <paper-spinner active="[[ processingPostRequest ]]"></paper-spinner>
                 </div>
             </template>
         </paper-dialog>
@@ -186,6 +186,7 @@
 
                 <template is="dom-if" if="[[datesAvailable]]">
                     <template is="dom-repeat" items="[[ dates ]]" as="date">
+                        <!-- Date list item -->
                         <div class="notification" data-index$="[[index]]" on-tap="_toggleNotificationDetail">
                             <template is="dom-if" if="[[user.isAdmin]]">
                                 <paper-icon-button icon="delete" id="remove-[[index]]"></paper-icon-button>
@@ -196,10 +197,11 @@
                             <span class="notification-time">[[ date.remainingLabel ]]</span>
                             <div style="clear:both;"></div>
                         </div>
+                        <!-- Date detail -->
                         <iron-collapse id="collapse-[[index]]">
                             <div class="notification-detail">
-                                <p>Date: [[date.date]]</p>
-                                <p>Location: [[date.location]]</p>
+                                <p><strong>[[ localize('notifications_detail_date') ]]</strong> [[date.date]]</p>
+                                <p><strong>[[ localize('notifications_detail_location') ]]</strong> [[date.location]]</p>
                             </div>
                         </iron-collapse>
                     </template>
@@ -234,10 +236,33 @@
                      semester-filter="[[getAjax.semesterId]]"
                      on-api-response="_receivedDates"
                      on-api-error="_receivedDatesError"
-                     loading="{{processingRequest}}"></api-request>
+                     loading="{{processingRequest}}"
+                     id="getRequest"></api-request>
+
+        <!-- Posting dates -->
+        <api-request method="[[postAjax.method]]"
+                     body="[[postAjax.body]]"
+                     headers="[[postAjax.headers]]"
+                     endpoint="[[postAjax.endpoint]]"
+                     on-api-response="_postSuccess"
+                     on-api-error="_postError"
+                     loading="{{processingPostRequest}}"
+                     id="postRequest"></api-request>
+
+        <!-- Deleting dates -->
+        <api-request method="[[deleteAjax.method]]"
+                     headers="[[deleteAjax.headers]]"
+                     endpoint="[[deleteAjax.endpoint]]"
+                     on-api-response="_deleteSuccess"
+                     on-api-error="_deleteError"
+                     loading="{{processingRequest}}"
+                     id="deleteRequest"></api-request>
 
         <!--Iron Signal for Localization-->
         <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
+        <iron-signals on-iron-signal-language="_updateRemainingLabels"></iron-signals>
+        <!-- Iron signal for synchronisation of notification list instances -->
+        <iron-signals on-iron-signal-update-notifications="reload"></iron-signals>
 
     </template>
 
@@ -251,6 +276,9 @@
                 accessToken: {
                     type: String },
                 processingRequest: {
+                    type: Boolean,
+                    value: false },
+                processingPostRequest: {
                     type: Boolean,
                     value: false },
                 selectedSemester: {
@@ -294,6 +322,10 @@
                 Polymer.MyLocalizeBehavior
             ],
 
+            reload: function () {
+                this.$.getRequest.trigger();
+            },
+
             /** API Logic **/
 
             _selectedSemesterChanged: function (semesterId) {
@@ -330,6 +362,7 @@
                         title: date.name,
                         location: date.location,
                         date: that._computeDateString(new Date(date.date), date.duration),
+                        dateString: date.date,
                         remainingLabel: that._computeRemainingDayString(date.date)
                     };
                 });
@@ -340,24 +373,61 @@
                 console.log(event);
             },
 
+            _triggerDateCreation: function () {
+                var postDate = this.dialogDate;
+                postDate.setHours(this.dialogHours);
+                postDate.setMinutes(this.dialogMins);
+                this.postAjax = {
+                    body: {
+                        name: this.dialogTitle,
+                        date: postDate,
+                        location: this.dialogLocation,
+                        duration: this.dialogDuration,
+                        semesterId: this.selectedSemester
+                    },
+                    endpoint: '/uniquedates/',
+                    headers: {
+                        Authorization: this.accessToken
+                    },
+                    method: 'POST'
+                };
+            },
+
+            _postSuccess: function (event) {
+                this._discardDialog();
+                this.fire('iron-signal', {name: 'update-notifications', data: this.language});
+            },
+
+            _postError: function (event) {
+
+            },
+
+            deleteSuccess: function (event) {
+
+            },
+
+            deleteError: function (event) {
+
+            },
+
             /** UI Logic **/
 
             _openDialog: function () {
                 this.$.addDateDialog.open();
             },
 
-            _dialogCancelled: function () {
+            _discardDialog: function () {
                 this.$.addDateDialog.close();
+                this._resetDialog();
+            },
+
+            _resetDialog: function () {
                 this.dialogTitle = '';
                 this.dialogDate = new Date();
                 this.dialogHours = 8;
                 this.dialogMins = 0;
                 this.dialogDuration = 90;
                 this.dialogLocation = '';
-            },
-
-            _triggerDateCreation: function () {
-                this.$.addDateDialog.close();
             },
 
             _toggleNotificationDetail: function (event) {
@@ -368,6 +438,19 @@
                 }
                 var targetIndex = target.getAttribute('data-index');
                 this.$$('#collapse-'+targetIndex).toggle();
+            },
+
+            _updateRemainingLabels: function () {
+                var that = this;
+                this.dates = this.dates.map(function(date){
+                    return {
+                        title: date.title,
+                        location: date.location,
+                        date: date.date,
+                        dateString: date.dateString,
+                        remainingLabel: that._computeRemainingDayString(date.dateString)
+                    };
+                });
             },
 
             /** Property computers **/
@@ -395,17 +478,19 @@
 
                 // Date lies in the past
                 if (diffToEndOfDay < 0 && diffToNow < 0) {
-                    return 'vorbei';
+                    return this.localize('notifications_remaining_passed');
                 }
                 // Date is today in the future
                 if (diffToEndOfDay < 0) {
-                    return 'in '+Math.floor(diffToNow/3600000)+' Stunden';
+                    return 'in '+Math.floor(diffToNow/3600000)+' '
+                            +this.localize('notifications_remaining_hours');
                 }
                 // Date is tomorrow
                 if (diffToEndOfDay < ONE_DAY_IN_MILLISECONDS) {
-                    return 'morgen';
+                    return this.localize('notifications_remaining_tomorrow');
                 }
-                return 'in '+Math.ceil(diffToEndOfDay / ONE_DAY_IN_MILLISECONDS)+' Tagen';
+                return 'in '+Math.ceil(diffToEndOfDay / ONE_DAY_IN_MILLISECONDS)+' '
+                        +this.localize('notifications_remaining_days');
             },
 
             _computeTimeString: function (milliseconds) {
