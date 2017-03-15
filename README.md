@@ -39,7 +39,7 @@ npm install
 npm install
 ```
 
-* Bower install der bower-dependencies des Projekts im `\frontend\` Ordner
+* Bower install der bower-dependencies des Projekts im `...\frontend\` Ordner
 
 ```
 bower install
