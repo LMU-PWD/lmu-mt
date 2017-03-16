@@ -315,6 +315,18 @@
             },
 
             /**
+             * Helper Function sorting an array of students object
+             * @return sorted array
+             */
+            sortStudents: function (students) {
+                var sorted = students.sort(function(a, b){
+                    var textA = a.name.toUpperCase();
+                    var textB = b.name.toUpperCase();
+                    return ((textA < textB) ? -1 : (textA > textB) ? 1 : 0); });
+                return sorted;
+            },
+
+            /**
              * Callback on API response to reqgistered Users Request
              * appending received Users to students array
              * generating Request for PendingUsers filtered by Semester & Role
@@ -322,8 +334,9 @@
              */
             _handleStudentsResponse: function (event) {
                 var api_response = event.detail;
+                var sorted = this.sortStudents(api_response);
                 for (var i = 0; i < api_response.length; i++) {
-                    this.push('students', api_response[i]);
+                    this.push('students', sorted[i]);
                 }
 
                 this.ajax_pending = {
@@ -343,8 +356,9 @@
              */
             _handlePendingStudentsResponse: function (event) {
                 var api_response = event.detail;
+                var sorted = this.sortStudents(api_response);
                 for (var i = 0; i < api_response.length; i++) {
-                    this.push('students', api_response[i]);
+                    this.push('students', sorted[i]);
                 }
                 //To Notify Polymer & other Components of changes to students property
                 this.notifyPath('students');

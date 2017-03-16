@@ -283,6 +283,18 @@
             },
 
             /**
+             * Helper Function sorting an array of tutor objects
+             * @return sorted array
+             */
+            sortTutors: function (tutors) {
+                var sorted = tutors.sort(function(a, b){
+                    var textA = a.name.toUpperCase();
+                    var textB = b.name.toUpperCase();
+                    return ((textA < textB) ? -1 : (textA > textB) ? 1 : 0); });
+                return sorted;
+            },
+
+            /**
              * Callback on API response to reqgistered Users Request
              * appending received Users to tutors array
              * generating Request for PendingUsers filtered by Semester & Role
@@ -290,9 +302,10 @@
              */
             _handleTutorsResponse: function (event) {
                 var api_response = event.detail;
-                for (var i = 0; i < api_response.length; i++) {
-                    api_response[i].labCount = 0;
-                    this.push('tutors', api_response[i]);
+                var sorted = this.sortTutors(api_response);
+                for (var i = 0; i < sorted.length; i++) {
+                    sorted[i].labCount = 0;
+                    this.push('tutors', sorted[i]);
                 }
 
                 this.ajax_pending = {
@@ -312,9 +325,10 @@
              */
             _handlePendingTutorsResponse: function (event) {
                 var api_response = event.detail;
-                for (var i = 0; i < api_response.length; i++) {
-                    api_response[i].labCount = 0;
-                    this.push('tutors', api_response[i]);
+                var sorted = this.sortTutors(api_response);
+                for (var i = 0; i < sorted.length; i++) {
+                    sorted[i].labCount = 0;
+                    this.push('tutors', sorted[i]);
                 }
                 this.labCountAjax = {
                     contentType: 'application/json',

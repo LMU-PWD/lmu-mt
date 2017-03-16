@@ -259,6 +259,18 @@
             },
 
             /**
+             * Helper Function sorting an array of admin objects
+             * @return sorted array
+             */
+            sortAdmin: function (admins) {
+                var sorted = admins.sort(function(a, b){
+                    var textA = a.name.toUpperCase();
+                    var textB = b.name.toUpperCase();
+                    return ((textA < textB) ? -1 : (textA > textB) ? 1 : 0); });
+                return sorted;
+            },
+
+            /**
              * Callback on API response to reqgistered Users Request
              * appending received Users to admins array
              * generating Request for PendingUsers filtered by Semester & Role
@@ -266,8 +278,9 @@
              */
             _handleAdminsResponse: function (event) {
                 var api_response = event.detail;
-                for (var i = 0; i < api_response.length; i++) {
-                    this.push('admins', api_response[i]);
+                var sorted = this.sortAdmin(api_response)
+                for (var i = 0; i < sorted.length; i++) {
+                    this.push('admins', sorted[i]);
                 }
 
                 this.ajax_pending = {
@@ -287,8 +300,9 @@
              */
             _handlePendingAdminsResponse: function (event) {
                 var api_response = event.detail;
-                for (var i = 0; i < api_response.length; i++) {
-                    this.push('admins', api_response[i]);
+                var sorted = this.sortAdmin(api_response)
+                for (var i = 0; i < sorted.length; i++) {
+                    this.push('admins', sorted[i]);
                 }
                 this.labCountAjax = {
                     contentType: 'application/json',
