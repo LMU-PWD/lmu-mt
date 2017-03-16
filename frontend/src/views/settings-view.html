@@ -50,7 +50,8 @@
 
                     <section>
                         <h2>Change your password</h2>
-                        <settings-change-password access-token="[[accessToken]]"></settings-change-password>
+                        <settings-change-password access-token="{{accessToken}}"
+                                                  user-email="[[userEmail]]"></settings-change-password>
                     </section>
 
                 </div>
@@ -70,6 +71,10 @@
             properties: {
 
                 accessToken: {
+                    type: String,
+                    notify: true,
+                    value: '' },
+                userEmail: {
                     type: String,
                     value: '' }
             }

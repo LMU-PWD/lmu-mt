@@ -60,7 +60,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 fallback-selection="error">
             <main-view
                     name="main"
-                    access-token="{{ session.accessToken }}"
+                    access-token="{{ accessToken }}"
                     user="{{user}}"
                     route="{{subRoute}}"></main-view>
             <login-view
@@ -69,6 +69,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <error-view name="error"></error-view>
 
         </iron-pages>
+
+        <pre style="position:fixed; bottom: 0;">[[accessToken]]</pre>
 
         <!--Iron Signal for Localization-->
         <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
@@ -93,14 +95,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 routeData: {
                     type: Object
                 },
-                session: {
-                    type: Object,
-                    value: {
-                        accessToken: null,
-                        loggedIn: false,
-                        userId: null
-                    }
-                },
+                accessToken: {
+                    type: String,
+                    value: '' },
+                loggedIn: {
+                    type: Boolean,
+                    value: false },
+                userId: {
+                    type: String,
+                    value: '' },
                 user: {
                     type: Object
                 }
@@ -123,16 +126,16 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
                 if (cookieAccessToken !== '' && cookieUserId !== '') {
 
-                    this.set('session.accessToken', cookieAccessToken);
-                    this.set('session.userId', cookieUserId);
+                    this.set('accessToken', cookieAccessToken);
+                    this.set('userId', cookieUserId);
 
                     //Fire User Request to verify Cooke Credentials
                     this.ajax = {
                         headers: {
-                            Authorization: this.session.accessToken
+                            Authorization: this.accessToken
                         },
                         method: 'GET',
-                        endpoint: '/platformusers/' + this.session.userId
+                        endpoint: '/platformusers/' + this.userId
                     };
                 } else {
                     //Reset Cookies, if parts left
@@ -176,7 +179,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 //                console.log(response);
                 this.set('route.path', '/main');
                 this.set('routeData.page', 'main');
-                this.set('session.loggedIn', true);
+                this.set('loggedIn', true);
             },
 
             /**
@@ -201,7 +204,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
              */
             _routeChanged: function () {
                 //Checking isLoading to wait for API Request on User Info
-                if (!this.session.loggedIn && !this.isLoading ) {
+                if (!this.loggedIn && !this.isLoading ) {
                     this.set('route.path', '/login');
                     this.set('routeData.page', 'login');
                 }
@@ -213,10 +216,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
              * @private
              */
             _fireLogoutRequest: function () {
-                if (this.session.loggedIn) {
+                if (this.loggedIn) {
                     this.ajaxLogout = {
                         headers: {
-                            'Authorization': this.session.accessToken
+                            'Authorization': this.accessToken
                         },
                         method: 'POST',
                         endpoint: '/platformusers/logout'
@@ -257,8 +260,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
              */
             _handleLogin: function (event) {
 
-                this.set('session.accessToken', event.detail.id);
-                this.set('session.userId', event.detail.userId);
+                this.set('accessToken', event.detail.id);
+                this.set('userId', event.detail.userId);
 
                 this.ajax = {
                     headers: {
