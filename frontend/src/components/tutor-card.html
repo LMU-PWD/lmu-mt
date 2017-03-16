@@ -393,8 +393,8 @@
 
             _showDatepicker: function() {
 
-                if(this.labtypeAudio.tutorsDistributed && this.labtypeFoto.tutorsDistributed && this.labtypeVideo.tutorsDistributed )
-                    return true
+                if(!this.labtypeAudio.tutorsDistributed || !this.labtypeFoto.tutorsDistributed || !this.labtypeVideo.tutorsDistributed )
+                    return true;
 
                 this.$.tab_calendar.classList.toggle("dark-tab");
 
