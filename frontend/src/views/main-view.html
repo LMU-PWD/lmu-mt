@@ -711,6 +711,8 @@ The Main View contains:
             },
 
             _userChanged: function (detail) {
+//                console.log(detail);
+
 
                 this.ajax_labTypes = {
                     headers: {
@@ -938,37 +940,37 @@ The Main View contains:
          * @param event
          * @private
          */
-//        _handleAllLabsRequest: function (event) {
-//            console.log('_handleLabRequest()');
-//            console.log(event.detail);
-//
-//            if(!this.isReady || this.gotLabTypes == false)
-//                return;
-//
-//            for (var i = 0; i < event.detail.length; i++) {
-//                if (event.detail[i].labTypeId == this.labtype_foto.id){
-//                    this.all_labs_foto.push(event.detail[i]);
-//                }
-//                if (event.detail[i].labTypeId == this.labtype_video.id) {
-//                    this.all_labs_video.push(event.detail[i]);
-//                }
-//                if (event.detail[i].labTypeId == this.labtype_audio.id){
-//                    this.all_labs_audio.push(event.detail[i]);
-//                }
-//
-//                this.allLabs.push(event.detail[i]);
-//            }
-//
-//            //console.log("AllLabs: ");
-//            //console.log(this.allLabs);
-//            //console.log(this.all_labs_foto);
-//            //console.log(this.all_labs_video);
-//            //console.log(this.all_labs_audio);
-//
-//            if (this.semesterId && this.labTypesRequestSent) {
-//                this.labsRequestSent = true;
-//            }
-//        },
+        _handleAllLabsRequest: function (event) {
+            console.log('_handleLabRequest()');
+            console.log(event.detail);
+
+            if(!this.isReady || this.gotLabTypes == false)
+                return;
+
+            for (var i = 0; i < event.detail.length; i++) {
+                if (event.detail[i].labTypeId == this.labtype_foto.id){
+                    this.all_labs_foto.push(event.detail[i]);
+                }
+                if (event.detail[i].labTypeId == this.labtype_video.id) {
+                    this.all_labs_video.push(event.detail[i]);
+                }
+                if (event.detail[i].labTypeId == this.labtype_audio.id){
+                    this.all_labs_audio.push(event.detail[i]);
+                }
+
+                this.allLabs.push(event.detail[i]);
+            }
+
+            //console.log("AllLabs: ");
+            //console.log(this.allLabs);
+            //console.log(this.all_labs_foto);
+            //console.log(this.all_labs_video);
+            //console.log(this.all_labs_audio);
+
+            if (this.semesterId && this.labTypesRequestSent) {
+                this.labsRequestSent = true;
+            }
+        },
 
         /**
          * Initializes and sets group-priorities-property for each lab
@@ -1015,8 +1017,13 @@ The Main View contains:
                     name = 'photo';
                     customColor = '#78909c';
                 } else if(labObject.type_str.includes("Video" || "video")){
-                    name = 'video';
-                    customColor = '#546e7a';
+                    if(labObject.type_str.includes("schnitt" || "edit")){
+                        name = 'edit';
+                        customColor = '#546e7a';
+                    } else{
+                        name = 'video';
+                        customColor = '#546e7a';
+                    }
                 } else if(labObject.type_str.includes("Audio" || "audio")){
                     name = 'audio';
                     customColor = '#455a64';

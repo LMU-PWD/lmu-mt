@@ -32,6 +32,9 @@
               color: var(--paper-blue-grey-50);
               text-align: center;
             }
+            .titles{
+                text-align: center;
+            }
             paper-tab{
               --paper-tab-ink:var(--paper-blue-grey-100);
               font-weight: 300;
@@ -51,7 +54,8 @@
               z-index: 1;
             }
             .content{
-              padding: 10px;
+                padding: 10px;
+                margin: 24px;
             }
         </style>
 
@@ -65,14 +69,14 @@
         <div class="page">
             <img class="icon" src="../../images/[[name]].svg" z-index="1">
             <paper-tabs selected="{{selectedTab}}" class="tabheader" no-slide>
-                <paper-tab class="tabheaderbuttons">Allgemein</paper-tab>
-                <paper-tab class="tabheaderbuttons">Termine</paper-tab>
+                <paper-tab class="tabheaderbuttons">[[ localize('practicals-view tab_general') ]]</paper-tab>
+                <paper-tab class="tabheaderbuttons">[[ localize('practicals-view tab_dates') ]]</paper-tab>
             </paper-tabs>
             <div class="content">
-                <h1>[[labType.type_str]] Praktikum</h1>
+                <h1 class="titles">[[labType.type_str]] [[ localize('practicals-view title_practical') ]]</h1>
                 <iron-pages selected="[[selectedTab]]">
                     <div>
-                        <h1>Informationen</h1>
+                        <!--h1 class="titles">[[ localize('practicals-view title_information') ]]</h1-->
                         <template is="dom-if" if="[[user.isTutor]]">
                             <p>[[labType.description_tutor]]</p>
                         </template>
@@ -81,7 +85,7 @@
                         </template>
                     </div>
                     <div>
-                        <h1>Terminauswahl</h1>
+                        <!--h1 class="titles">[[ localize('practicals-view title_datepick') ]]</h1-->
                         <practicals-students-date-detail id="detailView"
                                                          group="{{ group }}"
                                                          user="{{ user }}"
@@ -93,6 +97,9 @@
                 </iron-pages>
             </div>
         </div>
+
+        <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
+
     </template>
 
     <script>
@@ -145,6 +152,9 @@
                     observer: '_labTypeChanged'
                 }
             },
+            behaviors: [
+                Polymer.MyLocalizeBehavior
+            ],
 
             _groupChanged: function (detail) {
                 var newLabData = {lab: {}, priorities: []};
@@ -162,9 +172,14 @@
                     }
                 }
                 this.set('labData', newLabData);
-            },
 
+                //Just for Testing
+                //console.log(this.labType.type_str + ": Updated labData");
+                //console.log(this.labData);
+
+            },
             _userChanged: function (detail) {
+//                console.log(detail);
 
                 this.ajax_labs = {
                     headers: {
@@ -177,13 +192,13 @@
 
             },
             _labTypeChanged: function (response) {
-
+                //console.log(detail);
                 this.customStyle['--color'] = this.labType.color;
                 this.updateStyles();
             },
-
             _handleAllLabsRequest: function (response) {
                 this.set('allLabs',response.detail);
+                //console.log(this.allLabs);
             }
         });
     </script>

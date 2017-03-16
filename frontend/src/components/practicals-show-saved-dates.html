@@ -32,6 +32,7 @@
                 chosenlabs:{
                     type: Array,
                     value: [],
+                    notify: true,
                     observer: '_labsChanged'
                 },
                 chosenLabsList: {
@@ -54,7 +55,14 @@
                     return
 
             },
-
+            behaviors: [
+                Polymer.MyLocalizeBehavior
+            ],
+//            _labsChanged: function(labs){
+//                this.chosenlabs = labs;
+//                //console.log(this.chosenlabs);
+//                this.$.saved_dates.render();
+//            },
             /**
              * Creates string from the given date
              * @param {String} date - date that will be transformed to String
@@ -93,7 +101,7 @@
                 if(minutes<10){
                     minutes = "0"+minutes;
                 }
-                datestring = datestring+date.getDate()+"."+date.getMonth()+"."+date.getFullYear()+
+                datestring = datestring+date.getDate()+"."+(date.getMonth()+1)+"."+date.getFullYear()+
                     " um "+hours+":"+minutes+" Uhr";
                 return datestring;
             },
@@ -152,7 +160,7 @@
                         endminutes = "0"+endminutes;
                     }
 
-                    return datestring+lab[0].getDate()+"."+lab[0].getMonth()+"."+lab[0].getFullYear()+
+                    return datestring+lab[0].getDate()+"."+ (lab[0].getMonth()+1) +"."+lab[0].getFullYear()+
                         ", "+starthours +":"+startminutes+" - "+endhours+":"+endminutes+" Uhr";
                 }
             }

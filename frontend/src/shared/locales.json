@@ -135,9 +135,16 @@
     "admin_dashboard tutors" : "Tutors",
     "admin_dashboard semester" : "Terms",
 
+    "practicals-student-date no_registration":"Registration is not open!",
+    "practicals-student-date change_selection":"Change selection",
+    "practicals-student-date priority" : "Priority",
+    "practicals-student-date priorities_min" : "low",
+    "practicals-student-date priorities_max" : "high",
     "practicals-student-date labDate_1" : "Your practical takes place on ",
     "practicals-student-date labDate_2" : ", the  ",
     "practicals-student-date labDate_3" : ", starting at ",
+    "practicals-student-date info_chosen_dates" : "These dates have been chosen by your group: ",
+    "practicals-student-date error_text": "Please choose exactly 5 lab dates!",
 
     "general_weekdays 0": "Sunday",
     "general_weekdays 1": "Monday",
@@ -147,6 +154,13 @@
     "general_weekdays 5": "Friday",
     "general_weekdays 6": "Saturday",
 
+    "general_hours": "hours",
+
+    "practicals-view tab_general": "General",
+    "practicals-view tab_dates": "Dates",
+    "practicals-view title_practical": "practical",
+    "practicals-view title_information": "Information",
+    "practicals-view title_datepick": "Date selection"
     "tutor_card_heading_select-date": "Choose your free dates",
     "tutor_card_audio-practical": "Audio Practical",
     "tutor_card_video-practical": "Video Practical",
@@ -336,9 +350,16 @@
     "admin_dashboard tutors" : "Tutoren",
     "admin_dashboard semester" : "Semester",
 
+    "practicals-student-date no_registration":"Die Terminwahl ist noch nicht freigeschalten!",
+    "practicals-student-date change_selection":"Auswahl ändern",
+    "practicals-student-date priority" : "Priorität",
+    "practicals-student-date priorities_min" : "gering",
+    "practicals-student-date priorities_max" : "hoch",
     "practicals-student-date labDate_1" : "Dein Praktikumstermin ist am ",
     "practicals-student-date labDate_2" : ", den ",
     "practicals-student-date labDate_3" : ", ab ",
+    "practicals-student-date info_chosen_dates" : "Deine Gruppe hat diese Termine ausgewählt: ",
+    "practicals-student-date error_text": "Bitte wähle genau 5 Termine!",
 
     "general_weekdays 0": "Sonntag",
     "general_weekdays 1": "Montag",
@@ -346,7 +367,13 @@
     "general_weekdays 3": "Mittwoch",
     "general_weekdays 4": "Donnerstag",
     "general_weekdays 5": "Freitag",
-    "general_weekdays 6": "Samstag"
+    "general_weekdays 6": "Samstag",
+    "general_hours": "Uhr",
 
+    "practicals-view tab_general": "Allgemein",
+    "practicals-view tab_dates": "Termine",
+    "practicals-view title_practical": "Praktikum",
+    "practicals-view title_information": "Informationen",
+    "practicals-view title_datepick": "Terminauswahl"
   }
 }
