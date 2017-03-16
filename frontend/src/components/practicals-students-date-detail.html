@@ -1,5 +1,6 @@
 <link rel="import" href="../components/practicals-students-date-selector.html">
 <link rel="import" href="../components/practicals-show-saved-dates.html">
+<link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
 <!--Localization Imports-->
 <link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
 <link rel="import" href="../services/my-localize-behavior.html">
@@ -9,12 +10,6 @@
         <style include="shared-styles">
             :host {
                 #display: block;
-            }
-            .page{
-                #border-radius: 25px;
-                margin: 24px;
-                background-color: var(--paper-blue-grey-100);
-                color: var(--paper-blue-grey-900);
             }
             .tabheader{
                 background-color: var(--paper-blue-grey-900);
@@ -32,8 +27,9 @@
                 --paper-icon-button-ink-color:var(--paper-blue-grey-300);
                 padding-right: 30px;
             }
-            .content{
-                padding: 10px;
+            #error_toast {
+                --paper-toast-background-color: var(--paper-red-600);
+                --paper-toast-color: white;
             }
         </style>
 
@@ -69,10 +65,10 @@
                         <!-- Deadline is not over, Registration Open and dates selected; Show saved dates!-->
                         <practicals-show-saved-dates id="practicals_show_saved_dates"
                                                      chosenlabs="{{chosenlabs_transformed}}"
-                                                     title="Deine Gruppe hat diese Termine ausgewählt:"></practicals-show-saved-dates>
+                                                     title="[[ localize('practicals-student-date info_chosen_dates') ]]"></practicals-show-saved-dates>
                         <paper-button raised class="changeButton" on-tap="_handleChangeClick">
                             <iron-icon icon="reply"></iron-icon>
-                            Auswahl ändern
+                            [[ localize('practicals-student-date change_selection') ]]
                         </paper-button>
                     </template>
                 </template>
@@ -81,14 +77,14 @@
                     <template is="dom-if" if="[[!practical_date.exists]]">
                         <!-- Deadline is over, Registration has been started but Practical Date is not given -->
                         <practicals-show-saved-dates chosenlabs="{{chosenlabs_transformed}}"
-                                                     title="Deine Gruppe hat diese Termine ausgewählt:"></practicals-show-saved-dates>
+                                                     title="[[ localize('practicals-student-date info_chosen_dates') ]]"></practicals-show-saved-dates>
                     </template>
                     <template is="dom-if" if="[[practical_date.exists]]">
                         <!-- Deadline is over, Registration has been started and Practical Date is given-->
                         <div>
-                            {{localize('practicals-student-date labDate_1')}}
-                            [[practical_date.weekday]]{{localize('practicals-student-date labDate_2')}}
-                            [[practical_date.date]]{{localize('practicals-student-date labDate_3')}}
+                            [[ localize('practicals-student-date labDate_1') ]]
+                            [[practical_date.weekday]][[ localize('practicals-student-date labDate_2') ]]
+                            [[practical_date.date]][[ localize('practicals-student-date labDate_3') ]]
                             [[practical_date.time]]
                         </div>
                     </template>
@@ -97,10 +93,12 @@
             <template is="dom-if" if="[[!registration_open]]">
                 <!-- Registration Open Bool from Api is false; Registration not opened yet -->
                 <div>
-                    Die Terminwahl ist noch nicht freigeschalten!
+                    [[ localize('practicals-student-date no_registration') ]]
                 </div>
             </template>
         </div>
+
+        <paper-toast id="error_toast" class="fit-bottom" text="[[ localize('practicals-student-date error_text') ]] "></paper-toast>
 
         <!--Iron Signal for Localization-->
         <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
@@ -132,7 +130,7 @@
                 },
                 priority:{
                     type: Number,
-                    value: 2
+                    value: 5
                 },
                 registration_open:{
                     type: Boolean,
@@ -175,21 +173,16 @@
 
                 //Set Registration_Open
                 this.set('registration_open',this.labType.registration_open);
-                //console.log(this.allLabs);
+//                console.log(this.labType.type_str+" labdata Changed");
+//                console.log(this.labData);
+//                console.log(this.allLabs);
                 //console.log(this.labType.registration_open);
-
-
-
-
-                console.log(Object.keys(this.labData.lab).length);
+                //console.log(Object.keys(this.labData.lab).length);
+                //console.log(detail);
                     if(detail.lab.id){
                         //If Specific Lab exists -> lab has been set
                         //console.log(this.labType.type_str+": Received labData, lab Set:");
                         //console.log(detail.lab);
-                        //this.set('before_deadline',false);
-                        //this.set('practical_date_exists',true);
-                        //var d = new Date(detail.lab.date);
-                        //this.set('practical_date_string', d.toLocaleString().slice(0,-3));
                         this.setDate(detail.lab.date,'practical_date');
                         if(this.before_deadline){
                             console.log("ERROR: Die Praktikumsdaten können nicht vor der Deadline zugewiesen sein. Daten sind hier inkorrekt! LabType: "+this.labType.type_str);
@@ -202,20 +195,33 @@
                         if(this.allLabs == [] || this.allLabs == null){
                             this.set('registration_open',false);
                         }
-
                         if(detail.priorities.length){
                             //Priorities exist -> show Priorities
+                            this.chosenlabs = [];
                             this.set('labs_already_chosen',true);
-                            //console.log(this.labType.type_str+": Received labData, priorities Set:");
-                            //console.log(detail.priorities);
+                            for(var i = 0; i< this.allLabs.length; i++){
+                                for(var j = 0; j< detail.priorities.length; j++){
+                                    if(i==0){
+                                        //First time the loop is passing through the chosenlabs-Array
+                                        this.chosenlabs.push({});
+                                    }
+                                    if(detail.priorities[j].labId == this.allLabs[i].id){
+                                        this.chosenlabs[this.labData.priorities[j].priority - 1] = this.allLabs[i];
+                                    }
+                                }
+                            }
+                            //this.chosenlabs = detail.priorities;
+//                            console.log(this.labType.type_str+": Received labData, priorities Set:");
+//                            console.log(this.chosenlabs);
 
-                            this.chosenlabs = this.labData.priorities;
-                            this.chosenlabs_transformed = this._transformLabs(this.chosenlabs,false);
+                            this.chosenlabs_transformed = this._transformLabs(this.chosenlabs, false);
+//                            console.log(this.chosenlabs_transformed);
+
                         }else{
                             //Neither Lab nor Priorities set -> show date Picker
                             this.set('labs_already_chosen',false);
-                            //console.log(this.labType.type_str+": Received labData, nothing Set:");
-                            //console.log(detail);
+//                            console.log(this.labType.type_str+": Received labData, nothing Set:");
+//                            console.log(detail);
 
                             if(!this.before_deadline){
                                 console.log("ERROR: Die Deadline ist vorbei und trotzdem existieren weder zugewiesene noch ausgewählte Labs. Daten sind hier inkorrekt! LabType: "+this.labType.type_str);
@@ -223,6 +229,8 @@
                         }
                     }
                 //console.log(this.labType);
+                //console.log(this.chosenlabs);
+                //console.log(this.chosenlabs_transformed);
             },
 
 
@@ -250,14 +258,37 @@
             _handleBackTap: function(e) {
                 this.chosenlabs = [];
                 var practicals_date_selector = Polymer.dom(this.root).querySelector("#practicalsDateSelector");
-                //console.log(practicals_date_selector);
+//                console.log(practicals_date_selector);
                 if(practicals_date_selector) {
                     practicals_date_selector._handleResetClick();
                 }
             },
             _allLabsChanged: function (detail) {
                 //console.log(this.labType.type_str+": Received allLabs:");
-                //console.log(detail);
+//                console.log(detail);
+                if(this.labData && this.labData.priorities && this.labData.priorities.length > 0){
+                    //Priorities exist -> show Priorities
+//                    console.log(this.labData.priorities);
+                    this.chosenlabs = [];
+                    this.set('labs_already_chosen',true);
+                    for(var i = 0; i< this.allLabs.length; i++){
+                        for(var j = 0; j< this.labData.priorities.length; j++){
+                            if(i==0){
+                                //First time the loop is passing through the chosenlabs-Array
+                                this.chosenlabs.push({});
+                            }
+                            if(this.labData.priorities[j].labId == this.allLabs[i].id){
+                                this.chosenlabs[this.labData.priorities[j].priority - 1] = this.allLabs[i];
+                            }
+                        }
+                    }
+                    //this.chosenlabs = detail.priorities;
+//                    console.log(this.labType.type_str+": Received labs, priorities Set:");
+//                    console.log(this.chosenlabs);
+
+                    this.chosenlabs_transformed = this._transformLabs(this.chosenlabs, false);
+//                    console.log(this.chosenlabs_transformed);
+                }
             },
 
             /**
@@ -269,11 +300,12 @@
                 //console.log(e.target.chosenlabs);
                 var labcounter = 0;
                 for(i=0; i< e.target.chosenlabs.length; i++){
-                    if(e.target.chosenlabs[i] != null){
+                    if(e.target.chosenlabs[i]){
                         labcounter++;
                     }
                 }
-                if(labcounter == e.target.chosenlabs.length && labcounter != 0){
+                //console.log(labcounter);
+                if(labcounter != 0 && labcounter == this.priority ){
                     this.chosenlabs = [];
                     this.chosenlabs = e.target.chosenlabs;
                     this.chosenlabs_transformed = this._transformLabs(this.chosenlabs,false);
@@ -295,10 +327,14 @@
                         headers: {
                             'Authorization': this.accessToken
                         },
+                        body:{
+                            groupId:this.user.groupId,
+                            labTypeId: this.labType.id
+                        },
                         method: 'DELETE',
-                        endpoint: '/groups/'+this.user.groupId+'/Priorities?filter[where][labTypeId]=' + this.labType
+                        endpoint: '/Priorities/deleteByGroupAndLabType/'
                     };
-
+//                    console.log(this.ajax_delete);
                     this.labs_already_chosen = true;
                     var practicals_show_saved_dates = Polymer.dom(this.root).querySelector("#practicals_show_saved_dates");
                     if(practicals_show_saved_dates) {
@@ -306,7 +342,8 @@
                     }
                 }
                 else{
-                    alert("Error: Not enough labs chosen. Just "+labcounter+" labs chosen.");
+//                    alert("Error: Not enough labs chosen. Just "+labcounter+" labs chosen.");
+                    this.$.error_toast.open();
                 }
             },
             /**
@@ -372,7 +409,7 @@
              */
             _getDateString: function(date){
                 var datestring = "";
-                //console.log(date);
+//                console.log(date);
                 switch(date.getDay()){
                     case 0:
                         datestring = "Sonntag, den ";
@@ -399,9 +436,10 @@
                 var hours = date.getHours();
                 var minutes = date.getMinutes();
                 var day = date.getDate();
-                var month = date.getMonth();
+                var month = date.getMonth()+1;
 
                 if(hours<10){
+                    hours = "0"+hours;
                     hours = "0"+hours;
                 }
                 if(minutes<10){
@@ -425,49 +463,53 @@
              * @private
              */
             _transformLabs: function(labsFromApi,divideDates){
-                //console.log(labsFromApi);
+//                console.log("labs to transform:");
+//                console.log(labsFromApi);
                 var transformedLabs = []; //Store return-Array here
-                var lastLab = new Date(labsFromApi[0].date);
-                var countDates = 0; //Date counter
-                var countLabs = 0; //lab counter
-                var dates = [];
 
-                for(i=0; i<labsFromApi.length; i++){
-                    // Create a new array-entrie if date from recent lab is different from date of the last lab
-                    var labdate = new Date(labsFromApi[i].date);
-                    if(labdate.getFullYear() != lastLab.getFullYear() ||
-                        labdate.getMonth() != lastLab.getMonth() ||
-                        labdate.getDate() != lastLab.getDate()) {
-                        dates = [];
-                        lastlab = labdate.date;
-                        transformedLabs.push([]);
-                        countDates++;
-                        countLabs = 0;
-                    }
-                    var endtime = new Date(labdate.getFullYear(), labdate.getMonth(), labdate.getDate());
-                    if((labdate.getMinutes() + (labsFromApi[i].duration % 60)) > 60){
-                        endtime.setHours(1+Math.floor(labdate.getHours()+(labsFromApi[i].duration) / 60));
-                        endtime.setMinutes(labdate.getMinutes() + (labsFromApi[i].duration % 60)-60);
-                    }
-                    else{
-                        endtime.setHours(Math.floor(labdate.getHours()+(labsFromApi[i].duration) / 60));
-                        endtime.setMinutes(labdate.getMinutes() + (labsFromApi[i].duration % 60));
-                    }
+                if(labsFromApi[0] && labsFromApi[0].date) {
+                    var lastLab = new Date(labsFromApi[0].date);
+                    var countDates = 0; //Date counter
+                    var countLabs = 0; //lab counter
+                    var dates = [];
 
-                    var lab = [];
-                    lab = [labdate, endtime];
-                    if(divideDates){
-                        dates[countLabs] = lab;
-                        transformedLabs[countDates] = dates;
-                        countLabs++;
-                    }
-                    else{
-                        transformedLabs[i]=lab;
-                    }
+                    for (i = 0; i < labsFromApi.length; i++) {
+                        // Create a new array-entrie if date from recent lab is different from date of the last lab
+                        var labdate = new Date(labsFromApi[i].date);
+                        if (labdate.getFullYear() != lastLab.getFullYear() ||
+                            labdate.getMonth() != lastLab.getMonth() ||
+                            labdate.getDate() != lastLab.getDate()) {
+                            dates = [];
+                            lastLab = labdate;
+                            transformedLabs.push([]);
+                            countDates++;
+                            countLabs = 0;
+                        }
+                        var endtime = new Date(labdate.getFullYear(), labdate.getMonth(), labdate.getDate());
+                        if ((labdate.getMinutes() + (labsFromApi[i].duration % 60)) > 60) {
+                            endtime.setHours(1 + Math.floor(labdate.getHours() + (labsFromApi[i].duration) / 60));
+                            endtime.setMinutes(labdate.getMinutes() + (labsFromApi[i].duration % 60) - 60);
+                        }
+                        else {
+                            endtime.setHours(Math.floor(labdate.getHours() + (labsFromApi[i].duration) / 60));
+                            endtime.setMinutes(labdate.getMinutes() + (labsFromApi[i].duration % 60));
+                        }
 
+                        var lab = [];
+                        lab = [labdate, endtime];
+                        if (divideDates) {
+                            dates[countLabs] = lab;
+                            transformedLabs[countDates] = dates;
+                            countLabs++;
+                        }
+                        else {
+                            transformedLabs[i] = lab;
+                        }
+
+                    }
+                    //console.log("transformed labs: ");
+                    //console.log(transformedLabs);
                 }
-                //console.log("transformed labs: ");
-                //console.log(transformedLabs);
                 return transformedLabs;
             },
             /**
@@ -476,7 +518,7 @@
              * @private
              */
             _responseFromPrioritySave: function(response) {
-                //console.log(response);
+//                console.log(response);
             },
             /**
              * Gets response from API call to create a new priority
@@ -484,7 +526,7 @@
              * @private
              */
             _responseFromPrioritySaveDelete: function(response) {
-                //console.log(response);
+//                console.log(response);
                 this.ajax = {
                     headers: {
                         'Authorization': this.accessToken

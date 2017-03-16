@@ -6,6 +6,7 @@
     <template>
 
         <iron-ajax auto
+                   id="request"
                    body="[[ body ]]"
                    content-type="[[ contentType ]]"
                    handle-as="json"
@@ -76,10 +77,14 @@
                 }
             },
 
+            trigger: function () {
+                this.$$('iron-ajax').generateRequest();
+            },
+
             _handleResponse: function (response) {
                 this.fire('api-response', response.detail.response);
                 //Console Info to check if all received data is reset on logout
-                console.info("Received "+ this.endpoint)
+//                console.info("Received "+ this.endpoint)
             },
 
             _handleError: function (response) {
@@ -88,13 +93,14 @@
 
             _computeUrl: function () {
                 if (this.baseUrl && this.endpoint && this.baseUrl != '' && this.endpoint != '') {
-
+                    console.log('computing API url for endpoint '+this.endpoint)
                     this.url =
                             this.baseUrl +
                             this.endpoint +
                             ((this.semesterFilter != '')
                                     ? '?filter[where][semesterId]=' + this.semesterFilter
                                     : '');
+                    console.log(this.url);
                 }
             }
 

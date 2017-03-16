@@ -4,106 +4,117 @@
 <link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
 <link rel="import" href="../services/my-localize-behavior.html">
 
+<dom-module is="notifications-card">
 
-<dom-module id="notifications-card">
     <template>
-        <style  include="shared-styles">
-            hr {
-                margin: 0;
-            }
-            .notificationlist_container {
-                color: black;
-                background: #FFFFFF;
-                margin-top: 15px;
-                margin-left: 5px;
-                border-left: 5px solid var(--paper-orange-400);
-            }
-            .notification_item {
-                font-size: 14px;
-                margin: 2px;
-                border-radius: 2px;
-                padding: 10px;
-                border-bottom: 1px solid var(--paper-grey-300);
-            }
-            .notification_item:last-child {
-                border-bottom: none;
-            }
-            .notification_noitems {
-                border-left-color: var(--paper-blue-grey-400);
 
-            }
-            .notification_noitems .notification_item {
-                color: var(--paper-blue-grey-300);
+        <style include="shared-styles">
+
+            /*Notification Styles*/
+            :host {
+                display: none;
+                visibility: hidden;
             }
 
-            .date{
-                font-size: 12px;
-                color: var(--paper-grey-500);
-                float: right;
+            .spinner-container {
+                 background-color: rgba(255,255,255,0.8);
+                 display: block;
+                 height: 100%;
+                 left: 0;
+                 margin: 0 !important;
+                 padding: 0 !important;
+                 position: absolute;
+                 text-align: center;
+                 top: 0;
+                 width: 100%;
+                 z-index: 100000;
+            }
+
+            paper-spinner[active] {
+                height: 50px;
+                margin: auto;
+                top: calc(50% - 25px);
+                width: 50px;
+            }
+
+            /*Desktop*/
+            @media screen and (min-width: 1024px) {
+                :host {
+                    display: inline;
+                    visibility: visible;
+                    float: right;
+                    margin: 15px 10px;
+                    width: calc(30% - 20px);
+                    height: 370px;
+                    background-color: var(--paper-blue-grey-100);
+                }
+                .notifications-header {
+                    background-color: var(--paper-blue-grey-500);
+                    height: 50px;
+                    line-height: 50px;
+                    padding: 0 20px;
+                    color: var(--paper-blue-grey-50);
+                    border-bottom: 1px solid var(--paper-blue-grey-900);
+                }
+
+                .notifications-header > iron-icon{
+                    float: right;
+                    height: 32px;
+                    width: 32px;
+                    margin: 9px 0;
+                }
             }
 
         </style>
 
-
-        <div class="notificationlist_container notification_noitems">
-            <!--
-            <div class="notification_item">
-                <span class="text">
-                Die Gruppenzuteilung ist jetzt freigeschalten! Trage dich jetzt in eine Gruppe ein, damit du
-                zusammen mit deinen Freunden arbeiten kannst und nicht mit irgendwelchen random Leuten
-                was machen musst! Das wäre doch blöd... </span>
-                <span class="date">vor 10 Minuten</span>
-            </div>
-            <div class="notification_item">
-                <span>Die Terminwahl ist jetzt freigeschalten!</span>
-                <span class="date">gestern</span>
-            </div>
-            <div class="notification_item">
-                hallo
-                <span class="date">01.01.2001</span>
-            </div>
-            -->
-            <h1>[[length]]</h1>
-
-            <template is="dom-repeat" items="[[notifications]]">
-                <div class="notification_item">
-                    <span class="text">[[item.text]]</span>
-                    <span class="date">[[item.date]]</span>
-                </div>
-            </template>
-            <template is="dom-if" if="!{{length}}">
-                <div class="notification_item">
-                    <span class="text">{{localize('notifications-card none')}}</span>
-                </div>
-            </template>
-
-            <!--Iron Signal for Localization-->
-            <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
-
-
+        <div class="notifications-header">
+            [[ localize('notifications_header') ]]
+            <iron-icon src="../../images/notifications.svg"></iron-icon>
         </div>
+        <notifications-list access-token="[[accessToken]]"
+                            selected-semester="[[selectedSemester]]"
+                            user="[[user]]"></notifications-list>
+
+        <template is="dom-if" if="[[ processingRequest ]]">
+            <div class="spinner-container">
+                <paper-spinner active="[[ processingRequest ]]"></paper-spinner>
+            </div>
+        </template>
+
+        <!--Iron Signal for Localization-->
+        <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
+
     </template>
 
     <script>
-      Polymer({
 
-        is: 'notifications-card',
+        Polymer({
+            is: 'notifications-card',
 
-        properties: {
-          notifications: {
-              type: Array
-          },
-          length:{
-              computed: '_computeLength(notifications)'
-          }
-        },
-          behaviors: [
-              Polymer.MyLocalizeBehavior
-          ],
-          _computeLength: function (notifications) {
-             // this.set('noNotifications',notifications.length<=0);
-              return notifications.length;
-          }
-      });
+            properties: {
+
+                accessToken: {
+                    type: String },
+
+                processingRequest: {
+                    type: Boolean,
+                    value: false
+                },
+
+                selectedSemester: {
+                    type: String },
+
+                user: {
+                    type: Object,
+                    value: {}
+                }
+            },
+
+            behaviors: [
+                Polymer.MyLocalizeBehavior
+            ]
+        });
+
     </script>
+
 </dom-module>

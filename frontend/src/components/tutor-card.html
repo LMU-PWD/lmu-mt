@@ -1,0 +1,475 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../components/tutor-sessionlist.html">
+<link rel="import" href="../components/practicals-tutor-date-detail.html">
+
+<!--Localization Imports-->
+<link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
+<link rel="import" href="../services/my-localize-behavior.html">
+
+<dom-module id="tutor-card">
+
+    <template>
+
+        <style include="shared-styles">
+            :host {
+            }
+            .content > * {
+                background-color: var(--paper-blue-grey-100);
+            }
+            h1 {
+                margin: 0;
+                height: inherit;
+                padding: 14px;
+                font-size: 16px;
+                color: var(--paper-blue-grey-400);
+            }
+            .tabs {
+                background-color: var(--paper-blue-grey-700);
+                color: white;
+                height: 51px;
+                font-weight: 400;
+            }
+            paper-tab.iron-selected {
+                background-color: var(--paper-blue-grey-100);
+                color: var(--paper-blue-grey-900);
+            }
+            paper-tab {
+                font-size: 18px;
+            }
+            paper-listbox{
+                background-color: var(--paper-blue-grey-100);
+            }
+            .card-title{
+                color: var(--paper-blue-grey-700);
+            }
+            .datepicker-overview img {
+                border-radius: 50%;
+                /*border: 2px solid var(--paper-blue-grey-900);*/
+                width: 38px;
+                height: 38px;
+                margin-right: 15px
+            }
+            .datepicker-overview span {
+                flex-grow: 1;
+            }
+
+            .labtype_deadline {
+                color: var(--paper-grey-700);
+                font-weight: 100;
+                font-size: 16px;
+                text-align: right;
+                float: right;
+            }
+            paper-item {
+                border-top: 2px solid var(--paper-grey-200);
+                padding-top: 16px;
+                padding-bottom: 16px;
+            }
+            .datepicker-overview paper-item:hover {
+                background: var(--paper-orange-50);
+                cursor: pointer;
+            }
+            .iron-selected {
+                font-weight: normal;
+            }
+            .lab-title {
+                margin-right: 25px;
+                font-size: 20px;
+            }
+
+            /*Phone*/
+            @media screen and (max-width: 767px) {
+                .content {
+                    width: calc(100% - 25px);
+                    padding: 15px 0 15px 15px;
+                }
+            }
+            /*Tablet*/
+            @media screen and (min-width: 768px) and (max-width: 1023px) {
+                .content {
+                    width: calc(100% - 25px);
+                    padding: 15px 0 15px 15px;
+                }
+            }
+            /*Desktop*/
+            @media screen and (min-width: 1024px) {
+                .content {
+                    width: calc(70% - 25px);
+                    padding: 15px 0 15px 15px;
+                    display: inline-block;
+                }
+            }
+
+        </style>
+
+        <!-- API REQUESTS ------->
+        <!-- ALL LABS -->
+        <api-request
+                headers="[[ ajax_allLabs.headers ]]"
+                method="[[ ajax_allLabs.method ]]"
+                endpoint="[[ ajax_allLabs.endpoint ]]"
+                on-api-response="_handleAllLabsResponse"></api-request>
+
+        <!-- LABS CHOSEN -->
+        <api-request
+                headers="[[ ajax_possibleLabs.headers ]]"
+                method="[[ ajax_possibleLabs.method ]]"
+                body="[[ ajax_possibleLabs.body ]]"
+                endpoint="[[ ajax_possibleLabs.endpoint ]]"
+                on-api-response="_handlePossibleLabsResponse"></api-request>
+
+        <!-- FIXED / ASSIGNED LABS TO THIS TUTOR -->
+        <api-request
+                headers="[[ ajax_assignedLabs.headers ]]"
+                method="[[ ajax_assignedLabs.method ]]"
+                endpoint="[[ ajax_assignedLabs.endpoint ]]"
+                on-api-response="_handleAssignedLabsResponse"></api-request>
+
+        <!-- ALL LABS -->
+        <div class="content">
+
+            <paper-tabs selected="0" no-bar class="tabs">
+                <paper-tab on-click="_handleTabClick">[[ localize('tutor_card tab_calendar') ]]</paper-tab>
+                <template is="dom-if" if="[[ _showDatepicker(deadline_reached_audio, deadline_reached_video, deadline_reached_foto) ]]">
+                    <paper-tab on-click="_handleTabClick" >[[ localize('tutor_card tab_datepicker') ]]</paper-tab>
+                </template>
+            </paper-tabs>
+
+            <!--  TAB 1: CALENDAR -->
+            <template is="dom-if" if="[[ !selectedTab ]]">
+                <tutor-sessionlist
+                        access-token="{{ accessToken }}"
+                        lab-type-audio="[[ labtypeAudio ]]"
+                        lab-type-video="[[ labtypeVideo ]]"
+                        lab-type-foto="[[ labtypeFoto ]]"
+                        assigned-labs="[[ tutorSessions ]]">
+                </tutor-sessionlist>
+            </template>
+
+            <!--  TAB 2: DATE PICKER -->
+            <template is="dom-if" if="[[ selectedTab ]]">
+                <iron-pages
+                        selected="[[ page ]]"
+                        attr-for-selected="name"
+                        fallback-selection="error">
+
+                    <div  class="datepicker-overview" name="datepicker_overview">
+                        <h1 class="card-title">[[ localize('tutor_card_heading_select-date') ]]</h1>
+
+                        <paper-listbox style="padding: 0">
+                            <paper-item on-tap="_handleAudioTap" >
+                                <img src="../../../images/audio.svg" alt="Audio Icon">
+                                <span class="lab-title">[[ localize('tutor_card_audio-practical') ]]</span>
+                                <template is="dom-if" if="[[ !deadline_reached_audio ]]">
+                                    <span class="labtype_deadline">[[ localize('tutor_card_info-open-until')]] [[ prettyAudioDeadline.date ]], [[ prettyAudioDeadline.time ]]</span>
+                                </template>
+                                <template is="dom-if" if="[[ deadline_reached_audio ]]">
+                                    <span class="labtype_deadline">[[ localize('tutor_card_info-closed')]]</span>
+                                </template>
+                            </paper-item>
+                            <paper-item on-tap="_handleVideoTap" >
+                                <img src="../../../images/video.svg" alt="Video Icon">
+                                <span class="lab-title">[[ localize('tutor_card_video-practical') ]]</span>
+                                <template is="dom-if" if="[[ !deadline_reached_video ]]">
+                                    <span class="labtype_deadline">[[ localize('tutor_card_info-open-until')]] [[ prettyVideoDeadline.date ]], [[ prettyVideoDeadline.time ]]</span>
+                                </template>
+                                <template is="dom-if" if="[[ deadline_reached_video ]]">
+                                    <span class="labtype_deadline">[[ localize('tutor_card_info-closed')]]</span>
+                                </template>
+                            </paper-item>
+                            <paper-item on-tap="_handleFotoTap">
+                                <img src="../../../images/photo.svg" alt="Foto Icon">
+                                <span class="lab-title">[[ localize('tutor_card_foto-practical') ]]</span>
+                                <template is="dom-if" if="[[ !deadline_reached_foto ]]">
+                                    <span class="labtype_deadline">[[ localize('tutor_card_info-open-until')]] [[ prettyFotoDeadline.date ]], [[ prettyFotoDeadline.time ]]</span>
+                                </template>
+                                <template is="dom-if" if="[[ deadline_reached_foto ]]">
+                                    <span class="labtype_deadline">[[ localize('tutor_card_info-closed')]]</span>
+                                </template>
+                            </paper-item>
+                        </paper-listbox>
+                    </div>
+
+                    <div name="datepicker_audio">
+                        <h1 class="card-title"> [[ localize('tutor_card_heading_your-dates') ]] [[ localize('tutor_card_audio-practical') ]]</h1>
+                        <template is="dom-if" if="[[ labtypeAudio.registration_open ]]">
+                            <practicals-tutor-date-detail
+                                    user="[[ user ]]"
+                                    lab-type="[[ labtypeAudio ]]"
+                                    all-labs="[[allLabsAudio]]"
+                                    possible-labs="[[possibleLabs]]"
+                                    on-back-click="_handleBackTap"
+                                    access-token="{{ accessToken }}"
+                                    page="{{ page }}"></practicals-tutor-date-detail>
+                        </template>
+                    </div>
+
+                    <div name="datepicker_video">
+                        <h1 class="card-title"> [[ localize('tutor_card_heading_your-dates') ]] [[ localize('tutor_card_video-practical') ]]</h1>
+                        <template is="dom-if" if="[[ labtypeFoto.registration_open ]]">
+                            <practicals-tutor-date-detail
+                                    user="[[ user ]]"
+                                    lab-type="[[ labtypeVideo ]]"
+                                    all-labs="[[allLabsVideo]]"
+                                    possible-labs="[[possibleLabs]]"
+                                    on-back-click="_handleBackTap"
+                                    access-token="{{ accessToken }}"
+                                    page="{{ page }}"></practicals-tutor-date-detail>
+                        </template>
+                    </div>
+
+                    <div name="datepicker_foto">
+                        <h1 class="card-title"> [[ localize('tutor_card_heading_your-dates') ]] [[ localize('tutor_card_foto-practical') ]]</h1>
+                        <template is="dom-if" if="[[ labtypeFoto.registration_open ]]">
+                            <practicals-tutor-date-detail
+                                    user="[[ user ]]"
+                                    lab-type="[[ labtypeFoto ]]"
+                                    all-labs="[[allLabsFoto]]"
+                                    possible-labs="[[possibleLabs]]"
+                                    on-back-click="_handleBackTap"
+                                    access-token="{{ accessToken }}"
+                                    page="{{ page }}"></practicals-tutor-date-detail>
+                        </template>
+                    </div>
+
+                </iron-pages>
+            </template>
+
+        </div>
+
+        <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
+    </template>
+
+
+    <script>
+
+        Polymer({
+            is: 'tutor-card',
+            properties: {
+                accessToken: String,
+                selectedTab: {
+                    type: Number,
+                    value: 0
+                },
+                deadline_reached_audio: Boolean,
+                deadline_reached_video: Boolean,
+                deadline_reached_foto: Boolean,
+                hasAssignedLabs: Boolean,
+                labtypeAudio: Object,
+                labtypeVideo: Object,
+                labtypeFoto: Object,
+                allLabsAudio: {
+                    type: Array,
+                    value: []
+                },
+                labTypes: {
+                    type: Array,
+                    value: []
+                },
+                allLabsVideo: {
+                    type: Array,
+                    value: []
+                },
+                allLabsFoto: {
+                    type: Array,
+                    value: []
+                },
+                allLabs: {
+                    type: Array,
+                    value: []
+                },
+                page: {
+                    type: String,
+                    reflectToAttribute: false
+                },
+                prettyAudioDeadline: {
+                    type: String,
+                    computed: '_computePrettyDate(labtypeAudio.registration_deadline_tutors)'
+                },
+                prettyVideoDeadline: {
+                    type: String,
+                    computed: '_computePrettyDate(labtypeVideo.registration_deadline_tutors)'
+                },
+                prettyFotoDeadline: {
+                    type: String,
+                    computed: '_computePrettyDate(labtypeFoto.registration_deadline_tutors)'
+                },
+                tutorSessions: Array
+            },
+
+            observers: [
+                '_setupLabs(labTypes, tutorSessions)'
+            ],
+
+            ready: function () {
+                this.page = 'datepicker_overview'
+
+                this.ajax_assignedLabs = {
+                    headers: {
+                        Authorization: this.accessToken
+                    },
+                    method: 'GET',
+                    endpoint: '/labs/?filter[where][tutorId]=' + this.user.id
+                };
+            },
+
+            /**
+             * Localization setup
+             */
+            behaviors: [
+                Polymer.MyLocalizeBehavior
+            ],
+
+            /**
+             ** OBSERVER & COMPUTING METHODS **
+             */
+            /**
+             * Checks deadlines per labtype and fires API requests to get labs and tutor's lab choices if the
+             * deadlines are not reached yet.
+             */
+            _setupLabs: function(labTypes, tutorSessions) {
+
+                for (var i = 0; i < labTypes.length; i++) {
+                    if (labTypes[i].type_str == "Audio") {
+                        this.labtypeAudio = labTypes[i];
+                    }
+                    else if (labTypes[i].type_str == "Video") {
+                        this.labtypeVideo = labTypes[i];
+                    }
+                    else if (labTypes[i].type_str == "Foto") {
+                        this.labtypeFoto = labTypes[i];
+                    }
+                }
+
+                this.deadline_reached_audio = this._isAfterDeadline(this.labtypeAudio.registration_deadline_tutors);
+                this.deadline_reached_video = this._isAfterDeadline(this.labtypeVideo.registration_deadline_tutors);
+                this.deadline_reached_foto = this._isAfterDeadline(this.labtypeFoto.registration_deadline_tutors);
+
+                if (!this.labtypeAudio.deadline_reached_audio || !this.labtypeVideo.deadline_reached_video
+                    || !this.labtypeFoto.deadline_reached_foto)
+                {
+                    this.ajax_allLabs = {
+                        headers: {
+                            Authorization: this.accessToken
+                        },
+                        method: 'GET',
+                        endpoint: '/Labs?filter[where][semesterId]=' + this.labtypeAudio.semesterId
+                    };
+                }
+            },
+
+
+            _computePrettyDate: function(uglyDate) {
+
+                prettyDate = new Date(uglyDate)
+                prettyDateString = prettyDate.getDate()+"."+ (prettyDate.getMonth()+1) + "."+prettyDate.getFullYear();
+                prettyTimeString = (prettyDate.getHours() + 1) + ":" + (prettyDate.getMinutes()<10 ? '0' : '') + prettyDate.getMinutes();
+                prettyDateObject = { time: prettyTimeString, date: prettyDateString };
+
+                return prettyDateObject;
+            },
+
+
+            _isAfterDeadline: function (deadline){
+
+                var deadline_date = new Date(deadline);
+                var today = new Date();
+
+                return deadline_date < today;
+            },
+
+            _showDatepicker: function() {
+                return !(this.labtypeAudio.tutorsDistributed && this.labtypeFoto.tutorsDistributed && this.labtypeVideo.tutorsDistributed )
+            },
+
+
+            /**
+             **  API RESPONSE HANDLERS **
+             */
+            /**
+             * Checks if labs have been assigned to this tutor yet. If so, the tutor-sessions card will be shown,
+             * otherwise the datepicker
+             */
+            _handleAssignedLabsResponse: function(response) {
+
+                if (typeof response.detail != 'undefined')
+                    this.tutorSessions = response.detail;
+            },
+
+            /**
+             * Gets lab data from API and sets them for each labtype
+             */
+            _handleAllLabsResponse: function (event) {
+
+                var audiolabs = [];
+                var videolabs = [];
+                var fotolabs = [];
+                var alllabs = [];
+
+                for (var i = 0; i < event.detail.length; i++) {
+
+                    if (event.detail[i].labTypeId == this.labtypeAudio.id){
+                        audiolabs.push(event.detail[i]);
+                    }
+                    if (event.detail[i].labTypeId == this.labtypeVideo.id) {
+                        videolabs.push(event.detail[i]);
+                    }
+                    if (event.detail[i].labTypeId == this.labtypeFoto.id){
+                        fotolabs.push(event.detail[i]);
+                    }
+                    alllabs.push(event.detail[i]);
+                }
+
+                this.allLabsAudio = audiolabs;
+                this.allLabsVideo = videolabs;
+                this.allLabsFoto = fotolabs;
+                this.allLabs = alllabs;
+
+                this.ajax_possibleLabs = {
+                    headers: {
+                        'Authorization': this.accessToken
+                    },
+                    method: 'GET',
+                    endpoint: '/platformusers/' + this.user.id + '/tutorpossiblelabs/'
+                };
+            },
+
+
+            _handlePossibleLabsResponse: function(response) {
+
+                var possibleLabsForThisTutor = [];
+
+                for(i = 0; i<this.allLabs.length; i++){
+                    for(j = 0; j<response.detail.length; j++) {
+                        if (this.allLabs[i].id == response.detail[j]) {
+                            possibleLabsForThisTutor.push(this.allLabs[i]);
+                        }
+                    }
+                }
+                this.possibleLabs = possibleLabsForThisTutor;
+            },
+
+            /**
+             **  CLICK HANDLERS **
+             */
+            _handleAudioTap: function() {
+                this.page = 'datepicker_audio'
+            },
+            _handleVideoTap: function() {
+                this.page = 'datepicker_video'
+            },
+            _handleFotoTap: function() {
+                this.page = 'datepicker_foto'
+            },
+            _handleBackToDateOveriew: function() {
+                this.page = 'datepicker_overview'
+            },
+            _handleTabClick: function(e) {
+                this.selectedTab = e.target.parentElement.selected;
+            }
+
+        });
+    </script>
+</dom-module>

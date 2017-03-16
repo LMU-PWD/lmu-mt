@@ -1,0 +1,574 @@
+<link rel="import" href="../components/practicals-tutor-date-selector.html">
+<link rel="import" href="../components/practicals-show-saved-dates.html">
+
+<dom-module id="practicals-tutor-date-detail">
+    <template>
+        <style include="shared-styles">
+            :host {
+                #display: block;
+            }
+            .page{
+                #border-radius: 25px;
+                margin: 24px;
+                background-color: var(--paper-blue-grey-100);
+                color: var(--paper-blue-grey-900);
+            }
+            .tabheader{
+                background-color: var(--paper-blue-grey-900);
+                font-size: 120%;
+                #border-radius: 25px 25px 0px 0px;
+                overflow: hidden;
+                height: 5vh;
+            }
+            .tabheaderbuttons{
+                color: var(--paper-blue-grey-50);
+                text-align: center;
+            }
+            .backbutton{
+                width: 70px;
+                --paper-icon-button-ink-color:var(--paper-blue-grey-300);
+                padding-right: 30px;
+            }
+            .content{
+                padding: 10px;
+            }
+            paper-button {
+                display: inline-block;
+            }
+            .info {
+                padding: 0 20px 20px 20px;
+                font-weight: 100;
+                font-size: 14px
+            }
+        </style>
+
+
+        <api-request
+                id="ajax_save"
+            headers="[[ ajax_save.headers ]]"
+            method="[[ ajax_save.method ]]"
+            body="[[ ajax_save.body ]]"
+            endpoint="[[ ajax_save.endpoint ]]"
+            on-api-response="_responseFromPrioritySave"></api-request>
+
+        <api-request
+                id="ajax_delete"
+                headers="[[ ajax_delete.headers ]]"
+                method="[[ ajax_delete.method ]]"
+                body="[[ ajax_delete.body ]]"
+                endpoint="[[ ajax_delete.endpoint ]]"
+                on-api-response="_responseFromPriorityDelete"></api-request>
+
+        <div class="content">
+            <template is="dom-if" if="[[registration_open]]">
+
+                <!-- Registration Open Bool from Api is true -->
+                <template is="dom-if" if="[[before_deadline]]">
+                    <template is="dom-if" if="[[show_datepicker]]" >
+
+                        <!-- Deadline is not over, Registration Open and no dates selected; Select your dates!-->
+                        <practicals-tutor-date-selector  id="practicalsDateSelector"
+                                                   user="[[ user ]]"
+                                                   chosenlabs="{{ chosenlabs }}"
+                                                   api-all-labs="[[allLabs]]"
+                                                   on-back-click="_handleBackClick"
+                                                   on-save-click="_handleSaveClick"
+                                                   on-reset-click="_handleResetClick"></practicals-tutor-date-selector>
+                    </template>
+                    <template is="dom-if" if="[[!show_datepicker]]">
+
+                        <!-- Deadline is not over, Registration Open and dates selected; Show saved dates!-->
+                        <template is="dom-if" if="[[ labs_already_chosen ]]">
+                            <div  style="padding-top: 20px; padding-left: 20px">
+                                [[ localize('practicals_tutordatedetail_info-none-selected') ]]
+                            </div>
+                        </template>
+
+                        <practicals-show-saved-dates id="practicals_show_saved_dates"
+                                                     chosenlabs="{{chosenlabs_transformed}}"
+                                                     title="Du hast diese Termine ausgewählt:"></practicals-show-saved-dates>
+                        <paper-button on-tap="_handleBackToDateOveriew"  style="width: 50%"><iron-icon icon="arrow-back"></iron-icon>
+                            [[ localize('practicals_tutordatedetail_button-back') ]]
+                        </paper-button>
+                        <paper-button raised class="changeButton" on-tap="_handleChangeClick" style="width: 49%">
+                            <iron-icon icon="image:edit"></iron-icon>
+                            [[ localize('practicals_tutordatedetail_button-change') ]]
+                        </paper-button>
+                    </template>
+                </template>
+
+                <template is="dom-if" if="[[!before_deadline]]">
+
+                    <!-- Deadline is over and Registration has been started-->
+                    <template is="dom-if" if="[[!practical_dates_exists]]">
+
+                        <!-- Deadline is over, Registration has been started but Practical Date is not given -->
+                        <practicals-show-saved-dates
+                                chosenlabs="{{chosenlabs_transformed}}"
+                                title="Du hast diese Termine ausgewählt:"></practicals-show-saved-dates>
+                    </template>
+
+                    <template is="dom-if" if="[[practical_dates_exists]]">
+
+                        <!-- Deadline is over, Registration has been started and Practical Date is given-->
+                        <practicals-show-saved-dates
+                                chosenlabs="{{practical_dates_transformed}}"
+                                title="Das sind deine Praktikumstermine:"></practicals-show-saved-dates>
+                    </template>
+
+                    <div class="info">[[ localize('practicals_tutordatedetail_info_deadline-reached') ]]</div>
+                    <div style="text-align: center">
+                        <paper-button on-tap="_handleBackToDateOveriew"  style="width: 50%; text-align: center">
+                            <iron-icon icon="reply"></iron-icon>
+                            [[ localize('practicals_tutordatedetail_button-back') ]]
+                        </paper-button>
+                    </div>
+
+                </template>
+            </template>
+            <template is="dom-if" if="[[!registration_open]]">
+                <!-- Registration Open Bool from Api is false; Registration not opened yet -->
+                <div>
+                    [[ localize('practicals_tutordatedetail_info_not-unlocked') ]]
+                </div>
+            </template>
+        </div>
+
+        <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
+    </template>
+
+
+    <script>
+        Polymer({
+            is: 'practicals-tutor-date-detail',
+            properties: {
+                accessToken: {
+                    type: String,
+                    notify: true
+                },
+                before_deadline:{
+                    type: Boolean,
+                    value: true,
+                    computed: '_computeBeforeDeadline(labType)'
+                },
+                chosenlabs: {
+                    type: Array,
+                    value: []
+                },
+                practical_dates:{
+                    type: Array,
+                    value: [],
+                    notify: true
+                },
+                practical_dates_exists:{
+                    type: Boolean
+                },
+                registration_open:{
+                    type: Boolean,
+                    value: true
+                },
+                labs_already_chosen:{
+                    type: Boolean,
+                    computed: '_computeBooleanLabsChosen(chosenlabs)'
+                },
+                isReady: {
+                    type: Boolean,
+                    value: false
+                },
+                user: Object,
+                allLabs: {
+                    type: Array,
+                    value: []
+                },
+                possibleLabs: {
+                    type: Array,
+                },
+                labType: Object,
+                page: {
+                    type: String,
+                    notify: true
+                },
+                oldChosenLabs: {
+                    type: Array,
+                    value: []
+                },
+                chosenlabs_transformed: {
+                    type: Array
+                },
+                show_datepicker: {
+                    type: Boolean,
+                    value: false
+                }
+            },
+
+            observers: [
+                '_allLabsChanged(allLabs, user)',
+                '_possibleLabsChanged(possibleLabs)'
+            ],
+
+            ready: function () {
+//                this.labs_already_chosen = false;
+            },
+
+            /**
+             * Localization setup
+             */
+            behaviors: [
+                Polymer.MyLocalizeBehavior
+            ],
+
+            /**
+             * Observer method for allLabs Array
+             */
+            _allLabsChanged: function(allLabs, user) {
+
+                this.practical_dates = this._getPracticalDates(this.allLabs);
+                this.practical_dates_exists = this._practicalDateExists(this.practical_dates);
+
+                if(this.practical_dates_exists){
+                    this.practical_dates_transformed = this._transformLabs(this.practical_dates,false);
+                }
+
+                if(!this.practical_dates_exists && (this.allLabs == [] || this.allLabs == null)){
+                    this.registration_open = false;
+                }
+                else{
+                    this.registration_open = true;
+                }
+
+                if(this.practical_dates_exists && this.before_deadline){
+                    console.log("ERROR: Die Praktikumsdaten können nicht vor der Deadline zugewiesen sein. Daten sind hier inkorrekt! LabType: "+this.labType.type_str);
+                    console.log("before_deadline wird statisch auf false gesetzt, damit die Anzeige nicht leer ist");
+                    this.before_deadline = false;
+                }
+            },
+
+            _computeBeforeDeadline: function(labType) {
+                return this._getBeforeDeadline(this.labType.registration_deadline_tutors);
+            },
+
+            _computeBooleanLabsChosen: function(chosenlabs) {
+                return (chosenlabs.length == 0);
+            },
+
+            /**
+             * Back-button click handler
+             */
+            _backClicked: function(e) {
+                this.fire("back-click");
+            },
+
+            _getPracticalDates: function(labs){
+
+                var labsForThisTutor = [];
+
+                for(i = 0; i<labs.length; i++){
+                    if(labs[i].tutorId == this.user.id){
+                        labsForThisTutor.push(labs[i])
+                    }
+                }
+
+                return labsForThisTutor;
+            },
+
+            /**
+             * Handle save click
+             * @param e - Event Variable
+             * @private
+             */
+            _handleSaveClick: function(e){
+
+                if(this.chosenlabs.length != 0) {
+                    this.chosenlabs_transformed = this._transformLabs(this.chosenlabs, false);
+
+                    var temp = this.chosenlabs_transformed;
+                    this.chosenlabs_transformed = [];
+                    this.chosenlabs_transformed = temp;
+                }
+                else
+                    this.chosenlabs_transformed = [];
+
+                this.deletedChoices = this.getChosenLabDiff(this.oldChosenLabs, this.chosenlabs);
+                this.addedChoices = this.getChosenLabDiff(this.chosenlabs, this.oldChosenLabs);
+
+                if (this.deletedChoices.length != 0) {
+
+                    this.ajax_delete = {
+                        headers: {
+                            'Authorization': this.accessToken
+                        },
+                        method: 'POST',
+                        endpoint: '/platformusers/removetutorpossiblelabs/',
+                        body: {
+                            "tutorId": this.user.id,
+                            "labIds": this.deletedChoices
+                        }
+                    };
+                }
+
+                if (this.deletedChoices == 0 && this.addedChoices.length != 0) {
+
+                    this.ajax_save = {
+                        headers: {
+                            'Authorization': this.accessToken
+                        },
+                        method: 'POST',
+                        endpoint: '/platformusers/addtutorpossiblelabs/',
+                        body: {
+                            "tutorId": this.user.id,
+                            "labIds": this.addedChoices
+                        }
+                    };
+                }
+                this.oldChosenLabs = [];
+
+                for (var i = 0; i < this.chosenlabs.length; i++) {
+                    this.oldChosenLabs[i] = this.chosenlabs[i];
+                }
+                this.show_datepicker = false;
+            },
+
+            /**
+             * Handle reset click
+             * @param e - Event Variable
+             * @private
+             */
+            _handleResetClick: function(e){
+                this.chosenlabs = [];
+            },
+
+            /**
+             * Handle change click
+             * @param e - Event Variable
+             * @private
+             */
+            _handleChangeClick: function(e){
+                this.show_datepicker = true;
+            },
+
+            /**
+             * Function that checks for the practial course date
+             */
+            _practicalDateExists: function(dates){
+                return (dates != [] && dates.length != 0);
+            },
+
+            /**
+             * Function that checks for the if there are labs already chosen
+             */
+            _chosenlabsExist: function(labs){
+                return (labs != [] && labs && labs.length != 0 && labs[0].date)
+            },
+
+            _getBeforeDeadline: function (deadline){
+                return (new Date(deadline) > new Date());
+            },
+
+            /**
+             * Creates string from the given date
+             * @param {String} date - date that will be transformed to String
+             */
+            _getDateString: function(date){
+
+                var datestring = "";
+
+                switch(date.getDay()){
+                    case 0:
+                        datestring = "Sonntag, den ";
+                        break;
+                    case 1:
+                        datestring = "Montag, den ";
+                        break;
+                    case 2:
+                        datestring = "Dienstag, den ";
+                        break;
+                    case 3:
+                        datestring = "Mittwoch, den ";
+                        break;
+                    case 4:
+                        datestring = "Donnerstag, den ";
+                        break;
+                    case 5:
+                        datestring = "Freitag, den ";
+                        break;
+                    case 6:
+                        datestring = "Samstag, den ";
+                        break;
+                }
+
+                var hours = date.getHours();
+                var minutes = date.getMinutes();
+
+                if(hours<10){
+                    hours = "0"+hours;
+                }
+                if(minutes<10){
+                    minutes = "0"+minutes;
+                }
+                datestring = datestring+date.getDate()+"."+date.getMonth()+"."+date.getFullYear()+
+                    " um "+hours+":"+minutes+" Uhr";
+
+                return datestring;
+            },
+
+            /**
+             * Transform the Format of the given Timelabs from the Api, so it will be easier to handle in the frontend
+             * @param labsFromApi - Contains the given timelabs
+             * @param divideDates - Decides if there will be generated a new array for each day inside the return-array or not
+             * @returns {Array} - timelabs in new format
+             * @private
+             */
+            _transformLabs: function(labsFromApi,divideDates){
+
+                var transformedLabs = []; //Store return-Array here
+                var lastLab = new Date(labsFromApi[0].date);
+                var countDates = 0; //Date counter
+                var countLabs = 0; //lab counter
+                var dates = [];
+
+                for(i=0; i<labsFromApi.length; i++){
+
+                    // Create a new array-entrie if date from recent lab is different from date of the last lab
+                    var labdate = new Date(labsFromApi[i].date);
+
+                    if((labdate.getFullYear() != lastLab.getFullYear() ||
+                        labdate.getMonth() != lastLab.getMonth() ||
+                        labdate.getDate() != lastLab.getDate()) && divideDates) {
+                        dates = [];
+                        lastLab = labdate;
+                        transformedLabs.push([]);
+                        countDates++;
+                        countLabs = 0;
+                    }
+
+                    var endtime = new Date(labdate.getFullYear(), labdate.getMonth(), labdate.getDate());
+
+                    if((labdate.getMinutes() + (labsFromApi[i].duration % 60)) > 60){
+                        endtime.setHours(1+Math.floor(labdate.getHours()+(labsFromApi[i].duration) / 60));
+                        endtime.setMinutes(labdate.getMinutes() + (labsFromApi[i].duration % 60)-60);
+                    }
+                    else{
+                        endtime.setHours(Math.floor(labdate.getHours()+(labsFromApi[i].duration) / 60));
+                        endtime.setMinutes(labdate.getMinutes() + (labsFromApi[i].duration % 60));
+                    }
+
+                    var lab = [];
+                    lab = [labdate, endtime];
+
+                    if(divideDates){
+                        dates[countLabs] = lab;
+                        transformedLabs[countDates] = dates;
+                        countLabs++;
+                    }
+                    else{
+                        transformedLabs[i]=lab;
+                    }
+                }
+
+                return transformedLabs;
+            },
+
+            /**
+             * Gets response from API call to save the priorities
+             * @param response
+             * @private
+             */
+            _responseFromPriorityDelete: function(response) {
+
+                if (this.addedChoices != 0) {
+
+                    this.ajax_save = {
+                        headers: {
+                            'Authorization': this.accessToken
+                        },
+                        method: 'POST',
+                        endpoint: '/platformusers/addtutorpossiblelabs/',
+                        body: {
+                            "tutorId": this.user.id,
+                            "labIds": this.addedChoices
+                        }
+                    };
+                }
+                else {
+                  var currentPage = this.page;
+                  this.page = '';
+                  this.page = currentPage;
+                }
+            },
+
+            _responseFromPrioritySave: function(response) {
+              var currentPage = this.page;
+              this.page = '';
+              this.page = currentPage;
+            },
+
+            /**
+             * Filters already chosen lab dates for this labtype.
+             * allLabs contains all lab dates already chosen by this tutor.
+             * @private
+             */
+            _possibleLabsChanged: function(allLabs) {
+
+                if(this.practical_dates_exists)
+                    return
+
+                var possibleLabsForThisLabtype = [];
+                for(i = 0; i<this.allLabs.length; i++){
+                    for(j = 0; j< this.possibleLabs.length; j++) {
+                        if (this.allLabs[i].id == this.possibleLabs[j].id) {
+                            possibleLabsForThisLabtype.push(this.allLabs[i]);
+                        }
+                    }
+                }
+
+                this.oldChosenLabs = [];
+                for (var i = 0; i < possibleLabsForThisLabtype.length; i++) {
+                    this.oldChosenLabs[i] = possibleLabsForThisLabtype[i];
+                }
+
+                if(this._chosenlabsExist(possibleLabsForThisLabtype)){
+                    this.chosenlabs = possibleLabsForThisLabtype;
+                    this.chosenlabs_transformed = this._transformLabs(this.chosenlabs,false);
+                }
+                else
+                    this.show_datepicker = true;
+            },
+
+            _handleBackToDateOveriew: function() {
+                this.page = 'datepicker_overview'
+                for (var i = 0; i < this.chosenlabs.length; i++) {
+                    this.chosenlabs[i] = this.oldChosenLabs[i];
+                }
+            },
+
+            _handleBackClick: function(e) {
+                this.show_datepicker = false;
+                var currentPage = this.page;
+                this.page = currentPage;
+            },
+
+            /**
+             * Returns an array containing items that are only in newLabArray but not in oldLabArray
+             * @param oldLabArray
+             * @param newLabArray
+             * @returns {Array}
+             */
+            getChosenLabDiff: function(oldLabArray, newLabArray) {
+
+                var resultArray = [];
+
+                Array.prototype.diff = function(a) {
+                    return this.filter(function(i) {return a.indexOf(i) < 0;});
+                };
+
+                var filteredArray = oldLabArray.diff( newLabArray );
+
+                for (var i = 0; i < filteredArray.length; i ++)
+                    resultArray.push(filteredArray[i].id)
+
+                return resultArray;
+            }
+
+        });
+    </script>
+</dom-module>

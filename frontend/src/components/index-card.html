@@ -18,6 +18,9 @@
                 position: relative;
                 top: -1px;
             }
+            :host(:hover) {
+                cursor: pointer;
+            }
             h2 {
                 display: inline;
                 float: left;
@@ -39,13 +42,9 @@
             .back-fill{
                 width:calc(100% - 40px);
                 height:30px;
-                /*position: absolute;
-                right:0;*/
                 display: inline;
                 float: right;
                 background-color: var(--paper-blue-grey-100);
-
-
             }
 
             .content{
@@ -79,6 +78,11 @@
                 position: relative;
                 line-height: 30px;
             }
+            .padmin{
+                width: 120%;
+                margin: 0;
+                padding: 0;
+            }
 
             .icon{
                 height: 64px;
@@ -110,8 +114,14 @@
                     <img src="../../images/[[labType.name]].svg" width="64px" height="64px" alt="camera-icon" fill="">
                 </div>
                 <div class="info">
-                    <p class="plabel">Lab:<br/>[[label2]]</p>
-                    <p class="pinfo">[[labDate]]<br/>[[info2]]</p>
+                    <template is="dom-if" if="[[!isAdmin]]">
+                        <p class="plabel">[[localize('practicals-admin lab')]]:<br/>[[label2]]</p>
+                        <p class="pinfo">[[labDate]]<br/>[[info2]]</p>
+                    </template>
+                    <template is="dom-if" if="[[isAdmin]]">
+                        <p class="padmin">[[localize('practicals-admin-labtype text2_short')]]: [[deadlineTutors]]</p>
+                        <p class="padmin">[[localize('practicals-admin-labtype text1_short')]]: [[deadlineStudents]]</p>
+                    </template>
                 </div>
             </div>
         </div>
@@ -145,6 +155,10 @@
                 icon: {
                     type: String
                 },
+                isAdmin: {
+                    type: Boolean,
+                    value: false
+                },
                 labType: {
                     type: Object,
                     observer: '_labTypeChanged'
@@ -161,52 +175,41 @@
             behaviors: [
                 Polymer.MyLocalizeBehavior
             ],
-            /*ready: function () {
-                if(this.type.includes("Photo" || "photo")){
-                    this.icon = "../../../images/photo.svg";
-                    this.customStyle['--color'] = '#78909c';
-                    this.updateStyles();
-                } else if(this.type.includes("Foto" || "foto")){
-                    this.icon = "../../../images/photo.svg";
-                    this.customStyle['--color'] = '#78909c';
-                    this.updateStyles();
-                } else if(this.type.includes("Video" || "video")){
-                    this.icon = "../../../images/video.svg";
-                    this.customStyle['--color'] = '#546e7a';
-                    this.updateStyles();
-                } else if(this.type.includes("Audio" || "audio")){
-                    this.icon = "../../../images/audio.svg";
-                    this.customStyle['--color'] = '#455a64';
-                    this.updateStyles();
-                }
-            },*/
             _handleTap: function (event) {
-                //console.log(event);
-                //console.log(event.path[0].key);
                 var key = this.labType.name;
                 this.fire('CHANGE_ROUTE', {path: '/' + key, page: key});
-                //console.log(event.model);
             },
 
             _labTypeChanged: function (detail) {
-                //console.log(detail);
+                if(this.isAdmin && this.labType){
+                    //console.log(this.labType);
+                    var temporal_deadline_students = new Date(this.labType.registration_deadline);
+                    var temporal_deadline_tutors = new Date(this.labType.registration_deadline_tutors);
+                    if(temporal_deadline_tutors && temporal_deadline_tutors.getDate()) {
+                        this.deadlineTutors = temporal_deadline_tutors.getDate()+"."
+                            +(temporal_deadline_tutors.getMonth()+1)
+                            +"."+temporal_deadline_tutors.getFullYear();
+                    }
+                    if(temporal_deadline_students && temporal_deadline_students.getDate()) {
+                        this.deadlineStudents = temporal_deadline_students.getDate()+"."
+                                                +(temporal_deadline_students.getMonth()+1)
+                                                +"."+ temporal_deadline_students.getFullYear();
+                    }
+                }
                 this.customStyle['--color'] = this.labType.color;
                 this.updateStyles();
             },
 
             _groupChanged: function (detail) {
-                //console.log(detail);
-                for (var i=0; i<this.group.labIds.length; i++){
-                    //console.log(this.labType.id);
-                    if(this.group.labIds[i].labTypeId === this.labType.id){
-                        var d = new Date(this.group.labIds[i].date);
-                        this.set('labDate', d.toLocaleString().slice(0,-3));
+                if(this.group && this.group.labIds) {
+                    for (var i = 0; i < this.group.labIds.length; i++) {
+                        if (this.group.labIds[i].labTypeId === this.labType.id) {
+                            var d = new Date(this.group.labIds[i].date);
+                            this.set('labDate', d.toLocaleString().slice(0, -3));
 
+                        }
                     }
                 }
-            },
-            _labDateChanged: function (detail) {
-                //console.log(detail);
             }
 
         });

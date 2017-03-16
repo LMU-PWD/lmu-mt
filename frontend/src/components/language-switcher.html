@@ -71,17 +71,6 @@
 
             <paper-icon-button class="menu-icon" icon="icons:language" on-tap="_handleLanguageSelection">DE</paper-icon-button>
             <h2 class="menu-icon" icon="icons:language" on-tap="_handleLanguageSelection">[[language]]</h2>
-            <!--paper-menu-button no-animat="_fireLogoutRequ     <paper-icon-button noink icon="language" class="dropdown-trigger"></paper-icon-button>
-                <paper-menu class="dropdown-content" selected="{{selected}}">
-                    <template is="dom-repeat" items="[[languages]]">
-                        <paper-item>[[item.name]]</paper-item>
-                    </template>
-                </paper-menu>
-            </paper-menu-button-->
-            <!--span class="localepicker">
-                    <paper-button style="float:right" on-tap="initSwitchLocale">{{ language }}</paper-button>
-                    <paper-tooltip offset="5">{{localize('logincard_locale button tooltip')}}</paper-tooltip>
-                </span-->
             <iron-localstorage id="localstorage"
                                name="language"
                                value="{{language}}"

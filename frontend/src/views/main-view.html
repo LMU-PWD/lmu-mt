@@ -12,8 +12,10 @@ The Main View contains:
 <link rel="import" href="../components/index-card.html">
 <link rel="import" href="../components/group-card.html">
 <link rel="import" href="../components/group-detail.html">
+<link rel="import" href="../components/tutor-card.html">
 <link rel="import" href="groups-admin.html">
 <link rel="import" href="../components/notifications-card.html">
+<link rel="import" href="../components/notifications-list.html">
 <link rel="import" href="../components/navigation-bar.html">
 <link rel="import" href="../components/admin-toolbar.html">
 <link rel="import" href="../components/language-switcher.html">
@@ -59,7 +61,7 @@ The Main View contains:
                 height: auto;
             }
 
-            .desktop-only {
+            .desktop-only{
                 display: none;
             }
 
@@ -308,11 +310,16 @@ The Main View contains:
                 border-radius: 32px;
             }
 
+
             #notifications {
-                position: relative;
-                z-index: 10;
-                top: -30px;
+                box-shadow: 0 5px 10px -5px var(--paper-blue-grey-800);
+                margin-left: -10px;
+                margin-right: -10px;
                 padding-top: 30px;
+                position: absolute;
+                top: -30px;
+                width: 100%;
+                z-index: 10;
             }
 
             /*.not-active{
@@ -362,41 +369,6 @@ The Main View contains:
             .hidden {
                 visibility: hidden;
                 display: none;
-            }
-
-            /*Notification Styles*/
-            .notifications-container {
-                display: none;
-                visibility: hidden;
-            }
-
-            /*Desktop*/
-            @media screen and (min-width: 1024px) {
-                .notifications-container {
-                    display: inline;
-                    visibility: visible;
-                    float: right;
-                    margin: 15px 10px;
-                    width: calc(30% - 20px);
-                    height: 365px;
-                    background-color: var(--paper-blue-grey-100);
-                }
-
-                .notifications-container > div {
-                    background-color: var(--paper-blue-grey-500);
-                    height: 50px;
-                    line-height: 50px;
-                    padding: 0 20px;
-                    color: var(--paper-blue-grey-50);
-                    border-bottom: 1px solid var(--paper-blue-grey-900);
-                }
-
-                .notifications-container > div > iron-icon {
-                    float: right;
-                    height: 32px;
-                    width: 32px;
-                    margin: 9px 0;
-                }
             }
         </style>
 
@@ -474,11 +446,12 @@ The Main View contains:
                             <paper-tooltip>{{localize('tooltip_menu settings')}}</paper-tooltip>
                         </div>
                     </div>
-                    <div>
-                        <iron-collapse id="notifications" class="no-desktop">
-                            <notifications-card notifications="{{notifications}}"></notifications-card>
-                        </iron-collapse>
-                    </div>
+
+                    <iron-collapse id="notifications" class="no-desktop">
+                        <notifications-list user="[[user]]"
+                                            access-token="[[accessToken]]"
+                                            selected-semester="[[adminSelectedSemesterId]]"></notifications-list>
+                    </iron-collapse>
 
                     <div class="larger_geometry_container">
                         <div></div>
@@ -493,15 +466,11 @@ The Main View contains:
                         </svg>
                     </div>
 
-                    <iron-collapse id="notifications_2" class="no-desktop">
-                        <div style="height: 300px; width: 100%; background-color:green;">Test Notification Container
-                        </div>
-                    </iron-collapse>
-
                 </paper-toolbar>
                 <div>
 
-                    <div class="menu-overlay not-active" on-tap="_toggleMenu"></div>
+                    <div class="menu-overlay not-active" id="menu-overlay" on-tap="_toggleMenu"></div>
+                    <div class="menu-overlay not-active" id="notifications-overlay" on-tap="_toggleNotifications"></div>
 
                     <!-- P A G E S -->
                     <iron-pages
@@ -513,17 +482,26 @@ The Main View contains:
                         <div class="main-page" name="dashboard">
                             <template is="dom-if" if="{{user.isAdmin}}">
                                 <admin-dashboard
+                                        admin-selected-semester-id="{{adminSelectedSemesterId}}"
                                         lab-types="{{labTypes}}"
                                         user="{{user}}"
                                         access-token="[[accessToken]]"
                                         lab-types="[[labTypes]]"></admin-dashboard>
                             </template>
                             <template is="dom-if" if="{{user.isTutor}}">
-                                <tutor-dashboard
-                                        lab-types="{{labTypes}}"
-                                        user="{{user}}"
-                                        access-token="[[accessToken]]"
-                                        lab-types="[[labTypes]]"></tutor-dashboard>
+                                <tutor-card
+                                        access-token="{{ accessToken }}"
+                                        labtype-audio="[[ labtype_audio ]]"
+                                        labtype-foto="[[ labtype_foto ]]"
+                                        labtype-video="[[ labtype_video ]]"
+                                        lab-types="[[ labTypes ]]"
+                                        user="[[ user ]]">
+                                </tutor-card>
+                                <!--<tutor-dashboard-->
+                                        <!--lab-types="{{labTypes}}"-->
+                                        <!--user="{{user}}"-->
+                                        <!--access-token="[[accessToken]]"-->
+                                        <!--lab-types="[[labTypes]]"></tutor-dashboard>-->
                             </template>
                             <template is="dom-if" if="{{user.isStudent}}">
                                 <student-dashboard
@@ -534,13 +512,9 @@ The Main View contains:
                                         lab-types="[[labTypes]]"></student-dashboard>
                             </template>
 
-                            <div class="notifications-container">
-                                <div>
-                                    Notifications
-                                    <iron-icon src="../../images/notifications.svg"></iron-icon>
-                                </div>
-                                <notifications-card></notifications-card>
-                            </div>
+                            <notifications-card user="[[user]]"
+                                                access-token="[[accessToken]]"
+                                                selected-semester="[[adminSelectedSemesterId]]"></notifications-card>
                         </div>
 
                         <!-- Practical Detail Pages -->
@@ -589,8 +563,8 @@ The Main View contains:
                         </template>
                         <settings-view
                                 name="settings"
-                                access-token="[[ accessToken ]]"
-                                user="{{user}}"></settings-view>
+                                access-token="{{accessToken}}"
+                                user-email="[[user.email]]"></settings-view>
 
                     </iron-pages>
 
@@ -625,7 +599,8 @@ The Main View contains:
                 },
 
                 accessToken: {
-                    type: String
+                    type: String,
+                    notify: true
                 },
                 adminSelectedSemesterId: {
                     //TODO try iron meta
@@ -694,6 +669,7 @@ The Main View contains:
             },
 
             _userChanged: function (detail) {
+//                console.log(detail);
                 if (Object.keys(detail).length !== 0) {
                     console.log(detail);
 
@@ -738,15 +714,13 @@ The Main View contains:
                     this.set('transburgerChangeTo', 'close');
                     this.$$('#transburger').toggleIcon();
 
-                } else {
-                    console.log(detail);
-
+                }else{
                     this.$$('#transburger').toggleIcon();
                     this.$$('#menu').toggle();
-                    this.$$('.menu-overlay').classList.toggle('not-active');
-                    console.log(this.$.menu.opened);
-                    console.log(this.$$('#transburger').icon);
-                    if (this.$.menu.opened && this.activeIcon == 'menu') {
+                    this.$$('#menu-overlay').classList.toggle('not-active');
+                    //console.log(this.$.menu.opened);
+                    //console.log(this.$$('#transburger').icon);
+                    if(this.$.menu.opened && this.activeIcon=='menu'){
                         this.$$('#transburger').toggleIcon();
 
                     }
@@ -754,6 +728,7 @@ The Main View contains:
             },
             _toggleNotifications: function () {
                 this.$$('#notifications').toggle();
+                this.$$('#notifications-overlay').classList.toggle('not-active');
             },
 
             /**
@@ -817,7 +792,7 @@ The Main View contains:
              * @private
              */
             _handleRouting: function (event) {
-                //console.log(event);
+
                 //Route to Page&Path specified in the event
                 this.set('route.path', event.detail.path);
                 this.set('routeData.page', event.detail.page);
@@ -867,6 +842,117 @@ The Main View contains:
             },
 
             addNameLabel: function (labObject) {
+            /**
+             * Observes group changes and initiates API calls to get priorities and lab data for each labtype
+             * @param response
+             * @private
+             */
+            _groupChanged: function(response) {
+                //console.log(this.group);
+                if (!this.isReady || !this.group.priorityIds)
+                    return;
+
+                this.semesterId = response.semesterId;
+                for (i = 0; i < this.group.priorityIds.length; i++) {
+                    // Get priorities
+                    this.ajax_prios = {
+                        headers: {
+                            Authorization: this.accessToken
+                        },
+                        method: 'GET',
+                        endpoint: '/Priorities?filter[where][groupId]='+this.user.groupId
+                    };
+                    //console.log(this.ajax_prios);
+                }
+                for (j = 0; j < this.group.labIds.length; j++) {
+                    // Get group-labs
+                    this.ajax_glabs = {
+                        headers: {
+                            Authorization: this.accessToken
+                        },
+                        method: 'GET',
+                        endpoint: '/labs/' + this.group.labIds[j]
+                    };
+                }
+            },
+
+             /**
+             * Gets lab data from API and sets them for each labtype
+             * @param event
+             * @private
+             */
+            _handleAllLabsRequest: function (event) {
+                console.log('_handleLabRequest()');
+                console.log(event.detail);
+
+                if(!this.isReady || this.gotLabTypes == false)
+                    return;
+
+                for (var i = 0; i < event.detail.length; i++) {
+                    if (event.detail[i].labTypeId == this.labtype_foto.id){
+                        this.all_labs_foto.push(event.detail[i]);
+                    }
+                    if (event.detail[i].labTypeId == this.labtype_video.id) {
+                        this.all_labs_video.push(event.detail[i]);
+                    }
+                    if (event.detail[i].labTypeId == this.labtype_audio.id){
+                        this.all_labs_audio.push(event.detail[i]);
+                    }
+
+                    this.allLabs.push(event.detail[i]);
+                }
+
+                //console.log("AllLabs: ");
+                //console.log(this.allLabs);
+                //console.log(this.all_labs_foto);
+                //console.log(this.all_labs_video);
+                //console.log(this.all_labs_audio);
+
+                if (this.semesterId && this.labTypesRequestSent) {
+                    this.labsRequestSent = true;
+                }
+            },
+
+
+            /**
+             * Initializes and sets group-priorities-property for each lab
+             * @param event
+             * @private
+             */
+            _handlePriosRequest: function(event){
+                console.log('_handlePriosRequest()');
+                console.log(event.detail);
+
+                if(!this.isReady || this.gotLabTypes == false)
+                    return;
+
+                this.allPriorities = event.detail;
+                var lab = "";
+                for(i = 0; i<this.allLabs.length;i++){
+                    lab = this.allLabs[i];
+                    for(j = 0; j < event.detail.length;j++) {
+                        if (event.detail[j].labId == this.allLabs[i].id) {
+                            if (lab.labTypeId == this.labtype_audio.id) {
+                                this.groupdata_audio.priorities[event.detail[j].priority - 1] = lab;
+                            }
+                            if (lab.labTypeId == this.labtype_video.id) {
+                                this.groupdata_video.priorities[event.detail[j].priority - 1] = lab;
+                            }
+                            if (lab.labTypeId == this.labtype_foto.id) {
+                                this.groupdata_foto.priorities[event.detail[j].priority - 1] = lab;
+                            }
+
+                        }
+                    }
+                }
+                //console.log("Group Prios:");
+                //console.log(this.group.id);
+                //console.log(this.groupdata_foto.priorities);
+                //console.log(this.groupdata_video.priorities);
+                //console.log(this.groupdata_audio.priorities);
+
+            },
+            addNameLabel: function (labObject) {
                 var name;
                 var customColor;
                 if (labObject.type_str.includes("Photo" || "photo")) {
@@ -897,6 +983,33 @@ The Main View contains:
                 }
                 this.set('labTypes', labResponse);
                 console.log(labResponse);
+            }
+                this.set('labTypes',labResponse);
+            },
+
+            /**
+             * Gets group-lab data from API and sets them for each labtype
+             * @param event
+             * @private
+             */
+            _handleGroupLabsRequest: function(event){
+                console.log('_handleGroupLabsRequest()');
+                //console.log(event.detail);
+
+                if(!this.isReady || this.gotLabTypes == false)
+                    return;
+
+                if (event.detail.labTypeId == this.labtype_foto.id)
+                    this.groupdata_audio.lab = new Date(event.detail.date);
+                if (event.detail.labTypeId == this.labtype_video.id)
+                    this.groupdata_video.lab = new Date(event.detail.date);
+                if (event.detail.labTypeId == this.labtype_audio.id)
+                    this.groupdata_foto.lab = new Date(event.detail.date);
+
+                //console.log("Group Labs:");
+                //console.log(this.groupdata_foto.lab);
+                //console.log(this.groupdata_video.lab);
+                //console.log(this.groupdata_audio.lab);
             }
         });
 
