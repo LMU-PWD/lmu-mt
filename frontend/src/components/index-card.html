@@ -9,11 +9,14 @@
         <style  include="shared-styles">
             :host {
                 --color: #000000;
-                height: 120px;
+                height: 121px;
                 min-width: 320px;
-                margin:5px 0;
+                margin: 12px 0;
                 display: block;
                 background-color: var(--color);
+                border-radius: 5px;
+                position: relative;
+                top: -1px;
             }
             :host(:hover) {
                 cursor: pointer;
@@ -50,6 +53,7 @@
                 position: relative;
                 top: 30px;
                 background-color: var(--paper-blue-grey-100);
+                border-radius: 0 0 5px 5px;
             }
 
 
@@ -73,6 +77,11 @@
                 top: -30px;
                 position: relative;
                 line-height: 30px;
+            }
+            .padmin{
+                width: 120%;
+                margin: 0;
+                padding: 0;
             }
 
             .icon{
@@ -105,8 +114,14 @@
                     <img src="../../images/[[labType.name]].svg" width="64px" height="64px" alt="camera-icon" fill="">
                 </div>
                 <div class="info">
-                    <p class="plabel">Lab:<br/>[[label2]]</p>
-                    <p class="pinfo">[[labDate]]<br/>[[info2]]</p>
+                    <template is="dom-if" if="[[!isAdmin]]">
+                        <p class="plabel">[[localize('practicals-admin lab')]]:<br/>[[label2]]</p>
+                        <p class="pinfo">[[labDate]]<br/>[[info2]]</p>
+                    </template>
+                    <template is="dom-if" if="[[isAdmin]]">
+                        <p class="padmin">[[localize('practicals-admin-labtype text2_short')]]: [[deadlineTutors]]</p>
+                        <p class="padmin">[[localize('practicals-admin-labtype text1_short')]]: [[deadlineStudents]]</p>
+                    </template>
                 </div>
             </div>
         </div>
@@ -140,6 +155,10 @@
                 icon: {
                     type: String
                 },
+                isAdmin: {
+                    type: Boolean,
+                    value: false
+                },
                 labType: {
                     type: Object,
                     observer: '_labTypeChanged'
@@ -162,16 +181,33 @@
             },
 
             _labTypeChanged: function (detail) {
+                if(this.isAdmin && this.labType){
+                    //console.log(this.labType);
+                    var temporal_deadline_students = new Date(this.labType.registration_deadline);
+                    var temporal_deadline_tutors = new Date(this.labType.registration_deadline_tutors);
+                    if(temporal_deadline_tutors && temporal_deadline_tutors.getDate()) {
+                        this.deadlineTutors = temporal_deadline_tutors.getDate()+"."
+                            +(temporal_deadline_tutors.getMonth()+1)
+                            +"."+temporal_deadline_tutors.getFullYear();
+                    }
+                    if(temporal_deadline_students && temporal_deadline_students.getDate()) {
+                        this.deadlineStudents = temporal_deadline_students.getDate()+"."
+                                                +(temporal_deadline_students.getMonth()+1)
+                                                +"."+ temporal_deadline_students.getFullYear();
+                    }
+                }
                 this.customStyle['--color'] = this.labType.color;
                 this.updateStyles();
             },
 
             _groupChanged: function (detail) {
-                for (var i=0; i<this.group.labIds.length; i++){
-                    if(this.group.labIds[i].labTypeId === this.labType.id){
-                        var d = new Date(this.group.labIds[i].date);
-                        this.set('labDate', d.toLocaleString().slice(0,-3));
+                if(this.group && this.group.labIds) {
+                    for (var i = 0; i < this.group.labIds.length; i++) {
+                        if (this.group.labIds[i].labTypeId === this.labType.id) {
+                            var d = new Date(this.group.labIds[i].date);
+                            this.set('labDate', d.toLocaleString().slice(0, -3));
 
+                        }
                     }
                 }
             }

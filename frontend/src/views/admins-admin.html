@@ -8,7 +8,7 @@
 <link rel="import" href="../services/my-localize-behavior.html">
 
 
-<dom-module id="tutors-admin">
+<dom-module id="admins-admin">
     <template>
         <style include="shared-styles iron-flex iron-flex-alignment">
 
@@ -24,7 +24,7 @@
                 padding: 0 20px;
             }
 
-            .tutor {
+            .admin {
                 height: 70px;
                 width: auto;
                 background-color: var(--paper-blue-grey-100);
@@ -33,7 +33,7 @@
                 border-radius: 5px;
             }
 
-            .tutor > h1 {
+            .admin > h1 {
                 margin: 0 8px;
                 padding: 0;
                 font-size: 20px;
@@ -71,16 +71,6 @@
                 margin: 0;
                 float: left;
             }
-            .icon-wrapper>p{
-                color: var(--paper-blue-grey-100);
-                background-color: var(--paper-blue-grey-500);
-                border-radius: 50%;
-                height: 24px;
-                width: 24px;
-                margin: 8px;
-                text-align: center;
-                line-height: 24px;
-            }
             iron-icon{
                 padding: 8px;
             }
@@ -88,7 +78,6 @@
             paper-icon-button:hover{
                 color: var(--paper-blue-grey-600);
             }
-
 
             #title{
                 height: 20px;
@@ -104,30 +93,23 @@
 
         </style>
         <div></div>
-        <!-- Fetches all registered Tutors -->
+        <!-- Fetches all registered Admins -->
         <api-request
                 headers="[[ ajax.headers ]]"
                 method="[[ ajax.method ]]"
                 endpoint="[[ ajax.endpoint ]]"
                 semester-filter="[[ selectedSemester ]]"
-                on-api-response="_handleTutorsResponse"></api-request>
+                on-api-response="_handleAdminsResponse"></api-request>
 
-        <!-- Fetches all pending Tutors -->
+        <!-- Fetches all pending Admins -->
         <api-request
                 headers="[[ ajax_pending.headers ]]"
                 method="[[ ajax_pending.method ]]"
                 endpoint="[[ ajax_pending.endpoint ]]"
                 semester-filter="[[ selectedSemester ]]"
-                on-api-response="_handlePendingTutorsResponse"></api-request>
+                on-api-response="_handlePendingAdminsResponse"></api-request>
 
-        <!-- Count Labs for each Tutor -->
-        <api-request
-                headers="[[ labCountAjax.headers ]]"
-                method="[[ labCountAjax.method ]]"
-                endpoint="[[ labCountAjax.endpoint ]]"
-                on-api-response="_handleLabCountResponse"></api-request>
-
-        <!-- Deletes Specific Tutor -->
+        <!-- Deletes Specific Admin -->
         <api-request
                 headers="[[ deleteAjax.headers ]]"
                 method="[[ deleteAjax.method ]]"
@@ -136,7 +118,7 @@
                 on-api-error="_handleDeleteError"></api-request>
 
 
-        <!-- Create tutor -->
+        <!-- Create admin -->
         <api-request
                 headers="[[ createAjax.headers ]]"
                 body="[[ createAjax.body ]]"
@@ -170,7 +152,6 @@
                              value="{{newUser.email}}"
                              required>
                     <iron-icon icon="mail" prefix></iron-icon>
-                    <div suffix>@campus.lmu.de</div>
                 </paper-input>
             </div>
             <div class="buttons">
@@ -179,32 +160,27 @@
             </div>
         </paper-dialog>
 
-
         <div class="fullbleed horizontal justified layout" style="width: 100%; margin: 10px 0;">
-            <h1 id="title">{{localize('admin_dashboard tutors')}}</h1>
+            <h1 id="title">{{localize('admin_dashboard admins')}}</h1>
             <paper-icon-button  id="add" icon="add-circle-outline" on-tap="create"></paper-icon-button>
         </div>
 
-        <!--Lists all Tutors-->
+        <!--Lists all Admins-->
         <div class="container horizontal layout wrap">
-            <template is="dom-repeat" items="[[tutors]]" as="tutor">
-                <div class="tutor flex self-center" id="tutor_[[index]]">
-                    <h1>[[tutor.first_name]] [[tutor.name]]</h1>
+            <template is="dom-repeat" items="[[admins]]" as="admin">
+                <div class="admin flex self-center" id="admin_[[index]]">
+                    <h1>[[admin.first_name]] [[admin.name]]</h1>
                     <div class="icon-container">
-                        <a class="icon-wrapper" href="mailto:[[tutor.email]]" tabindex="-1">
+                        <a class="icon-wrapper" href="mailto:[[admin.email]]" tabindex="-1">
                             <paper-icon-button icon="icons:mail"></paper-icon-button>
                         </a>
-                        <template is="dom-if" if="[[tutor.emailVerified]]">
+                        <template is="dom-if" if="[[admin.emailVerified]]">
                             <div class="icon-wrapper">
                                 <iron-icon id="verified" icon="icons:verified-user"></iron-icon>
                                 <paper-tooltip>{{localize('users-admin email-verified')}}</paper-tooltip>
                             </div>
                         </template>
-                        <paper-icon-button icon="icons:delete" on-tap="_deleteTutor"></paper-icon-button>
-                        <div class="icon-wrapper">
-                            <p>[[tutor.labCount]]</p>
-                            <paper-tooltip>{{localize('users-admin tutor-count')}}</paper-tooltip>
-                        </div>
+                        <paper-icon-button icon="icons:delete" on-tap="_deleteAdmin"></paper-icon-button>
                     </div>
                 </div>
             </template>
@@ -228,9 +204,9 @@
     </template>
     <script>
         Polymer({
-            is: 'tutors-admin',
+            is: 'admins-admin',
             properties: {
-                tutors: {
+                admins: {
                     type: Array,
                     value: []
                 },
@@ -247,8 +223,8 @@
                         "name": "",
                         "first_name": "",
                         "email": "",
-                        "isTutor": true,
-                        "isAdmin": false,
+                        "isTutor": false,
+                        "isAdmin": true,
                         "semesterId": ""
                     }
                 }
@@ -263,18 +239,18 @@
             /**
              * Requests registered Users from API
              * On Semester is Changed
-             * Filtered by Semester & UserRole: Tutor
+             * Filtered by Semester & UserRole: Admin
              * @private
              */
             _semesterChanged: function (event) {
-                this.set('semester', event.detail.semesterId);
-                this.set('tutors', []);
+                this.set('semester', event.detail);
+                this.set('admins', []);
 
                 this.ajax = {
                     contentType: 'application/json',
                     headers: {
                         Authorization: this.accessToken,
-                        filter: '{"where":{"isTutor":"true","isAdmin":"false","semesterId":"' + this.semester + '"}}'
+                        filter: '{"where":{"isTutor":"false","isAdmin":"true"}}'
                     },
                     method: 'GET',
                     endpoint: '/platformUsers'
@@ -283,11 +259,11 @@
             },
 
             /**
-             * Helper Function sorting an array of tutor objects
+             * Helper Function sorting an array of admin objects
              * @return sorted array
              */
-            sortTutors: function (tutors) {
-                var sorted = tutors.sort(function(a, b){
+            sortAdmin: function (admins) {
+                var sorted = admins.sort(function(a, b){
                     var textA = a.name.toUpperCase();
                     var textB = b.name.toUpperCase();
                     return ((textA < textB) ? -1 : (textA > textB) ? 1 : 0); });
@@ -296,23 +272,22 @@
 
             /**
              * Callback on API response to reqgistered Users Request
-             * appending received Users to tutors array
+             * appending received Users to admins array
              * generating Request for PendingUsers filtered by Semester & Role
              * @private
              */
-            _handleTutorsResponse: function (event) {
+            _handleAdminsResponse: function (event) {
                 var api_response = event.detail;
-                var sorted = this.sortTutors(api_response);
+                var sorted = this.sortAdmin(api_response)
                 for (var i = 0; i < sorted.length; i++) {
-                    sorted[i].labCount = 0;
-                    this.push('tutors', sorted[i]);
+                    this.push('admins', sorted[i]);
                 }
 
                 this.ajax_pending = {
                     contentType: 'application/json',
                     headers: {
                         Authorization: this.accessToken,
-                        filter: '{"where":{"isTutor":"true","isAdmin":"false","semesterId":"' + this.semester + '"}}'
+                        filter: '{"where":{"isTutor":"false","isAdmin":"true"}}'
                     },
                     method: 'GET',
                     endpoint: '/PendingPlatformUsers'
@@ -320,58 +295,45 @@
             },
 
             /**
-             * Function appending Pending Users received from API to Tutors Array
+             * Function appending Pending Users received from API to Admins Array
              * @private
              */
-            _handlePendingTutorsResponse: function (event) {
+            _handlePendingAdminsResponse: function (event) {
                 var api_response = event.detail;
-                var sorted = this.sortTutors(api_response);
+                var sorted = this.sortAdmin(api_response)
                 for (var i = 0; i < sorted.length; i++) {
-                    sorted[i].labCount = 0;
-                    this.push('tutors', sorted[i]);
+                    this.push('admins', sorted[i]);
                 }
                 this.labCountAjax = {
                     contentType: 'application/json',
                     headers: {
-                        Authorization: this.accessToken
-                        //filter: '{"where":{"tutorId":"'+this.tutors[0].id+'","semesterId":"' + this.semester + '"}}'
+                        Authorization: this.accessToken,
+                        filter: '{"where":{"adminId":"'+this.admins[0].id+'","semesterId":"' + this.semester + '"}}'
                     },
                     method: 'GET',
                     endpoint: '/Labs'
                 };
-            },
-
-            /**
-             * Function Mapping Labs received from API to Tutors and count Labs for each
-             * @private
-             */
-            _handleLabCountResponse: function (response) {
-                for(var i=0; i<this.tutors.length; i++){
-                    var tutorId = this.tutors[i].id;
-                    var labs = response.detail.filter(function (item) {
-                        return item.tutorId===tutorId;
-                    });
-                    this.set('tutors.'+i+'.labCount', labs.length);
-                }
+                //To Notify Polymer & other Components of changes to admins property
+                this.notifyPath('admins');
             },
 
             /**
              * Opens Popup to Approve User Deletion
              * @private
              */
-            _deleteTutor: function (event) {
-                //Grabbing Tutor information from target
-                var tutor = event.model.__data__.tutor;
-                var tutorID = tutor.id;
-                var tutorName = tutor.first_name + " " + tutor.name;
-                var pending = !tutor.emailVerified;
+            _deleteAdmin: function (event) {
+                //Grabbing Admin information from target
+                var admin = event.model.__data__.admin;
+                var adminID = admin.id;
+                var adminName = admin.first_name + " " + admin.name;
+                var pending = !admin.emailVerified;
 
-                //Temporarily save Tutor Info in deleteDialogs Attributes
-                this.$.deleteDialog.dataset.tutorID = tutorID;
+                //Temporarily save Admin Info in deleteDialogs Attributes
+                this.$.deleteDialog.dataset.adminID = adminID;
                 this.$.deleteDialog.dataset.pending = pending;
 
-                //Set Popup Text to match selcted Tutor & Open Popus
-                this.$$('#deleteDialog > div > H1 > span').textContent = tutorName;
+                //Set Popup Text to match selcted Admin & Open Popus
+                this.$$('#deleteDialog > div > H1 > span').textContent = adminName;
                 this.$.deleteDialog.open();
             },
 
@@ -390,9 +352,9 @@
             _reactToDeleteDialog: function (event) {
                 //Check if Popup Approved or Canceled
                 if (event.detail.confirmed) {
-                    //Calculate API endpoint from pendingFlag & tutorId stored in popups data
+                    //Calculate API endpoint from pendingFlag & adminId stored in popups data
                     var data = event.path[0].dataset;
-                    var endpoint = ((data.pending == 'true') ? ('/PendingPlatformUsers/') : ('/PlatformUsers/')) + data.tutorID;
+                    var endpoint = ((data.pending == 'true') ? ('/PendingPlatformUsers/') : ('/PlatformUsers/')) + data.adminID;
                     //Generate API Request
                     this.deleteAjax = {
                         contentType: 'application/json',
@@ -405,7 +367,7 @@
 
                 } else {
                     //Reset Attributes
-                    this.$.deleteDialog.dataset.tutorId = '';
+                    this.$.deleteDialog.dataset.adminId = '';
                     this.$.deleteDialog.dataset.pending = '';
                 }
             },
@@ -418,9 +380,7 @@
                 //Check if Popup Approved or Canceled
                 if (event.detail.confirmed) {
                     //Validate if all Fields Filled in & not final mail submitted
-                    if (this.newUser.name && this.newUser.first_name && this.newUser.email && !this.newUser.email.includes('@')) {
-                        //Append Mail Suffix & generate API Request
-                        this.newUser.email += '@campus.lmu.de';
+                    if (this.newUser.name && this.newUser.first_name && this.newUser.email && this.newUser.email.includes('@')) {
                         this.set('newUser.semesterId', this.semester);
                         this.createAjax = {
                             contentType: 'application/json',
@@ -432,13 +392,13 @@
                             endpoint: '/PendingPlatformUsers'
                         };
                         //Reset newUser to Display empty fields the next time again
-                        this.set('newUser',{"name": "","first_name": "","email": "","isTutor": true,"isAdmin": false})
+                        this.set('newUser',{"name": "","first_name": "","email": "","isTutor": false,"isAdmin": true})
                     } else {
                         this.$$('#createFail').open();
                     }
                 } else {
                     //Reset Attributes
-                    this.$.deleteDialog.dataset.tutorId = '';
+                    this.$.deleteDialog.dataset.adminId = '';
                     this.$.deleteDialog.dataset.pending = '';
                 }
             },
@@ -448,13 +408,13 @@
              * @private
              */
             _handleDeleteResponse: function (response) {
-                //Remove Tutor from Tutors List
-                var tutorID = this.$.deleteDialog.dataset.tutorID;
-                index = this.tutors.findIndex(x => x.id === tutorID);
-                this.splice('tutors', index, 1);
+                //Remove Admin from Admins List
+                var adminID = this.$.deleteDialog.dataset.adminID;
+                index = this.admins.findIndex(x => x.id === adminID);
+                this.splice('admins', index, 1);
 
                 //Reset Attributes
-                this.$.deleteDialog.dataset.tutorId = '';
+                this.$.deleteDialog.dataset.adminId = '';
                 this.$.deleteDialog.dataset.pending = '';
 
                 this.$$('#deleteSuccess').open();
@@ -469,14 +429,14 @@
             },
 
             /**
-             * Updates tutors and displays Succeeded Toast
-             * on API response to Create Tutor Request
+             * Updates admins and displays Succeeded Toast
+             * on API response to Create Admin Request
              * @private
              */
             _handleCreateResponse: function (response) {
                 this.$$('#createSuccess').open();
-                this.push('tutors', response.detail);
-                this.notifyPath('tutors');
+                this.push('admins', response.detail);
+                this.notifyPath('admins');
             },
 
             /**
@@ -493,7 +453,8 @@
              * @private
              */
             _forget: function () {
-                this.set('tutors', []);
+                this.set('admins', []);
+
             }
 
         });

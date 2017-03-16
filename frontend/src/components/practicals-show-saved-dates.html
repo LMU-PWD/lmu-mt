@@ -1,16 +1,28 @@
+<link rel="import" href="../../bower_components/iron-list/iron-list.html">
+
 <dom-module id="practicals-show-saved-dates">
     <template>
         <style include="shared-styles">
             .saved-dates-shower{
-                padding-left: 20px;
+                padding: 10px 20px 20px 20px;
+            }
+            .listrow {
+                padding: 5px;
+                border-bottom: 1px solid var(--paper-grey-300)
+            }
+            .listrow:last-child {
+                border: none
             }
         </style>
-        <div class="saved-dates-shower">[[title]]
-            <ol type="1">
-                <template id="saved_dates" is="dom-repeat" items="{{chosenlabs}}" as="chosen">
-                    <li>[[_getLabString(chosen)]]</li>
+        <div class="saved-dates-shower">
+            <!--[[title]]-->
+            <iron-list items="{{chosenLabsList}}" as="chosen" style=" flex: 1 1 auto;">
+                <template>
+                    <div class="listrow">
+                        [[_getLabString(chosen)]]
+                    </div>
                 </template>
-            </ol>
+            </iron-list>
         </div>
     </template>
     <script>
@@ -23,21 +35,34 @@
                     notify: true,
                     observer: '_labsChanged'
                 },
-                title:{
+                chosenLabsList: {
+                    type: Array,
+                },
+                title: {
                     type: String
                 }
             },
-            ready: function(){
-                //console.log(this.chosenlabs);
+
+
+            _labsChanged: function(){
+
+                this.chosenLabsList = [];
+                for (var i = 0; i < this.chosenlabs.length; i++) {
+                    this.push('chosenLabsList', this.chosenlabs[i]);
+                }
+
+                if (this.chosenlabs.length == 0)
+                    return
+
             },
             behaviors: [
                 Polymer.MyLocalizeBehavior
             ],
-            _labsChanged: function(labs){
-                this.chosenlabs = labs;
-                //console.log(this.chosenlabs);
-                this.$.saved_dates.render();
-            },
+//            _labsChanged: function(labs){
+//                this.chosenlabs = labs;
+//                //console.log(this.chosenlabs);
+//                this.$.saved_dates.render();
+//            },
             /**
              * Creates string from the given date
              * @param {String} date - date that will be transformed to String
@@ -80,6 +105,7 @@
                     " um "+hours+":"+minutes+" Uhr";
                 return datestring;
             },
+
             /**
              * Creates string from the timelab-timits to get a nicer visualisation,
              * Adds leading zeros, if necessary

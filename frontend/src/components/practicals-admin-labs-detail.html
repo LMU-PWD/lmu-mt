@@ -1,0 +1,448 @@
+<link rel="import" href="practicals-admin-date-creator.html">
+<link rel="import" href="practicals-admin-labs-creator.html">
+<link rel="import" href="lab-detail-view.html">
+
+<!--Localization Imports-->
+<link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
+<link rel="import" href="../services/my-localize-behavior.html">
+
+<dom-module id="practicals-admin-labs-detail">
+    <template>
+        <style include="shared-styles">
+            :host {
+                display: block;
+                text-align: center;
+                padding: 10px;
+                margin: 24px;
+            }
+            .title{
+                font-size: larger;
+            }
+            .datecreator{
+                display:inline-block;
+                #margin:0;
+                height: auto;
+                vertical-align:top;
+                padding-bottom: 10px;
+            }
+            #detailView{
+                background-color: var(--paper-blue-grey-50);
+            }
+            .dialogButton{
+                width: 49.8%;
+                height: 40px;
+            }
+            /*Phone*/
+            @media screen and (max-width: 767px) {
+                .datecreator{
+                    width: 100%;
+                }
+            }
+            /*Tablet*/
+            @media screen and (min-width: 768px) and (max-width: 1023px) {
+                .datecreator{
+                    min-width: 400px;
+                    width: 49%;
+
+                }
+            }
+            /*Desktop*/
+            @media screen and (min-width: 1024px) {
+                .datecreator{
+                    min-width: 400px;
+                    width: 24%;
+                }
+            }
+        </style>
+
+        <api-request
+                headers="[[ ajax_groups.headers ]]"
+                method="[[ ajax_groups.method ]]"
+                body="[[ ajax_groups.body ]]"
+                endpoint="[[ ajax_groups.endpoint ]]"
+                on-api-response="_responseFromGettingGroups"></api-request>
+        <api-request
+                headers="[[ ajax_tutors.headers ]]"
+                method="[[ ajax_tutors.method ]]"
+                body="[[ ajax_tutors.body ]]"
+                endpoint="[[ ajax_tutors.endpoint ]]"
+                on-api-response="_responseFromGettingTutors"></api-request>
+        <api-request
+                headers="[[ ajax_save_lab.headers ]]"
+                method="[[ ajax_save_lab.method ]]"
+                body="[[ ajax_save_lab.body ]]"
+                endpoint="[[ ajax_save_lab.endpoint ]]"
+                on-api-response="_responseFromPostingLab"></api-request>
+        <api-request
+                headers="[[ ajax_save_new_lab.headers ]]"
+                method="[[ ajax_save_new_lab.method ]]"
+                body="[[ ajax_save_new_lab.body ]]"
+                endpoint="[[ ajax_save_new_lab.endpoint ]]"
+                on-api-response="_responseFromPostingLab"></api-request>
+
+        <paper-dialog id="detailView" on-iron-overlay-closed="_reactToDetailDialog">
+            <lab-detail-view lab-from-api="[[ chosenlab ]]"
+                             access-token ="[[accessToken]]"
+                             tutors = "[[tutors]]"
+                             groups = "[[groups]]"></lab-detail-view>
+
+            <div class="buttons">
+                <paper-button class="dialogButton" dialog-dismiss raised><iron-icon icon="close" on-tap="_handleDiscard"></iron-icon>[[localize('c_button_discard')]]</paper-button>
+                <paper-button class="dialogButton" dialog-confirm raised><iron-icon icon="save" ></iron-icon>[[localize('c_button_save')]]</paper-button>
+            </div>
+        </paper-dialog>
+
+        <!-- Dialog for creating new labs -->
+        <practicals-admin-labs-creator id="newLabView"
+                                       access-token="[[ accessToken ]]"
+                                       lab-type-id="[[ labType.id ]]"
+                                       semester-id="[[ semesterId ]]"
+                                       on-labs-changed="_responseFromPostingLab"></practicals-admin-labs-creator>
+
+        <div class="page">
+            <div>
+                <paper-button raised class="addNewLabButton" on-tap="_handleAddNewLab">
+                    <iron-icon icon="add" ></iron-icon> [[localize('semester_setup_dates_button_add')]]
+                </paper-button>
+            </div>
+            <div class="dateselector">
+                <template is="dom-repeat" id="dates" items="[[transformedLabs]]" as="labs">
+                    <practicals-admin-date-creator id="dateselectors" class="datecreator"
+                                                   labs="[[labs]]"
+                                                   priority="[[priority]]"
+                                                   on-date-click="_handleDateClick"></practicals-admin-date-creator>
+                </template>
+            </div>
+        </div>
+
+        <!--Iron Signal for Localization-->
+        <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
+
+    </template>
+
+    <script>
+        Polymer({
+            is: 'practicals-admin-labs-detail',
+            properties: {
+                accessToken: {
+                    type: String,
+                    notify: true
+                },
+                allLabs: {
+                    type: Array,
+                    value: [],
+                    observer: "_labsChanged"
+                },
+                isReady:{
+                    type: Boolean,
+                    value: false
+                },
+                groups: Array,
+                labType: Object,
+                labToSet: Object,
+                priority:{
+                    type: Number,
+                    value: 2
+                },
+                route: {
+                    type: Object,
+                    notify: true
+                },
+                selectedView:{
+                    type: String,
+                    value: "0"
+                },
+                semesterId:{
+                    type: String
+                },
+                transformedLabs: {
+                    type: Array,
+                    notify: true
+                },
+                tutors: Array,
+                user: Object,
+                userId: {
+                    type: String
+                }
+            },
+
+            behaviors: [
+                Polymer.MyLocalizeBehavior
+            ],
+
+            ready: function () {
+                //console.log(this.semesterId);
+                this.ajax_groups ={
+                    headers: {
+                        Authorization: this.accessToken
+                    },
+                    method: 'GET',
+                    endpoint: '/groups?filter[where][semesterId]=' + this.semesterId
+                };
+            },
+
+            attached: function() {
+                this.loadResources(this.resolveUrl('../shared/locales.json'));
+            },
+            _switchLocale: function() {
+                this.language = (this.language == 'en') ? 'de' : 'en';
+            },
+
+            /**
+             * Creates a groupName string searching for the given groupId inside the this.groups-Array
+             * and transforming the groupname
+             * @param group - groupId
+             */
+            _getLabGroupName: function(group){
+                    //console.log(group);
+                    var returnstring = "";
+                    if(group  && this.groups && group != "" && this.groups.length > 0){
+                        for(var i = 0; i < this.groups.length; i++){
+                            if(group == this.groups[i].id){
+                                returnstring = this.groups[i].name;
+                                break;
+                            }
+                        }
+                    }
+                    //console.log(returnstring);
+                    return returnstring;
+            },
+            /**
+             * Creates a tutorName string searching for the given tutorId inside the this.tutor-Array
+             * and transforming the tutor name and firstname
+             * @param tutor - tutorId
+             */
+            _getLabTutorName: function(tutor){
+                //console.log(tutor);
+                //console.log(this.tutor);
+                var returnstring = "";
+                if(tutor && this.tutors && tutor != "" && this.tutors.length > 0){
+                    for(var i = 0; i < this.tutors.length; i++){
+                        if(tutor == this.tutors[i].id){
+                            returnstring = this.tutors[i].name + ", " + this.tutors[i].first_name;
+                            //break;
+                        }
+                    }
+                }
+                //console.log(returnstring);
+                return returnstring;
+            },
+
+            /**
+             * Handle date click, Get chosenlab and open Lab-Detail-Dialog
+             * @param e - Event Variable
+             */
+            _handleDateClick: function(e){
+                this.set('chosenlab', {});
+                var labFromChild = new Date(e.detail.dates[0]);
+                //console.log(labFromChild.toString());
+                var lab = new Date();
+                for(i=0; i<this.allLabs.length; i++){
+                    lab = new Date(this.allLabs[i].date);
+                    if(lab.toString() == labFromChild.toString()){
+                        this.set('chosenlab', this.allLabs[i]);
+                        //this.chosenlab = this.allLabs[i];
+                        break;
+                    }
+                }
+                if(this.chosenlab) {
+                    this.$.detailView.open();
+                }
+                else{
+                    console.log("chosenlab is not correctly defined: ");
+                    console.log(this.chosenlab);
+                }
+            },
+            /**
+             * Handle date click, Open New-Lab-Dialog
+             * @param e - Event Variable
+             * @private
+             */
+            _handleAddNewLab: function(e){
+                this.$.newLabView.open();
+            },
+            /**
+             * Handle discard click, inside the lab-detial-view dialog, reset chosenlab
+             * @param event - Event Variable
+             */
+            _handleDiscard: function(event){
+                this.chosenlab = {};
+            },
+            /**
+             * Handle allLabs array changes, transform labs if group and tutors are already there
+             * @param e - Event Variable
+             * @private
+             */
+            _labsChanged: function(e){
+                //console.log("labsChanged");
+                if(this.groups && this.tutors) {
+                    this.set('transformedLabs', this._transformLabs(this.allLabs,true));
+                }
+            },
+            /**
+             * Handle Dialog button pressed, If confirmed replace the chosen Lab in API
+             * @param event
+             */
+            _reactToDetailDialog: function (event) {
+                if(event.detail.confirmed){
+                    //Post Lab-Changes in API
+                    this.labToSet = event.target.firstChild.nextSibling.lab;
+                    //console.log(this.labToSet);
+                    if(this.labToSet.id) {
+                        this.ajax_save_lab = {
+                            headers: {
+                                Authorization: this.accessToken
+                            },
+                            body: {
+                                date: this.labToSet.date.toString(),
+                                duration: this.labToSet.duration,
+                                location: this.labToSet.location,
+                                tutorId: this.labToSet.tutorId,
+                                groupId: this.labToSet.groupId
+                            },
+                            method: 'PATCH',
+                            endpoint: '/Labs/' + this.labToSet.id
+                        };
+                        //console.log(this.ajax_save_lab);
+                        this.labToSet = {};
+                    }
+                    else{
+                        console.log("Error: LabId is wrong: ");
+                        console.log(this.labToSet.id);
+                    }
+                }
+            },
+
+            /**
+             * Handle response from api-request whith ajax_groups, start ajax_tutors api-request
+             * @param e - Event Variable
+             * @private
+             */
+            _responseFromGettingGroups: function(e){
+                //console.log(e.detail);
+                this.groups = e.detail;
+
+                this.ajax_tutors ={
+                    headers: {
+                        Authorization: this.accessToken
+                    },
+                    method: 'GET',
+                    endpoint: '/platformusers?filter[where][semesterId]=' +  this.semesterId
+                };
+            },
+            /**
+             * Handle response from api-request whith ajax_tutors, filter plamtformUsers to get only tutors
+             * @param e - Event Variable
+             * @private
+             */
+            _responseFromGettingTutors: function(e){
+                var temporalArray = e.detail;
+                //filter plamtformUsers to get only tutors
+                this.tutors = temporalArray.filter(function(item){return item.isTutor;});
+                this.isReady = true;
+                //console.log(this.tutors);
+                this._labsChanged(e);
+            },
+            /**
+             * Handle response from api-request whith ajax_get_labs, filter labs to get only labs with this labTypeId
+             * @param e - Event Variable
+             * @private
+             */
+            _responseFromGettingLabs: function(e){
+                var temporalArray = e.detail;
+                var labTypeId = this.labType.id;
+                temporalArray = temporalArray.filter(function(item){return item.labTypeId == labTypeId;});
+                this.allLabs = temporalArray;
+            },
+
+            /**
+             * Handle response from api-request to save changed lab data, make parent look for changed in Labs on API
+             * @param e - Event Variable
+             * @private
+             */
+            _responseFromPostingLab: function(e){
+                //console.log(e);
+                this.fire('labs-changed');
+            },
+
+            /**
+             * Transform the Format of the given Timelabs from the Api, so it will be easier to handle in the frontend
+             * @param labsFromApi - Contains the given timelabs
+             * @param divideDates - Boolean
+             * @returns {Array} - timelabs in new format
+             * @private
+             */
+            _transformLabs: function(labsFromApi,divideDates){
+                var transformedLabs = []; //Store return-Array here
+                var lastLab = new Date(labsFromApi[0].date);
+                var countDates = 0; //Date counter
+                var countLabs = 0; //lab counter
+                var dates = [];
+
+                if(labsFromApi) {
+                    for ( var i = 0; i < labsFromApi.length; i++) {
+                        // Create a new array-entrie if date from recent lab is different from date of the last lab
+                        var labdate = new Date(labsFromApi[i].date);
+                        if ((labdate.getFullYear() != lastLab.getFullYear() ||
+                            labdate.getMonth() != lastLab.getMonth() ||
+                            labdate.getDate() != lastLab.getDate()) && divideDates) {
+                            dates = [];
+                            lastLab = labdate;
+                            transformedLabs.push([]);
+                            countDates++;
+                            countLabs = 0;
+                        }
+                        var endtime = new Date(labdate.getFullYear(), labdate.getMonth(), labdate.getDate());
+                        if ((labdate.getMinutes() + (labsFromApi[i].duration % 60)) > 60) {
+                            endtime.setHours(1 + Math.floor(labdate.getHours() + (labsFromApi[i].duration) / 60));
+                            endtime.setMinutes(labdate.getMinutes() + (labsFromApi[i].duration % 60) - 60);
+                        }
+                        else {
+                            endtime.setHours(Math.floor(labdate.getHours() + (labsFromApi[i].duration) / 60));
+                            endtime.setMinutes(labdate.getMinutes() + (labsFromApi[i].duration % 60));
+                        }
+
+                        var lab = {};
+                        lab.dates = [];
+                        lab.tutor = "";
+                        lab.group = "";
+                        lab.tutorName = "";
+                        lab.groupName = "";
+                        lab.dates = [labdate, endtime];
+                        lab.tutor = labsFromApi[i].tutorId;
+                        lab.group = labsFromApi[i].groupId;
+
+                        if (lab.tutor) {
+                            //console.log(lab.tutor);
+                            lab.tutorName = this._getLabTutorName(labsFromApi[i].tutorId);
+                            //console.log(lab.tutorName);
+                        }
+                        else{
+                            lab.tutor = "";
+                        }
+                        if (lab.group) {
+                            //console.log(lab.group);
+                            lab.groupName = this._getLabGroupName(labsFromApi[i].groupId);
+                            //console.log(lab.groupName);
+                        }
+                        else{
+                            lab.group = "";
+                        }
+
+                        if (divideDates) {
+                            dates[countLabs] = lab;
+                            transformedLabs[countDates] = dates;
+                        }
+                        else {
+                            transformedLabs[i] = lab;
+                        }
+                        countLabs++;
+                    }
+                }
+                //console.log("transformed labs: ");
+                //console.log(transformedLabs);
+                return transformedLabs;
+            }
+        });
+    </script>
+</dom-module>

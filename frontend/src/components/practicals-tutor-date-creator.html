@@ -1,0 +1,258 @@
+<dom-module id="practicals-tutor-date-creator">
+    <template>
+        <style include="shared-styles">
+            :host{
+
+            }
+            .date{
+                padding: 10px;
+                background-color: var(--paper-blue-grey-500);
+                color: var(--paper-blue-grey-100);
+                font-size: 18px;
+            }
+            .lab{
+                border-style: solid;
+                border-width: 1px;
+                border-color: var(--paper-blue-grey-100);
+            }
+            .date-creator{
+                margin-top: 20px;
+                background-color: var(--paper-blue-grey-50);
+                text-align: center;
+            }
+            #priorityselection{
+                background-color: var(--paper-blue-grey-200);
+                padding-bottom: 20px;
+            }
+            #priorityShower{
+                visibility: hidden;
+                margin-left: 10%;
+                color: green;
+            }
+            .dropdown-content{
+                width: 70px;
+            }
+            .selected-slot{
+                color: green;
+                background-color: #CEF6CE;
+            }
+            .lab:hover {
+                background: var(--paper-orange-50);
+                cursor: pointer;
+            }
+
+        </style>
+        <div class="date-creator">
+            <div class="date">
+                [[date]]
+            </div>
+            <template is="dom-repeat" items="[[mytimeslots]]" as="lab" >
+                <paper-item id="lab" class$="[[_getSelectedStateClass(lab)]]" on-tap="_handleDateClick">
+                     [[ _getTimeSlotString(lab) ]]
+                </paper-item>
+            </template>
+        </div>
+    </template>
+    <script>
+        Polymer({
+            is: 'practicals-tutor-date-creator',
+            properties: {
+                apiAllLabs: {
+                    type: Array,
+                    value: []
+                },
+                timeslots:{
+                    type: Array,
+                    value: []
+                },
+                date:{
+                    type: String,
+                    value: ""
+                },
+                chosenlabs:{
+                    type: Array,
+                    value: [],
+                    notify: true
+                },
+                mytimeslots: {
+                    type: Array,
+                    computed: '_computeMytimeslots(chosenlabs, timeslots)'
+                }
+            },
+            ready: function() {
+                this.date = this._getDateString(this.timeslots[0][0]);
+            },
+
+            /**
+             * Compute method for variable Mytimeslots.
+             */
+            _computeMytimeslots: function(chosenlabs, timeslots) {
+                var array = []
+                for (var i = 0; i < timeslots.length; i++)
+                {
+                    var currentTimeslot = {
+                        from: timeslots[i][0],
+                        to: timeslots[i][1],
+                        id: timeslots[i][2],
+                        selected: false
+                    };
+
+                    for (var j = 0; j < chosenlabs.length; j++) {
+
+                        if (chosenlabs[j].id == timeslots[i][2]  )  {
+                            currentTimeslot.selected = true;
+                        }
+                    }
+                    array.push(currentTimeslot)
+                }
+                return array;
+            },
+
+            /**
+             * Creates string from the timeslot-timits to get a nicer visualisation,
+             * Adds leading zeros, if necessary
+             */
+            _getTimeSlotString: function(slot){
+                if(slot) {
+                        var starthour = slot.from.getHours();
+                        var startminute = slot.from.getMinutes();
+                        var endhour = slot.to.getHours();
+                        var endminute = slot.to.getMinutes();
+                        /*
+                    * Add zeros, if necessary
+                    */
+
+                    if(starthour<10){
+
+                        starthour = "0"+ starthour;
+                    }
+                    if(startminute<10){
+                        startminute = "0"+startminute;
+                    }
+                    if(endhour<10
+                    ){
+                        endhour = "0"+endhour;
+                    }
+                    if(endminute< 10){
+                        endminute = "0" +endminute;
+                    }
+
+                    return starthour + ":" + startminute + " - " + endhour + ":" + endminute+ " Uhr";
+                }
+            },
+
+            /**
+             * Creates string from the given date
+             * @param {String} date - date that will be transformed to String
+             */
+            _getDateString: function(date){
+
+                var datestring = "";
+                switch(date.getDay()){
+
+                    case 0:
+                        datestring = "Sonntag, ";
+                        break;
+                    case 1:
+                        datestring = "Montag, ";
+                        break;
+                    case 2:
+                        datestring = "Dienstag, ";
+                        break;
+                    case 3:
+                        datestring = "Mittwoch, ";
+                        break;
+                    case 4:
+                        datestring = "Donnerstag, ";
+                        break;
+                    case 5:
+                        datestring = "Freitag, ";
+                        break;
+                    case 6:
+                        datestring = "Samstag, ";
+                        break;
+                }
+                datestring = datestring+date.getDate()+"."+((date.getMonth())+1)+"."+date.getFullYear();
+                return datestring;
+            },
+
+            /**
+             * Returns selected-slot if the slot has been selected before
+             */
+            _getSelectedStateClass: function(slot) {
+                if (slot.selected)
+                    return 'lab selected-slot'
+                else
+                    return 'lab'
+            },
+
+            /**
+             * Click-Event handler
+             * Handles the timeslot selection
+             * @param {String} e - handle data
+             */
+            _handleDateClick: function(e){
+                this.fire("date-click");
+
+                var chosenlabId = e.model.__data__.lab.id;
+                recentlab = e.target;
+
+                if(recentlab.classList.value.indexOf('selected-slot') >= 0){
+                    recentlab.classList.toggle('selected-slot')
+
+                    var temp = this.chosenlabs.filter(function(item){
+                        return item.id != chosenlabId;
+                    });
+                    this.chosenlabs = [];
+                    this.chosenlabs = temp;
+                }
+                else {
+                    recentlab.classList.toggle('selected-slot')
+
+                    // get object by id from allLabs array
+                    var labObject = {};
+                    for (var i = 0, len = this.apiAllLabs.length; i < len; i++) {
+                        if(this.apiAllLabs[i].id == chosenlabId) {
+                            labObject = this.apiAllLabs[i];
+                            break;
+                        }
+                    }
+//                    this.chosenlabs.push(labObject);
+//                    this.push('chosenlabs', labObject);
+
+                    var temp = this.chosenlabs;
+                    temp.push(labObject);
+                    this.chosenlabs = [];
+                    this.chosenlabs = temp;
+                }
+            },
+
+            _checkFilled: function(arrayItem){
+                return arrayItem == '';
+            },
+
+            /**
+             * Checks if given Parameter is 0 and returns true of false
+             * @param selector - Given parameter
+             * @returns {boolean}
+             * @private
+             */
+            _computeSelector: function(selector){
+                return !(selector == 0);
+            },
+
+            /**
+             * Reset labselection on Button click
+             * @private
+             */
+            _resetSelection: function(){
+                this.chosenlabs =[];
+                var labs = Polymer.dom(this.root).querySelectorAll("#lab");
+                for(j=0; j < labs.length; j++){
+                    labs[j].classList.remove("selected-slot");
+                }
+            },
+
+        });
+    </script>
+</dom-module>

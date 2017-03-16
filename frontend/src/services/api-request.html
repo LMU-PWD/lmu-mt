@@ -6,6 +6,7 @@
     <template>
 
         <iron-ajax auto
+                   id="request"
                    body="[[ body ]]"
                    content-type="[[ contentType ]]"
                    handle-as="json"
@@ -74,6 +75,10 @@
                     type: String,
                     reflectToAttribute: false
                 }
+            },
+
+            trigger: function () {
+                this.$$('iron-ajax').generateRequest();
             },
 
             _handleResponse: function (response) {

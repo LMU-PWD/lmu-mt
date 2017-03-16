@@ -1,0 +1,267 @@
+<dom-module id="lab-detail-content-element">
+    <template>
+        <style include="shared-styles">
+            :host {
+                display: block;
+            }
+            .textInputElements{
+                display: inline-block;
+                float: none;
+            }
+            #text{
+                margin-right: 2%;
+            }
+            paper-date-picker{
+                color: var(--paper-blue-grey-500) !important;
+                background-color: var(--paper-blue-grey-50) !important;
+            }
+            iron-icon{
+                display: inline-block;
+                float: right;
+            }
+            .checkicon{
+                background-color:var(--paper-blue-grey-700);
+                color:var(--paper-blue-grey-100);
+                border-radius: 50%;
+                padding: 3px;
+            }
+            paper-item{
+                margin-bottom: 1%;
+                margin-top: 1%;
+                text-align: left;
+            }
+            ace-widget{
+                width: 2000%;
+            }
+        </style>
+
+        <paper-item>
+            <div id="text">[[text]]:  </div>
+            <iron-collapse id="editorElement">
+                [[data]]
+                <iron-icon icon="editor:mode-edit" on-tap="_handleContentClick"></iron-icon>
+            </iron-collapse>
+            <iron-collapse id="changeContentElement">
+                <template is="dom-if" if="[[isString]]">
+                    <paper-input class="textInputElements" label="[[data]]" value="{{userInput}}"></paper-input>
+                </template>
+                <template is="dom-if" if="[[isDate]]">
+                    <paper-date-picker date="{{date}}" responsive-width="630px" ></paper-date-picker><br>
+                    <time-picker hour="{{ time.hour }}" min="{{ time.min }}"></time-picker>
+                </template>
+                <template is="dom-if" if="[[isId]]">
+                    <paper-dropdown-menu label="Name">
+                        <paper-listbox class="dropdown-content">
+                            <template is="dom-repeat" items="[[array]]">
+                                <paper-item on-tap="_handleItemClick">[[item]]</paper-item>
+                            </template>
+                        </paper-listbox>
+                    </paper-dropdown-menu>
+                </template>
+                <template is="dom-if" if="[[isEditor]]">
+                    <ace-widget
+                            id="aceEditor"
+                            on-editor-content="_aceValueChanged"
+                            theme="[[ editorTheme ]]"></ace-widget>
+                </template>
+                <iron-icon class="textInputElements checkicon" icon="check" on-tap="_handleSetClick"></iron-icon>
+            </iron-collapse>
+        </paper-item>
+    </template>
+
+    <script>
+        Polymer({
+            is: 'lab-detail-content-element',
+            properties: {
+                array: {
+                    type: Array
+                },
+                data: {
+                    type: String,
+                    notify: true,
+                    observer: '_dataChanged'
+                },
+                date: {
+                    type: Date,
+                    notify: true
+                },
+                editorTheme: {
+                    type: String,
+                    reflectToAttribute: false,
+                    value: 'ace/theme/kuroir'
+                },
+                input: {
+                    type: String,
+                    notify: true
+                },
+                isDateFromParent: {
+                    type: String,
+                    notify: true
+                },
+                isEditorFromParent: {
+                    type: String,
+                    notify: true
+                },
+                isIdFromParent: {
+                    type: String,
+                    notify: true
+                },
+                isDate: {
+                    type: Boolean,
+                    notify: true
+                },
+                isEditor: {
+                    type: Boolean,
+                    notify: true
+                },
+                isId: {
+                    type: Boolean,
+                    notify: true
+                },
+                isNumber:{
+                    type: Boolean,
+                    notify: true
+                },
+                isString: {
+                    type: Boolean,
+                    notify: true
+                },
+                text: {
+                    type: String,
+                    notify: true
+                },
+                selectedItem: {
+                    type: String,
+                    notify: true
+                }
+            },
+            /**
+             * Automatically called, when component is ready
+             */
+            ready: function () {
+                //console.log(this.array);
+                //console.log(this.data);
+                this.time = {};
+                this.time.min = "0";
+                this.time.hour = "0";
+                this.$.editorElement.toggle(); //Show Data Element
+                this.userInput = this.data;
+            },
+            /**
+             * Handles changes in ACE-Editor User Input
+             * @param e - event Variable
+             */
+            _aceValueChanged: function(e){
+                //console.log(e.detail.value);
+                this.userInput = e.detail.value;
+            },
+            /**
+             * Handles changes of Data coming from Parent
+             * @param e - event Variable
+             */
+            _dataChanged: function(e){
+                if (this.isDateFromParent && this.isDateFromParent == "true") {
+                    if(this.data && this.data != "") {
+                        //console.log(this.data.toString().substring(0,21));
+                        this.data = this.data.toString().substring(0,21);
+                    }
+                }
+            },
+
+            /**
+             * Handle Click on this paper-item
+             * @param e - Event Variable
+             * @private
+             */
+            _handleContentClick: function(e){
+                 if (this.isDateFromParent && this.isDateFromParent == "true") {
+                    if(this.data != "") {
+                    this.date = new Date(this.data);
+                    this.time.hour = this.date.getHours();
+                    this.time.min = this.date.getMinutes();
+                    }
+                    else{
+                        this.date = new Date();
+                    }
+                    this.set('isDate', true);
+                    this.set('isEditor', false);
+                    this.set('isId', false);
+                    this.set('isString', false);
+                }
+                else if (this.isIdFromParent && this.isIdFromParent == "true") {
+                    this.set('isDate', false);
+                    this.set('isEditor', false);
+                    this.set('isId', true);
+                    this.set('isString', false);
+                }
+                else if (this.isEditorFromParent && this.isEditorFromParent == "true") {
+                     this.set('isDate', false);
+                     this.set('isEditor', true);
+                     this.set('isId', false);
+                     this.set('isString', false);
+                }
+                else {
+                    this.set('isDate', false);
+                    this.set('isId', false);
+                    this.set('isEditor', false);
+                    this.set('isString', true);
+                    if(!isNaN(parseInt(this.data))){
+                        this.set('isNumber', true);
+                    }
+                }
+                this.$.editorElement.toggle();
+                this.$.changeContentElement.toggle();
+                this.userInput = this.data;
+                //this.data = "";
+            },
+            /**
+             * Handle click on dropdown menu item
+             * @param e - Event Variable
+             * @private
+             */
+            _handleItemClick: function(e){
+                //console.log(e.model.index);
+                this.selectedItem = this.array[e.model.index];
+            },
+            /**
+             * Handle click on save icon
+             * @param e - Event Variable
+             * @private
+             */
+            _handleSetClick: function(e){
+                this.$.text.style.color ="";
+                if(this.isString){
+                    if(this.isNumber){
+                        if(!isNaN(parseInt(this.userInput))){
+                            this.input = parseInt(this.userInput);
+                        }
+                        else{
+                            this.$.text.style.color ="red";
+                            console.log("Falsche Eingabe!");
+                        }
+                    }
+                    else{
+                        this.input = this.userInput;
+                    }
+                }
+                if(this.isEditor){
+                    this.input = this.userInput;
+                    var aceEditor = Polymer.dom(this.root).querySelector("#aceEditor");
+                    //console.log(aceEditor.editor);
+                    aceEditor.editor.setValue("");
+                }
+                if(this.isDate){
+                    this.date.setHours(this.time.hour);
+                    this.date.setMinutes(this.time.min);
+                    this.input = this.date;
+                }
+                if(this.isId){
+                    this.input = this.selectedItem;
+                }
+                //console.log(this.input);
+                this.$.editorElement.toggle();
+                this.$.changeContentElement.toggle();
+            }
+        });
+    </script>
+</dom-module>

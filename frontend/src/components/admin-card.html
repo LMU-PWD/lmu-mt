@@ -1,16 +1,23 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 
+<!--Localization Imports-->
+<link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
+<link rel="import" href="../services/my-localize-behavior.html">
+
+
 <dom-module id="admin-card"><template>
     <style  include="shared-styles">
         :host {
+        }
+        .container:hover{
+            background-color: var(--paper-blue-grey-200);
+        }
+        .container{
             height: 100px;
             margin-top: 5px;
             display: block;
             background-color: var(--paper-blue-grey-100);
             border-radius: 5px;
-        }
-        .container:hover{
-            background-color: var(--paper-blue-grey-200);
         }
 
         .icon{
@@ -46,11 +53,6 @@
             color: var(--paper-blue-grey-800);
         }
 
-        /*@media screen and (max-width: 767px) {
-            :host{
-                border-radius: 0;
-            }
-        }*/
     </style>
     <div on-tap="_handleTap" class="container">
         <div class="icon">
@@ -59,7 +61,10 @@
         <h1>[[label]]</h1>
         <paper-icon-button class="add" icon="add-circle-outline"></paper-icon-button>
     </div>
+
+    <!--Iron Signal for Localization-->
     <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
+
 </template>
     <script>
         Polymer({
@@ -69,12 +74,17 @@
                 label: String,
                 role: String
             },
-            ready: function() {
-            
-            },
+            behaviors: [
+                Polymer.MyLocalizeBehavior
+            ],
+            /**
+             * Callback on tap admin-card
+             * Fires ChANGE_ROUTE, if + tapped \w open-create
+             * @private
+             */
             _handleTap: function (event) {
                 if(event.target.className=='add'){
-                    //Open popup to add a new <role>
+                    this.fire('CHANGE_ROUTE', {path: '/'+this.role, page: this.role, create:true});
                 }else
                     this.fire('CHANGE_ROUTE', {path: '/'+this.role, page: this.role});
             }

@@ -20,6 +20,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         font-family: 'Roboto', 'Noto', sans-serif;
         font-weight: 400;
         color: var(--paper-blue-grey-900);
+        cursor: default;
       }
       .light{
         font-weight: 100;
@@ -76,24 +77,48 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         margin: auto;
       }
 
-      /*Icons*/
-      .icon-container{
+      paper-input {
+        --paper-input-container-color: var(--paper-blue-grey-500);
+        --paper-input-container-focus-color: var(--paper-blue-grey-700);
+      }
 
+      #success_toast {
+        --paper-toast-background-color: var(--paper-green-600);
+        --paper-toast-color: white;
+      }
+      #error_toast {
+        --paper-toast-background-color: var(--paper-red-600);
+        --paper-toast-color: white;
+      }
+
+      /*Icons*/
+      .icon-container {
+      }
+
+      paper-date-picker {
+        --default-primary-color: var(--paper-blue-grey-700);
+      }
+
+      /*Phone*/
+      @media screen and (max-width: 767px) {
+        .mobile-hidden {
+          display: none;
+        }
       }
 
       /* Tablet */
       @media screen and (min-width: 768px) and (max-width: 1023px) {
         .mobile-only {
-          visibility: hidden;
+          display: none;
         }
       }
       /* Desktop */
       @media screen and (min-width: 1024px) {
         .mobile-only {
-          visibility: hidden;
+          display: none;
         }
         .mobile-and-tablet-only {
-          visibility: hidden;
+          display: none;
         }
       }
 

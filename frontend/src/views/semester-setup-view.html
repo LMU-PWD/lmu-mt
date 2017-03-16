@@ -238,10 +238,14 @@
             tutors="[[ tutors ]]"
             students="[[ students ]]"
             dates="[[ dates ]]"
-            loading="{{ processingCreateRequest }}"></create-semester-request>
+            loading="{{ processingCreateRequest }}"
+            on-semester-created="_closeDialogCloseButtonTapped"></create-semester-request>
 
         <!--Iron Signal for Localization-->
         <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
+
+        <!--Iron Signal Fired on Logout-->
+        <iron-signals on-iron-signal-forget="_forget"></iron-signals>
 
 
     </template>
@@ -382,6 +386,7 @@
 
             _closeDialogCloseButtonTapped: function () {
                 this.page = 'dashboard';
+                this._forget();
             },
 
             _updateNavButtons: function () {
@@ -460,6 +465,25 @@
                             else clearInterval(scrollInterval);
                         },15);
 
+            },
+
+            _forget: function () {
+                this.activeIndex = 0;
+                this.backDisabled = true;
+                this.nextDisabled = false;
+                this.accessToken = null;
+                this.semesterTitle = "";
+                this.semesterStartDate = new Date();
+                this.semesterEndDate = new Date();
+                this.semesterGroupSize = 4;
+                this.set('labTypeAudio', {});
+                this.set('labTypeVideo', {});
+                this.set('labTypePhoto', {});
+                this.labTypes = [];
+                this.tutors = [];
+                this.students = [];
+                this.dates = [];
+                this.processingCreateRequest = false;
             }
         });
 
