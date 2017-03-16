@@ -374,7 +374,7 @@
             _computeFutureList: function(allSessions, finishedLoading) {
 
                 if(allSessions.length == 0)
-                    return
+                    return;
 
                 var futureSessions = [];
                 var today = Date.now();
@@ -391,7 +391,7 @@
                     }
                 }
                 if(futureSessions.length == 0)
-                    return []
+                    return [];
 
                 return futureSessions;
             },
@@ -399,7 +399,7 @@
             _splitSessionList: function(allSessions, finishedLoading) {
 
                 if (allSessions.length == 0)
-                    return
+                    return;
 
                 var futureSessions = [];
                 var pastSessions = [];
@@ -419,7 +419,7 @@
                         if (typeof allSessions[i].groupMembers[j].name == 'undefined') {
                             this.myFutureSessions = [];
                             this.myPastSessions = [];
-                            return
+                            return;
                         }
                     }
                 }
@@ -431,7 +431,7 @@
              * Returns an icon according to the lab type
              */
             _getIcon: function(session) {
-                icon = ""
+                icon = "";
 
                 switch(session.labType_string){
                     case "":
@@ -471,14 +471,14 @@
 
                     var date = new Date(assignedLabs[i].date);
                     var date_string = this._getDateString(date);
-                    var time_string = (date.getHours() + 1) + ":" + (date.getMinutes()<10 ? '0' : '') + date.getMinutes();
-                    var labType_string = ""
-                    var labType_description_tutor = ""
+                    var time_string = date.getHours() + ":" + (date.getMinutes()<10 ? '0' : '') + date.getMinutes();
+                    var labType_string = "";
+                    var labType_description_tutor = "";
 
                     if (labTypesArray.length != 0) {
                         for (var j = 0; j < labTypesArray.length; j++) {
                             if (labTypesArray[j].id == assignedLabs[i].labTypeId) {
-                                labType_string = labTypesArray[j].type_str
+                                labType_string = labTypesArray[j].type_str;
                                 labType_description_tutor = labTypesArray[j].description_tutor
                             }
                         }
