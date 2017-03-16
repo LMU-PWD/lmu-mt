@@ -12,7 +12,7 @@ The Main View contains:
 <link rel="import" href="../components/index-card.html">
 <link rel="import" href="../components/group-card.html">
 <link rel="import" href="../components/group-detail.html">
-<link rel="import" href="groups-admin.html">
+<link rel="import" href="../components/tutor-card.html">
 <link rel="import" href="../components/notifications-card.html">
 <link rel="import" href="../components/notifications-list.html">
 <link rel="import" href="../components/navigation-bar.html">
@@ -499,11 +499,19 @@ The Main View contains:
                                         lab-types="[[labTypes]]"></admin-dashboard>
                             </template>
                             <template is="dom-if" if="{{user.isTutor}}">
-                                <tutor-dashboard
-                                        lab-types="{{labTypes}}"
-                                        user="{{user}}"
-                                        access-token="[[accessToken]]"
-                                        lab-types="[[labTypes]]"></tutor-dashboard>
+                                <tutor-card
+                                        access-token="{{ accessToken }}"
+                                        labtype-audio="[[ labtype_audio ]]"
+                                        labtype-foto="[[ labtype_foto ]]"
+                                        labtype-video="[[ labtype_video ]]"
+                                        lab-types="[[ labTypes ]]"
+                                        user="[[ user ]]">
+                                </tutor-card>
+                                <!--<tutor-dashboard-->
+                                        <!--lab-types="{{labTypes}}"-->
+                                        <!--user="{{user}}"-->
+                                        <!--access-token="[[accessToken]]"-->
+                                        <!--lab-types="[[labTypes]]"></tutor-dashboard>-->
                             </template>
                             <template is="dom-if" if="{{user.isStudent}}">
                                 <student-dashboard
@@ -527,7 +535,8 @@ The Main View contains:
                                     group= "[[group]]"
                                     user= "[[user]]"
                                     access-token= "[[accessToken]]"
-                                    lab-type= "[[labType]]"></practicals-view>
+                                    lab-type= "[[labType]]"
+                                    on-labtype-changed = "_userChanged"></practicals-view>
                         </template>
 
                         <!-- Semester Setup Pages (Admin only) -->
@@ -676,13 +685,11 @@ The Main View contains:
                     this.$$('#transburger').toggleIcon();
 
                 }else{
-                    console.log(detail);
-
                     this.$$('#transburger').toggleIcon();
                     this.$$('#menu').toggle();
                     this.$$('#menu-overlay').classList.toggle('not-active');
-                    console.log(this.$.menu.opened);
-                    console.log(this.$$('#transburger').icon);
+                    //console.log(this.$.menu.opened);
+                    //console.log(this.$$('#transburger').icon);
                     if(this.$.menu.opened && this.activeIcon=='menu'){
                         this.$$('#transburger').toggleIcon();
 
@@ -755,7 +762,7 @@ The Main View contains:
              * @private
              */
             _handleRouting: function (event) {
-                //console.log(event);
+
                 //Route to Page&Path specified in the event
                 this.set('route.path',event.detail.path);
                 this.set('routeData.page',event.detail.page);
@@ -797,12 +804,6 @@ The Main View contains:
                 ];
             },
 
-
-
-            //NEW
-
-
-
             /**
              * Observes group changes and initiates API calls to get priorities and lab data for each labtype
              * @param response
@@ -837,43 +838,6 @@ The Main View contains:
                 }
             },
 
-
-
-            /**
-             * Gets labtypes from API and initializes labtype-property for each labtype
-             * @param event.detail
-             * @private
-             */
-            /* _handleLabTypesRequest: function (event) {
-             console.log('_handleLabTypesRequest()');
-             console.log(event.detail);
-
-             if(!this.isReady)
-             return;
-
-             if (this.semesterId) {
-             this.labTypesRequestSent = true;
-             }
-
-             for (var i = 0; i < event.detail.length; i++) {
-             if (event.detail[i].type_str == "Audio") {
-             this.labtype_audio = event.detail[i];
-             }
-             else if (event.detail[i].type_str == "Video") {
-             this.labtype_video = event.detail[i];
-             }
-             else if (event.detail[i].type_str == "Foto") {
-             this.labtype_foto = event.detail[i];
-             }
-             }
-             this.gotLabTypes = true;
-
-             //console.log("Labtypes: ");
-             //console.log(this.labtype_foto);
-             //console.log(this.labtype_video);
-             //console.log(this.labtype_audio);
-
-             },
              /**
              * Gets lab data from API and sets them for each labtype
              * @param event
@@ -911,6 +875,7 @@ The Main View contains:
                 }
             },
 
+
             /**
              * Initializes and sets group-priorities-property for each lab
              * @param event
@@ -938,18 +903,18 @@ The Main View contains:
                             if (lab.labTypeId == this.labtype_foto.id) {
                                 this.groupdata_foto.priorities[event.detail[j].priority - 1] = lab;
                             }
+
                         }
                     }
                 }
-
-                console.log("Group Prios:");
+                //console.log("Group Prios:");
                 //console.log(this.group.id);
                 //console.log(this.groupdata_foto.priorities);
                 //console.log(this.groupdata_video.priorities);
                 //console.log(this.groupdata_audio.priorities);
 
             },
-            addNameLabel: function (labObject) {
+            _addNameLabel: function (labObject) {
                 var name;
                 var customColor;
                 if(labObject.type_str.includes("Photo" || "photo")){
@@ -976,7 +941,7 @@ The Main View contains:
             _handleLabTypesRequest: function (response) {
                 var labResponse = response.detail;
                 for(var i=0; i<labResponse.length; i++){
-                    labResponse[i] = this.addNameLabel(labResponse[i]);
+                    labResponse[i] = this._addNameLabel(labResponse[i]);
                 }
                 this.set('labTypes',labResponse);
             },
@@ -1005,7 +970,6 @@ The Main View contains:
                 //console.log(this.groupdata_video.lab);
                 //console.log(this.groupdata_audio.lab);
             }
-
         });
     </script>
 </dom-module>

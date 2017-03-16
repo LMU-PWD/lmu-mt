@@ -1,0 +1,471 @@
+<!--Localization Imports-->
+<link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
+<link rel="import" href="../services/my-localize-behavior.html">
+
+<link rel="import" href="lab-detail-content-element.html">
+<link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
+
+<dom-module id="labtype-detail-view">
+    <template>
+        <style include="shared-styles">
+            :host {
+                display: block;
+                padding: 3%;
+                text-align: left;
+                padding-bottom: 9%;
+            }
+            .button{
+                margin: 1%;
+                margin-bottom: 2%;
+                width: 47.8%;
+            }
+            .distributeblock{
+                display: inline-block;
+                width: 100%;
+                text-align: center;
+                border-radius: 10px;
+                background-color:  var(--paper-blue-grey-50);
+                margin-bottom: 2%;
+            }
+            .distributetext{
+                margin: 2%;
+                #margin-bottom: 2%;
+            }
+            #success_toast {
+                --paper-toast-background-color: var(--paper-green-600);
+                --paper-toast-color: white;
+            }
+            #error_toast {
+                --paper-toast-background-color: var(--paper-red-600);
+                --paper-toast-color: white;
+            }
+
+            /*Phone*/
+            @media screen and (max-width: 767px) {
+            }
+            /*Tablet*/
+            @media screen and (min-width: 768px) and (max-width: 1023px) {
+
+            }
+            /*Desktop*/
+            @media screen and (min-width: 1024px) {
+
+            }
+        </style>
+
+        <api-request
+                headers="[[ ajax_save_registration_open.headers ]]"
+                method="[[ ajax_save_registration_open.method ]]"
+                body="[[ ajax_save_registration_open.body ]]"
+                endpoint="[[ ajax_save_registration_open.endpoint ]]"
+                on-api-response="_responseFromPostingRegistrationOpen"></api-request>
+        <api-request
+                headers="[[ ajax_save_labtype.headers ]]"
+                method="[[  ajax_save_labtype.method ]]"
+                body="[[  ajax_save_labtype.body ]]"
+                endpoint="[[  ajax_save_labtype.endpoint ]]"
+                on-api-response="_responseFromPostingRegistrationOpen"></api-request>
+        <api-request
+                headers="[[ ajax_call_distribute.headers ]]"
+                method="[[  ajax_call_distribute.method ]]"
+                body="[[  ajax_call_distribute.body ]]"
+                endpoint="[[  ajax_call_distribute.endpoint ]]"
+                on-api-response="_responseFromCallingDistribute"></api-request>
+
+
+        <template is="dom-if" if="[[showDistribute]]">
+            <div class="distributeblock">
+                <div class="distributetext">
+                    [[localize('practicals-admin distribute_text')]]:
+                </div>
+                <div>
+                    <paper-button raised  disabled$="{{!showDistributeStudents}}"  style="float: left;" class="button" on-tap="_handleDistributeStudents">
+                        [[localize('practicals-admin students')]]
+                    </paper-button>
+                    <paper-button style="float: right;" raised class="button" disabled$="{{!showDistributeTutors}}" on-tap="_handleDistributeTutors">
+                        [[localize('practicals-admin tutors')]]
+                    </paper-button>
+                </div>
+            </div>
+        </template>
+
+        <paper-button raised on-tap="_handleStudentButtonClick">
+            <template is="dom-if" if="[[labType.registration_open]]">
+                [[localize('practicals-admin close_registration')]]
+            </template>
+            <template is="dom-if" if="[[!labType.registration_open]]">
+                [[localize('practicals-admin open_registration')]]
+            </template>
+        </paper-button>
+
+
+        <lab-detail-content-element
+                        id="deadlineStudent"
+                        text="[[localize('practicals-admin-labtype text1')]]"
+                        data="[[labType.registration_deadline]]"
+                        input="{{ dateInput }}"
+                        is-date-from-parent="true"
+                        is-id-from-parent="false"
+                        is-editor-from-parent="false"></lab-detail-content-element>
+        <lab-detail-content-element
+                        id="deadlineTutor"
+                        text="[[localize('practicals-admin-labtype text2')]]"
+                        data="[[labType.registration_deadline_tutors]]"
+                        input="{{ dateTutorInput }}"
+                        is-date-from-parent="true"
+                        is-id-from-parent="false"
+                        is-editor-from-parent="false"></lab-detail-content-element>
+        <lab-detail-content-element
+                        id="descriptionStudent"
+                        text="[[localize('practicals-admin-labtype text3')]]"
+                        data="[[labType.description_student]]"
+                        input="{{ descriptionStudentInput }}"
+                        is-date-from-parent="false"
+                        is-id-from-parent="false"
+                        is-editor-from-parent="true"></lab-detail-content-element>
+        <lab-detail-content-element
+                        id="descriptionTutor"
+                        text="[[localize('practicals-admin-labtype text4')]]"
+                        data="[[labType.description_tutor]]"
+                        input="{{ descriptionTutorInput }}"
+                        is-date-from-parent="false"
+                        is-id-from-parent="false"
+                        is-editor-from-parent="true"></lab-detail-content-element>
+
+        <template is="dom-if" if="[[showSaveButton]]">
+            <paper-button raised  style="float: left;" class="button" on-tap="_handleSaveButtonClick">
+                <iron-icon icon="save" ></iron-icon>[[localize('c_button_save')]]
+            </paper-button>
+            <paper-button style="float: right;" raised class="button" on-tap="_handleDiscardButtonClick">
+                <iron-icon icon="close" ></iron-icon>[[localize('c_button_discard')]]
+            </paper-button>
+        </template>
+
+        <paper-toast id="success_toast" class="fit-bottom" text="[[localize('c_function_success')]]"></paper-toast>
+        <paper-toast id="error_toast" class="fit-bottom" text="[[localize('c_function_error')]]"></paper-toast>
+
+        <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
+    </template>
+
+    <script>
+        Polymer({
+            is: 'labtype-detail-view',
+            properties: {
+                accessToken: {
+                    type: String,
+                    notify: true
+                },
+                dateInput: {
+                    type: String,
+                    observer: "_dateChanged"
+                },
+                dateTutorInput: {
+                    type: String,
+                    observer: "_dateTutorChanged"
+                },
+                descriptionStudentInput: {
+                    type: String,
+                    observer: "_descriptionStudentChanged"
+                },
+                descriptionTutorInput: {
+                    type: String,
+                    observer: "_descriptionTutorChanged"
+                },
+                labType: Object,
+                labTypeFromApi: {
+                    type: Object,
+                    observer: "_labTypeChanged"
+                },
+                showSaveButton:{
+                    type: Boolean,
+                    value: false
+                },
+                studentsDistributed:{
+                    type: Boolean,
+                    value: false
+                },
+                tutorsDistributed:{
+                    type: Boolean,
+                    value: false
+                },
+                showDistribute:{
+                    type: Boolean,
+                    value: false
+                },
+                showDistributeStudents:{
+                    type: Boolean,
+                    value: false
+                },
+                showDistributeTutors:{
+                    type: Boolean,
+                    value: false
+                }
+            },
+            behaviors: [
+                Polymer.MyLocalizeBehavior
+            ],
+            /**
+             * Automatically called, when component is ready
+             */
+            ready: function () {
+
+            },
+            /**
+             * Handle changes of dateTutorInput variable, get inserted deadline date on lab-detail-content Element
+             * @param e - Event Variable
+             */
+            _dateChanged: function(e){
+                //console.log(this.dateInput);
+                this.set('labType.registration_deadline', this.dateInput);
+                this.set('showSaveButton', true);
+            },
+            /**
+             * Handle changes of dateTutorInput variable, get inserted deadline date on lab-detail-content Element
+             * @param e - Event Variable
+             */
+            _dateTutorChanged: function(e){
+                //console.log(this.dateTutorInput);
+                this.set('labType.registration_deadline_tutors', this.dateTutorInput);
+                this.set('showSaveButton', true);
+            },
+
+            /**
+             * Handle changes of descriptionTutorInput variable, get inserted description on lab-detail-content Element
+             * @param e - Event Variable
+             */
+            _descriptionTutorChanged: function(e){
+                //console.log(this.descriptionTutorInput);
+                this.set('labType.description_tutor', this.descriptionTutorInput);
+                this.set('showSaveButton', true);
+            },
+            /**
+             * Handle changes of descriptionStudentInput variable, get inserted description on lab-detail-content Element
+             * @param e - Event Variable
+             */
+            _descriptionStudentChanged: function(e){
+                console.log(this.descriptionStudentInput);
+                this.set('labType.description_student', this.descriptionStudentInput);
+                this.set('showSaveButton', true);
+            },
+            /**
+             * Handle click on Save Button to Post changed Labtype on API
+             */
+            _handleSaveButtonClick: function(){
+                //console.log(event.detail);
+                //Post LabType-Changes in API
+                //console.log(this.labType);
+                if (this.labType.id) {
+                    this.ajax_save_labtype = {
+                        headers: {
+                            Authorization: this.accessToken
+                        },
+                        body: {
+                            description_student: this.labType.description_student,
+                            description_tutor: this.labType.description_tutor,
+                            registration_deadline: this.labType.registration_deadline.toString(),
+                            registration_deadline_tutors: this.labType.registration_deadline_tutors.toString()
+                        },
+                        method: 'PATCH',
+                        endpoint: '/labtypes/' + this.labType.id
+                    };
+                    //console.log(this.ajax_save_labtype);
+                }
+                else {
+                    console.log("Error: LabTypeId is wrong: ");
+                    console.log(this.labType.id);
+                }
+
+                this.set('showSaveButton', false);
+            },
+
+            /**
+             * Handle click on Disard Button to discard changes on Labtype
+             */
+            _handleDiscardButtonClick: function(){
+                //Reset LabtypeValues
+                //console.log(this.labTypeFromApi);
+                this.set('labType.description_tutor', this.labTypeFromApi.description_tutor);
+                this.set('labType.description_student', this.labTypeFromApi.description_student);
+                this.set('labType.registration_deadline', new Date(this.labTypeFromApi.registration_deadline));
+                this.set('labType.registration_deadline_tutors', new Date(this.labTypeFromApi.registration_deadline_tutors));
+                //console.log(this.labType);
+
+                Polymer.dom(this.root).querySelector("#deadlineStudent").data = this.labType.registration_deadline;
+                Polymer.dom(this.root).querySelector("#deadlineTutor").data = this.labType.registration_deadline_tutors;
+                Polymer.dom(this.root).querySelector("#descriptionStudent").data = this.labType.description_student;
+                Polymer.dom(this.root).querySelector("#descriptionTutor").data = this.labType.description_tutor;
+
+                this.set('showSaveButton', false);
+            },
+
+            /**
+             * Compares given deadline to recent date
+             * @param deadline
+             */
+            _getBeforeDeadline: function (deadline){
+                var deadline_date = new Date(deadline);
+                var today = new Date();
+                if(deadline_date > today){
+                    //Before deadline
+                    return true;
+
+                }
+                //After deadline
+                return false;
+            },
+
+            /**
+             * Handle click on Distribute Button for Students to automatically distribute the chosen labs to groups
+             * @param e - Event Variable
+             * @private
+             */
+            _handleDistributeStudents: function(e){
+                this.ajax_call_distribute = {
+                    headers: {
+                        Authorization: this.accessToken
+                    },
+                    body: {
+                        labTypeId: this.labType.id
+                    },
+                    method: 'POST',
+                    endpoint: '/labtypes/autodistributegroups'
+                };
+                //console.log(this.ajax_call_distribute);
+            },
+
+            /**
+             * Handle click on Distribute Button for Students to automatically distribute the chosen labs to groups
+             * @param e - Event Variable
+             * @private
+             */
+            _handleDistributeTutors: function(e){
+                this.ajax_call_distribute = {
+                    headers: {
+                        Authorization: this.accessToken
+                    },
+                    body: {
+                        labTypeId: this.labType.id
+                    },
+                    method: 'POST',
+                    endpoint: '/labtypes/autodistributetutors'
+                };
+                //console.log(this.ajax_call_distribute);
+            },
+
+            /**
+             * Handle click on Student Button to Post registration_open on API
+             * @private
+             */
+            _handleStudentButtonClick: function(){
+                if(this.labType.registration_open) {
+                    this.set('labType.registration_open', false);
+                    this.ajax_save_registration_open = {
+                        headers: {
+                            Authorization: this.accessToken
+                        },
+                        body: {
+                            registration_open: this.labType.registration_open
+                        },
+                        method: 'PATCH',
+                        endpoint: '/labtypes/' + this.labType.id
+                    };
+                }
+                else {
+                    this.set('labType.registration_open', true);
+                    this.ajax_save_registration_open = {
+                        headers: {
+                            Authorization: this.accessToken
+                        },
+                        body: {
+                            registration_open: this.labType.registration_open
+                        },
+                        method: 'PATCH',
+                        endpoint: '/labtypes/' + this.labType.id
+                    };
+                }
+                //console.log(this.ajax_save_registration_open);
+            },
+
+            /**
+             * Handle chages of lab-Object
+             * @param e - Event Variable
+             * @private
+             */
+            _labTypeChanged: function(e){
+                //console.log("labtypeChanged");
+                //console.log(e);
+
+                this.labType = {};
+                this.labType.id = "";
+                this.labType.registration_open = "";
+                this.labType.description_student = "";
+                this.labType.description_tutor = "";
+                this.labType.registration_deadline = new Date();
+                this.labType.registration_deadline_tutors = new Date();
+
+                this.set('labType.id', e.id);
+                this.set('labType.registration_open', e.registration_open);
+                this.set('labType.description_student', e.description_student);
+                this.set('labType.description_tutor', e.description_tutor);
+                this.set('labType.registration_deadline', new Date(e.registration_deadline));
+                this.set('labType.registration_deadline_tutors', new Date(e.registration_deadline_tutors));
+
+                //console.log(e.tutorsDistributed);
+                //console.log(e.groupsDistributed);
+
+                if(e.tutorsDistributed == "true" || e.tutorsDistributed) {
+                    this.tutorsDistributed = true;
+                }
+                if(e.groupsDistributed == "true" || e.groupsDistributed) {
+                    this.studentsDistributed = true;
+                }
+                //console.log(this.tutorsDistributed);
+                //console.log(this.studentsDistributed);
+
+                //Set Before Deadline Flags
+                this.set('showDistributeTutors', (!this._getBeforeDeadline(e.registration_deadline_tutors))&& !this.studentsDistributed);
+                this.set('showDistributeStudents', (!this._getBeforeDeadline(e.registration_deadline)) && this.tutorsDistributed);
+                if(this.showDistributeStudents ||this.showDistributeTutors){
+                    this.set('showDistribute', true);
+                }
+                else {
+                    this.set('showDistribute', false);
+                }
+            },
+
+            /**
+             * Handle response from api-request whith ajax_groups
+             * @param e - Event Variable
+             * @private
+             */
+            _responseFromCallingDistribute: function(e){
+                console.log(e.detail);
+                if (e.detail.length != 0)
+                    this.$.success_toast.open();
+                else
+                    this.$.error_toast.open();
+                this.fire('labtype-changed');
+            },
+
+            /**
+             * Handle response from api-request whith ajax_groups
+             * @param e - Event Variable
+             * @private
+             */
+            _responseFromPostingRegistrationOpen: function(e){
+                //console.log(e.detail);
+                this.fire('labtype-changed');
+            },
+
+            /**
+             * Handle response from api-request to save changed lab data
+             * @param e - Event Variable
+             * @private
+             */
+            _responseFromPostingLabtype: function(e){
+                //console.log(e);
+                this.fire('labtype-changed');
+            }
+        });
+    </script>
+</dom-module>

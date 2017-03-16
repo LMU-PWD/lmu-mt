@@ -1,0 +1,228 @@
+<!--Localization Imports-->
+<link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
+<link rel="import" href="../services/my-localize-behavior.html">
+
+<link rel="import" href="lab-detail-content-element.html">
+<dom-module id="lab-detail-view">
+    <template>
+        <style include="shared-styles">
+            :host {
+                display: block;
+                margin-top: 20px;
+                background-color: var(--paper-blue-grey-50);
+                padding-bottom: 9%;
+            }
+            .title{
+                padding: 10px;
+                text-align: center;
+                font-size: 20px;
+            }
+            /*Phone*/
+            @media screen and (max-width: 767px) {
+            }
+            /*Tablet*/
+            @media screen and (min-width: 768px) and (max-width: 1023px) {
+
+            }
+            /*Desktop*/
+            @media screen and (min-width: 1024px) {
+
+            }
+        </style>
+
+        <paper-item class="title">[[localize('practicals-admin-lab title')]]</paper-item>
+        <lab-detail-content-element
+                text="[[localize('practicals-admin-lab text1')]]" data="[[lab.date]]" input="{{ dateInput }}"
+                is-date-from-parent="true" is-id-from-parent="false" is-editor-from-parent="false"></lab-detail-content-element>
+        <lab-detail-content-element
+                text="[[localize('practicals-admin-lab text2')]]" data="[[lab.duration]]"  input="{{ durationInput }}"
+                is-date-from-parent="false" is-id-from-parent="false" is-editor-from-parent="false"></lab-detail-content-element>
+        <lab-detail-content-element
+                text="[[localize('practicals-admin-lab text3')]]" data="[[lab.location]]"  input="{{ locationInput }}"
+                is-date-from-parent="false" is-id-from-parent="false" is-editor-from-parent="false"></lab-detail-content-element>
+        <lab-detail-content-element
+                text="[[localize('practicals-admin tutor')]]" data="[[labTutor]]"  input="{{ tutorInput }}"
+                is-date-from-parent="false" is-id-from-parent="true" array="[[tutorNames]]" is-editor-from-parent="false"></lab-detail-content-element>
+        <lab-detail-content-element
+                text="[[localize('practicals-admin group')]]" data="[[labGroup]]" input="{{ groupInput }}"
+                is-date-from-parent="false" is-id-from-parent="true" array="[[groupNames]]" is-editor-from-parent="false"></lab-detail-content-element>
+        <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
+    </template>
+
+    <script>
+        Polymer({
+            is: 'lab-detail-view',
+            properties: {
+                accessToken: {
+                    type: String,
+                    notify: true
+                },
+                dateInput: {
+                    type: String,
+                    observer: "_dateChanged"
+                },
+                durationInput: {
+                    type: String,
+                    observer: "_durationChanged"
+                },
+                groupInput: {
+                    type: String,
+                    observer: "_groupChanged"
+                },
+                groups:{
+                    type: Array,
+                    value: [],
+                    observer: "_dataFromApiChanged"
+                },
+                groupNames: {
+                    type: Array,
+                    value: []
+                },
+                lab: {
+                    type: Object
+                },
+                labFromApi: {
+                    type: Object,
+                    observer: "_labChanged"
+                },
+                labTutor: {
+                    type: String,
+                    notify: true
+                },
+                labGroup: {
+                    type: String,
+                    notify: true
+                },
+                locationInput: {
+                    type: String,
+                    observer: "_locationChanged"
+                },
+                tutorInput: {
+                    type: String,
+                    observer: "_tutorChanged"
+                },
+                tutorNames: {
+                    type: Array,
+                    value: []
+                },
+                tutors:{
+                    type: Array,
+                    value: [],
+                    observer: "_dataFromApiChanged"
+                }
+            },
+
+            behaviors: [
+                Polymer.MyLocalizeBehavior
+            ],
+            /**
+             * Automatically called, when component is ready
+             */
+            ready: function() {
+                //console.log(this.accessToken);
+                //console.log(this.lab);
+            },
+            /**
+             * Handle changes of dateInput variable, get inserted date at lab-detail-content Element
+             * @param e - Event Variable
+             */
+            _dateChanged: function(e){
+                //console.log(e);
+                //console.log(this.dateInput);
+                this.set('lab.date', this.dateInput.toString());
+            },
+
+            /**
+             * Handle changes of groups and tutors arrays from api
+             * @param e - Event Variable
+             * @private
+             */
+            _dataFromApiChanged: function(e){
+                if(this.tutors && this.groups) {
+                    //console.log(e);
+                    if(this.tutors.length > 0) {
+                        this.set('labTutor', "");
+                        this.tutorNames = [];
+                        for (var i = 0; i < this.tutors.length; i++) {
+                            this.push('tutorNames',this.tutors[i].name + ", " + this.tutors[i].first_name);
+                            if (this.lab && this.lab.tutorId == this.tutors[i].id) {
+                                this.set('labTutor', (this.tutors[i].name + ", " + this.tutors[i].first_name));
+                                //console.log(this.labTutor);
+                            }
+                        }
+                    }
+                    if(this.groups.length > 0){
+                        this.groupNames = [];
+                        this.set('labGroup', "");
+                        for (var i = 0; i < this.groups.length; i++) {
+                            this.push('groupNames',this.groups[i].name);
+                            if (this.lab && this.lab.groupId == this.groups[i].id) {
+                                this.set('labGroup', this.groups[i].name);
+                                //console.log(this.labGroup);
+                            }
+                        }
+                    }
+                    //console.log(this.groupNames);
+                    //console.log(this.tutorNames);
+                }
+            },
+            /**
+             * Handle changes of durationInput variable, get inserted duration at lab-detail-content Element
+             * @param e - Event Variable
+             */
+            _durationChanged: function(e){
+                //console.log(e);
+                //console.log(this.durationInput);
+                this.set('lab.duration', this.durationInput);
+            },
+            /**
+             * Handle changes of locationInput variable, get inserted loaction at lab-detail-content Element
+             * @param e - Event Variable
+             */
+            _locationChanged: function(e){
+                //console.log(e);
+                //console.log(this.locationInput);
+                this.set('lab.location', this.locationInput);
+            },
+
+            /**
+             * Handle changes of tutorInput variable, get selected tutor at lab-detail-content Element
+             * @param e - Event Variable
+             */
+            _tutorChanged: function(e){
+                //console.log(e);
+                //console.log(this.tutorInput);
+                this.set('labTutor', this.tutorInput);
+                for (var i = 0; i < this.tutors.length; i++) {
+                    if(this.tutorInput == (this.tutors[i].name + ", " + this.tutors[i].first_name)){
+                        this.set('lab.tutorId', this.tutors[i].id);
+                    }
+                }
+            },
+            /**
+             * Handle changes of tutorInput variable, get selected tutor at lab-detail-content Element
+             * @param e - Event Variable
+             */
+            _groupChanged: function(e){
+                //console.log(e);
+                //console.log(this.groupInput);
+                this.set('labGroup', this.groupInput);
+                for (var i = 0; i < this.groups.length; i++) {
+                    if(this.groupInput == this.groups[i].name){
+                        this.set('lab.groupId', this.groups[i].id);
+                    }
+                }
+            },
+            /**
+             * Handle changes of lab-Object form the API, gets lab from parent
+             * @param e - Event Variable
+             */
+            _labChanged: function(e){
+                //console.log(this.labFromApi);
+                this.set('lab', this.labFromApi);
+                this.set('lab.date', new Date(this.labFromApi.date));
+                this._dataFromApiChanged(e);
+            }
+        });
+    </script>
+</dom-module>

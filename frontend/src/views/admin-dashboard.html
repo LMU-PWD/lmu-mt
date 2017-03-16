@@ -100,12 +100,15 @@
             </div>
 
         <div class="practicals-container">
-                <index-card type="Fotopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:"
-                            info2="18.05.16, 14-16"></index-card>
-                <index-card type="Videopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:"
-                            info2="18.05.16, 14-16"></index-card>
-                <index-card type="Audiopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:"
-                            info2="18.05.16, 14-16"></index-card>
+            <template is="dom-repeat" items="[[labTypes]]" as="labType">
+                <index-card lab-type="[[labType]]" group="[[group]]" is-admin="[[user.isAdmin]]"></index-card>
+            </template>
+            <!--index-card key="photo" type="Fotopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:"
+                        info2="18.05.16, 14-16"></index-card>
+            <index-card key="video" type="Videopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:"
+                        info2="18.05.16, 14-16"></index-card>
+            <index-card key="audio" type="Audiopraktikum" label1="Lab:" info1="in 6 Tagen" label2="Abgabe:"
+                        info2="18.05.16, 14-16"></index-card-->
         </div>
 
         <!--Iron Signal for Localization-->
@@ -125,22 +128,22 @@
                     type: String,
                     notify: true
                 }
-            
+
             },
             behaviors: [
                 Polymer.MyLocalizeBehavior
             ],
             ready: function() {
-                console.log(this.adminSelectedSemesterId);
+                //console.log(this.adminSelectedSemesterId);
 
             },
             _handleTap: function (event) {
-                console.log(event.target);
-                console.log(event);
-                //var key = event.target.getAttribute('key');
-                //this.fire('CHANGE_ROUTE', {path: '/'+key, page: key});
+                //console.log(event.target);
+                //console.log(event);
+                var key = event.target.getAttribute('key');
+                this.fire('CHANGE_ROUTE', {path: '/'+key, page: key});
                 //console.log(event.model);
-            },
+            }
         });
     </script>
 </dom-module>
