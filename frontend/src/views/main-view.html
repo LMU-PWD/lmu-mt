@@ -659,16 +659,22 @@ The Main View contains:
                 'GROUP_CHANGED': '_updateGroup',
                 'STUDENTS_CHANGED': '_updateStudents'
             },
-
+            /**
+             * Updates Students-array (list of all students)
+             */
             _updateStudents: function (event) {
-                console.log(event);
+                //console.log(event);
                 this.set('students', event.detail.students);
             },
-
+            /**
+             * Updates Group Object, if User is Student, It's his group
+             */
             _updateGroup: function (event) {
                 this.set('group', event.detail);
             },
-
+            /**
+             * Handles changes of user-Object, fire api-request ajax_labTypes to get labTypes
+             */
             _userChanged: function (detail) {
 //                console.log(detail);
                 if (Object.keys(detail).length !== 0) {
@@ -685,7 +691,10 @@ The Main View contains:
                     };
                 }
             },
-
+            /**
+             * The Admin changed the recently selected semester
+             * fire api-request ajax_labTypes to get labTypes
+             */
             _adminSemesterChanged: function (event) {
                 var semesterId = event.detail.semesterId;
                 if (semesterId !== '') {
@@ -703,19 +712,20 @@ The Main View contains:
             _handleIconChanged: function (event) {
                 this.set('activeIcon', event.detail.icon);
             },
-            isStudent: function () {
-                if (!this.user.isAdmin && !this.user.isTutor) {
-                    return true;
-                }
-            },
-            _toggleMenu: function (detail) {
+            /**
+             * Handles tap on menu-Button, Shows Menu or makes a back-click
+             * @param event - event Variable
+             */
+            _toggleMenu: function (event) {
 
                 if (this.routeData.page != 'dashboard') {
+                    //back-click
                     window.history.back();
                     this.set('transburgerChangeTo', 'close');
                     this.$$('#transburger').toggleIcon();
 
                 }else{
+                    //Show menu
                     this.$$('#transburger').toggleIcon();
                     this.$$('#menu').toggle();
                     this.$$('#menu-overlay').classList.toggle('not-active');
@@ -727,6 +737,9 @@ The Main View contains:
                     }
                 }
             },
+            /**
+             * Shows the Notifications dropdown for Tablet and Mobile phone view
+             */
             _toggleNotifications: function () {
                 this.$$('#notifications').toggle();
                 this.$$('#notifications-overlay').classList.toggle('not-active');
@@ -952,6 +965,10 @@ The Main View contains:
                 //console.log(this.groupdata_audio.priorities);
 
             },
+            /**
+             * Gets and sets correct attributes for the index-card-headers
+             * @param labObject - labType Object to get the attributes from
+             */
             _addNameLabel: function (labObject) {
                 var name;
                 var customColor;
@@ -976,6 +993,9 @@ The Main View contains:
                 return Object.assign({}, labObject, {name: name, color: customColor});
             },
 
+            /**
+             * Handles response from Api_request ajax_get_labtype to get Labtypes
+             */
             _handleLabTypesRequest: function (response) {
                 var labResponse = response.detail;
                 for (var i = 0; i < labResponse.length; i++) {
