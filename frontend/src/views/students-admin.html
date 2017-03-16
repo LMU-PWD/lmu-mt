@@ -338,12 +338,6 @@
                 for (var i = 0; i < api_response.length; i++) {
                     this.push('students', sorted[i]);
                 }
-                var temporalArray = this.students;
-                temporalArray = temporalArray.sort(function(a, b){
-                    var textA = a.first_name.toUpperCase();
-                    var textB = b.first_name.toUpperCase();
-                    return ((textA < textB) ? -1 : (textA > textB) ? 1 : 0); });
-                this.set('students', temporalArray);
                 this.ajax_pending = {
                     contentType: 'application/json',
                     headers: {
@@ -365,14 +359,6 @@
                 for (var i = 0; i < api_response.length; i++) {
                     this.push('students', sorted[i]);
                 }
-                var temporalArray = this.students;
-                temporalArray = temporalArray.sort(function(a, b){
-                    var textA = a.first_name.toUpperCase();
-                    var textB = b.first_name.toUpperCase();
-                    return ((textA < textB) ? -1 : (textA > textB) ? 1 : 0); });
-                this.set('students', temporalArray);
-                console.log(this.students);
-
                 //To Notify Polymer & other Components of changes to students property
                 this.notifyPath('students');
                 this.fire('STUDENTS_CHANGED',{students: this.students});
