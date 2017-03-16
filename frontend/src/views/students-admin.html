@@ -93,6 +93,16 @@
                 margin: 0 20px;
             }
 
+            paper-checkbox{
+                margin: 10px;
+            }
+
+            #editIcon{
+                position: absolute;
+                top: 20px;
+                right: 20px;
+            }
+
 
         </style>
         <div></div>
@@ -111,6 +121,15 @@
                 endpoint="[[ ajax_pending.endpoint ]]"
                 semester-filter="[[ selectedSemester ]]"
                 on-api-response="_handlePendingStudentsResponse"></api-request>
+
+        <!-- Edit Specific Student -->
+        <api-request
+                headers="[[ editAjax.headers ]]"
+                body="[[editAjax.body]]"
+                method="[[ editAjax.method ]]"
+                endpoint="[[ editAjax.endpoint ]]"
+                on-api-response="_handleEditResponse"
+                on-api-error="_handleEditError"></api-request>
 
         <!-- Deletes Specific Student -->
         <api-request
@@ -134,8 +153,7 @@
 
         <paper-dialog id="deleteDialog" on-iron-overlay-closed="_reactToDeleteDialog">
             <div>
-                <h1>{{localize('usersadmin_dialog text-1')}}<span></span> {{localize('groupsadmin_dialog text-2')}}
-                </h1>
+                <h1>{{localize('usersadmin_dialog text-1')}}<span></span> {{localize('groupsadmin_dialog text-2')}}</h1>
                 <p>{{localize('admin_dialog text-3')}}</p>
             </div>
             <div class="buttons">
@@ -146,23 +164,11 @@
 
         <paper-dialog id="editDialog" on-iron-overlay-closed="_reactToEditDialog">
             <div>
-                <h1>{{localize('usersadmin_dialog text-1')}}<span></span> {{localize('groupsadmin_dialog text-2')}}
-                </h1>
-                <!--p>{{localize('admin_dialog text-3')}}</p-->
-                <h2>Semester: </h2>
-                <paper-dropdown-menu label="Semester">
-                    <paper-listbox class="dropdown-content" attr-for-selected="semesterId" selected="{{ editUser.semesterId }}">
-                        <template is="dom-repeat" items="[[ semesters ]]" as="semester">
-                            <paper-item semesterId$="[[semester.id]]">[[ semester.term ]]</paper-item>
-                        </template>
-                    </paper-listbox>
-                </paper-dropdown-menu>
-
-                <h2>Role: </h2>
+                <h1>[[editUser.first_name]] [[editUser.name]]</h1>
+                <iron-icon icon="editor:mode-edit" id="editIcon"></iron-icon>
                 <h2>Passed Labs: </h2>
-                <template is="dom-repeat" items="[[labTypes]]" as="labType">
-                    <paper-checkbox>[[labType.type_str]]</paper-checkbox>
-                    <h3>[[labType.id]]</h3>
+                <template is="dom-repeat" items="[[editUser.passedLabTypes]]" as="labType">
+                    <paper-checkbox on-change="_handleCheckboxChange" checked="[[labType.passed]]">[[labType.name]]</paper-checkbox>
                 </template>
             </div>
             <div class="buttons">
@@ -174,6 +180,7 @@
         <paper-dialog id="createDialog" on-iron-overlay-closed="_reactToCreateDialog">
             <div>
                 <h1>{{localize('usersadmin_dialog create')}}</h1>
+                <p>{{localize('users-admin create-disclaimer')}}</p>
                 <paper-input value="{{newUser.first_name}}" label="{{localize('semester_setup_users_table_firstname')}}"></paper-input>
                 <paper-input value="{{newUser.name}}" label="{{localize('semester_setup_users_table_lastname')}}"></paper-input>
                 <paper-input class="create-group-input"
@@ -197,7 +204,7 @@
 
         <!--Lists all Students-->
         <div class="container horizontal layout wrap">
-            <template is="dom-repeat" items="[[students]]" as="student">
+            <template id="students" is="dom-repeat" items="[[students]]" as="student">
                 <div class="student flex self-center" id="student_[[index]]">
                     <h1>[[student.first_name]] [[student.name]]</h1>
                     <div class="icon-container">
@@ -217,7 +224,9 @@
                             </div>
                         </template>
                         <paper-icon-button icon="icons:delete" on-tap="_deleteStudent"></paper-icon-button>
-                        <paper-icon-button icon="editor:mode-edit" on-tap="_editStudent"></paper-icon-button>
+                        <template is="dom-if" if="[[student.emailVerified]]">
+                            <paper-icon-button id="[[index]]" icon="editor:mode-edit" on-tap="_editStudent"></paper-icon-button>
+                        </template>
                     </div>
                 </div>
             </template>
@@ -228,6 +237,8 @@
             <paper-toast id="createFail" text="{{localize('admin-toast create-fail')}}"></paper-toast>
             <paper-toast id="deleteSuccess" text="{{localize('admin-toast delete-success')}}"></paper-toast>
             <paper-toast id="deleteFail" text="{{localize('admin-toast delete-fail')}}"></paper-toast>
+            <paper-toast id="editSuccess" text="{{localize('admin-toast edit-success')}}"></paper-toast>
+            <paper-toast id="editFail" text="{{localize('admin-toast edit-fail')}}"></paper-toast>
 
 
             <!--Iron Signal for Localization-->
@@ -267,12 +278,10 @@
                     }
                 },
                 editUser: {
-                    type: Object,
-                    value: {
-                        semester: "",
-                        passedLabs: [],
-                        userRole: ""
-                    }
+                    type: Object
+                },
+                userToChange: {
+                    type: Object
                 }
 
             },
@@ -313,11 +322,9 @@
              */
             _handleStudentsResponse: function (event) {
                 var api_response = event.detail;
-                console.log(api_response);
                 for (var i = 0; i < api_response.length; i++) {
                     this.push('students', api_response[i]);
                 }
-                console.log(this.students);
 
                 this.ajax_pending = {
                     contentType: 'application/json',
@@ -369,35 +376,36 @@
              * @private
              */
             _editStudent: function (event) {
-                //Grabbing Student information from target
-                var student = event.model._config.student;
-                var passedLabTypes = student.passedLabTypesIds;
-                var labTyes = this.lab
-                student.passedLabTypes.set(this.labTypes);
-                for(var i=0; i< length(this.labTypes); i++){
-                    for(var j=0; j< length(passedLabTypes); j++){
-                        if(passedLabTypes[j]===student.passedLabTypes[i]){
-                            student.passedLabTypes[i].set({passed: true});
+                //Grabbing Student index from target & information from students property
+                var student = this.get('students.'+event.model.__data__.index);
+                //duplicate to edit user (popup info is binding to edit user)
+                this.set('editUser', student);
+                this.set('editUser.passedLabTypes',[]);
+                this.set('userToChange',{});
+
+                //Pushing LabTypes to editUser & mapping passed flag
+                for(var i=0; i< this.labTypes.length; i++){
+                    this.push('editUser.passedLabTypes',{name: this.labTypes[i].type_str, id:this.labTypes[i].id});
+                    for(var j=0; j< this.editUser.passedLabTypesIds.length; j++){
+                        if(this.editUser.passedLabTypes[i].id===this.editUser.passedLabTypesIds[j]){
+                            this.set('editUser.passedLabTypes.'+i+'.passed', true);
                         }
                     }
                 }
-
-                this.set('editUser', student);
-                var semester = student.semesterId;
-                var studentID = student.id;
-                var isStudent = student.isStudent;
-                var isTutor = student.isTutor;
-                var studentName = student.first_name + " " + student.name;
-                var pending = !student.emailVerified;
-                console.log(this.editUser);
-
-                //Temporarily save Student Info in deleteDialogs Attributes
-                this.$.editDialog.dataset.studentID = studentID;
-                this.$.editDialog.dataset.pending = pending;
-
-                //Set Popup Text to match selcted Student & Open Popus
-                this.$$('#editDialog > div > H1 > span').textContent = studentName;
+                // Open Popup
                 this.$.editDialog.open();
+            },
+
+            _handleCheckboxChange: function (event) {
+                var data = event.model.__data__;
+                if(this.get('userToChange.'+data.labType.id)===undefined) {
+                    this.set('userToChange.' + data.labType.id, !data.labType.passed);
+                }else{
+                    //Delete From Object
+                    var newToChange = this.get('userToChange');
+                    delete newToChange[data.labType.id];
+                    this.set('userToChange', newToChange);
+                }
             },
 
             /**
@@ -442,24 +450,34 @@
             _reactToEditDialog: function (event) {
                 //Check if Popup Approved or Canceled
                 if (event.detail.confirmed) {
+                    var keys = Object.keys(this.userToChange);
+                    if(keys.length != 0){
+                        //Generate API Request for first change in Object
+                        this.editAjax = {
+                            contentType: 'application/json',
+                            headers: {
+                                Authorization: this.accessToken
+                            },
+                            method: 'POST',
+                            endpoint: '/PlatformUsers/setPassedLabType',
+                            body: {
+                                userId: this.editUser.id,
+                                labTypeId: keys[0],
+                                passed: this.get('userToChange.'+keys[0])
+                            }
+                        };
 
-                    console.log(this.editUser);
-                    //Generate API Request to Update User
-                    this.deleteAjax = {
-                        contentType: 'application/json',
-                        headers: {
-                            Authorization: this.accessToken
-                        },
-                        method: 'PUT',
-                        endpoint: '/PlatformUsers/'+this.editUser.id,
-                        body: this.editUser
-                    };
-                    console.log(this.deleteAjax);
-
+                        //Delete Fired Request From Object
+                        var newToChange = this.get('userToChange');
+                        delete newToChange[keys[0]];
+                        this.set('userToChange', newToChange);
+                    }else{
+                        //Reset Attributes
+                        this.set('editUser',{});
+                    }
                 } else {
                     //Reset Attributes
-                    this.$.deleteDialog.dataset.studentId = '';
-                    this.$.deleteDialog.dataset.pending = '';
+                    this.set('editUser',{});
                 }
             },
 
@@ -522,6 +540,55 @@
             },
 
             /**
+             * Callback on API response to Delete User Request
+             * @private
+             */
+            _handleEditResponse: function (response) {
+                var keys = Object.keys(this.userToChange);
+                if(keys.length != 0) {
+                    //Generate API Request for further changes
+                    this.editAjax = {
+                        contentType: 'application/json',
+                        headers: {
+                            Authorization: this.accessToken
+                        },
+                        method: 'POST',
+                        endpoint: '/PlatformUsers/setPassedLabType',
+                        body: {
+                            userId: this.editUser.id,
+                            labTypeId: keys[0],
+                            passed: this.get('userToChange.' + keys[0])
+                        }
+                    };
+
+                    //Update toChange Object
+                    var newToChange = this.get('userToChange');
+                    delete newToChange[keys[0]];
+                }else{
+                    //Display Success Toast
+                    this.$$('#editSuccess').open();
+
+                    //Reset editUser
+                    this.set('editUser', {});
+
+                    //Update user received
+                    var student = response.detail;
+                    var pos = this.students.map(function (e) {
+                        return e.id;
+                    }).indexOf(student.id);
+                    this.set('students.' + pos, student);
+                }
+            },
+
+        /**
+         * Displays Edit Fail Toast on API Error
+         * @private
+         */
+        _handleEditError: function (response) {
+            this.$$('#editFail').open();
+        },
+
+            /**
              * Updates students and displays Succeeded Toast
              * on API response to Create Student Request
              * @private
@@ -548,7 +615,6 @@
              */
             _forget: function () {
                 this.set('students', []);
-                console.info("Reset Students");
             }
 
         });

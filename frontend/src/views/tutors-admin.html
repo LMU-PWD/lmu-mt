@@ -162,6 +162,7 @@
         <paper-dialog id="createDialog" on-iron-overlay-closed="_reactToCreateDialog">
             <div>
                 <h1>{{localize('usersadmin_dialog create')}}</h1>
+                <p>{{localize('users-admin create-disclaimer')}}</p>
                 <paper-input value="{{newUser.first_name}}" label="{{localize('semester_setup_users_table_firstname')}}"></paper-input>
                 <paper-input value="{{newUser.name}}" label="{{localize('semester_setup_users_table_lastname')}}"></paper-input>
                 <paper-input class="create-group-input"
@@ -289,12 +290,10 @@
              */
             _handleTutorsResponse: function (event) {
                 var api_response = event.detail;
-                console.log(api_response);
                 for (var i = 0; i < api_response.length; i++) {
                     api_response[i].labCount = 0;
                     this.push('tutors', api_response[i]);
                 }
-                console.log(this.tutors);
 
                 this.ajax_pending = {
                     contentType: 'application/json',
@@ -481,7 +480,6 @@
              */
             _forget: function () {
                 this.set('tutors', []);
-                console.info("Reset Tutors");
             }
 
         });

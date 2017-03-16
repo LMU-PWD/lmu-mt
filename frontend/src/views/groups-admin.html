@@ -45,11 +45,6 @@
                 height: 20px;
                 overflow: hidden;
             }
-
-            /*div :last-of-type {
-                border-radius: 0 0 5px 5px;
-                border-bottom: hidden !important;
-            }*/
             .member div :last-of-type {
                 border-radius: 5px 5px 0 0;
             }
@@ -293,7 +288,6 @@
             },
 
             _handleGroupSizeResponse: function (response) {
-                console.log(response);
                 this.set('groupSize', response.detail.group_size);
             },
 
@@ -514,7 +508,6 @@
              */
             _forget: function () {
                 this.set('groups', []);
-                console.info('Reset Groups');
             },
 
             /**

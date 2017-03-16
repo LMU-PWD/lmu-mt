@@ -153,6 +153,7 @@
     "users-admin email-verified" : "User verified his email",
     "users-admin group" : "User is member in a group.",
     "users-admin tutor-count" : "Counts the Labs assigned to this tutor.",
+    "users-admin create-disclaimer" : "(Adding already existing users will cause their reset!)",
 
     "usersadmin_dialog create" : "Please enter Name and Campus Mail adress to create a new User",
 
@@ -160,7 +161,9 @@
     "admin-toast create-success" : "Creation Succeeded",
     "admin-toast create-fail" : "Creation Failed",
     "admin-toast delete-success" : "Deletion Succeeded",
-    "admin-toast delete-fail" : "Deletion Failed"
+    "admin-toast delete-fail" : "Deletion Failed",
+    "admin-toast edit-success" : "Edit Succeeded",
+    "admin-toast edit-fail" : "Edit Failed"
 
 
   },
@@ -319,13 +322,16 @@
     "users-admin email-verified" : "Dieser Nutzer hat seine E-Mail bestätigt.",
     "users-admin group" : "Dieser Nutzer ist Mitglied einer Gruppe.",
     "users-admin tutor-count" : "Zähler für die dem Tutor zugewiesenen Termine.",
+    "users-admin create-disclaimer" : "(Das Hinzufügen von bereits registrierten Nutzern führt zu deren Zurücksetzung!)",
 
     "usersadmin_dialog create" : "Bitte geben sie Vor- und Nachname sowie die Campus Mail Adresse an um einen neuen Nutzer zu erstellen ",
 
     "admin-toast create-success" : "Erfolgreich Erstellt",
     "admin-toast create-fail" : "Erstellen Fehlgeschlagen",
     "admin-toast delete-success" : "Erfolgreich Entfernt",
-    "admin-toast delete-fail" : "Entfernen Fehlgeschlagen"
+    "admin-toast delete-fail" : "Entfernen Fehlgeschlagen",
+    "admin-toast edit-success" : "Erfolgreich Bearbeitet",
+    "admin-toast edit-fail" : "Bearbeiten Fehlgeschlagen"
 
   }
 }

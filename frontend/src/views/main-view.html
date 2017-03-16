@@ -59,7 +59,7 @@ The Main View contains:
                 height: auto;
             }
 
-            .desktop-only{
+            .desktop-only {
                 display: none;
             }
 
@@ -86,22 +86,23 @@ The Main View contains:
 
             /*Desktop*/
             @media screen and (min-width: 1024px) {
-                .no-desktop{
+                .no-desktop {
                     display: none;
                 }
-                .desktop-only{
+
+                .desktop-only {
                     display: block;
                 }
 
                 .menu-icon:hover {
                     background-color: var(--paper-blue-grey-500);
                 }
+
                 .menu-icon {
                     background-color: transparent !important;
                 }
 
-
-                .menu-overlay{
+                .menu-overlay {
                     opacity: 0 !important;
                     height: 0 !important;
                 }
@@ -121,7 +122,7 @@ The Main View contains:
                 float: right;
             }
 
-            iron-collapse{
+            iron-collapse {
                 z-index: 20;
             }
 
@@ -250,7 +251,7 @@ The Main View contains:
                 z-index: 20;
                 height: 0;
                 opacity: 0;
-                transition: height,opacity 0.2s;
+                transition: height, opacity 0.2s;
 
             }
 
@@ -267,7 +268,7 @@ The Main View contains:
             paper-toolbar.tall > .larger_geometry_container {
                 height: 10px;
                 opacity: 1;
-                transition: height,opacity 0.2s;
+                transition: height, opacity 0.2s;
 
             }
 
@@ -283,7 +284,8 @@ The Main View contains:
                 color: var(--paper-blue-grey-50);
 
             }
-            .menu-icon{
+
+            .menu-icon {
 
                 background-color: var(--paper-blue-grey-500);
                 border-radius: 50%;
@@ -292,10 +294,11 @@ The Main View contains:
                 margin: 12px;
             }
 
-            .menu-icon-wrapper{
+            .menu-icon-wrapper {
                 float: right;
             }
-            .menu-icon-container{
+
+            .menu-icon-container {
                 top: 8px;
                 position: relative;
                 left: calc(50% - 96px);
@@ -305,8 +308,7 @@ The Main View contains:
                 border-radius: 32px;
             }
 
-
-            #notifications{
+            #notifications {
                 position: relative;
                 z-index: 10;
                 top: -30px;
@@ -317,14 +319,14 @@ The Main View contains:
                 /*display: none !important;
                 opacity: 0;
                 height: 0px !important;*/
-                /*background-color: red;
-                transition: background-color 2s;*/
+            /*background-color: red;
+            transition: background-color 2s;*/
             /*}*/
-            .menu-overlay{
+            .menu-overlay {
 
                 width: 100%;
                 height: 100%;
-                background-color: rgba(0,0,0,0.5);
+                background-color: rgba(0, 0, 0, 0.5);
                 position: fixed;
                 z-index: 10;
                 top: 80px;
@@ -333,41 +335,44 @@ The Main View contains:
                 display: block;
                 transition: opacity 0.2s;
             }
-            .menu-overlay.not-active{
+
+            .menu-overlay.not-active {
                 opacity: 0;
                 height: 0;
                 transition: opacity 0.2s, height 0.2s ease 0.1s;
 
             }
 
-            button{
+            button {
                 color: var(--paper-blue-grey-50);
                 background-color: transparent;
                 --transburger-icon-line-radius: 0;
                 border-radius: 50%;
             }
-            button:focus{
+
+            button:focus {
                 outline: none;
                 border: none;
             }
-            button:hover{
+
+            button:hover {
                 color: var(--paper-blue-grey-100);
             }
 
-            .hidden{
+            .hidden {
                 visibility: hidden;
                 display: none;
             }
-
 
             /*Notification Styles*/
-            .notifications-container{
+            .notifications-container {
                 display: none;
                 visibility: hidden;
             }
+
             /*Desktop*/
             @media screen and (min-width: 1024px) {
-                .notifications-container{
+                .notifications-container {
                     display: inline;
                     visibility: visible;
                     float: right;
@@ -376,7 +381,8 @@ The Main View contains:
                     height: 365px;
                     background-color: var(--paper-blue-grey-100);
                 }
-                .notifications-container > div{
+
+                .notifications-container > div {
                     background-color: var(--paper-blue-grey-500);
                     height: 50px;
                     line-height: 50px;
@@ -385,7 +391,7 @@ The Main View contains:
                     border-bottom: 1px solid var(--paper-blue-grey-900);
                 }
 
-                .notifications-container > div > iron-icon{
+                .notifications-container > div > iron-icon {
                     float: right;
                     height: 32px;
                     width: 32px;
@@ -395,31 +401,6 @@ The Main View contains:
         </style>
 
         <!--TODO get semester info-->
-
-        <!--api-request
-                headers="[[ ajax_labTypes.headers ]]"
-                method="[[ ajax_labTypes.method ]]"
-                endpoint="[[ ajax_labTypes.endpoint ]]"
-                on-api-response="_handleLabTypesRequest"></api-request-->
-
-        <!--api-request
-                headers="[[ ajax_labs.headers ]]"
-                method="[[ ajax_labs.method ]]"
-                endpoint="[[ ajax_labs.endpoint ]]"
-                on-api-response="_handleAllLabsRequest"></api-request-->
-
-        <api-request
-                headers="[[ ajax_prios.headers ]]"
-                method="[[ ajax_prios.method ]]"
-                endpoint="[[ ajax_prios.endpoint ]]"
-                on-api-response="_handlePriosRequest"></api-request>
-
-        <api-request
-                headers="[[ ajax_glabs.headers ]]"
-                method="[[ ajax_glabs.method ]]"
-                endpoint="[[ ajax_glabs.endpoint ]]"
-                on-api-response="_handleGroupLabsRequest"></api-request>
-
 
         <!--Fetch Lab Types from API-->
         <api-request
@@ -440,7 +421,8 @@ The Main View contains:
             <iron-collapse id="menu" class="no-desktop">
                 <div class="menu-icon-container">
                     <div class="menu-icon-wrapper">
-                        <paper-icon-button class="menu-icon" icon="icons:exit-to-app" on-tap="_fireLogoutRequest"></paper-icon-button>
+                        <paper-icon-button class="menu-icon" icon="icons:exit-to-app"
+                                           on-tap="_fireLogoutRequest"></paper-icon-button>
                         <paper-tooltip>{{localize('tooltip_menu logout')}}</paper-tooltip>
                     </div>
 
@@ -449,7 +431,8 @@ The Main View contains:
                         <paper-tooltip>{{localize('tooltip_menu language')}}</paper-tooltip>
                     </div>
                     <div class="menu-icon-wrapper">
-                        <paper-icon-button class="menu-icon" icon="icons:settings" on-tap="_goToSetting"></paper-icon-button>
+                        <paper-icon-button class="menu-icon" icon="icons:settings"
+                                           on-tap="_goToSetting"></paper-icon-button>
                         <paper-tooltip>{{localize('tooltip_menu settings')}}</paper-tooltip>
                     </div>
                 </div>
@@ -457,24 +440,28 @@ The Main View contains:
             </iron-collapse>
             <paper-header-panel mode="waterfall-tall">
                 <paper-toolbar>
-                    <div class="icon-one nav-block" >
-                        <img src="../../images/mt.svg" alt="Medientechnik Logo" draggable="false" on-tap="_goToDashboard">
+                    <div class="icon-one nav-block">
+                        <img src="../../images/mt.svg" alt="Medientechnik Logo" draggable="false"
+                             on-tap="_goToDashboard">
                     </div>
 
                     <div class="icon-container">
 
                         <div class="configuration nav-block no-desktop" id="menuButton">
-                            <button id="transburger" is="transburger-icon" no-transform transform-to="{{transburgerChangeTo}}" on-tap="_toggleMenu" style=""></button>
+                            <button id="transburger" is="transburger-icon" no-transform
+                                    transform-to="{{transburgerChangeTo}}" on-tap="_toggleMenu" style=""></button>
                             <paper-tooltip>Menu</paper-tooltip>
                         </div>
 
                         <div class="notification  nav-block no-desktop">
-                            <paper-icon-button class="mobile-and-tablet-only" src="../../images/notifications.svg" style="color: white;"
+                            <paper-icon-button class="mobile-and-tablet-only" src="../../images/notifications.svg"
+                                               style="color: white;"
                                                on-tap="_toggleNotifications"></paper-icon-button>
                         </div>
 
                         <div class="menu-icon-wrapper desktop-only">
-                            <paper-icon-button class="menu-icon" icon="icons:exit-to-app" on-tap="_fireLogoutRequest"></paper-icon-button>
+                            <paper-icon-button class="menu-icon" icon="icons:exit-to-app"
+                                               on-tap="_fireLogoutRequest"></paper-icon-button>
                             <paper-tooltip>{{localize('tooltip_menu logout')}}</paper-tooltip>
                         </div>
                         <div class="menu-icon-wrapper desktop-only">
@@ -482,7 +469,8 @@ The Main View contains:
                             <paper-tooltip>{{localize('tooltip_menu language')}}</paper-tooltip>
                         </div>
                         <div class="menu-icon-wrapper desktop-only">
-                            <paper-icon-button class="menu-icon" icon="icons:settings" on-tap="_goToSetting" toggles></paper-icon-button>
+                            <paper-icon-button class="menu-icon" icon="icons:settings" on-tap="_goToSetting"
+                                               toggles></paper-icon-button>
                             <paper-tooltip>{{localize('tooltip_menu settings')}}</paper-tooltip>
                         </div>
                     </div>
@@ -506,7 +494,8 @@ The Main View contains:
                     </div>
 
                     <iron-collapse id="notifications_2" class="no-desktop">
-                        <div style="height: 300px; width: 100%; background-color:green;">Test Notification Container</div>
+                        <div style="height: 300px; width: 100%; background-color:green;">Test Notification Container
+                        </div>
                     </iron-collapse>
 
                 </paper-toolbar>
@@ -550,7 +539,7 @@ The Main View contains:
                                     Notifications
                                     <iron-icon src="../../images/notifications.svg"></iron-icon>
                                 </div>
-                                <notifications-card ></notifications-card>
+                                <notifications-card></notifications-card>
                             </div>
                         </div>
 
@@ -558,36 +547,12 @@ The Main View contains:
                         <template is="dom-repeat" items="{{labTypes}}" as="labType">
                             <h1>[[labType.name]]</h1>
                             <practicals-view
-                                    name= "[[labType.name]]"
-                                    group= "[[group]]"
-                                    user= "[[user]]"
-                                    access-token= "[[accessToken]]"
-                                    lab-type= "[[labType]]"></practicals-view>
+                                    name="[[labType.name]]"
+                                    group="[[group]]"
+                                    user="[[user]]"
+                                    access-token="[[accessToken]]"
+                                    lab-type="[[labType]]"></practicals-view>
                         </template>
-            <!--practicals-view
-                    name="photo"
-                    type="Foto"
-                    route="{{subroute}}"
-                    group="[[ group ]]"
-                    user="{{user}}"
-                    lab-data="[[ groupdata_foto ]]"
-                    access-token="{{ accessToken }}"></practicals-view>
-            <practicals-view
-                    name="video"
-                    type="Video"
-                    route="{{subroute}}"
-                    group="[[ group ]]"
-                    user="{{user}}"
-                    lab-data="[[ groupdata_video ]]"
-                    access-token="{{ accessToken }}"></practicals-view>
-            <practicals-view
-                    name="audio"
-                    type="Audio"
-                    route="{{subroute}}"
-                    group="[[ group ]]"
-                    user="{{user}}"
-                    lab-data="[[ groupdata_audio ]]"
-                    access-token="{{ accessToken }}"></practicals-view-->
 
                         <!-- Semester Setup Pages (Admin only) -->
                         <template is="dom-if" if="[[ user.isAdmin ]]">
@@ -630,7 +595,6 @@ The Main View contains:
                     </iron-pages>
 
 
-
                 </div>
             </paper-header-panel>
         </div>
@@ -640,6 +604,9 @@ The Main View contains:
 
         <!--Iron Signal for Localization-->
         <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
+
+        <!--Iron Signal for passing Semester-->
+        <iron-signals on-iron-signal-semester="_adminSemesterChanged"></iron-signals>
 
     </template>
 
@@ -711,8 +678,8 @@ The Main View contains:
             ],
 
             listeners: {
-                'CHANGE_ROUTE' : '_handleRouting',
-                'icon-changed' : '_handleIconChanged',
+                'CHANGE_ROUTE': '_handleRouting',
+                'icon-changed': '_handleIconChanged',
                 'GROUP_CHANGED': '_updateGroup',
                 'STUDENTS_CHANGED': '_updateStudents'
             },
@@ -723,11 +690,11 @@ The Main View contains:
             },
 
             _updateGroup: function (event) {
-                this.set('group',event.detail);
+                this.set('group', event.detail);
             },
 
             _userChanged: function (detail) {
-                if(Object.keys(detail).length !== 0) {
+                if (Object.keys(detail).length !== 0) {
                     console.log(detail);
 
 
@@ -740,12 +707,24 @@ The Main View contains:
                         endpoint: '/Labtypes'
                     };
                 }
+            },
 
-
+            _adminSemesterChanged: function (event) {
+                var semesterId = event.detail.semesterId;
+                if (semesterId !== '') {
+                    this.ajax_labTypes = {
+                        headers: {
+                            Authorization: this.accessToken,
+                            filter: '{"where":{"semesterId":"' + semesterId + '"}}'
+                        },
+                        method: 'GET',
+                        endpoint: '/Labtypes'
+                    };
+                }
             },
 
             _handleIconChanged: function (event) {
-                this.set('activeIcon',event.detail.icon);
+                this.set('activeIcon', event.detail.icon);
             },
             isStudent: function () {
                 if (!this.user.isAdmin && !this.user.isTutor) {
@@ -754,12 +733,12 @@ The Main View contains:
             },
             _toggleMenu: function (detail) {
 
-                if(this.routeData.page!='dashboard'){
+                if (this.routeData.page != 'dashboard') {
                     window.history.back();
-                    this.set('transburgerChangeTo','close');
+                    this.set('transburgerChangeTo', 'close');
                     this.$$('#transburger').toggleIcon();
 
-                }else{
+                } else {
                     console.log(detail);
 
                     this.$$('#transburger').toggleIcon();
@@ -767,7 +746,7 @@ The Main View contains:
                     this.$$('.menu-overlay').classList.toggle('not-active');
                     console.log(this.$.menu.opened);
                     console.log(this.$$('#transburger').icon);
-                    if(this.$.menu.opened && this.activeIcon=='menu'){
+                    if (this.$.menu.opened && this.activeIcon == 'menu') {
                         this.$$('#transburger').toggleIcon();
 
                     }
@@ -784,9 +763,9 @@ The Main View contains:
             _routeChanged: function (detail) {
 
                 //Rerouting from /main to /main/dashboard
-                if(detail.prefix=='/main' && detail.path==''){
-                    this.set('route.path','/dashboard');
-                    this.set('routeData.page','dashboard');
+                if (detail.prefix == '/main' && detail.path == '') {
+                    this.set('route.path', '/dashboard');
+                    this.set('routeData.page', 'dashboard');
                 }
 
                 //Change scroll position -> 0 (on routeChanged)
@@ -799,9 +778,9 @@ The Main View contains:
              */
             _routeDataChanged: function (detail) {
                 /* Setting Menu/Back icon back to Menu&Close
-                   Needed for supporting Browsers 'back' functionality */
-                if(detail.page==='dashboard'){
-                    this.set('transburgerChangeTo','close');
+                 Needed for supporting Browsers 'back' functionality */
+                if (detail.page === 'dashboard') {
+                    this.set('transburgerChangeTo', 'close');
                 }
             },
 
@@ -827,8 +806,8 @@ The Main View contains:
              * @private
              */
             _forget: function () {
-                this.set('group',{});
-                this.set('labTypes',[]);
+                this.set('group', {});
+                this.set('labTypes', []);
             },
 
             /**
@@ -840,18 +819,18 @@ The Main View contains:
             _handleRouting: function (event) {
                 //console.log(event);
                 //Route to Page&Path specified in the event
-                this.set('route.path',event.detail.path);
-                this.set('routeData.page',event.detail.page);
+                this.set('route.path', event.detail.path);
+                this.set('routeData.page', event.detail.page);
 
                 //Change Menu Icon to Back Button
-                this.set('transburgerChangeTo','arrow-left');
+                this.set('transburgerChangeTo', 'arrow-left');
                 this.$$('#transburger').toggleIcon();
 
                 //Change scroll position -> 0 (on routeChanged)
                 this.$$('paper-header-panel').scroller.scrollTop = 0;
 
-                if(event.detail.create){
-                    var name = event.detail.page+"-admin";
+                if (event.detail.create) {
+                    var name = event.detail.page + "-admin";
                     this.$$(name).create();
                     //select component where name is passed
 
@@ -877,186 +856,34 @@ The Main View contains:
              * @private
              */
             _goToDashboard: function () {
-                this.set('route.path','/dashboard');
-                this.set('routeData.page','dashboard');
+                this.set('route.path', '/dashboard');
+                this.set('routeData.page', 'dashboard');
             },
 
             _computeNotifications: function () {
-                return [{text:"Die Gruppen einteilung ist freigeschalten", date:"vor 6 Tagen"},
-                    {text:"Ihr könnt nun prioritäten für das Audioprakikum vergeben", date:"vor 2 Tagen"}
+                return [{text: "Die Gruppen einteilung ist freigeschalten", date: "vor 6 Tagen"},
+                    {text: "Ihr könnt nun prioritäten für das Audioprakikum vergeben", date: "vor 2 Tagen"}
                 ];
             },
 
-
-
-            //NEW
-
-
-
-                    /**
-                     * Observes group changes and initiates API calls to get priorities and lab data for each labtype
-                     * @param response
-                     * @private
-                     */
-                    _groupChanged: function(response) {
-                        //console.log(this.group);
-                        if (!this.isReady || !this.group.priorityIds)
-                            return;
-
-                        this.semesterId = response.semesterId;
-                        for (i = 0; i < this.group.priorityIds.length; i++) {
-                            // Get priorities
-                            this.ajax_prios = {
-                                headers: {
-                                    Authorization: this.accessToken
-                                },
-                                method: 'GET',
-                                endpoint: '/Priorities?filter[where][groupId]='+this.user.groupId
-                            };
-                            //console.log(this.ajax_prios);
-                        }
-                        for (j = 0; j < this.group.labIds.length; j++) {
-                            // Get group-labs
-                            this.ajax_glabs = {
-                                headers: {
-                                    Authorization: this.accessToken
-                                },
-                                method: 'GET',
-                                endpoint: '/labs/' + this.group.labIds[j]
-                            };
-                        }
-                    },
-
-
-
-        /**
-         * Gets labtypes from API and initializes labtype-property for each labtype
-         * @param event.detail
-         * @private
-         */
-       /* _handleLabTypesRequest: function (event) {
-            console.log('_handleLabTypesRequest()');
-            console.log(event.detail);
-
-            if(!this.isReady)
-                return;
-
-            if (this.semesterId) {
-                this.labTypesRequestSent = true;
-            }
-
-            for (var i = 0; i < event.detail.length; i++) {
-                if (event.detail[i].type_str == "Audio") {
-                    this.labtype_audio = event.detail[i];
-                }
-                else if (event.detail[i].type_str == "Video") {
-                    this.labtype_video = event.detail[i];
-                }
-                else if (event.detail[i].type_str == "Foto") {
-                    this.labtype_foto = event.detail[i];
-                }
-            }
-            this.gotLabTypes = true;
-
-            //console.log("Labtypes: ");
-            //console.log(this.labtype_foto);
-            //console.log(this.labtype_video);
-            //console.log(this.labtype_audio);
-
-        },
-        /**
-         * Gets lab data from API and sets them for each labtype
-         * @param event
-         * @private
-         */
-        _handleAllLabsRequest: function (event) {
-            console.log('_handleLabRequest()');
-            console.log(event.detail);
-
-            if(!this.isReady || this.gotLabTypes == false)
-                return;
-
-            for (var i = 0; i < event.detail.length; i++) {
-                if (event.detail[i].labTypeId == this.labtype_foto.id){
-                    this.all_labs_foto.push(event.detail[i]);
-                }
-                if (event.detail[i].labTypeId == this.labtype_video.id) {
-                    this.all_labs_video.push(event.detail[i]);
-                }
-                if (event.detail[i].labTypeId == this.labtype_audio.id){
-                    this.all_labs_audio.push(event.detail[i]);
-                }
-
-                this.allLabs.push(event.detail[i]);
-            }
-
-            //console.log("AllLabs: ");
-            //console.log(this.allLabs);
-            //console.log(this.all_labs_foto);
-            //console.log(this.all_labs_video);
-            //console.log(this.all_labs_audio);
-
-            if (this.semesterId && this.labTypesRequestSent) {
-                this.labsRequestSent = true;
-            }
-        },
-
-        /**
-         * Initializes and sets group-priorities-property for each lab
-         * @param event
-         * @private
-         */
-        _handlePriosRequest: function(event){
-            console.log('_handlePriosRequest()');
-            console.log(event.detail);
-
-            if(!this.isReady || this.gotLabTypes == false)
-                return;
-
-            this.allPriorities = event.detail;
-            var lab = "";
-            for(i = 0; i<this.allLabs.length;i++){
-                lab = this.allLabs[i];
-                for(j = 0; j < event.detail.length;j++) {
-                    if (event.detail[j].labId == this.allLabs[i].id) {
-                        if (lab.labTypeId == this.labtype_audio.id) {
-                            this.groupdata_audio.priorities[event.detail[j].priority - 1] = lab;
-                        }
-                        if (lab.labTypeId == this.labtype_video.id) {
-                            this.groupdata_video.priorities[event.detail[j].priority - 1] = lab;
-                        }
-                        if (lab.labTypeId == this.labtype_foto.id) {
-                            this.groupdata_foto.priorities[event.detail[j].priority - 1] = lab;
-                        }
-                    }
-                }
-            }
-
-            console.log("Group Prios:");
-            //console.log(this.group.id);
-            //console.log(this.groupdata_foto.priorities);
-            //console.log(this.groupdata_video.priorities);
-            //console.log(this.groupdata_audio.priorities);
-
-        },
             addNameLabel: function (labObject) {
                 var name;
                 var customColor;
-                if(labObject.type_str.includes("Photo" || "photo")){
+                if (labObject.type_str.includes("Photo" || "photo")) {
                     name = 'photo';
                     customColor = '#78909c';
-                } else if(labObject.type_str.includes("Foto" || "foto")){
+                } else if (labObject.type_str.includes("Foto" || "foto")) {
                     name = 'photo';
                     customColor = '#78909c';
-                } else if(labObject.type_str.includes("Video" || "video")){
-                    if(labObject.type_str.includes("schnitt" || "edit")){
+                } else if (labObject.type_str.includes("Video" || "video")) {
+                    if (labObject.type_str.includes("schnitt" || "edit")) {
                         name = 'edit';
                         customColor = '#546e7a';
-                    } else{
+                    } else {
                         name = 'video';
                         customColor = '#546e7a';
                     }
-                } else if(labObject.type_str.includes("Audio" || "audio")){
+                } else if (labObject.type_str.includes("Audio" || "audio")) {
                     name = 'audio';
                     customColor = '#455a64';
                 }
@@ -1065,37 +892,13 @@ The Main View contains:
 
             _handleLabTypesRequest: function (response) {
                 var labResponse = response.detail;
-                for(var i=0; i<labResponse.length; i++){
+                for (var i = 0; i < labResponse.length; i++) {
                     labResponse[i] = this.addNameLabel(labResponse[i]);
                 }
-                this.set('labTypes',labResponse);
-            },
-
-        /**
-         * Gets group-lab data from API and sets them for each labtype
-         * @param event
-         * @private
-         */
-        _handleGroupLabsRequest: function(event){
-            console.log('_handleGroupLabsRequest()');
-            //console.log(event.detail);
-
-            if(!this.isReady || this.gotLabTypes == false)
-                return;
-
-            if (event.detail.labTypeId == this.labtype_foto.id)
-                this.groupdata_audio.lab = new Date(event.detail.date);
-            if (event.detail.labTypeId == this.labtype_video.id)
-                this.groupdata_video.lab = new Date(event.detail.date);
-            if (event.detail.labTypeId == this.labtype_audio.id)
-                this.groupdata_foto.lab = new Date(event.detail.date);
-
-            //console.log("Group Labs:");
-            //console.log(this.groupdata_foto.lab);
-            //console.log(this.groupdata_video.lab);
-            //console.log(this.groupdata_audio.lab);
-        }
-
+                this.set('labTypes', labResponse);
+                console.log(labResponse);
+            }
         });
+
     </script>
 </dom-module>

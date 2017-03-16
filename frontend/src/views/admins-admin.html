@@ -144,6 +144,7 @@
         <paper-dialog id="createDialog" on-iron-overlay-closed="_reactToCreateDialog">
             <div>
                 <h1>{{localize('usersadmin_dialog create')}}</h1>
+                <p>{{localize('users-admin create-disclaimer')}}</p>
                 <paper-input value="{{newUser.first_name}}" label="{{localize('semester_setup_users_table_firstname')}}"></paper-input>
                 <paper-input value="{{newUser.name}}" label="{{localize('semester_setup_users_table_lastname')}}"></paper-input>
                 <paper-input class="create-group-input"
@@ -265,11 +266,9 @@
              */
             _handleAdminsResponse: function (event) {
                 var api_response = event.detail;
-                console.log(api_response);
                 for (var i = 0; i < api_response.length; i++) {
                     this.push('admins', api_response[i]);
                 }
-                console.log(this.admins);
 
                 this.ajax_pending = {
                     contentType: 'application/json',
@@ -302,11 +301,6 @@
                 };
                 //To Notify Polymer & other Components of changes to admins property
                 this.notifyPath('admins');
-            },
-
-            _handleLabCountResponse: function (response) {
-                console.log(response);
-                console.log(this.admins[0].id);
             },
 
             /**
@@ -446,7 +440,7 @@
              */
             _forget: function () {
                 this.set('admins', []);
-                console.info("Reset Admins");
+
             }
 
         });
