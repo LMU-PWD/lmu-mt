@@ -12,24 +12,6 @@
     <template>
 
         <style>
-
-          /*  :host {
-                display: block;
-                text-align: right;
-            }
-
-            paper-dropdown-menu {
-                margin: 0 10px;
-                --paper-input-container-color: var(--paper-blue-grey-500);
-                --paper-input-container-focus-color: var(--paper-blue-grey-900);
-            }
-
-            @media screen and (max-width: 767px) {
-                :host {
-                    text-align: left;
-                }
-            }*/
-
             :host {
                 height: 100px;
                 display: block;
@@ -116,9 +98,6 @@
     </template>
 
     <script>
-
-        // TODO:
-        // - change content globally on selection change
 
         Polymer({
 
@@ -227,7 +206,6 @@
             _handleSemesterResponse: function (event) {
                 this.set('semesters', event.detail);
                 var selection = this._calcPreselectedSemester();
-                console.log(selection);
                 this.set('selectedSemesterIndex', parseInt(selection));
             },
 
@@ -244,10 +222,6 @@
 
             _semesterSelectionChanged: function (detail) {
                 if(Object.keys(this.semesters).length !== 0){
-                    console.log("fired semesterchange");
-
-                    console.log(this.semesters);
-                    console.log(this.selectedSemesterIndex);
                     var semesterID = this.semesters[detail].id;
                     this.fire('iron-signal', {name: 'semester', data: {semesterId: semesterID, semesters: this.semesters}});
                 }
@@ -256,8 +230,6 @@
             _forget: function () {
                 this.set('semesters', []);
                 this.set('selectedSemesterIndex',-1);
-                console.log(this.selectedSemesterIndex);
-                console.info("Reset Semesters")
             }
 
         });
