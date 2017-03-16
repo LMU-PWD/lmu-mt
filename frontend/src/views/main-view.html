@@ -841,7 +841,6 @@ The Main View contains:
                 ];
             },
 
-            addNameLabel: function (labObject) {
             /**
              * Observes group changes and initiates API calls to get priorities and lab data for each labtype
              * @param response
@@ -952,7 +951,7 @@ The Main View contains:
                 //console.log(this.groupdata_audio.priorities);
 
             },
-            addNameLabel: function (labObject) {
+            _addNameLabel: function (labObject) {
                 var name;
                 var customColor;
                 if (labObject.type_str.includes("Photo" || "photo")) {
@@ -979,12 +978,10 @@ The Main View contains:
             _handleLabTypesRequest: function (response) {
                 var labResponse = response.detail;
                 for (var i = 0; i < labResponse.length; i++) {
-                    labResponse[i] = this.addNameLabel(labResponse[i]);
+                    labResponse[i] = this._addNameLabel(labResponse[i]);
                 }
                 this.set('labTypes', labResponse);
                 console.log(labResponse);
-            }
-                this.set('labTypes',labResponse);
             },
 
             /**
