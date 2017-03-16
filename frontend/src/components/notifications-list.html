@@ -278,6 +278,9 @@
         <!--Iron Signal Fired on Logout-->
         <iron-signals on-iron-signal-forget="_forget"></iron-signals>
 
+        <!--Iron Signal for passing Semester-->
+        <iron-signals on-iron-signal-semester="_adminSemesterChanged"></iron-signals>
+
     </template>
 
     <script>
@@ -337,7 +340,7 @@
             ],
 
             reload: function () {
-                this.$.getRequest.trigger();
+                this.$$('#getRequest').trigger();
             },
 
             /** * * * * * * * * * **/
@@ -345,10 +348,17 @@
             /** * * * * * * * * * **/
 
             /**
+             * Update Semester on Semester Changed by Admin
+             * @private
+             */
+            _adminSemesterChanged: function (event) {
+                this.set('selectedSemester',event.detail.semesterId)
+            },
+
+            /**
              * On every semester change reload list data
              */
             _selectedSemesterChanged: function (semesterId) {
-
                 this.getAjax = {
                     headers: {
                         Authorization: this.accessToken
