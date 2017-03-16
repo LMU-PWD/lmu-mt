@@ -119,6 +119,7 @@
     "semester_setup_practicals_markdown": "markdown syntax",
     "semester_setup_practicals_title_input": "Title that will be shown to users",
     "semester_setup_practicals_deadline_input": "Deadline for student groups to enroll (dd / mm / yyyy)",
+    "semester_setup_practicals_deadline_input_tutors": "Deadline for tutors to enroll (dd / mm / yyyy)",
     "semester_setup_practicals_description_label_1": "Add some content to the page ",
     "semester_setup_practicals_description_label_2": " will see when they click on the ",
     "semester_setup_practicals_description_label_3": " lab. You can use ",

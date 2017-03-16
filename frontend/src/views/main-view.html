@@ -533,7 +533,7 @@ The Main View contains:
                         <template is="dom-if" if="[[ user.isAdmin ]]">
                             <semester-setup-view
                                     name="semester-setup"
-                                    page="{{ page }}"
+                                    page="{{ routeData.page }}"
                                     access-token="[[ accessToken ]]"></semester-setup-view>
                             <admins-admin
                                     name="admins"

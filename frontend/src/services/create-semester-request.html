@@ -143,6 +143,7 @@
                                 type: 0,
                                 type_str: photo.title,
                                 registration_deadline: photo.deadline,
+                                registration_deadline_tutors: photo.deadlineTutors,
                                 registration_open: false,
                                 description_tutor: photo.descriptionTutor,
                                 description_student: photo.descriptionStudent,
@@ -151,6 +152,7 @@
                                 type: 1,
                                 type_str: video.title,
                                 registration_deadline: video.deadline,
+                                registration_deadline_tutors: video.deadlineTutors,
                                 registration_open: false,
                                 description_tutor: video.descriptionTutor,
                                 description_student: video.descriptionStudent,
@@ -159,6 +161,7 @@
                                 type: 2,
                                 type_str: audio.title,
                                 registration_deadline: audio.deadline,
+                                registration_deadline_tutors: audio.deadlineTutors,
                                 registration_open: false,
                                 description_tutor: audio.descriptionTutor,
                                 description_student: audio.descriptionStudent,
@@ -167,6 +170,7 @@
                                 type: 3,
                                 type_str: 'Videoschnitt',
                                 registration_deadline: video.deadline, // Only for API validation, not used in app
+                                registration_deadline_tutors: video.deadlineTutors, // Only for API validation, not used in app
                                 registration_open: false,
                                 description_tutor: video.descriptionTutor,
                                 description_student: video.descriptionStudent,
@@ -284,6 +288,7 @@
                 this.datesAjax = null;
                 console.log("dates created");
                 this.loading = false;
+                this.fire('semester-created');
             },
 
             _handleDatesError: function (event) {

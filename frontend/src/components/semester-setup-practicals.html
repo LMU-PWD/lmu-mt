@@ -54,6 +54,13 @@
                                     label="[[ localize('semester_setup_practicals_title_input') ]]"
                                     value="{{ photoTitle }}"></paper-input>
 
+                            <paper-input label="[[ localize('semester_setup_practicals_deadline_input_tutors') ]]"
+                                         on-tap="_openPhotoPickerDialogTutors"
+                                         allowed-pattern="/[1-9]{1}\d? \/ [1-9]{1}\d? \/ [1-9]{1}\d{3}/"
+                                         value="[[ photoDeadlineTutorsFormatted ]]">
+                                <iron-icon icon="icons:date-range" prefix></iron-icon>
+                            </paper-input>
+
                             <paper-input label="[[ localize('semester_setup_practicals_deadline_input') ]]"
                                          on-tap="_openPhotoPickerDialog"
                                          allowed-pattern="/[1-9]{1}\d? \/ [1-9]{1}\d? \/ [1-9]{1}\d{3}/"
@@ -100,6 +107,13 @@
                                     label="[[ localize('semester_setup_practicals_title_input') ]]"
                                     value="{{ videoTitle }}"></paper-input>
 
+                            <paper-input label="[[ localize('semester_setup_practicals_deadline_input_tutors') ]]"
+                                         on-tap="_openVideoPickerDialogTutors"
+                                         allowed-pattern="/[1-9]{1}\d? \/ [1-9]{1}\d? \/ [1-9]{1}\d{3}/"
+                                         value="[[ videoDeadlineTutorsFormatted ]]">
+                                <iron-icon icon="icons:date-range" prefix></iron-icon>
+                            </paper-input>
+
                             <paper-input label="[[ localize('semester_setup_practicals_deadline_input') ]]"
                                          on-tap="_openVideoPickerDialog"
                                          allowed-pattern="/[1-9]{1}\d? \/ [1-9]{1}\d? \/ [1-9]{1}\d{3}/"
@@ -145,6 +159,13 @@
                             <paper-input
                                     label="[[ localize('semester_setup_practicals_title_input') ]]"
                                     value="{{ audioTitle }}"></paper-input>
+
+                            <paper-input label="[[ localize('semester_setup_practicals_deadline_input_tutors') ]]"
+                                         on-tap="_openAudioPickerDialogTutors"
+                                         allowed-pattern="/[1-9]{1}\d? \/ [1-9]{1}\d? \/ [1-9]{1}\d{3}/"
+                                         value="[[ audioDeadlineTutorsFormatted ]]">
+                                <iron-icon icon="icons:date-range" prefix></iron-icon>
+                            </paper-input>
 
                             <paper-input label="[[ localize('semester_setup_practicals_deadline_input') ]]"
                                          on-tap="_openAudioPickerDialog"
@@ -211,6 +232,36 @@
             </div>
         </paper-dialog>
 
+        <paper-dialog id="photoDeadlineDialogTutors" class="paper-date-picker-dialog">
+            <paper-date-picker
+                    id="picker"
+                    date="{{ photoDeadlineTutors }}"
+                    responsive-width="630px"></paper-date-picker>
+            <div class="buttons">
+                <paper-button dialog-confirm>[[ localize('c_button_ok') ]]</paper-button>
+            </div>
+        </paper-dialog>
+
+        <paper-dialog id="videoDeadlineDialogTutors" class="paper-date-picker-dialog">
+            <paper-date-picker
+                    id="picker"
+                    date="{{ videoDeadlineTutors }}"
+                    responsive-width="630px"></paper-date-picker>
+            <div class="buttons">
+                <paper-button dialog-confirm>[[ localize('c_button_ok') ]]</paper-button>
+            </div>
+        </paper-dialog>
+
+        <paper-dialog id="audioDeadlineDialogTutors" class="paper-date-picker-dialog">
+            <paper-date-picker
+                    id="picker"
+                    date="{{ audioDeadlineTutors }}"
+                    responsive-width="630px"></paper-date-picker>
+            <div class="buttons">
+                <paper-button dialog-confirm>[[ localize('c_button_ok') ]]</paper-button>
+            </div>
+        </paper-dialog>
+
         <!--Iron Signal for Localization-->
         <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
 
@@ -242,6 +293,13 @@
                     type: String,
                     computed: '_formatDate(audioDeadline)',
                     reflectToAttribute: false },
+                audioDeadlineTutors: {
+                    type: Date,
+                    observer: '_audioChanged' },
+                audioDeadlineTutorsFormatted: {
+                    type: String,
+                    computed: '_formatDate(audioDeadlineTutors)',
+                    reflectToAttribute: false },
                 audioDescriptionTutor: {
                     type: String,
                     observer: '_audioChanged',
@@ -262,6 +320,13 @@
                     type: String,
                     computed: '_formatDate(photoDeadline)',
                     reflectToAttribute: false },
+                photoDeadlineTutors: {
+                    type: Date,
+                    observer: '_photoChanged' },
+                photoDeadlineTutorsFormatted: {
+                    type: String,
+                    computed: '_formatDate(photoDeadlineTutors)',
+                    reflectToAttribute: false },
                 photoDescriptionTutor: {
                     type: String,
                     observer: '_photoChanged' },
@@ -280,6 +345,13 @@
                 videoDeadlineFormatted: {
                     type: String,
                     computed: '_formatDate(videoDeadline)',
+                    reflectToAttribute: false },
+                videoDeadlineTutors: {
+                    type: Date,
+                    observer: '_videoChanged' },
+                videoDeadlineTutorsFormatted: {
+                    type: String,
+                    computed: '_formatDate(videoDeadlineTutors)',
                     reflectToAttribute: false },
                 videoDescriptionTutor: {
                     type: String,
@@ -327,6 +399,18 @@
                 this.$.audioDeadlineDialog.open();
             },
 
+            _openPhotoPickerDialogTutors: function () {
+                this.$.photoDeadlineDialogTutors.open();
+            },
+
+            _openVideoPickerDialogTutors: function () {
+                this.$.videoDeadlineDialogTutors.open();
+            },
+
+            _openAudioPickerDialogTutors: function () {
+                this.$.audioDeadlineDialogTutors.open();
+            },
+
             _formatDate: function (date) {
                 return date.getDate() + ' / ' + (date.getMonth() + 1) + ' / ' + date.getFullYear();
             },
@@ -360,6 +444,7 @@
             _audioChanged: function () {
                 this.audioObject = {
                     deadline: this.audioDeadline,
+                    deadlineTutors: this.audioDeadlineTutors,
                     title: this.audioTitle,
                     descriptionStudent: this.audioDescriptionStudent,
                     descriptionTutor: this.audioDescriptionTutor
@@ -369,6 +454,7 @@
             _photoChanged: function () {
                 this.photoObject = {
                     deadline: this.photoDeadline,
+                    deadlineTutors: this.photoDeadlineTutors,
                     title: this.photoTitle,
                     descriptionStudent: this.photoDescriptionStudent,
                     descriptionTutor: this.photoDescriptionTutor
@@ -378,6 +464,7 @@
             _videoChanged: function () {
                 this.videoObject = {
                     deadline: this.videoDeadline,
+                    deadlineTutors: this.videoDeadlineTutors,
                     title: this.videoTitle,
                     descriptionStudent: this.videoDescriptionStudent,
                     descriptionTutor: this.videoDescriptionTutor
