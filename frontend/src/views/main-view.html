@@ -12,7 +12,7 @@ The Main View contains:
 <link rel="import" href="../components/index-card.html">
 <link rel="import" href="../components/group-card.html">
 <link rel="import" href="../components/group-detail.html">
-<link rel="import" href="groups-admin.html">
+<link rel="import" href="../components/tutor-card.html">
 <link rel="import" href="../components/notifications-card.html">
 <link rel="import" href="../components/navigation-bar.html">
 <link rel="import" href="../components/admin-toolbar.html">
@@ -529,11 +529,19 @@ The Main View contains:
                                         lab-types="[[labTypes]]"></admin-dashboard>
                             </template>
                             <template is="dom-if" if="{{user.isTutor}}">
-                                <tutor-dashboard
-                                        lab-types="{{labTypes}}"
-                                        user="{{user}}"
-                                        access-token="[[accessToken]]"
-                                        lab-types="[[labTypes]]"></tutor-dashboard>
+                                <tutor-card
+                                        access-token="{{ accessToken }}"
+                                        labtype-audio="[[ labtype_audio ]]"
+                                        labtype-foto="[[ labtype_foto ]]"
+                                        labtype-video="[[ labtype_video ]]"
+                                        lab-types="[[ labTypes ]]"
+                                        user="[[ user ]]">
+                                </tutor-card>
+                                <!--<tutor-dashboard-->
+                                        <!--lab-types="{{labTypes}}"-->
+                                        <!--user="{{user}}"-->
+                                        <!--access-token="[[accessToken]]"-->
+                                        <!--lab-types="[[labTypes]]"></tutor-dashboard>-->
                             </template>
                             <template is="dom-if" if="{{user.isStudent}}">
                                 <student-dashboard
@@ -735,13 +743,9 @@ The Main View contains:
                     this.$$('#transburger').toggleIcon();
 
                 }else{
-                    console.log(detail);
-
                     this.$$('#transburger').toggleIcon();
                     this.$$('#menu').toggle();
                     this.$$('.menu-overlay').classList.toggle('not-active');
-                    console.log(this.$.menu.opened);
-                    console.log(this.$$('#transburger').icon);
                     if(this.$.menu.opened && this.activeIcon=='menu'){
                         this.$$('#transburger').toggleIcon();
 
@@ -813,7 +817,7 @@ The Main View contains:
              * @private
              */
             _handleRouting: function (event) {
-                //console.log(event);
+
                 //Route to Page&Path specified in the event
                 this.set('route.path',event.detail.path);
                 this.set('routeData.page',event.detail.page);
@@ -867,7 +871,7 @@ The Main View contains:
                      * @private
                      */
                     _groupChanged: function(response) {
-                        //console.log(this.group);
+
                         if (!this.isReady || !this.group.priorityIds)
                             return;
 
@@ -881,7 +885,7 @@ The Main View contains:
                                 method: 'GET',
                                 endpoint: '/Priorities?filter[where][groupId]='+this.user.groupId
                             };
-                            //console.log(this.ajax_prios);
+
                         }
                         for (j = 0; j < this.group.labIds.length; j++) {
                             // Get group-labs
@@ -975,8 +979,6 @@ The Main View contains:
          * @private
          */
         _handlePriosRequest: function(event){
-            console.log('_handlePriosRequest()');
-            console.log(event.detail);
 
             if(!this.isReady || this.gotLabTypes == false)
                 return;
@@ -1000,7 +1002,6 @@ The Main View contains:
                 }
             }
 
-            console.log("Group Prios:");
             //console.log(this.group.id);
             //console.log(this.groupdata_foto.priorities);
             //console.log(this.groupdata_video.priorities);
@@ -1045,8 +1046,6 @@ The Main View contains:
          * @private
          */
         _handleGroupLabsRequest: function(event){
-            console.log('_handleGroupLabsRequest()');
-            //console.log(event.detail);
 
             if(!this.isReady || this.gotLabTypes == false)
                 return;

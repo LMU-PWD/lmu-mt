@@ -1,0 +1,282 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../../bower_components/iron-collapse/iron-collapse.html">
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="practicals-tutor-date-creator.html">
+<link rel="import" href="../shared/shared-styles.html">
+
+<!--Localization Imports-->
+<link rel="import" href="../services/my-localize-behavior.html">
+
+<dom-module id="practicals-tutor-date-selector">
+    <template>
+        <style include="shared-styles">
+            :host{
+
+            }
+            .dateselector{
+                text-align: center;
+                width: 100%;
+            }
+            .datecreator{
+                display:inline-block;
+                margin:0;
+                height: auto;
+                vertical-align:top;
+            }
+            .resetButton, .backButton, .saveButton {
+                display: inline-block;
+            }
+            .backButton{
+                margin-bottom: 10px;
+                width: 32.8%;
+                float: left;
+            }
+            .resetButton {
+                margin-bottom: 10px;
+                width: 33.8%;
+                margin-left: 0.3%;
+            }
+            .saveButton{
+                margin-bottom: 10px;
+                width: 32.8%;
+                float: right;
+            }
+            /*Phone*/
+            @media screen and (max-width: 767px) {
+                .datecreator{
+                    width: 100%;
+                }
+            }
+            /*Tablet*/
+            @media screen and (min-width: 768px) and (max-width: 1023px) {
+                .datecreator{
+                    min-width: 400px;
+                    width: 49%;
+                }
+            }
+            /*Desktop*/
+            @media screen and (min-width: 1024px) {
+                .datecreator{
+                    min-width: 400px;
+                    width: 24%;
+                }
+            }
+        </style>
+        <div>
+            <paper-button raised class="backButton" on-tap="_handleBackClick">
+                <iron-icon icon="arrow-back"></iron-icon>
+                [[ localize('practicals_tutordateselector_button-goback') ]]
+            </paper-button>
+            <paper-button raised class="resetButton" on-tap="_handleResetClick">
+                <iron-icon icon="av:replay"></iron-icon>
+                    [[ localize('practicals_tutordateselector_button-setback') ]]
+            </paper-button>
+            <paper-button raised class="saveButton" on-tap="_handleSaveClick">
+                <iron-icon icon="save"></iron-icon>
+                [[ localize('practicals_tutordateselector_button-save') ]]
+            </paper-button>
+        </div>
+        <div class="dateselector">
+            <template is="dom-repeat" items="{{timeslots}}" as="labs">
+                <practicals-tutor-date-creator id="dateselectors" class="datecreator"
+                                    timeslots="[[labs]]"
+                                    chosenlabs="{{chosenlabs}}"
+                                    api-all-labs="[[apiAllLabs]]"
+                                    on-date-click="_handleDateClick"
+                ></practicals-tutor-date-creator>
+            </template>
+        </div>
+
+        <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
+    </template>
+
+    <script>
+        Polymer({
+            is: 'practicals-tutor-date-selector',
+            properties: {
+                timeslots:{
+//                    computed: '_computeTimeslots(apiAllLabs)',
+                    type: Array,
+                    value: []
+                },
+                chosenlabs: {
+                    type: Array,
+                    value: [],
+                    notify: true
+                },
+
+                // From API
+                labType: Object,
+                user: Object,
+                apiPriorities: {
+                    value: Object,
+                    notify: true
+                },
+                apiAllLabs: {
+                    type: Array,
+                    observer: '_apiAllLabsChanged'
+                }
+            },
+
+            /**
+             * Localization setup
+             */
+            behaviors: [
+                Polymer.MyLocalizeBehavior
+            ],
+
+            /**
+             * Computes timeslots for pretty view
+             **/
+            _apiAllLabsChanged: function() {
+                this.timeslots = this._transformLabs(this.apiAllLabs, true);
+            },
+
+            /**
+             * Creates string from the given date
+             * @param {String} date - date that will be transformed to String
+             */
+            _getDateString: function(date){
+
+                var datestring = "";
+
+                switch(date.getDay()){
+                    case 0:
+                        datestring = "Sonntag, den ";
+                        break;
+                    case 1:
+                        datestring = "Montag, den ";
+                        break;
+                    case 2:
+                        datestring = "Dienstag, den ";
+                        break;
+                    case 3:
+                        datestring = "Mittwoch, den ";
+                        break;
+                    case 4:
+                        datestring = "Donnerstag, den ";
+                        break;
+                    case 5:
+                        datestring = "Freitag, den ";
+                        break;
+                    case 6:
+                        datestring = "Samstag, den ";
+                        break;
+                }
+
+                var hours = date.getHours();
+                var minutes = date.getMinutes();
+
+                if(hours<10){
+                   hours = "0"+hours;
+                }
+                if(minutes<10){
+                   minutes = "0"+minutes;
+                }
+                datestring = datestring+date.getDate()+"."+date.getMonth()+"."+date.getFullYear()+
+                        " um "+hours+":"+minutes+" Uhr";
+
+                return datestring;
+            },
+
+            /**
+             * Handles Reset-Button Click; Resets the priorities-Array and calls childs resetSelection functions
+             */
+            _handleResetClick: function(e){
+
+                var dateselectors = Polymer.dom(this.root).querySelectorAll("#dateselectors");
+
+                for(i = 0; i < dateselectors.length; i++){
+                    dateselectors[i]._resetSelection();
+                }
+                this.fire("reset-click");
+            },
+
+            /**
+             * Handle date click from Child (date-creator)
+             * Update child priorities-Array
+             * @param e - Event Variable
+             * @private
+             */
+            _handleDateClick: function(e){
+                this.chosenlabs = e.target.chosenlabs;
+            },
+
+            /**
+             * Handle save click
+             * @param e - Event Variable
+             * @private
+             */
+            _handleSaveClick: function(e){
+                this.fire("save-click", this.chosenlabs);
+            },
+
+            _handleBackClick: function() {
+                this.fire("back-click", this.chosenlabs)
+            },
+
+            /**
+             * Transform the Format of the given Timelabs from the Api, so it will be easier to handle in the frontend
+             * @param labsFromApi - Contains the given timelabs
+             * @returns {Array} - timelabs in new format
+             * @private
+             */
+            _transformLabs: function(labsFromApi,divideDates){
+
+                if (typeof labsFromApi == 'undefined' || labsFromApi.length == 0)
+                    return [];
+
+                var transformedLabs = []; //Store return-Array here
+                var lastLab = new Date(labsFromApi[0].date);
+                var countDates = 0; //Date counter
+                var countLabs = 0; //lab counter
+                var dates = [];
+
+                for(i=0; i<labsFromApi.length; i++){
+
+                    // Create a new array-entrie if date from recent lab is different from date of the last lab
+                    var labdate = new Date(labsFromApi[i].date);
+
+                    if((labdate.getFullYear() != lastLab.getFullYear() ||
+                        labdate.getMonth() != lastLab.getMonth() ||
+                        labdate.getDate() != lastLab.getDate()) && divideDates) {
+                        dates = [];
+                        lastLab = labdate;
+                        transformedLabs.push([]);
+                        countDates++;
+                        countLabs = 0;
+                    }
+                    var endtime = new Date(labdate.getFullYear(), labdate.getMonth(), labdate.getDate());
+
+                    if((labdate.getMinutes() + (labsFromApi[i].duration % 60)) > 60){
+                        endtime.setHours(1+Math.floor(labdate.getHours()+(labsFromApi[i].duration) / 60));
+                        endtime.setMinutes(labdate.getMinutes() + (labsFromApi[i].duration % 60)-60);
+                    }
+                    else{
+                        endtime.setHours(Math.floor(labdate.getHours()+(labsFromApi[i].duration) / 60));
+                        endtime.setMinutes(labdate.getMinutes() + (labsFromApi[i].duration % 60));
+                    }
+
+                    var lab = [];
+                    lab = [labdate, endtime, labsFromApi[i].id];
+
+                    if(divideDates){
+                        dates[countLabs] = lab;
+                        transformedLabs[countDates] = dates;
+                        countLabs++;
+                    }
+                    else{
+                        transformedLabs[i]=lab;
+                    }
+                }
+                return transformedLabs;
+            }
+        });
+    </script>
+</dom-module>

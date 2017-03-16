@@ -146,11 +146,9 @@
     "practicals-admin tutor": "Tutor",
     "practicals-admin group": "Group",
     "practicals-admin lab": "Labdate",
-
     "practicals-admin students": "Students",
     "practicals-admin tutors": "Tutors",
     "practicals-admin distribute_text":"Automatically distribute labs for",
-
     "practicals-admin close_registration": "Close Registration",
     "practicals-admin open_registration": "Open Registration",
 
@@ -158,7 +156,6 @@
     "practicals-admin-labtype text2":"Registration Deadline Tutors",
     "practicals-admin-labtype text3":"Practicals Description Students",
     "practicals-admin-labtype text4":"Practicals Description Tutors",
-
     "practicals-admin-labtype text1_short":"Deadline Students",
     "practicals-admin-labtype text2_short":"Deadline Tutors",
 
@@ -195,6 +192,32 @@
     "general_weekdays 5": "Friday",
     "general_weekdays 6": "Saturday",
     "general_hours": "hours",
+
+    "tutor_card_heading_select-date": "Choose your free dates",
+    "tutor_card_audio-practical": "Audio Practical",
+    "tutor_card_video-practical": "Video Practical",
+    "tutor_card_foto-practical": "Photo Practical",
+    "tutor_card_heading_your-dates": "Your free dates for the ",
+    "tutor_card_info-open-until": "Open until ",
+    "tutor_card_info-closed": "The registration is closed. ",
+    "tutor_card tab_calendar": "Calendar",
+    "tutor_card tab_datepicker": "Date Selection",
+
+    "tutor_sessionlist_heading_date": "Date",
+    "tutor_sessionlist_heading_time": "Time",
+    "tutor_sessionlist_no-upcoming-sessions": "No upcoming lab sessions.",
+    "tutor_sessionlist no-sessions-yet": "You haven't been assigned fixed lab dates yet. Please choose your lab date preferences under 'Date Selection'",
+    "tutor_sessionlist_group": "Group",
+
+    "practicals_tutordateselector_button-goback": "Back to overview",
+    "practicals_tutordateselector_button-setback": "Reset",
+    "practicals_tutordateselector_button-save": "Save",
+
+    "practicals_tutordatedetail_button-back": "Back",
+    "practicals_tutordatedetail_button-change": "Change selection",
+    "practicals_tutordatedetail_info_deadline-reached": "The date selection deadline has been reached. You will be assigned fixed lab dates soon.",
+    "practicals_tutordatedetail_info_not-unlocked": "Date selection is not unlocked yet!",
+    "practicals_tutordatedetail_info-none-selected": "You haven't chosen any lab dates yet.",
     "c_function_success": "The function has been executed sucessfully",
     "c_function_error": "Error at function execution"
   },
@@ -328,6 +351,32 @@
     "semester_setup_dates_dialog_heading": "Neuen Termin hinzufügen",
     "semester_setup_dates_dialog_startingat": "Beginn:",
 
+    "tutor_card_heading_select-date": "Wähle deine freien Termine",
+    "tutor_card_audio-practical": "Audio-Praktikum",
+    "tutor_card_video-practical": "Video-Praktikum",
+    "tutor_card_foto-practical": "Foto-Praktikum",
+    "tutor_card_heading_your-dates": "Deine freien Termine für das ",
+    "tutor_card_info-open-until": "Noch offen bis ",
+    "tutor_card_info-closed": "Die Registrierung ist abgeschlossen. ",
+    "tutor_card tab_calendar": "Kalender",
+    "tutor_card tab_datepicker": "Terminwahl",
+
+    "tutor_sessionlist_heading_date": "Datum",
+    "tutor_sessionlist_heading_time": "Zeit",
+    "tutor_sessionlist_no-upcoming-sessions": "Keine zukünftigen Termine.",
+    "tutor_sessionlist no-sessions-yet": " Dir wurden noch keine Termine fest zugeteilt. Bitte wähle unter 'Terminwahl' Termine, an denen du Zeit hast.",
+    "tutor_sessionlist_group": "Gruppe ",
+
+    "practicals_tutordateselector_button-goback": "Zur Übersicht",
+    "practicals_tutordateselector_button-setback": "Zurücksetzen",
+    "practicals_tutordateselector_button-save": "Speichern",
+
+    "practicals_tutordatedetail_button-back": "Zurück",
+    "practicals_tutordatedetail_button-change": "Auswahl ändern",
+    "practicals_tutordatedetail_info_deadline-reached": "Die Deadline zur Terminwahl wurde bereits erreicht. In Kürze werden dir feste Termine zugeteilt werden.",
+    "practicals_tutordatedetail_info_not-unlocked": "Die Terminwahl ist noch nicht freigeschalten!",
+    "practicals_tutordatedetail_info-none-selected": "Du hast bisher keine Termine gewählt.",
+
     "tooltip_menu logout" : "Den aktuellen Benutzer ausloggen",
     "tooltip_menu language" : "Plattformsprache zu Englisch ändern",
     "tooltip_menu settings" : "Benutzereinstellungen",
@@ -344,14 +393,11 @@
     "practicals-view title_datepick": "Terminauswahl",
 
     "practicals-admin lab": "Termin",
-
     "practicals-admin tutor": "Tutor",
     "practicals-admin group": "Gruppe",
-
     "practicals-admin students": "Studenten",
     "practicals-admin tutors": "Tutoren",
     "practicals-admin distribute_text":"Automatische Terminzuweisung für",
-
     "practicals-admin close_registration": "Registrierung schliessen",
     "practicals-admin open_registration": "Registrierung freischalten",
 

@@ -1,0 +1,577 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../../bower_components/iron-icons/social-icons.html">
+<link rel="import" href="../../bower_components/iron-icons/av-icons.html">
+<link rel="import" href="../../bower_components/iron-icons/image-icons.html">
+<link rel="import" href="../../bower_components/iron-icons/hardware-icons.html">
+<link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="../../bower_components/iron-data-table/iron-data-table.html">
+<link rel="import" href="../../bower_components/iron-collapse/iron-collapse.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item-body.html">
+
+<!--Localization Imports-->
+<link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
+<link rel="import" href="../services/my-localize-behavior.html">
+
+<dom-module id="tutor-sessionlist">
+
+    <template>
+
+        <style include="shared-styles">
+            :host {
+                min-width: 320px;
+                display: block;
+                background-color: var(--paper-blue-grey-500);
+            }
+            paper-button {
+                width: calc(35% - 20px);
+            }
+            paper-item {
+                cursor: pointer
+            }
+            .session_date {
+                min-width: 170px;
+                width: 25%;
+            }
+            .session_time {
+                width: 20%;
+                padding-right: 5%;
+                text-align: right
+            }
+            .session_icon {
+                width: 5%;
+                min-width: 24px;
+                margin-left: 5%;
+            }
+            .session_type {
+                width: 30%;
+            }
+            .sessions_row {
+                border-top: 2px solid var(--paper-grey-200)
+            }
+            .sessions_row:first-of-type {
+                border-top: none
+            }
+            paper-item{
+                background-color: var(--paper-blue-grey-100);
+            }
+            paper-item:not(.sessions-row):focus {
+                background-color: var(--paper-blue-grey-100);
+            }
+            .sessions_row:hover {
+                background-color: var(--paper-grey-100)
+            }
+            .sessions_heading {
+                background-color: var(--paper-blue-grey-100);
+                color: var(--paper-blue-grey-700);
+                font-size: 16px;
+            }
+            .session_details {
+                font-size: 14px;
+            }
+            .session_details a {
+                color: var(--paper-blue-grey-300);
+                text-align: right;
+                text-decoration: none;
+                font-weight: 100;
+            }
+            paper-listbox {
+                padding: 0
+            }
+            .session-unfolded {
+                border-left: 5px solid var(--paper-blue-grey-400);
+            }
+            .session-unfolded .row_title{
+                font-weight: bold;
+            }
+            .session_toggleDropdown {
+                width: 4%;
+                color: var(--paper-blue-grey-200);
+            }
+            .session-unfolded .session_toggleDropdown iron-icon {
+                -o-transform: rotate(90deg);
+                -moz-transform:  rotate(90deg);
+                -webkit-transform: rotate(90deg);
+                transform: rotate(90deg);
+                transition: transform .3s;
+                -moz-transition: transform .3s;
+                -webkit-transition: transform .3s;
+                -o-transition: transform .3s;
+            }
+            .session-unfolded iron-collapse {
+                padding: 0px 29px 10px
+            }
+            .sessions_row.session-unfolded {
+                padding-left: 11px
+            }
+            .sessions_row hr {
+                border: 1px solid #EEE;
+            }
+            paper-item-body .row_title {
+                font-size: 20px
+            }
+            .group_name {
+              color: var(--paper-blue-grey-300);
+              font-weight:100;
+            }
+
+        </style>
+
+        <api-request
+                headers="[[ ajax_labs.headers ]]"
+                method="[[ ajax_labs.method ]]"
+                endpoint="[[ ajax_labs.endpoint ]]"
+                on-api-response="_apiLabsResponse"></api-request>
+        <api-request
+                headers="[[ ajax_exercises.headers ]]"
+                method="[[ ajax_exercises.method ]]"
+                endpoint="[[ ajax_exercises.endpoint ]]"
+                on-api-response="_apiExercisesResponse"></api-request>
+        <api-request
+                id="ajax_group"
+                headers="[[ ajax_group.headers ]]"
+                method="[[ ajax_group.method ]]"
+                endpoint="[[ ajax_group.endpoint ]]"
+                on-api-response="_apiGroupResponse"></api-request>
+        <api-request
+                id="ajax_student"
+                headers="[[ ajax_student.headers ]]"
+                method="[[ ajax_student.method ]]"
+                endpoint="[[ ajax_student.endpoint ]]"
+                on-api-response="_apiStudentResponse"></api-request>
+
+        <div class="lab-list-container">
+                <paper-listbox>
+
+                    <paper-item class="sessions_heading" disabled>
+                        <span class="session_toggleDropdown mobile-hidden" style="width: 4%">
+                        </span>
+                        <span class="session_date">[[ localize('tutor_sessionlist_heading_date') ]]</span>
+                        <span class="session_time" style="margin-right: 20px">[[ localize('tutor_sessionlist_heading_time') ]]</span>
+                        <span class="session_icon"></span>
+                        <span class="session_type"></span>
+                    </paper-item>
+
+                    <template is="dom-if" if="[[ noAssignedDates ]]">
+                        <paper-item disabled style="color: var(--paper-blue-grey-700);">
+                            [[ localize('tutor_sessionlist no-sessions-yet') ]]
+                        </paper-item>
+                    </template>
+
+                    <template is="dom-if" if="[[ _isEmpty(futureSessions) ]]">
+                        <paper-item disabled>
+                            [[ localize('tutor_sessionlist_no-upcoming-sessions') ]]
+                        </paper-item>
+                    </template>
+
+                    <template id="sessionlist" is="dom-repeat" items="[[ myFutureSessions ]]" as="session">
+                        <paper-item  class="sessions_row" id="src-[[ session.id ]]">
+                            <paper-item-body style="padding: 7px 0">
+                                  <div style="padding: 10px 0; display: flex" class="row_title" on-click="toggleCollapse">
+                                    <span class="session_toggleDropdown mobile-hidden"><iron-icon icon="hardware:keyboard-arrow-right"></iron-icon></span>
+                                    <span class="session_date">[[ session.date_string ]]</span>
+                                    <span class="session_time">[[ session.time_string ]]</span>
+                                    <span class="session_icon"><iron-icon icon="[[ _getIcon(session) ]]"></iron-icon></span>
+                                    <span class="session_type">[[ session.labType_string ]]</span>
+                                </div>
+                                <div secondary style="cursor: auto">
+                                    <iron-collapse id="collapse-[[ session.id ]]">
+                                        <div class="session_details" style="border-left: 2px solid var(--paper-blue-grey-500)">
+                                            [[ session.location ]]
+                                        </div>
+                                        <hr>
+                                        <div class="session_details" style="border-left: 2px solid var(--paper-blue-grey-500)">
+                                            [[ session.labType_description_tutor ]]
+                                        </div>
+
+                                        <template is="dom-if" if="[[ !_isEmpty(session.groupMembers) ]]">
+                                            <hr>
+                                            <div class="session_details" style="margin-bottom: 0.5em">
+                                                [[ localize('tutor_sessionlist_group') ]] <span class="group_name">[[ session.group.name ]] </span>
+                                            </div>
+                                            <template is="dom-repeat" items="[[ session.groupMembers ]]" as="groupMember">
+                                                <div class="session_details" style="padding-left: 15px; ">
+                                                  <span>  [[ groupMember.first_name ]] [[ groupMember.name ]] </span>
+                                                  <span><a href="mailto:[[ groupMember.email ]]"><iron-icon icon="communication:mail-outline"></iron-icon> [[ groupMember.email ]]</a></span>
+                                                </div>
+                                            </template>
+                                        </template>
+                                    </iron-collapse>
+                                </div>
+                            </paper-item-body>
+                        </paper-item>
+                    </template>
+                </paper-listbox>
+        </div>
+
+        <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
+    </template>
+    <script>
+
+
+        Polymer({
+            is: 'tutor-sessionlist',
+            properties: {
+                accessToken: String,
+                selfInfo: String,
+                nextSessions: {
+                    type: Array,
+                    value: []
+                },
+                users_in_exercises: {
+                    type: Array,
+                    value: []
+                },
+                sessions: {
+                    type: Array,
+                    value: []
+                },
+                myFutureSessions: {
+                    type: Array,
+                    value: [],
+                    computed: '_computeFutureList(sessions, finishedLoading)'
+                },
+                assignedLabs: {
+                    type: Array
+                },
+                labTypeAudio: Object,
+                labTypeVideo: Object,
+                labTypeFoto: Object,
+                labTypesArray: {
+                    type: Array,
+                    value: []
+                },
+                finishedSessionsLoad: false,
+                noAssignedDates: false,
+                studentsList: {
+                    type: Array,
+                    value: []
+                },
+                groupList: {
+                    type: Array,
+                    value: []
+                },
+                allSessionsRequested: false,
+                finishedLoading: {
+                    type: Boolean
+                }
+            },
+
+            observers: [
+                '_initSessionList(labTypeAudio, labTypeVideo, labTypeFoto, assignedLabs, accessToken)'
+            ],
+
+            /**
+             * Localization setup
+             */
+            behaviors: [
+                Polymer.MyLocalizeBehavior
+            ],
+
+
+            /**
+             ** OBSERVERS & COMPUTING METHODS **
+             */
+            _isEmpty: function(array) {
+                return (array.length == 0)
+            },
+
+            /**
+             * Returns the list which is iterated in the dom-repeat
+             */
+            _computeFutureList: function(allSessions, finishedLoading) {
+
+                if(allSessions.length == 0)
+                    return
+
+                var futureSessions = [];
+                var today = Date.now();
+
+                for (var i = 0; i < allSessions.length; i++) {
+
+                    var currentSession = allSessions[i];
+                    if (new Date(currentSession.date) > today)
+                        futureSessions.push(allSessions[i]);
+
+                    for (var j = 0; j < allSessions[i].groupMembers.length; j++) {
+                        if (typeof allSessions[i].groupMembers[j].name == 'undefined')
+                          return [];
+                    }
+                }
+                if(futureSessions.length == 0)
+                    return []
+
+                return futureSessions;
+            },
+
+            /**
+             * Returns an icon according to the lab type
+             */
+            _getIcon: function(session) {
+                icon = ""
+
+                switch(session.labType_string){
+                    case "":
+                        icon = "av:videocam";
+                        break;
+                    case "Audio":
+                        icon = "av:volume-mute";
+                        break;
+                    case "Video":
+                        icon = "av:videocam";
+                        break;
+                    case "Foto":
+                        icon = "image:photo-camera";
+                        break;
+                }
+                return icon;
+            },
+
+
+            /**
+             * Initialize sessions list
+             */
+            _initSessionList: function(labTypeAudio, labTypeVideo, labTypeFoto, assignedLabs, accessToken) {
+
+                if (assignedLabs.length == 0) {
+                    this.noAssignedDates = true;
+                    return
+                }
+
+                this._makeLabTypesArray(labTypeAudio, labTypeVideo, labTypeFoto);
+
+                var labTypesArray = [labTypeAudio, labTypeVideo, labTypeFoto];
+                var type = ("labTypeId" in assignedLabs[0]) ? "lab" : "exercise";
+                var sessions_list = [];
+
+                for (var i = 0; i < assignedLabs.length; i++) {
+
+                    var date = new Date(assignedLabs[i].date);
+                    var date_string = this._getDateString(date);
+                    var time_string = (date.getHours() + 1) + ":" + (date.getMinutes()<10 ? '0' : '') + date.getMinutes();
+                    var labType_string = ""
+                    var labType_description_tutor = ""
+
+                    if (labTypesArray.length != 0) {
+                        for (var j = 0; j < labTypesArray.length; j++) {
+                            if (labTypesArray[j].id == assignedLabs[i].labTypeId) {
+                                labType_string = labTypesArray[j].type_str
+                                labType_description_tutor = labTypesArray[j].description_tutor
+                            }
+                        }
+                    }
+
+                    var session = {
+                        'id': assignedLabs[i].id,
+                        'type': type,
+                        'date': assignedLabs[i].date,
+                        'date_string': date_string,
+                        'time_string': time_string,
+                        'location': assignedLabs[i].location,
+                        'groupId': assignedLabs[i].groupId,
+                        'labTypeId': assignedLabs[i].labTypeId,
+                        'labType_string': labType_string,
+                        'labType_description_tutor': labType_description_tutor,
+                        'exercise_name': assignedLabs[i].name,
+                        'groupMembers': []
+                    };
+
+                    sessions_list.push(session);
+                    this.$.ajax_group.$.request.auto = false;
+
+                    // If a group signed up for the session, get their data
+                    if (typeof assignedLabs[i].groupId != 'undefined' && this.groupList.indexOf(assignedLabs[i].groupId) < 0) {
+                        this.ajax_group = {
+                            'headers': {
+                                'Authorization': this.accessToken
+                            },
+                            'method': 'GET',
+                            'endpoint': '/labs/' + assignedLabs[i].id + '/group'
+                        }
+
+                        this.$.ajax_group.$.request.generateRequest();
+                        this.push('groupList', assignedLabs[i].groupId)
+
+                        var studentsRequested = true;
+                    }
+                }
+                this.sessions = sessions_list;
+                this.allSessionsRequested = true;
+
+                if (!studentsRequested)
+                    this.finishedLoading = true;
+            },
+
+
+            /**
+             ** API RESPONSE HANDLERS **
+             */
+            _apiLabsResponse: function(response) {
+                this._initSessionList(response.detail)
+            },
+
+
+            _apiExercisesResponse: function(response) {
+
+                if (response.detail.length == 0)
+                    return;
+                this._initSessionList(response.detail)
+            },
+
+
+            _apiGroupResponse: function(response) {
+
+                var receivedGroup = response.detail
+                var studentsList = []
+
+                for (var j = 0; j < this.sessions.length; j++) {
+
+                    if(receivedGroup.id == this.sessions[j].groupId) {
+
+                        this.sessions[j].group = receivedGroup;
+                        this.sessions[j].groupMembers = []
+
+                        for (var m = 0; m < receivedGroup.groupMemberIds.length; m++) {
+                            var groupmember = { id: receivedGroup.groupMemberIds[m] }
+                            this.sessions[j].groupMembers.push(groupmember)
+
+                            var found = false;
+
+                            for (var x = 0; x < this.studentsList.length; x++) {
+
+                                if (this.studentsList[x].id == groupmember.id) {
+                                    found = true;
+                                    break;
+                                }
+                            }
+                            if (!found)
+                                this.studentsList.push(groupmember)
+                        }
+                    }
+                }
+
+                // make students api call if all have been collected in the studentsList only
+                if (!this.allSessionsRequested)
+                    return;
+
+                this.$.ajax_student.$.request.auto = false;
+
+                for (var s = 0; s < this.studentsList.length; s++) {
+
+                    this.ajax_student = {
+                        'headers': {
+                            'Authorization': this.accessToken
+                        },
+                        'method': 'GET',
+                        'endpoint': '/platformusers/' + this.studentsList[s].id
+                    }
+                    this.$.ajax_student.$.request.generateRequest();
+                }
+            },
+
+
+            _apiStudentResponse: function(response) {
+
+                var receivedStudent = response.detail;
+
+                for (var i = 0; i < this.sessions.length; i++) {
+
+                    if (typeof this.sessions[i].groupMembers == 'undefined')
+                        continue;
+
+                    for (var j = 0; j < this.sessions[i].groupMembers.length; j++) {
+                        if (this.sessions[i].groupMembers[j].id == receivedStudent.id) {
+                            this.sessions[i].groupMembers[j].email = receivedStudent.email;
+                            this.sessions[i].groupMembers[j].first_name = receivedStudent.first_name;
+                            this.sessions[i].groupMembers[j].name = receivedStudent.name;
+                        }
+                    }
+                }
+
+                var sessions = this.sessions;
+                this.set('sessions', []);
+                this.set('sessions', sessions);
+                this.finishedLoading = true;
+            },
+
+
+            /**
+             ** OTHER METHODS **
+             */
+            _makeLabTypesArray: function(labtypeAudio, labtypeVideo, labtypeFoto) {
+
+                var labtypes = [ labtypeAudio, labtypeVideo, labtypeFoto ];
+
+                for (var i = 0; i < labtypes.length; i++) {
+
+                    this.labTypesArray[labtypes[i].type_str] =  {
+                        'id':  labtypes[i].id,
+                        'name': labtypes[i].type_str,
+                        'registration_open': labtypes[i].registration_open
+                    }
+
+                    if (this.sessions.length != 0) {
+
+                        var labType_string;
+
+                        for (var j = 0; j < this.sessions.length; j++) {
+                            if (labtypes[i].id == this.sessions[j].labTypeId) {
+                                this.sessions[j].labType_string = labtypes[i].type_str
+                            }
+                        }
+                        var sessions = this.sessions;
+                        this.set('sessions', []);
+                        this.set('sessions', sessions);
+                    }
+                }
+                this.finishedSessionsLoad = true
+                return this.labTypesArray;
+            },
+
+            /**
+             * Creates string from the given date
+             * @param {String} date - date that will be transformed to String
+             */
+            _getDateString: function(date){
+
+                var datestring = "";
+
+                switch(date.getDay()){
+                    case 0:
+                        datestring = "Sonntag, ";
+                        break;
+                    case 1:
+                        datestring = "Montag, ";
+                        break;
+                    case 2:
+                        datestring = "Dienstag, ";
+                        break;
+                    case 3:
+                        datestring = "Mittwoch, ";
+                        break;
+                    case 4:
+                        datestring = "Donnerstag, ";
+                        break;
+                    case 5:
+                        datestring = "Freitag, ";
+                        break;
+                    case 6:
+                        datestring = "Samstag, ";
+                        break;
+                }
+                datestring = datestring+date.getDate()+"."+ (date.getMonth()+1) + "."+date.getFullYear();
+
+                return datestring;
+            },
+
+            /**
+             * Handler for list item collapse
+             */
+            toggleCollapse: function(e) {
+                this.$$("#collapse-" + e.model.session.id).toggle();
+                this.$$("#src-" + e.model.session.id).classList.toggle('session-unfolded');
+            },
+        });
+    </script>
+</dom-module>
