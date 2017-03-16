@@ -41,6 +41,7 @@
     "groupsadmin_dialog text-3": "(This action can't be undone!)",
 
     "c_medientechnik": "Media Technology",
+    "c_button_add": "Add",
     "c_button_cancel": "Cancel",
     "c_button_discard": "Discard",
     "c_button_save": "Save",
@@ -52,6 +53,7 @@
     "c_hours": "hours",
     "c_minute": "minute",
     "c_minutes": "minutes",
+    "c_time": "Time",
 
     "admin_toolbar_new_semester_tooltip": "Create new semester",
 
@@ -135,6 +137,33 @@
     "admin_dashboard tutors" : "Tutors",
     "admin_dashboard semester" : "Terms",
 
+    "practicals-view tab_general": "General",
+    "practicals-view tab_dates": "Dates",
+    "practicals-view title_practical": "practical",
+    "practicals-view title_information": "Information",
+    "practicals-view title_datepick": "Date selection",
+
+    "practicals-admin tutor": "Tutor",
+    "practicals-admin group": "Group",
+    "practicals-admin lab": "Labdate",
+    "practicals-admin students": "Students",
+    "practicals-admin tutors": "Tutors",
+    "practicals-admin distribute_text":"Automatically distribute labs for",
+    "practicals-admin close_registration": "Close Registration",
+    "practicals-admin open_registration": "Open Registration",
+
+    "practicals-admin-labtype text1":"Registration Deadline Students",
+    "practicals-admin-labtype text2":"Registration Deadline Tutors",
+    "practicals-admin-labtype text3":"Practicals Description Students",
+    "practicals-admin-labtype text4":"Practicals Description Tutors",
+    "practicals-admin-labtype text1_short":"Deadline Students",
+    "practicals-admin-labtype text2_short":"Deadline Tutors",
+
+    "practicals-admin-lab title":"Detail View",
+    "practicals-admin-lab text1":"Date",
+    "practicals-admin-lab text2":"Duration",
+    "practicals-admin-lab text3":"Location",
+
     "practicals-student-date no_registration":"Registration is not open!",
     "practicals-student-date change_selection":"Change selection",
     "practicals-student-date priority" : "Priority",
@@ -146,6 +175,15 @@
     "practicals-student-date info_chosen_dates" : "These dates have been chosen by your group: ",
     "practicals-student-date error_text": "Please choose exactly 5 lab dates!",
 
+    "practicals_admin_labs_creator_mode_single": "Single date",
+    "practicals_admin_labs_creator_mode_multiple": "Multiple dates",
+    "practicals_admin_labs_creator_start_time": "Start time",
+    "practicals_admin_labs_creator_multiple_helptext_1": "Use this tool to create lab timeslots for one or more days that follow the same scheme.",
+    "practicals_admin_labs_creator_multiple_helptext_2": "For example: You have booked the audio laboratory on 13th, 14th, 20th and 21st of May. On each of these days you want to offer lab timeslots from 9:00 to 12:30, from 12:45 to 16:15 and from 16:30 to 20:00.",
+    "practicals_admin_labs_creator_multiple_choose_days": "Select all days you want to create labs for:",
+    "practicals_admin_labs_creator_multiple_add_timeslots": "Add timeslots to the scheme. These timeslots will be created for each selected day.",
+    "practicals_admin_labs_creator_multiple_location_error": "Location is empty!",
+
     "general_weekdays 0": "Sunday",
     "general_weekdays 1": "Monday",
     "general_weekdays 2": "Tuesday",
@@ -153,14 +191,8 @@
     "general_weekdays 4": "Thursday",
     "general_weekdays 5": "Friday",
     "general_weekdays 6": "Saturday",
-
     "general_hours": "hours",
 
-    "practicals-view tab_general": "General",
-    "practicals-view tab_dates": "Dates",
-    "practicals-view title_practical": "practical",
-    "practicals-view title_information": "Information",
-    "practicals-view title_datepick": "Date selection",
     "tutor_card_heading_select-date": "Choose your free dates",
     "tutor_card_audio-practical": "Audio Practical",
     "tutor_card_video-practical": "Video Practical",
@@ -185,7 +217,9 @@
     "practicals_tutordatedetail_button-change": "Change selection",
     "practicals_tutordatedetail_info_deadline-reached": "The date selection deadline has been reached. You will be assigned fixed lab dates soon.",
     "practicals_tutordatedetail_info_not-unlocked": "Date selection is not unlocked yet!",
-    "practicals_tutordatedetail_info-none-selected": "You haven't chosen any lab dates yet."
+    "practicals_tutordatedetail_info-none-selected": "You haven't chosen any lab dates yet.",
+    "c_function_success": "The function has been executed sucessfully",
+    "c_function_error": "Error at function execution"
   },
 
   "de": {
@@ -230,6 +264,7 @@
     "groupsadmin_dialog text-3": "(Diese Aktion kann nicht rückgängig gemacht werden!)",
 
     "c_medientechnik": "Medientechnik",
+    "c_button_add": "Hinzufügen",
     "c_button_cancel": "Abbrechen",
     "c_button_discard": "Verwerfen",
     "c_button_save": "Speichern",
@@ -241,6 +276,7 @@
     "c_hours": "Stunden",
     "c_minute": "Minute",
     "c_minutes": "Minuten",
+    "c_time": "Uhrzeit",
 
     "admin_toolbar_new_semester_tooltip": "Neues Semester anlegen",
 
@@ -350,6 +386,33 @@
     "admin_dashboard tutors" : "Tutoren",
     "admin_dashboard semester" : "Semester",
 
+    "practicals-view tab_general": "Allgemeines",
+    "practicals-view tab_dates": "Termine",
+    "practicals-view title_practical": "Praktikum",
+    "practicals-view title_information": "Informationen",
+    "practicals-view title_datepick": "Terminauswahl",
+
+    "practicals-admin lab": "Termin",
+    "practicals-admin tutor": "Tutor",
+    "practicals-admin group": "Gruppe",
+    "practicals-admin students": "Studenten",
+    "practicals-admin tutors": "Tutoren",
+    "practicals-admin distribute_text":"Automatische Terminzuweisung für",
+    "practicals-admin close_registration": "Registrierung schliessen",
+    "practicals-admin open_registration": "Registrierung freischalten",
+
+    "practicals-admin-labtype text1":"Registrierungsfrist Studenten",
+    "practicals-admin-labtype text2":"Registrierungsfrist Tutoren",
+    "practicals-admin-labtype text3":"Praktikumsbeschreibung Studenten",
+    "practicals-admin-labtype text4":"Praktikumsbeschreibung Tutoren",
+    "practicals-admin-labtype text1_short":"Frist Studenten",
+    "practicals-admin-labtype text2_short":"Frist Tutoren",
+
+    "practicals-admin-lab title":"Detailansicht",
+    "practicals-admin-lab text1":"Datum",
+    "practicals-admin-lab text2":"Dauer",
+    "practicals-admin-lab text3":"Ort",
+
     "practicals-student-date no_registration":"Die Terminwahl ist noch nicht freigeschalten!",
     "practicals-student-date change_selection":"Auswahl ändern",
     "practicals-student-date priority" : "Priorität",
@@ -361,6 +424,15 @@
     "practicals-student-date info_chosen_dates" : "Deine Gruppe hat diese Termine ausgewählt: ",
     "practicals-student-date error_text": "Bitte wähle genau 5 Termine!",
 
+    "practicals_admin_labs_creator_mode_single": "Einzeltermin",
+    "practicals_admin_labs_creator_mode_multiple": "Terminserie",
+    "practicals_admin_labs_creator_start_time": "Beginn",
+    "practicals_admin_labs_creator_multiple_helptext_1": "Hier kannst du Termine für Tage erstellen, die immer nach dem gleichen Schema ablaufen.",
+    "practicals_admin_labs_creator_multiple_helptext_2": "Ein Beispiel: Du hast das Audiolabor am 13. und 14. Mai sowie am 20. und 21. Mai reserviert. An diesen Tagen möchtest du jeweils von 9:00 und 12:30, von 12:45 bis 16:15 und von 16:30 bis 20:00 ein Praktikum anbieten.",
+    "practicals_admin_labs_creator_multiple_choose_days": "Wähle die Tage aus, für die du neue Termine erstellen willst:",
+    "practicals_admin_labs_creator_multiple_add_timeslots": "Füge Termine zum Schema hinzu. Diese Termine werden für jeden ausgewählten Tag angelegt.",
+    "practicals_admin_labs_creator_multiple_location_error": "Die Ortsangabe is nicht ausgefüllt!",
+
     "general_weekdays 0": "Sonntag",
     "general_weekdays 1": "Montag",
     "general_weekdays 2": "Dienstag",
@@ -369,11 +441,7 @@
     "general_weekdays 5": "Freitag",
     "general_weekdays 6": "Samstag",
     "general_hours": "Uhr",
-
-    "practicals-view tab_general": "Allgemein",
-    "practicals-view tab_dates": "Termine",
-    "practicals-view title_practical": "Praktikum",
-    "practicals-view title_information": "Informationen",
-    "practicals-view title_datepick": "Terminauswahl"
+    "c_function_success": "Die Funktion wurde erfolgreich ausgeführt",
+    "c_function_error": "Fehler bei der Funktionsausführung"
   }
 }
