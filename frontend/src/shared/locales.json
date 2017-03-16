@@ -208,6 +208,12 @@
     "tutor_sessionlist_no-upcoming-sessions": "No upcoming lab sessions.",
     "tutor_sessionlist no-sessions-yet": "You haven't been assigned fixed lab dates yet. Please choose your lab date preferences under 'Date Selection'",
     "tutor_sessionlist_group": "Group",
+    "tutor_sessionlist has_passed": "Passed",
+    "tutor_sessionlist toast_success_passed": "The success of this lab has been set to 'passed'.",
+    "tutor_sessionlist toast_success_not_passed": "The success of this lab has been set to 'not passed'.",
+    "tutor_sessionlist toast_error": "The success of this lab couln't be changed.",
+    "tutor_sessionlist past_Sessions_info": "Please set the practical's passed states here.",
+    "tutor_sessionlist past_Sessions": "Past labs",
 
     "practicals_tutordateselector_button-goback": "Back to overview",
     "practicals_tutordateselector_button-setback": "Reset",
@@ -366,6 +372,13 @@
     "tutor_sessionlist_no-upcoming-sessions": "Keine zukünftigen Termine.",
     "tutor_sessionlist no-sessions-yet": " Dir wurden noch keine Termine fest zugeteilt. Bitte wähle unter 'Terminwahl' Termine, an denen du Zeit hast.",
     "tutor_sessionlist_group": "Gruppe ",
+    "tutor_sessionlist has_passed": "Bestanden",
+    "tutor_sessionlist toast_success_passed": "Der Erfolg des Praktikums wurde auf 'bestanden' gesetzt.",
+    "tutor_sessionlist toast_success_not_passed": "Der Erfolg dieses Praktikums wurde auf 'nicht bestanden' gesetzt.",
+    "tutor_sessionlist toast_error": "Der Erfolg dieses Praktikums konnte nicht geändert werden.",
+    "tutor_sessionlist past_Sessions_info": "Hier bitte wählen, welche Gruppen ihr Praktikum bestanden haben.",
+    "tutor_sessionlist past_Sessions": "Vergangene Termine",
+
 
     "practicals_tutordateselector_button-goback": "Zur Übersicht",
     "practicals_tutordateselector_button-setback": "Zurücksetzen",

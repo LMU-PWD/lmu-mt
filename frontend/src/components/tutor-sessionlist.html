@@ -10,6 +10,7 @@
 <link rel="import" href="../../bower_components/iron-collapse/iron-collapse.html">
 <link rel="import" href="../../bower_components/paper-item/paper-item-body.html">
 <link rel="import" href="../../bower_components/paper-radio-button/paper-radio-button.html">
+<link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
 
 <!--Localization Imports-->
 <link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
@@ -65,14 +66,15 @@
             }
             .sessions_heading {
                 background-color: var(--paper-blue-grey-100);
-                color: var(--paper-blue-grey-700);
+                color: var(--paper-blue-grey-400);
                 font-size: 16px;
             }
             .session_details {
                 font-size: 14px;
+                color: #000;
             }
             .session_details a {
-                color: var(--paper-blue-grey-300);
+                color: var(--paper-blue-grey-700);
                 text-align: right;
                 text-decoration: none;
                 font-weight: 100;
@@ -110,16 +112,29 @@
                 border: 1px solid #EEE;
             }
             paper-item-body .row_title {
-                font-size: 20px
+                font-size: 18px
             }
             .group_name {
-              color: var(--paper-blue-grey-300);
+              color: var(--paper-blue-grey-700);
               font-weight:100;
             }
-
-            #pastSessionlist .session_group {
-
+            paper-radio-button.labpassed {
+                --paper-radio-button-checked-color: var(--paper-green-500);
+                --paper-radio-button-checked-ink-color: var(--paper-green-500);
+                --paper-radio-button-unchecked-color: var(--paper-red-600);
+                --paper-radio-button-unchecked-ink-color: var(--paper-red-600);
             }
+            .past-dates-heading p {
+                margin: 0 20px 15px 20px;
+            }
+            .past-dates-heading h2 {
+                color: #FFF;
+                background-color: var(--paper-blue-grey-400);
+                padding: 10px 20px 18px 20px;
+                margin: 0 0 10px 0;
+                text-align: center;
+            }
+
 
         </style>
 
@@ -215,10 +230,9 @@
                 </template>
             </paper-listbox>
 
-            <div style="margin-top: 35px">
-                <h2>
-                    Vergangene Termine
-                </h2>
+            <div style="margin-top: 35px" class="past-dates-heading">
+                <h2>[[ localize('tutor_sessionlist past_Sessions') ]]</h2>
+                <p>[[ localize('tutor_sessionlist past_Sessions_info') ]]</p>
             </div>
 
             <paper-listbox>
@@ -271,8 +285,8 @@
                                             </template>
                                         </div>
                                         <div style="width: 50%; display: inline-block; vertical-align: top; text-align: right">
-                                            Lab Passed
-                                            <paper-radio-button checked="[[ session.passed ]]" on-click="_handlePassedClick"></paper-radio-button>
+                                            [[ localize('tutor_sessionlist has_passed') ]]
+                                            <paper-radio-button checked="[[ session.passed ]]" on-click="_handlePassedClick" class="labpassed"></paper-radio-button>
                                         </div>
                                     </template>
                                 </iron-collapse>
@@ -284,6 +298,9 @@
             </paper-listbox>
         </div>
 
+        <paper-toast id="success_toast" class="fit-bottom" text="[[ localize('tutor_sessionlist toast_success' ]]"></paper-toast>
+        <paper-toast id="error_toast" class="fit-bottom" text="[[ localize('tutor_sessionlist toast_error') ]]"></paper-toast>
+
         <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
     </template>
     <script>
@@ -293,28 +310,17 @@
             is: 'tutor-sessionlist',
             properties: {
                 accessToken: String,
-                selfInfo: String,
-                nextSessions: {
-                    type: Array,
-                    value: []
-                },
-                users_in_exercises: {
-                    type: Array,
-                    value: []
-                },
                 sessions: {
                     type: Array,
                     value: []
                 },
                 myFutureSessions: {
                     type: Array,
-                    value: [],
-//                    computed: '_computeFutureList(sessions, finishedLoading)'
+                    value: []
                 },
                 myPastSessions: {
                     type: Array,
-                    value: [],
-//                    computed: '_computePastList(sessions, finishedLoading)'
+                    value: []
                 },
                 assignedLabs: {
                     type: Array
@@ -615,7 +621,27 @@
             },
 
             _apiLabPassedResponse: function(response) {
-                return response.detail;
+
+                if (response.detail.passed == this.clickedLabHadPassed || response.detail.length == 0) {
+                    this.$.error_toast.open();
+                }
+                else {
+                    if (response.detail.passed)
+                        this.$.success_toast.text = this.localize('tutor_sessionlist toast_success_passed');
+                    else
+                        this.$.success_toast.text = this.localize('tutor_sessionlist toast_success_not_passed');
+                    this.$.success_toast.open();
+                }
+
+                for (var i = 0; i < this.sessions.length; i++) {
+
+                    if (this.sessions[i].id == response.detail.id) {
+                        this.sessions[i].passed = response.detail.passed;
+                        var temp = this.sessions;
+                        this.sessions = [];
+                        this.sessions = temp;
+                    }
+                }
             },
 
 
@@ -696,24 +722,20 @@
                 this.$$("#src-" + e.model.session.id).classList.toggle('session-unfolded');
             },
 
+            /**
+             * Handler Click on radio-button "passed" in a lab entry
+             */
             _handlePassedClick: function(e) {
-//                console.log("clicked passed icon")
-                if (e.model.__data__.session.passed)
-                {
-                    console.log("already passed");
-                    e.target.checked = true;
-                }
-                else {
-                    this.ajax_labPassed = {
-                        'headers': {
-                            'Authorization': this.accessToken
-                        },
-                        'method': 'POST',
-                        'endpoint': '/labs/setpassed',
-                        'body': {
-                            labId: e.model.__data__.session.id,
-                            passed: true
-                        }
+
+                this.ajax_labPassed = {
+                    'headers': {
+                        'Authorization': this.accessToken
+                    },
+                    'method': 'POST',
+                    'endpoint': '/labs/setpassed',
+                    'body': {
+                        labId: e.model.__data__.session.id,
+                        passed: !e.model.__data__.session.passed
                     }
                 }
             }
