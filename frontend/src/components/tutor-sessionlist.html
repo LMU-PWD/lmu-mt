@@ -422,6 +422,9 @@
 
             _apiGroupResponse: function(response) {
 
+                if (typeof response.detail.id == 'undefined')
+                    return
+
                 var receivedGroup = response.detail
                 var studentsList = []
 
