@@ -125,21 +125,24 @@
                     type: String
                 },
                 adminSelectedSemesterId: {
-                    type: String
+                    type: String,
+                    notify: true
                 }
+
             },
             behaviors: [
                 Polymer.MyLocalizeBehavior
             ],
             ready: function() {
-                console.log(this.adminSelectedSemesterId);
+                //console.log(this.adminSelectedSemesterId);
+
             },
             _handleTap: function (event) {
-                console.log(event.target);
-                console.log(event);
+                //console.log(event.target);
+                //console.log(event);
                 var key = event.target.getAttribute('key');
                 this.fire('CHANGE_ROUTE', {path: '/'+key, page: key});
-                console.log(event.model);
+                //console.log(event.model);
             }
         });
     </script>
