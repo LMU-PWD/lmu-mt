@@ -9,6 +9,8 @@
 <link rel="import" href="../../bower_components/iron-data-table/iron-data-table.html">
 <link rel="import" href="../../bower_components/iron-collapse/iron-collapse.html">
 <link rel="import" href="../../bower_components/paper-item/paper-item-body.html">
+<link rel="import" href="../../bower_components/paper-radio-button/paper-radio-button.html">
+<link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
 
 <!--Localization Imports-->
 <link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
@@ -64,14 +66,15 @@
             }
             .sessions_heading {
                 background-color: var(--paper-blue-grey-100);
-                color: var(--paper-blue-grey-700);
+                color: var(--paper-blue-grey-400);
                 font-size: 16px;
             }
             .session_details {
                 font-size: 14px;
+                color: #000;
             }
             .session_details a {
-                color: var(--paper-blue-grey-300);
+                color: var(--paper-blue-grey-700);
                 text-align: right;
                 text-decoration: none;
                 font-weight: 100;
@@ -109,12 +112,29 @@
                 border: 1px solid #EEE;
             }
             paper-item-body .row_title {
-                font-size: 20px
+                font-size: 18px
             }
             .group_name {
-              color: var(--paper-blue-grey-300);
+              color: var(--paper-blue-grey-700);
               font-weight:100;
             }
+            paper-radio-button.labpassed {
+                --paper-radio-button-checked-color: var(--paper-green-500);
+                --paper-radio-button-checked-ink-color: var(--paper-green-500);
+                --paper-radio-button-unchecked-color: var(--paper-red-600);
+                --paper-radio-button-unchecked-ink-color: var(--paper-red-600);
+            }
+            .past-dates-heading p {
+                margin: 0 20px 15px 20px;
+            }
+            .past-dates-heading h2 {
+                color: #FFF;
+                background-color: var(--paper-blue-grey-400);
+                padding: 10px 20px 18px 20px;
+                margin: 0 0 10px 0;
+                text-align: center;
+            }
+
 
         </style>
 
@@ -140,70 +160,146 @@
                 method="[[ ajax_student.method ]]"
                 endpoint="[[ ajax_student.endpoint ]]"
                 on-api-response="_apiStudentResponse"></api-request>
+        <api-request
+                id="ajax_labPassed"
+                headers="[[ ajax_labPassed.headers ]]"
+                method="[[ ajax_labPassed.method ]]"
+                endpoint="[[ ajax_labPassed.endpoint ]]"
+                body="[[ ajax_labPassed.body ]]"
+                on-api-response="_apiLabPassedResponse"></api-request>
 
         <div class="lab-list-container">
-                <paper-listbox>
+            <paper-listbox>
+                <paper-item class="sessions_heading" disabled>
+                    <span class="session_toggleDropdown mobile-hidden" style="width: 4%">
+                    </span>
+                    <span class="session_date">[[ localize('tutor_sessionlist_heading_date') ]]</span>
+                    <span class="session_time" style="margin-right: 20px">[[ localize('tutor_sessionlist_heading_time') ]]</span>
+                    <span class="session_icon"></span>
+                    <span class="session_type"></span>
+                </paper-item>
 
-                    <paper-item class="sessions_heading" disabled>
-                        <span class="session_toggleDropdown mobile-hidden" style="width: 4%">
-                        </span>
-                        <span class="session_date">[[ localize('tutor_sessionlist_heading_date') ]]</span>
-                        <span class="session_time" style="margin-right: 20px">[[ localize('tutor_sessionlist_heading_time') ]]</span>
-                        <span class="session_icon"></span>
-                        <span class="session_type"></span>
+                <template is="dom-if" if="[[ noAssignedDates ]]">
+                    <paper-item disabled style="color: var(--paper-blue-grey-700);">
+                        [[ localize('tutor_sessionlist no-sessions-yet') ]]
                     </paper-item>
+                </template>
 
-                    <template is="dom-if" if="[[ noAssignedDates ]]">
-                        <paper-item disabled style="color: var(--paper-blue-grey-700);">
-                            [[ localize('tutor_sessionlist no-sessions-yet') ]]
-                        </paper-item>
-                    </template>
+                <template is="dom-if" if="[[ _isEmpty(futureSessions) ]]">
+                    <paper-item disabled>
+                        [[ localize('tutor_sessionlist_no-upcoming-sessions') ]]
+                    </paper-item>
+                </template>
 
-                    <template is="dom-if" if="[[ _isEmpty(futureSessions) ]]">
-                        <paper-item disabled>
-                            [[ localize('tutor_sessionlist_no-upcoming-sessions') ]]
-                        </paper-item>
-                    </template>
+                <template id="pastSessionlist" is="dom-repeat" items="[[ myFutureSessions ]]" as="session">
+                    <paper-item  class="sessions_row" id="src-[[ session.id ]]">
+                        <paper-item-body style="padding: 7px 0">
+                              <div style="padding: 10px 0; display: flex" class="row_title" on-click="toggleCollapse">
+                                <span class="session_toggleDropdown mobile-hidden"><iron-icon icon="hardware:keyboard-arrow-right"></iron-icon></span>
+                                <span class="session_date">[[ session.date_string ]]</span>
+                                <span class="session_time">[[ session.time_string ]]</span>
+                                <span class="session_icon"><iron-icon icon="[[ _getIcon(session) ]]"></iron-icon></span>
+                                <span class="session_type">[[ session.labType_string ]]</span>
+                            </div>
+                            <div secondary style="cursor: auto">
+                                <iron-collapse id="collapse-[[ session.id ]]">
+                                    <div class="session_details" style="border-left: 2px solid var(--paper-blue-grey-500)">
+                                        [[ session.location ]]
+                                    </div>
+                                    <hr>
+                                    <div class="session_details" style="border-left: 2px solid var(--paper-blue-grey-500)">
+                                        [[ session.labType_description_tutor ]]
+                                    </div>
 
-                    <template id="sessionlist" is="dom-repeat" items="[[ myFutureSessions ]]" as="session">
-                        <paper-item  class="sessions_row" id="src-[[ session.id ]]">
-                            <paper-item-body style="padding: 7px 0">
-                                  <div style="padding: 10px 0; display: flex" class="row_title" on-click="toggleCollapse">
-                                    <span class="session_toggleDropdown mobile-hidden"><iron-icon icon="hardware:keyboard-arrow-right"></iron-icon></span>
-                                    <span class="session_date">[[ session.date_string ]]</span>
-                                    <span class="session_time">[[ session.time_string ]]</span>
-                                    <span class="session_icon"><iron-icon icon="[[ _getIcon(session) ]]"></iron-icon></span>
-                                    <span class="session_type">[[ session.labType_string ]]</span>
-                                </div>
-                                <div secondary style="cursor: auto">
-                                    <iron-collapse id="collapse-[[ session.id ]]">
-                                        <div class="session_details" style="border-left: 2px solid var(--paper-blue-grey-500)">
-                                            [[ session.location ]]
-                                        </div>
+                                    <template is="dom-if" if="[[ !_isEmpty(session.groupMembers) ]]">
                                         <hr>
-                                        <div class="session_details" style="border-left: 2px solid var(--paper-blue-grey-500)">
-                                            [[ session.labType_description_tutor ]]
+                                        <div class="session_details session_group" style="margin-bottom: 0.5em">
+                                            [[ localize('tutor_sessionlist_group') ]] <span class="group_name">[[ session.group.name ]] </span>
                                         </div>
+                                        <template is="dom-repeat" items="[[ session.groupMembers ]]" as="groupMember">
+                                            <div class="session_details" style="padding-left: 15px; ">
+                                              <span>  [[ groupMember.first_name ]] [[ groupMember.name ]] </span>
+                                              <span><a href="mailto:[[ groupMember.email ]]"><iron-icon icon="communication:mail-outline"></iron-icon> [[ groupMember.email ]]</a></span>
+                                            </div>
+                                        </template>
+                                    </template>
+                                </iron-collapse>
+                            </div>
+                        </paper-item-body>
+                    </paper-item>
+                </template>
+            </paper-listbox>
 
-                                        <template is="dom-if" if="[[ !_isEmpty(session.groupMembers) ]]">
-                                            <hr>
+            <div style="margin-top: 35px" class="past-dates-heading">
+                <h2>[[ localize('tutor_sessionlist past_Sessions') ]]</h2>
+                <p>[[ localize('tutor_sessionlist past_Sessions_info') ]]</p>
+            </div>
+
+            <paper-listbox>
+                <paper-item class="sessions_heading" disabled>
+                    <span class="session_toggleDropdown mobile-hidden" style="width: 4%">
+                    </span>
+                    <span class="session_date">[[ localize('tutor_sessionlist_heading_date') ]]</span>
+                    <span class="session_time" style="margin-right: 20px">[[ localize('tutor_sessionlist_heading_time') ]]</span>
+                    <span class="session_icon"></span>
+                    <span class="session_type"></span>
+                </paper-item>
+
+                <template is="dom-if" if="[[ _isEmpty(myPastSessions) ]]">
+                    <paper-item disabled>
+                        [[ localize('tutor_sessionlist_no-upcoming-sessions') ]]
+                    </paper-item>
+                </template>
+
+                <template id="sessionlistpast" is="dom-repeat" items="[[ myPastSessions ]]" as="session">
+                    <paper-item  class="sessions_row" id="src-[[ session.id ]]">
+                        <paper-item-body style="padding: 7px 0">
+                            <div style="padding: 10px 0; display: flex" class="row_title" on-click="toggleCollapse">
+                                <span class="session_toggleDropdown mobile-hidden"><iron-icon icon="hardware:keyboard-arrow-right"></iron-icon></span>
+                                <span class="session_date">[[ session.date_string ]]</span>
+                                <span class="session_time">[[ session.time_string ]]</span>
+                                <span class="session_icon"><iron-icon icon="[[ _getIcon(session) ]]"></iron-icon></span>
+                                <span class="session_type">[[ session.labType_string ]]</span>
+                            </div>
+                            <div secondary style="cursor: auto">
+                                <iron-collapse id="collapse-[[ session.id ]]">
+                                    <div class="session_details" style="border-left: 2px solid var(--paper-blue-grey-500)">
+                                        [[ session.location ]]
+                                    </div>
+                                    <hr>
+                                    <div class="session_details" style="border-left: 2px solid var(--paper-blue-grey-500)">
+                                        [[ session.labType_description_tutor ]]
+                                    </div>
+
+                                    <template is="dom-if" if="[[ !_isEmpty(session.groupMembers) ]]">
+                                        <hr>
+                                        <div style="width: 50%; display: inline-block">
                                             <div class="session_details" style="margin-bottom: 0.5em">
                                                 [[ localize('tutor_sessionlist_group') ]] <span class="group_name">[[ session.group.name ]] </span>
                                             </div>
                                             <template is="dom-repeat" items="[[ session.groupMembers ]]" as="groupMember">
                                                 <div class="session_details" style="padding-left: 15px; ">
-                                                  <span>  [[ groupMember.first_name ]] [[ groupMember.name ]] </span>
-                                                  <span><a href="mailto:[[ groupMember.email ]]"><iron-icon icon="communication:mail-outline"></iron-icon> [[ groupMember.email ]]</a></span>
+                                                    <span>  [[ groupMember.first_name ]] [[ groupMember.name ]] </span>
+                                                    <span><a href="mailto:[[ groupMember.email ]]"><iron-icon icon="communication:mail-outline"></iron-icon> [[ groupMember.email ]]</a></span>
                                                 </div>
                                             </template>
-                                        </template>
-                                    </iron-collapse>
-                                </div>
-                            </paper-item-body>
-                        </paper-item>
-                    </template>
-                </paper-listbox>
+                                        </div>
+                                        <div style="width: 50%; display: inline-block; vertical-align: top; text-align: right">
+                                            [[ localize('tutor_sessionlist has_passed') ]]
+                                            <paper-radio-button checked="[[ session.passed ]]" on-click="_handlePassedClick" class="labpassed"></paper-radio-button>
+                                        </div>
+                                    </template>
+                                </iron-collapse>
+                            </div>
+                        </paper-item-body>
+                    </paper-item>
+                </template>
+
+            </paper-listbox>
         </div>
+
+        <paper-toast id="success_toast" class="fit-bottom" text="[[ localize('tutor_sessionlist toast_success' ]]"></paper-toast>
+        <paper-toast id="error_toast" class="fit-bottom" text="[[ localize('tutor_sessionlist toast_error') ]]"></paper-toast>
 
         <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
     </template>
@@ -214,23 +310,17 @@
             is: 'tutor-sessionlist',
             properties: {
                 accessToken: String,
-                selfInfo: String,
-                nextSessions: {
-                    type: Array,
-                    value: []
-                },
-                users_in_exercises: {
-                    type: Array,
-                    value: []
-                },
                 sessions: {
                     type: Array,
                     value: []
                 },
                 myFutureSessions: {
                     type: Array,
-                    value: [],
-                    computed: '_computeFutureList(sessions, finishedLoading)'
+                    value: []
+                },
+                myPastSessions: {
+                    type: Array,
+                    value: []
                 },
                 assignedLabs: {
                     type: Array
@@ -259,7 +349,8 @@
             },
 
             observers: [
-                '_initSessionList(labTypeAudio, labTypeVideo, labTypeFoto, assignedLabs, accessToken)'
+                '_initSessionList(labTypeAudio, labTypeVideo, labTypeFoto, assignedLabs, accessToken)',
+                '_splitSessionList(sessions, finishedLoading)'
             ],
 
             /**
@@ -283,7 +374,7 @@
             _computeFutureList: function(allSessions, finishedLoading) {
 
                 if(allSessions.length == 0)
-                    return
+                    return;
 
                 var futureSessions = [];
                 var today = Date.now();
@@ -300,16 +391,47 @@
                     }
                 }
                 if(futureSessions.length == 0)
-                    return []
+                    return [];
 
                 return futureSessions;
+            },
+
+            _splitSessionList: function(allSessions, finishedLoading) {
+
+                if (allSessions.length == 0)
+                    return;
+
+                var futureSessions = [];
+                var pastSessions = [];
+                var today = Date.now();
+
+                for (var i = 0; i < allSessions.length; i++) {
+
+                    var currentSession = allSessions[i];
+
+                    if (new Date(currentSession.date) > today)
+                        futureSessions.push(allSessions[i]);
+                    else
+                        pastSessions.push(allSessions[i]);
+
+                    // This loop is important for a bugfix (group was not displayed correctly)
+                    for (var j = 0; j < allSessions[i].groupMembers.length; j++) {
+                        if (typeof allSessions[i].groupMembers[j].name == 'undefined') {
+                            this.myFutureSessions = [];
+                            this.myPastSessions = [];
+                            return;
+                        }
+                    }
+                }
+                this.myFutureSessions = futureSessions;
+                this.myPastSessions = pastSessions;
             },
 
             /**
              * Returns an icon according to the lab type
              */
             _getIcon: function(session) {
-                icon = ""
+                icon = "";
 
                 switch(session.labType_string){
                     case "":
@@ -349,14 +471,14 @@
 
                     var date = new Date(assignedLabs[i].date);
                     var date_string = this._getDateString(date);
-                    var time_string = (date.getHours() + 1) + ":" + (date.getMinutes()<10 ? '0' : '') + date.getMinutes();
-                    var labType_string = ""
-                    var labType_description_tutor = ""
+                    var time_string = date.getHours() + ":" + (date.getMinutes()<10 ? '0' : '') + date.getMinutes();
+                    var labType_string = "";
+                    var labType_description_tutor = "";
 
                     if (labTypesArray.length != 0) {
                         for (var j = 0; j < labTypesArray.length; j++) {
                             if (labTypesArray[j].id == assignedLabs[i].labTypeId) {
-                                labType_string = labTypesArray[j].type_str
+                                labType_string = labTypesArray[j].type_str;
                                 labType_description_tutor = labTypesArray[j].description_tutor
                             }
                         }
@@ -374,6 +496,7 @@
                         'labType_string': labType_string,
                         'labType_description_tutor': labType_description_tutor,
                         'exercise_name': assignedLabs[i].name,
+                        'passed': assignedLabs[i].passed,
                         'groupMembers': []
                     };
 
@@ -392,7 +515,6 @@
 
                         this.$.ajax_group.$.request.generateRequest();
                         this.push('groupList', assignedLabs[i].groupId)
-
                         var studentsRequested = true;
                     }
                 }
@@ -498,6 +620,30 @@
                 this.finishedLoading = true;
             },
 
+            _apiLabPassedResponse: function(response) {
+
+                if (response.detail.passed == this.clickedLabHadPassed || response.detail.length == 0) {
+                    this.$.error_toast.open();
+                }
+                else {
+                    if (response.detail.passed)
+                        this.$.success_toast.text = this.localize('tutor_sessionlist toast_success_passed');
+                    else
+                        this.$.success_toast.text = this.localize('tutor_sessionlist toast_success_not_passed');
+                    this.$.success_toast.open();
+                }
+
+                for (var i = 0; i < this.sessions.length; i++) {
+
+                    if (this.sessions[i].id == response.detail.id) {
+                        this.sessions[i].passed = response.detail.passed;
+                        var temp = this.sessions;
+                        this.sessions = [];
+                        this.sessions = temp;
+                    }
+                }
+            },
+
 
             /**
              ** OTHER METHODS **
@@ -575,6 +721,24 @@
                 this.$$("#collapse-" + e.model.session.id).toggle();
                 this.$$("#src-" + e.model.session.id).classList.toggle('session-unfolded');
             },
+
+            /**
+             * Handler Click on radio-button "passed" in a lab entry
+             */
+            _handlePassedClick: function(e) {
+
+                this.ajax_labPassed = {
+                    'headers': {
+                        'Authorization': this.accessToken
+                    },
+                    'method': 'POST',
+                    'endpoint': '/labs/setpassed',
+                    'body': {
+                        labId: e.model.__data__.session.id,
+                        passed: !e.model.__data__.session.passed
+                    }
+                }
+            }
         });
     </script>
 </dom-module>

@@ -1,6 +1,8 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/iron-icons/notification-icons.html">
+<link rel="import" href="../../bower_components/iron-icons/editor-icons.html">
 <link rel="import" href="../components/tutor-sessionlist.html">
 <link rel="import" href="../components/practicals-tutor-date-detail.html">
 
@@ -35,8 +37,12 @@
                 background-color: var(--paper-blue-grey-100);
                 color: var(--paper-blue-grey-900);
             }
+            .dark-tab {
+                color: #FFF !important;
+                background-color: var(--paper-blue-grey-700) !important;
+            }
             paper-tab {
-                font-size: 18px;
+                font-size: 20px;
             }
             paper-listbox{
                 background-color: var(--paper-blue-grey-100);
@@ -64,8 +70,8 @@
             }
             paper-item {
                 border-top: 2px solid var(--paper-grey-200);
-                padding-top: 16px;
-                padding-bottom: 16px;
+                padding-top: 19px;
+                padding-bottom: 18px;
             }
             .datepicker-overview paper-item:hover {
                 background: var(--paper-orange-50);
@@ -131,9 +137,14 @@
         <div class="content">
 
             <paper-tabs selected="0" no-bar class="tabs">
-                <paper-tab on-click="_handleTabClick">[[ localize('tutor_card tab_calendar') ]]</paper-tab>
+                <paper-tab on-click="_handleTabClick" id="tab_calendar">
+                    <iron-icon icon="notification:event-note" style=" margin-right: 10px"></iron-icon>
+                    [[ localize('tutor_card tab_calendar') ]]</paper-tab>
                 <template is="dom-if" if="[[ _showDatepicker(deadline_reached_audio, deadline_reached_video, deadline_reached_foto) ]]">
-                    <paper-tab on-click="_handleTabClick" >[[ localize('tutor_card tab_datepicker') ]]</paper-tab>
+                    <paper-tab on-click="_handleTabClick" >
+                        <iron-icon icon="editor:format-list-bulleted"></iron-icon>
+                        [[ localize('tutor_card tab_datepicker') ]]
+                    </paper-tab>
                 </template>
             </paper-tabs>
 
@@ -381,7 +392,13 @@
             },
 
             _showDatepicker: function() {
-                return !(this.labtypeAudio.tutorsDistributed && this.labtypeFoto.tutorsDistributed && this.labtypeVideo.tutorsDistributed )
+
+                if(!this.labtypeAudio.tutorsDistributed || !this.labtypeFoto.tutorsDistributed || !this.labtypeVideo.tutorsDistributed )
+                    return true;
+
+                this.$.tab_calendar.classList.toggle("dark-tab");
+
+                return false;
             },
 
 
@@ -455,13 +472,16 @@
              **  CLICK HANDLERS **
              */
             _handleAudioTap: function() {
-                this.page = 'datepicker_audio'
+                if (!this._isAfterDeadline(this.labtypeAudio.registration_deadline_tutors))
+                    this.page = 'datepicker_audio'
             },
             _handleVideoTap: function() {
-                this.page = 'datepicker_video'
+                if (!this._isAfterDeadline(this.labtypeVideo.registration_deadline_tutors))
+                    this.page = 'datepicker_video'
             },
             _handleFotoTap: function() {
-                this.page = 'datepicker_foto'
+                if (!this._isAfterDeadline(this.labtypeFoto.registration_deadline_tutors))
+                    this.page = 'datepicker_foto'
             },
             _handleBackToDateOveriew: function() {
                 this.page = 'datepicker_overview'
