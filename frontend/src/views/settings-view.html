@@ -4,6 +4,10 @@
 <link rel="import" href="../shared/shared-styles.html">
 <link rel="import" href="../components/settings-change-password.html">
 
+<!--Localization Imports-->
+<link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
+<link rel="import" href="../services/my-localize-behavior.html">
+
 <dom-module id="settings-view">
 
     <template>
@@ -44,12 +48,12 @@
 
         <div class="settings-container vertical layout">
 
-            <paper-card heading="User Settings" class="flex">
+            <paper-card heading="[[ localize('settings_headline') ]]" class="flex">
 
                 <div class="card-content">
 
                     <section>
-                        <h2>Change your password</h2>
+                        <h2>[[ localize('settings_changepw_headline') ]]</h2>
                         <settings-change-password access-token="{{accessToken}}"
                                                   user-email="[[userEmail]]"></settings-change-password>
                     </section>
@@ -60,6 +64,9 @@
 
         </div>
 
+        <!--Iron Signal for Localization-->
+        <iron-signals on-iron-signal-language="changeLanguage"></iron-signals>
+
     </template>
 
     <script>
@@ -67,6 +74,10 @@
         Polymer({
 
             is: 'settings-view',
+
+            behaviors: [
+                Polymer.MyLocalizeBehavior
+            ],
 
             properties: {
 

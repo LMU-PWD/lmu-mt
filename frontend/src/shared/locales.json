@@ -262,6 +262,8 @@
     "c_function_success": "The function has been executed sucessfully",
     "c_function_error": "Error at function execution",
 
+    "settings_headline": "User Settings",
+    "settings_changepw_headline": "Change password",
     "settings_changepw_old": "Old password",
     "settings_changepw_new": "New password",
     "settings_changepw_confirmNew": "Confirm new password",
@@ -534,6 +536,8 @@
     "c_function_success": "Die Funktion wurde erfolgreich ausgeführt",
     "c_function_error": "Fehler bei der Funktionsausführung",
 
+    "settings_headline": "Benutzereinstellungen",
+    "settings_changepw_headline": "Passwort ändern",
     "settings_changepw_old": "Altes Passwort",
     "settings_changepw_new": "Neues Passwort",
     "settings_changepw_confirmNew": "Neues Password bestätigen",
