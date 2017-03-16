@@ -224,9 +224,8 @@
     "admin-toast delete-success" : "Deletion Succeeded",
     "admin-toast delete-fail" : "Deletion Failed",
     "admin-toast edit-success" : "Edit Succeeded",
-    "admin-toast edit-fail" : "Edit Failed"
+    "admin-toast edit-fail" : "Edit Failed",
 
-    "general_weekdays 6": "Saturday",
     "general_hours": "hours",
 
     "tutor_card_heading_select-date": "Choose your free dates",
@@ -517,8 +516,7 @@
     "admin-toast delete-success" : "Erfolgreich Entfernt",
     "admin-toast delete-fail" : "Entfernen Fehlgeschlagen",
     "admin-toast edit-success" : "Erfolgreich Bearbeitet",
-    "admin-toast edit-fail" : "Bearbeiten Fehlgeschlagen"
-    "general_weekdays 6": "Samstag",
+    "admin-toast edit-fail" : "Bearbeiten Fehlgeschlagen",
     "general_hours": "Uhr",
     "c_function_success": "Die Funktion wurde erfolgreich ausgeführt",
     "c_function_error": "Fehler bei der Funktionsausführung",
