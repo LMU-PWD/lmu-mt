@@ -62,11 +62,14 @@
     "c_button_next": "Next",
     "c_button_ok": "OK",
     "c_button_save_table": "Save table",
+    "c_button_reset": "Reset fields",
     "c_hour": "hour",
     "c_hours": "hours",
     "c_minute": "minute",
     "c_minutes": "minutes",
     "c_time": "Time",
+    "c_error_required": "required",
+    "c_error_pwmismatch": "Passwords don't match",
 
     "admin_toolbar_new_semester_tooltip": "Create new semester",
 
@@ -232,7 +235,16 @@
     "practicals_tutordatedetail_info_not-unlocked": "Date selection is not unlocked yet!",
     "practicals_tutordatedetail_info-none-selected": "You haven't chosen any lab dates yet.",
     "c_function_success": "The function has been executed sucessfully",
-    "c_function_error": "Error at function execution"
+    "c_function_error": "Error at function execution",
+
+    "settings_changepw_old": "Old password",
+    "settings_changepw_new": "New password",
+    "settings_changepw_confirmNew": "Confirm new password",
+    "settings_changepw_storepw": "Save password",
+    "settings_changepw_apierror": "Error storing password. Please try again.",
+    "settings_changepw_inputerror": "Your input contains errors",
+    "settings_changepw_success": "Password changed successfully",
+    "settings_changepw_error_mismatch": "Error in field"
   },
 
   "de": {
@@ -298,11 +310,14 @@
     "c_button_next": "Weiter",
     "c_button_ok": "OK",
     "c_button_save_table": "Tabelle speichern",
+    "c_button_reset": "Felder zurücksetzen",
     "c_hour": "Stunde",
     "c_hours": "Stunden",
     "c_minute": "Minute",
     "c_minutes": "Minuten",
     "c_time": "Uhrzeit",
+    "c_error_required": "Pflichtfeld",
+    "c_error_pwmismatch": "Passwörter stimmen nicht überein",
 
     "admin_toolbar_new_semester_tooltip": "Neues Semester anlegen",
 
@@ -468,6 +483,16 @@
     "general_weekdays 6": "Samstag",
     "general_hours": "Uhr",
     "c_function_success": "Die Funktion wurde erfolgreich ausgeführt",
-    "c_function_error": "Fehler bei der Funktionsausführung"
+    "c_function_error": "Fehler bei der Funktionsausführung",
+
+    "settings_changepw_old": "Altes Passwort",
+    "settings_changepw_new": "Neues Passwort",
+    "settings_changepw_confirmNew": "Neues Password bestätigen",
+    "settings_changepw_storepw": "Passwort speichern",
+    "settings_changepw_apierror": "Fehler beim Speichern des Passworts. Bitte versuche es noch einmal.",
+    "settings_changepw_inputerror": "Deine Eingaben enthalten Fehler",
+    "settings_changepw_success": "Passwort erfolgreich geändert",
+    "settings_changepw_error_mismatch": "Feld nicht korrekt ausgefüllt"
+
   }
 }

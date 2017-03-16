@@ -565,12 +565,10 @@ The Main View contains:
                         </template>
                         <settings-view
                                 name="settings"
-                                access-token="[[ accessToken ]]"
-                                user="{{user}}"></settings-view>
+                                access-token="{{accessToken}}"
+                                user-email="[[user.email]]"></settings-view>
 
                     </iron-pages>
-
-
 
                 </div>
             </paper-header-panel>
@@ -599,7 +597,8 @@ The Main View contains:
                 },
 
                 accessToken: {
-                    type: String
+                    type: String,
+                    notify: true
                 },
                 adminSelectedSemesterId: {
                     //TODO try iron meta

@@ -93,13 +93,14 @@
 
             _computeUrl: function () {
                 if (this.baseUrl && this.endpoint && this.baseUrl != '' && this.endpoint != '') {
-
+                    console.log('computing API url for endpoint '+this.endpoint)
                     this.url =
                             this.baseUrl +
                             this.endpoint +
                             ((this.semesterFilter != '')
                                     ? '?filter[where][semesterId]=' + this.semesterFilter
                                     : '');
+                    console.log(this.url);
                 }
             }
 
