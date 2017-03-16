@@ -380,8 +380,8 @@
                 return deadline_date < today;
             },
 
-            _showDatepicker: function(deadline_reached_audio, deadline_reached_video, deadline_reached_foto) {
-                return !(this.deadline_reached_audio && this.deadline_reached_video && this.deadline_reached_foto)
+            _showDatepicker: function() {
+                return !(this.labtypeAudio.tutorsDistributed && this.labtypeFoto.tutorsDistributed && this.labtypeVideo.tutorsDistributed )
             },
 
 
