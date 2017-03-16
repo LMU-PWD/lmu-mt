@@ -1,102 +1,81 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../../bower_components/iron-signals/iron-signals.html">
 <link rel="import" href="../shared/shared-styles.html">
+<link rel="import" href="../components/settings-change-password.html">
 
 <dom-module id="settings-view">
+
     <template>
+
+        <style include="iron-flex"></style>
         <style include="shared-styles">
-            :host{
+
+            .settings-container {
+                margin: 40px auto 0;
+                max-width: 1000px;
+                text-align: left;
             }
+
+            paper-card {
+                display: block;
+                margin: 0 20px 20px;
+                width: auto;
+
+                --paper-card-background-color: var(--paper-blue-grey-100);
+                --paper-card-header-color: var(--paper-blue-grey-50);
+
+                --paper-card-header: {
+                    background: var(--paper-blue-grey-700);
+                };
+            }
+
+            section {
+                margin: 0 20px;
+            }
+
+            section > h2 {
+                margin-bottom: 0;
+                padding-left: 0;
+                padding-right: 0;
+            }
+
         </style>
-        <div>Welcome to the Settings</div>
-        <template is="dom-if" if="[[user.isAdmin]]">
-            <!-- Fetches all Admins -->
-            <api-request
-                    headers="[[ ajax.headers ]]"
-                    method="[[ ajax.method ]]"
-                    endpoint="[[ ajax.endpoint ]]"
-                    on-api-response="_handleAdminResponse"></api-request>
 
-            <!-- Create new Admins -->
-            <api-request
-                    headers="[[ createAjax.headers ]]"
-                    body="[[ createAjax.body ]]"
-                    method="[[ createAjax.method ]]"
-                    endpoint="[[ createAjax.endpoint ]]"
-                    on-api-response="_handleCreateAdminResponse"></api-request>
+        <div class="settings-container vertical layout">
 
-            <template is="dom-repeat" items="[[admins]]" as="admin">
-                <h1>[[admin.first_name]] [[admin.name]]</h1>
-            </template>
+            <paper-card heading="User Settings" class="flex">
 
-            <paper-icon-button icon="add-circle-outline" on-tap="_createAdmin"></paper-icon-button>
-            <iron-signals on-iron-signal-semester="_semesterChanged"></iron-signals>
+                <div class="card-content">
 
-        </template>
-        <!--TODO domif isAdmin -> admin zugänge verwalten (liste der admins & neuen hinzfügen)-->
+                    <section>
+                        <h2>Change your password</h2>
+                        <settings-change-password access-token="[[accessToken]]"></settings-change-password>
+                    </section>
+
+                </div>
+
+            </paper-card>
+
+        </div>
+
     </template>
+
     <script>
+
         Polymer({
+
             is: 'settings-view',
+
             properties: {
-                admins: Array,
-                user: {
-                    type: Object,
-                    observer: '_userChanged'
-                },
-                accessToken: String
-            
-            },
-            _userChanged: function() {
-                if(this.user.isAdmin){
-                    this.ajax = {
-                        contentType: 'application/json',
-                        headers: {
-                            Authorization: this.accessToken,
-                            filter: '{"where":{"isAdmin":"true"}}'
-                        },
-                        method: 'GET',
-                        endpoint: '/platformUsers'
-                    }
 
-                }
-            },
-            _semesterChanged: function (event) {
-                this.set('semester',event.detail);
-            },
-            _handleAdminResponse: function (response) {
-                this.set('admins', response.detail);
-            },
-            _createAdmin: function () {
-
-                var body =  {
-                        name: 'Admin',
-                        first_name: 'Neuer',
-                        email: 'admin',
-                        isTutor: false,
-                        isAdmin: true,
-                        semesterId: this.semesterId
-                    };
-
-                this.createAjax = {
-                    method: 'POST',
-                    endpoint: '/pendingplatformusers/',
-                    headers: {
-                        Authorization: this.accessToken
-                    },
-                    body: {
-                        name: 'Admin',
-                        first_name: 'Neuer',
-                        email: 'new@min.com',
-                        isTutor: false,
-                        isAdmin: true,
-                        semesterId: this.semester
-                    }
-                }
-            },
-            _handleCreateAdminResponse: function (response) {
-                console.log(response);
+                accessToken: {
+                    type: String,
+                    value: '' }
             }
+
         });
+
     </script>
+
 </dom-module>
