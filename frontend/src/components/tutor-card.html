@@ -472,15 +472,15 @@
              **  CLICK HANDLERS **
              */
             _handleAudioTap: function() {
-                if (labtypeAudio.registration_open)
+                if (!this._isAfterDeadline(this.labtypeAudio.registration_deadline_tutors))
                     this.page = 'datepicker_audio'
             },
             _handleVideoTap: function() {
-                if (labtypeVideo.registration_open)
+                if (!this._isAfterDeadline(this.labtypeVideo.registration_deadline_tutors))
                     this.page = 'datepicker_video'
             },
             _handleFotoTap: function() {
-                if (labtypeFoto.registration_open)
+                if (!this._isAfterDeadline(this.labtypeFoto.registration_deadline_tutors))
                     this.page = 'datepicker_foto'
             },
             _handleBackToDateOveriew: function() {
