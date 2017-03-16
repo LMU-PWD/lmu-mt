@@ -359,14 +359,17 @@
              * On every semester change reload list data
              */
             _selectedSemesterChanged: function (semesterId) {
-                this.getAjax = {
-                    headers: {
-                        Authorization: this.accessToken
-                    },
-                    endpoint: '/uniquedates',
-                    method: 'GET',
-                    semesterId: semesterId
-                };
+                if(Object.keys(semesterId).length != 0) {
+
+                    this.getAjax = {
+                        headers: {
+                            Authorization: this.accessToken
+                        },
+                        endpoint: '/uniquedates',
+                        method: 'GET',
+                        semesterId: semesterId
+                    };
+                }
             },
 
             /**
@@ -374,8 +377,10 @@
              * filtering of dates
              */
             _userChanged: function (user) {
-                if (user && !user.isAdmin) {
-                    this.selectedSemester = user.semesterId;
+                if(Object.keys(user).length != 0) {
+                    if (user && !user.isAdmin) {
+                        this.selectedSemester = user.semesterId;
+                    }
                 }
             },
 

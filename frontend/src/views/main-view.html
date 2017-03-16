@@ -526,7 +526,8 @@ The Main View contains:
                                     group="[[group]]"
                                     user="[[user]]"
                                     access-token="[[accessToken]]"
-                                    lab-type="[[labType]]"></practicals-view>
+                                    lab-type="[[labType]]"
+                                    on-labtype-changed="_reloadLabTypes"></practicals-view>
                         </template>
 
                         <!-- Semester Setup Pages (Admin only) -->
@@ -679,7 +680,6 @@ The Main View contains:
             _userChanged: function (detail) {
 //                console.log(detail);
                 if (Object.keys(detail).length !== 0) {
-                    console.log(detail);
 
 
                     this.ajax_labTypes = {
@@ -692,6 +692,17 @@ The Main View contains:
                     };
                 }
             },
+
+            _reloadLabTypes: function (event) {
+                this.ajax_labTypes = {
+                    headers: {
+                        Authorization: this.accessToken,
+                        filter: '{"where":{"semesterId":"' + this.semesterId + '"}}'
+                    },
+                    method: 'GET',
+                    endpoint: '/Labtypes'
+                };
+            },
             /**
              * The Admin changed the recently selected semester
              * fire api-request ajax_labTypes to get labTypes
@@ -699,6 +710,7 @@ The Main View contains:
             _adminSemesterChanged: function (event) {
                 var semesterId = event.detail.semesterId;
                 if (semesterId !== '') {
+                    this.set('semesterId', semesterId);
                     this.ajax_labTypes = {
                         headers: {
                             Authorization: this.accessToken,
@@ -857,116 +869,6 @@ The Main View contains:
             },
 
             /**
-             * Observes group changes and initiates API calls to get priorities and lab data for each labtype
-             * @param response
-             * @private
-             */
-            _groupChanged: function(response) {
-                //console.log(this.group);
-                if (!this.isReady || !this.group.priorityIds)
-                    return;
-
-                this.semesterId = response.semesterId;
-                for (i = 0; i < this.group.priorityIds.length; i++) {
-                    // Get priorities
-                    this.ajax_prios = {
-                        headers: {
-                            Authorization: this.accessToken
-                        },
-                        method: 'GET',
-                        endpoint: '/Priorities?filter[where][groupId]='+this.user.groupId
-                    };
-                    //console.log(this.ajax_prios);
-                }
-                for (j = 0; j < this.group.labIds.length; j++) {
-                    // Get group-labs
-                    this.ajax_glabs = {
-                        headers: {
-                            Authorization: this.accessToken
-                        },
-                        method: 'GET',
-                        endpoint: '/labs/' + this.group.labIds[j]
-                    };
-                }
-            },
-
-             /**
-             * Gets lab data from API and sets them for each labtype
-             * @param event
-             * @private
-             */
-            _handleAllLabsRequest: function (event) {
-                console.log('_handleLabRequest()');
-                console.log(event.detail);
-
-                if(!this.isReady || this.gotLabTypes == false)
-                    return;
-
-                for (var i = 0; i < event.detail.length; i++) {
-                    if (event.detail[i].labTypeId == this.labtype_foto.id){
-                        this.all_labs_foto.push(event.detail[i]);
-                    }
-                    if (event.detail[i].labTypeId == this.labtype_video.id) {
-                        this.all_labs_video.push(event.detail[i]);
-                    }
-                    if (event.detail[i].labTypeId == this.labtype_audio.id){
-                        this.all_labs_audio.push(event.detail[i]);
-                    }
-
-                    this.allLabs.push(event.detail[i]);
-                }
-
-                //console.log("AllLabs: ");
-                //console.log(this.allLabs);
-                //console.log(this.all_labs_foto);
-                //console.log(this.all_labs_video);
-                //console.log(this.all_labs_audio);
-
-                if (this.semesterId && this.labTypesRequestSent) {
-                    this.labsRequestSent = true;
-                }
-            },
-
-
-            /**
-             * Initializes and sets group-priorities-property for each lab
-             * @param event
-             * @private
-             */
-            _handlePriosRequest: function(event){
-                console.log('_handlePriosRequest()');
-                console.log(event.detail);
-
-                if(!this.isReady || this.gotLabTypes == false)
-                    return;
-
-                this.allPriorities = event.detail;
-                var lab = "";
-                for(i = 0; i<this.allLabs.length;i++){
-                    lab = this.allLabs[i];
-                    for(j = 0; j < event.detail.length;j++) {
-                        if (event.detail[j].labId == this.allLabs[i].id) {
-                            if (lab.labTypeId == this.labtype_audio.id) {
-                                this.groupdata_audio.priorities[event.detail[j].priority - 1] = lab;
-                            }
-                            if (lab.labTypeId == this.labtype_video.id) {
-                                this.groupdata_video.priorities[event.detail[j].priority - 1] = lab;
-                            }
-                            if (lab.labTypeId == this.labtype_foto.id) {
-                                this.groupdata_foto.priorities[event.detail[j].priority - 1] = lab;
-                            }
-
-                        }
-                    }
-                }
-                //console.log("Group Prios:");
-                //console.log(this.group.id);
-                //console.log(this.groupdata_foto.priorities);
-                //console.log(this.groupdata_video.priorities);
-                //console.log(this.groupdata_audio.priorities);
-
-            },
-            /**
              * Gets and sets correct attributes for the index-card-headers
              * @param labObject - labType Object to get the attributes from
              */
@@ -1003,32 +905,6 @@ The Main View contains:
                     labResponse[i] = this._addNameLabel(labResponse[i]);
                 }
                 this.set('labTypes', labResponse);
-                console.log(labResponse);
-            },
-
-            /**
-             * Gets group-lab data from API and sets them for each labtype
-             * @param event
-             * @private
-             */
-            _handleGroupLabsRequest: function(event){
-                console.log('_handleGroupLabsRequest()');
-                //console.log(event.detail);
-
-                if(!this.isReady || this.gotLabTypes == false)
-                    return;
-
-                if (event.detail.labTypeId == this.labtype_foto.id)
-                    this.groupdata_audio.lab = new Date(event.detail.date);
-                if (event.detail.labTypeId == this.labtype_video.id)
-                    this.groupdata_video.lab = new Date(event.detail.date);
-                if (event.detail.labTypeId == this.labtype_audio.id)
-                    this.groupdata_foto.lab = new Date(event.detail.date);
-
-                //console.log("Group Labs:");
-                //console.log(this.groupdata_foto.lab);
-                //console.log(this.groupdata_video.lab);
-                //console.log(this.groupdata_audio.lab);
             }
         });
 
