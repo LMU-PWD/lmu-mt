@@ -472,13 +472,16 @@
              **  CLICK HANDLERS **
              */
             _handleAudioTap: function() {
-                this.page = 'datepicker_audio'
+                if (labtypeAudio.registration_open)
+                    this.page = 'datepicker_audio'
             },
             _handleVideoTap: function() {
-                this.page = 'datepicker_video'
+                if (labtypeVideo.registration_open)
+                    this.page = 'datepicker_video'
             },
             _handleFotoTap: function() {
-                this.page = 'datepicker_foto'
+                if (labtypeFoto.registration_open)
+                    this.page = 'datepicker_foto'
             },
             _handleBackToDateOveriew: function() {
                 this.page = 'datepicker_overview'
