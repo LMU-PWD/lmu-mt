@@ -89,6 +89,10 @@ module.exports = function(Labtype) {
       }
 
       labTypeInstance = labTypeSearchResult[0];
+      if (labTypeInstance.groupsDistributed) {
+        next(new Error('Tutor distribution denied. Groups have already been distributed on this LabType.'), null);
+        return;
+      }
 
       // Get all Labs for this LabType
       Lab.find({where: {labTypeId: labTypeId}}, function (err, labSearchResult) {
@@ -368,16 +372,22 @@ module.exports = function(Labtype) {
                     // success
                     function(){
 
-                      Lab.find({where: {labTypeId: labTypeId}}, function (err, labSearchResult) {
+                      labTypeInstance.updateAttribute('tutorsDistributed', true, function (err) {
 
                         if (err) throw err;
-                        if (labSearchResult.length == 0) {
-                          next(new Error('LabType with id ' + labTypeId + ' has no associated Labs'), null);
-                          return;
-                        }
 
-                        next(null, labSearchResult);
-                        return;
+                        Lab.find({where: {labTypeId: labTypeId}}, function (err, labSearchResult) {
+
+                          if (err) throw err;
+                          if (labSearchResult.length == 0) {
+                            next(new Error('LabType with id ' + labTypeId + ' has no associated Labs'), null);
+                            return;
+                          }
+
+                          next(null, labSearchResult);
+                          return;
+
+                        });
 
                       });
                     },
@@ -429,6 +439,10 @@ module.exports = function(Labtype) {
       }
 
       labTypeInstance = labTypeSearchResult[0];
+      if (!labTypeInstance.tutorsDistributed) {
+        next(new Error('Group distribution denied. Tutors have not yet been distributed on this LabType.'), null);
+        return;
+      }
 
       // Get all Labs for this LabType instance
       Lab.find({where: {labTypeId: labTypeId}}, function (err, labSearchResult) {
@@ -705,16 +719,22 @@ module.exports = function(Labtype) {
                     // success
                     function(){
 
-                      Lab.find({where: {labTypeId: labTypeId}}, function(err, labsForResponse){
+                      labTypeInstance.updateAttribute('groupsDistributed', true, function(err){
 
                         if (err) throw err;
-                        if (labsForResponse.length == 0) {
-                          next(new Error('LabType with id ' + labTypeId + ' has no associated Labs'), null);
-                          return;
-                        }
 
-                        next(null, labsForResponse);
-                        return;
+                        Lab.find({where: {labTypeId: labTypeId}}, function(err, labsForResponse){
+
+                          if (err) throw err;
+                          if (labsForResponse.length == 0) {
+                            next(new Error('LabType with id ' + labTypeId + ' has no associated Labs'), null);
+                            return;
+                          }
+
+                          next(null, labsForResponse);
+                          return;
+                        });
+
                       });
                     },
 

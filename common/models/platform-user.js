@@ -286,7 +286,7 @@ module.exports = function (Platformuser) {
     });
   }
 
-  Platformuser.changePassword = function (newPassword, options, cb) {
+  Platformuser.changePassword = function (oldPassword, newPassword, options, cb) {
 
     var app = Platformuser.app;
     var userId = options.accessToken.userId;
@@ -296,16 +296,27 @@ module.exports = function (Platformuser) {
         cb(err, undefined);
         throw err;
       }
-      // PW is hashed automatically by Loopback
-      user.password = newPassword;
-      user.save();
-      cb(undefined, user);
+
+      user.hasPassword(oldPassword, function(err, isMatch) {
+
+        if (err) throw err;
+        if (isMatch) {
+          // PW is hashed automatically by Loopback
+          user.password = newPassword;
+          user.save();
+          cb(undefined, user);
+        } else {
+          cb(new Error('Wrong password provided'), undefined);
+        }
+
+      });
     })
 
   };
 
   Platformuser.remoteMethod('changePassword', {
     accepts: [
+      {arg: 'oldPassword', type: 'string'},
       {arg: 'newPassword', type: 'string'},
       {arg: "options", type: "object", http: "optionsFromRequest"}
     ],

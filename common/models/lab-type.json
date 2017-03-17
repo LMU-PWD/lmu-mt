@@ -32,6 +32,16 @@
     },
     "description_student": {
       "type": "string"
+    },
+    "tutorsDistributed": {
+      "type": "boolean",
+      "required": true,
+      "default": false
+    },
+    "groupsDistributed": {
+      "type": "boolean",
+      "required": true,
+      "default": false
     }
   },
   "validations": [],
