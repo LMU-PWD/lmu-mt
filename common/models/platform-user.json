@@ -1,0 +1,120 @@
+{
+  "name": "PlatformUser",
+  "base": "User",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "forceId": false,
+  "properties": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "first_name": {
+      "type": "string",
+      "required": true
+    },
+    "isAdmin": {
+      "type": "boolean",
+      "required": true,
+      "default": false
+    },
+    "isTutor": {
+      "type": "boolean",
+      "required": true,
+      "default": false
+    },
+    "isStudent": {
+      "type": "boolean",
+      "required": false,
+      "default": true
+    },
+    "free_tutor_dates": {
+      "type": [
+        "date"
+      ]
+    }
+  },
+  "validations": [],
+  "relations": {
+    "uniqueDates": {
+      "type": "referencesMany",
+      "model": "UniqueDates",
+      "foreignKey": "uniqueDatesIds"
+    },
+    "semester": {
+      "type": "belongsTo",
+      "model": "Semester",
+      "foreignKey": "semesterId"
+    },
+    "group": {
+      "type": "belongsTo",
+      "model": "Group",
+      "foreignKey": "groupId"
+    },
+    "exercise": {
+      "type": "referencesMany",
+      "model": "Exercise",
+      "foreignKey": "exerciseIds"
+    },
+    "tutorPossibleLabs": {
+      "type": "hasAndBelongsToMany",
+      "model": "Lab",
+      "foreignKey": ""
+    },
+    "passedLabTypes": {
+      "type": "referencesMany",
+      "model": "LabType",
+      "foreignKey": "passedLabTypesIds"
+    }
+  },
+  "acls": [
+    {
+      "accessType": "*",
+      "principalType": "ROLE",
+      "principalId": "$everyone",
+      "permission": "DENY"
+    },
+    {
+      "accessType": "READ",
+      "principalType": "ROLE",
+      "principalId": "$authenticated",
+      "permission": "ALLOW"
+    },
+    {
+      "accessType": "EXECUTE",
+      "principalType": "ROLE",
+      "principalId": "$authenticated",
+      "permission": "ALLOW",
+      "property": "addTutorPossibleLabs"
+    },
+    {
+      "accessType": "EXECUTE",
+      "principalType": "ROLE",
+      "principalId": "$authenticated",
+      "permission": "ALLOW",
+      "property": "removeTutorPossibleLabs"
+    },
+    {
+      "accessType": "EXECUTE",
+      "principalType": "ROLE",
+      "principalId": "admin",
+      "permission": "ALLOW",
+      "property": "setPassedLabType"
+    },
+    {
+      "accessType": "*",
+      "principalType": "ROLE",
+      "principalId": "admin",
+      "permission": "ALLOW"
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "$authenticated",
+      "permission": "ALLOW",
+      "property": "changePassword"
+    }
+  ],
+  "methods": {}
+}

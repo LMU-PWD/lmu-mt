@@ -31,7 +31,7 @@
                     type: String,
                     reflectToAttribute: false,
                     value: 'http://localhost:3000/api'
-                    //value: 'https://lmu-mt-api.herokuapp.com/api'
+                    //value: 'https://lmu-mt.herokuapp.com/api'
                 },
 
                 body: {
@@ -93,14 +93,13 @@
 
             _computeUrl: function () {
                 if (this.baseUrl && this.endpoint && this.baseUrl != '' && this.endpoint != '') {
-                    //console.log('computing API url for endpoint '+this.endpoint)
+
                     this.url =
                             this.baseUrl +
                             this.endpoint +
                             ((this.semesterFilter != '')
                                     ? '?filter[where][semesterId]=' + this.semesterFilter
                                     : '');
-                    //console.log(this.url);
                 }
             }
 

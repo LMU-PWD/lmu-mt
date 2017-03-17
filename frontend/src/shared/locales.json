@@ -6,7 +6,7 @@
     "logincard_locale button tooltip": "Change to German",
     "logincard_login button": "Login",
     "logincard_password placeholder": "Password",
-    "logincard_register text": "New here?",
+    "logincard_register text": "Are you new here?",
     "logincard_register button": "Register",
 
     "groupdetail_create group": "Create new group",

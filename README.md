@@ -1,91 +1,111 @@
 # Medientechnik WebApp Polymer
 
-Diese WebApp bietet eine Plattform um den Ablauf der Medientechnik Praktika zu erleichtern.
-Das Frontend basiert auf [Polymer](https://www.polymer-project.org/) und das Backend ist eine [Node.js](https://nodejs.org/) API.
+Diese WebApp bietet eine Plattform um Ablauf und Organisation des Kurses Medientechnik an der Ludwig-Maximilians-Universität München zu erleichtern.
+
+Die App besteht aus einem [Node.js](https://nodejs.org/)-Backend basierend auf dem [Loopback](http://loopback.io/)-Framework. Das Frontend wurde in [Polymer](https://www.polymer-project.org/) umgesetzt.
 
 ## Kurze Beschreibung des Funktionsumfangs
 
-Die Registrierung erfolgt über die LMU Campus-EMail-Adressen.
-Die App erlaubt es den Studenten Gruppen zu bilden, sich für Prakita einzutragen und die wichtigsten Informationen über ihre Gruppe und die zu absolvierenden Praktikas schnell einzusehen. Auch Tutoren können sich für die Betreuung von Praktika eintragen und Kontakt mit wichtigen Informationen einsehen. Administratoren haben einen großen Umfang an Funktionen um Semester, Nutzer, Gruppen und Praktika verwalten und bearbeiten.
+Die App erlaubt es den Studenten Gruppen zu bilden, sich für Prakita einzutragen und die wichtigsten Informationen über ihre Gruppe und die zu absolvierenden Praktikas schnell einzusehen.
 
-## Getting Started
+Tutoren können sich für die Betreuung von Praktika eintragen, Kontakt mit ihren Studenten aufnehmen und Informationen zu ihren Kursen einsehen.
 
-Diese Anleitung umfasst alle nötigen Informationen um eine Kopie des Projekts auf deiner lokalen Maschine zur Entwicklung- und Testzwecken nutzen zu können. Für Informationen über das deployen auf einem Livesystem siehe den Punkt "Deployment".
-* Das Backend befindet sich hier: [backend](https://gitlab.lrz.de/ru67xoz/mt-common-api.git)
-* Und das Frontend hier: [frontend](https://gitlab.cip.ifi.lmu.de/altmannp/PWD_MT.git)
+Administratoren haben einen großen Umfang an Funktionen um Semester, Nutzer, Gruppen und Praktika zu erstellen, verwalten und bearbeiten.
+
+Die Registrierung für die Plattform erfolgt über die Campus-E-Mail-Adressen der LMU.
+
+## Erste Schritte
+
+Diese Anleitung umfasst alle nötigen Informationen um eine Kopie des Projekts auf deiner lokalen Maschine zur Entwicklung- und Testzwecken nutzen zu können.
 
 ### Voraussetzungen
 
-Was du brauchst um das Projekt installieren zu können.
+Was du brauchst um das Projekt installieren zu können:
 
-
-* Datenbank: [mongo.db](https://www.mongodb.com/download-center)
-* Backend: [Node.js](https://nodejs.org/)
-
+* [Git](https://git-scm.com/)
+* [Node.js](https://nodejs.org/)
+* [MongoDB](https://www.mongodb.com/download-center)
+* [Polymer CLI](https://www.polymer-project.org/2.0/docs/tools/polymer-cli)
 
 ### Installation
 
-Schritt-für-Schritt Anleitung zur Installation
-
-* npm-Install im `\backend\` Ordner
+##### Das Projekt klonen
 
 ```
+git clone https://gitlab.cip.ifi.lmu.de/altmannp/PWD_MT.git
+```
+
+##### Installieren
+
+Das Installskript lädt alle benötigten Komponenten für Backend und Frontend.
+
+```
+cd <<Projektverzeichnis>>
 npm install
 ```
 
-* npm-Install im `...\frontend\` Ordner
+## Starten der Anwendung
+
+#### Datenbank starten
+
+##### Windows
 
 ```
-npm install
+"C:\path\to\mongod.exe" --dbpath \custom\db\path
 ```
 
-* Bower install der bower-dependencies des Projekts im `...\frontend\` Ordner
+##### Mac OS / Linux
 
 ```
-bower install
+mongod --dbpath /custom/db/path
 ```
 
-## Starten des Codes
+Wenn du keine Änderungen an deiner Mongo-Konfiguration vorgenommen hast, sollte dies ausreichen. Stelle ansonsten sicher, dass MongoDB auf Port 27017 hört.
 
-### Backend starten
-Mongo.db starten, die auf Verbindungen auf dem Port `27017` wartet
+#### App starten
+
+Im Projekt-Verzeichnis reicht ein einfaches
+
 ```
-"[path to mongod.exe]"
-```
-Server starten in `\backend\server\` der auf den Port `3000` hört
-```
-node server.js
+npm start
 ```
 
-### Frontend starten
-Frontend serven in `...\frontend\` auf dem Port `8080`
+Und wir sind bereit!
+
+* Das Frontend der App ist unter `localhost:3000` erreichbar
+* Die Backend-API läuft unter `localhost:3000/api/`
+* Unter `localhost:3000/explorer` steht ein Webinterface zum Durchstöbern des API-Modells zur Verfügung
+
+## Hinweise für Entwickler
+
+#### Bei laufender Anwendung das Frontend neu bauen
+
+Loopback liefert unter `localhost:3000` einen statischen Build des Frontends aus. Um diesen nach Änderungen am Code zu erneuern, führe im App-Verzeichnis folgendes aus:
+
 ```
+cd frontend
+polymer build
+```
+
+#### Frontend dynamisch ausliefern
+
+Alternativ können Änderungen am Frontend-Code mithilfe der Polymer CLI auch on the fly ohne Kompilieren ausgeliefert werden. Dazu einfach:
+
+```
+cd frontend
 polymer serve
 ```
 
-Jetzt ist die App im Browser deiner Wahl unter der url `localhost:8080` erreichbar
-
-## Deployment
-
-Add additional notes about how to deploy this on a live system
-
-## Built With
-
-* [Polymer](https://www.polymer-project.org/) - Frontend JavaScript Bibliothek
-* [Mongo.db](https://www.mongodb.com/download-center) - Datenbank
-* [Node.js](https://nodejs.org/) - Backend/API
-
+Unter `localhost:8080` wird dann der jeweils aktuelle Codestand ausgeliefert.
 
 ## Autoren
 
-* **Bettina Noglik**
-* **Martin Schön**
 * **Philipp Altmann**
 * **Sarah Delgado Rodriguez**
+* **Bettina Noglik**
+* **Martin Schön**
 
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
+## Anmerkungen
 
-## Acknowledgments
-
-* Dieses Projekt ist im Rahmen des Praktikums Webprogrammierung an der LMU durchgeführt von Juliane Franze und Tobias Seitz entstanden
-
+* Dieses Projekt ist im Rahmen des Praktikums Webprogrammierung an der Ludwig-Maximilians-Universität München entstanden. Es wurde betreut von Juliane Franze und [Tobias Seitz](https://twitter.com/TbsStz)
+* [Zur Abschlusspräsentation auf Prezi](http://prezi.com/zdyz8h9v8px3/?utm_campaign=share&utm_medium=copy)
