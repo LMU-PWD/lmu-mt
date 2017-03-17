@@ -76,6 +76,28 @@ Und wir sind bereit!
 * Die Backend-API läuft unter `localhost:3000/api/`
 * Unter `localhost:3000/explorer` steht ein Webinterface zum Durchstöbern des API-Modells zur Verfügung
 
+## Hinweise für Entwickler
+
+#### Bei laufender Anwendung das Frontend neu bauen
+
+Loopback liefert unter `localhost:3000` einen statischen Build des Frontends aus. Um diesen nach Änderungen am Code zu erneuern, führe im App-Verzeichnis folgendes aus:
+
+```
+cd frontend
+polymer build
+```
+
+#### Frontend dynamisch ausliefern
+
+Alternativ können Änderungen am Frontend-Code mithilfe der Polymer CLI auch on the fly ohne Kompilieren ausgeliefert werden. Dazu einfach:
+
+```
+cd frontend
+polymer serve
+```
+
+Unter `localhost:8080` wird dann der jeweils aktuelle Codestand ausgeliefert.
+
 ## Autoren
 
 * **Philipp Altmann**
