@@ -76,6 +76,38 @@ Und wir sind bereit!
 * Die Backend-API läuft unter `localhost:3000/api/`
 * Unter `localhost:3000/explorer` steht ein Webinterface zum Durchstöbern des API-Modells zur Verfügung
 
+## Testdaten
+
+In der aktuellen Version wird die Datenbank beim Start mit Testdaten befüllt. Diese enthalten unter anderem Nutzer aller möglichen Nutzerrollen zu Testzwecken.
+
+#### Zugangsdaten von Dummy-Nutzern
+
+##### Admin
+
+**E-Mail**: mtadmin@mt.medien.ifi.lmu.de
+
+**Passwort**: mtadmin
+
+##### Tutor
+
+**E-Mail**: kevin@campus.lmu.de
+
+**Passwort**: test
+
+##### Student
+
+**E-Mail**: max.mustermann@campus.lmu.de
+
+**Passwort**: test
+
+##### Weitere User (Passwort jeweils "test")
+
+- willischmidt@campus.lmu.de (Tutor)
+- dakota@campus.lmu.de (Student)
+- gianna@campus.lmu.de (Student)
+- jacky@campus.lmu.de (Student)
+- justin@campus.lmu.de (Student, noch nicht registriert, Passwort nicht vergeben)
+
 ## Hinweise für Entwickler
 
 #### Bei laufender Anwendung das Frontend neu bauen
