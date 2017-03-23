@@ -84,7 +84,7 @@ In der aktuellen Version wird die Datenbank beim Start mit Testdaten befüllt. D
 
 ##### Admin
 
-**E-Mail**: mtadmin@mt.medien.ifi.lmu.de
+**E-Mail**: admin@mt.medien.ifi.lmu.de
 
 **Passwort**: mtadmin
 
