@@ -1,0 +1,112 @@
+var semesters = [];
+var uniqueDates = [];
+var roles = [];
+
+module.exports = function (app) {
+
+  // SEMESTER
+  app.dataSources.mongo.automigrate('Semester', function (err) {
+    if (err) throw err;
+
+    console.log('\nSeeding DB with dummy data...');
+
+    app.models.Semester.create([{
+      "term": "SoSe 2017",
+      "start_date": "2017-04-15",
+      "end_date": "2017-09-30",
+      "group_size": 4
+    }], function (err, documents) {
+      if (err) throw err;
+      console.log('Semester models created');
+      semesters = semesters.concat(documents);
+      seedRoles(app);
+    });
+  });
+
+};
+
+// ROLES
+seedRoles = function (app) {
+  app.dataSources.mongo.automigrate('Role', function (err) {
+
+    if (err) throw err;
+
+    app.models.Role.create([
+      {name: 'tutor'},
+      {name: 'admin'}
+    ], function (err, documents) {
+
+      if (err) throw err;
+
+      console.log('User roles created');
+      roles = roles.concat(documents);
+      seedPendingPlatformUsers(app, documents[1]);
+
+    });
+  });
+};
+
+
+// PENDING PLATFORM USER
+seedPendingPlatformUsers = function (app, adminRole) {
+  app.dataSources.mongo.automigrate('PlatformUser', function (err) {
+
+    app.dataSources.mongo.automigrate('PendingPlatformUser', function (err) {
+      if (err) throw err;
+
+      var semesterOneId = semesters[0].id;
+      var semesterTwoId = semesters[1].id;
+
+      app.models.PendingPlatformUser.create([
+
+        // DEFAULT ADMIN
+        {
+          "name": "Medientechnik",
+          "first_name": "Administrator",
+          "isAdmin": true,
+          "isTutor": true,
+          "email": "admin@mt.medien.ifi.lmu.de",
+          "semesterId": semesterOneId
+        }
+      ], function (err, documents) {
+
+        if (err) throw err;
+        console.log('PendingPlatformUser models created');
+
+        seedPlatformUsers(app, adminRole);
+
+      });
+    });
+  });
+};
+
+
+// PlatformUsers
+seedPlatformUsers = function (app, adminrole) {
+  app.dataSources.mongo.automigrate('PlatformUser', function (err) {
+    if (err) throw err;
+
+    app.models.PlatformUser.create(
+      [
+        /* This is the default admin user and should not be
+         * deleted when going in production */
+        {
+          "name": "Medientechnik",
+          "first_name": "Administrator",
+          "isAdmin": true,
+          "isTutor": true,
+          "password": "mtadmin",
+          "username": "mtadmin",
+          "email": "admin@mt.medien.ifi.lmu.de",
+          "emailVerified": true,
+          "uniqueDateIds": [],
+          "semesterId": ""
+        }
+
+      ], function (err, documents) {
+        if (err) throw err;
+        console.log('User models created');
+        console.log('Done seeding.');
+      });
+  });
+};
