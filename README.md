@@ -137,6 +137,9 @@ Unter `localhost:8080` wird dann der jeweils aktuelle Codestand ausgeliefert.
 * **Bettina Noglik**
 * **Martin Schön**
 
+## Troubleshooting
+* https://loopback.io/doc/en/lb2/Creating-database-tables-for-built-in-models.html muss augeführt werden, sonst geht z.B. MySQL als Connector nicht. 
+
 ## Anmerkungen
 
 * Dieses Projekt ist im Rahmen des Praktikums Webprogrammierung an der Ludwig-Maximilians-Universität München entstanden. Es wurde betreut von Juliane Franze und [Tobias Seitz](https://twitter.com/TbsStz)
